@@ -5,41 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Ultimate Journey - Career Optimization Platform</title>
     <style>
+        :root {
+            --bg-primary: #0A0A0A;
+            --accent-cyan: #00D9FF;
+            --glass-blur: 10px;
+            --default-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --default-accent: #667eea;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.5s ease;
+            background: var(--default-bg);
         }
+
         .container {
             max-width: 800px;
+            width: 90%;
             padding: 40px;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
+            transition: all 0.5s ease;
         }
+
         h1 {
-            color: #667eea;
+            color: var(--default-accent);
             font-size: 2.5em;
             margin-bottom: 20px;
+            transition: color 0.5s ease;
         }
+
         p {
             color: #666;
             font-size: 1.2em;
             margin: 20px 0;
+            transition: color 0.5s ease;
         }
+
         .status {
             background: #f0f0f0;
             padding: 20px;
             border-radius: 10px;
             margin: 30px 0;
+            transition: all 0.5s ease;
         }
+
         .links {
             display: flex;
             gap: 15px;
@@ -47,17 +66,65 @@
             flex-wrap: wrap;
             margin-top: 30px;
         }
+
         .links a {
             padding: 12px 24px;
-            background: #667eea;
+            background: var(--default-accent);
             color: white;
             text-decoration: none;
             border-radius: 8px;
             transition: all 0.3s;
+            font-weight: 600;
         }
+
         .links a:hover {
-            background: #764ba2;
             transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Black Glass Theme */
+        body.black-glass {
+            background: var(--bg-primary);
+            color: #ffffff;
+        }
+
+        body.black-glass .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        body.black-glass h1 {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+
+        body.black-glass p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        body.black-glass .status {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        body.black-glass .links a {
+            background: transparent;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        body.black-glass .links a:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px var(--accent-cyan);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .container { padding: 20px; }
         }
     </style>
 </head>
@@ -77,9 +144,35 @@
             <a href="https://www.thispagedoesnotexist12345.info" target="_blank">📚 Resources</a>
         </div>
         
-        <p style="margin-top: 40px; font-size: 0.9em; color: #999;">
-            Ready for copy-over | Repository: thispagedoesnotexist12345
+        <p style="margin-top: 40px; font-size: 0.8em; opacity: 0.6;">
+            © 2026 The Ultimate Journey | <span id="theme-status"></span>
         </p>
     </div>
+
+    <script>
+        function manageTheme() {
+            const now = new Date();
+            const launchDate = new Date('2026-02-17T00:00:00');
+            const expiryDate = new Date('2026-03-01T00:00:00');
+            const themeStatus = document.getElementById('theme-status');
+            
+            // Check localStorage for manual override
+            const manualTheme = localStorage.getItem('preferred-theme');
+            
+            if (manualTheme === 'black-glass' || (!manualTheme && now >= launchDate && now < expiryDate)) {
+                document.body.classList.add('black-glass');
+                themeStatus.textContent = "February Black Glass Theme Active";
+            } else {
+                document.body.classList.remove('black-glass');
+                themeStatus.textContent = "Default Theme Active";
+            }
+        }
+
+        // Initialize theme
+        manageTheme();
+        
+        // Optional: Re-check every minute
+        setInterval(manageTheme, 60000);
+    </script>
 </body>
 </html>
