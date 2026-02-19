@@ -5,148 +5,300 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Ultimate Journey - Career Optimization Platform</title>
     <style>
-        :root {
-            --bg-primary: #0A0A0A;
-            --accent-cyan: #00D9FF;
-            --glass-blur: 10px;
-            --default-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --default-accent: #667eea;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.5s ease;
-            background: var(--default-bg);
-        }
-
-        .container {
-            max-width: 800px;
-            width: 90%;
-            padding: 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-            transition: all 0.5s ease;
-        }
-
-        h1 {
-            color: var(--default-accent);
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            transition: color 0.5s ease;
-        }
-
-        p {
-            color: #666;
-            font-size: 1.2em;
-            margin: 20px 0;
-            transition: color 0.5s ease;
-        }
-
-        .status {
-            background: #f0f0f0;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 30px 0;
-            transition: all 0.5s ease;
-        }
-
-        .links {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-
-        .links a {
-            padding: 12px 24px;
-            background: var(--default-accent);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .links a:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
         }
 
         /* Black Glass Theme */
         body.black-glass {
-            background: var(--bg-primary);
-            color: #ffffff;
+            background: radial-gradient(ellipse at 20% 50%, #001a1a 0%, #000 60%),
+                        radial-gradient(ellipse at 80% 20%, #001020 0%, transparent 50%);
         }
 
-        body.black-glass .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
+        .container {
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            padding: 60px 50px;
+            max-width: 760px;
+            width: 90%;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 40px rgba(0, 217, 255, 0.08), 0 0 0 1px rgba(0,217,255,0.05);
+            text-align: center;
         }
 
-        body.black-glass h1 {
-            color: var(--accent-cyan);
-            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #00D9FF;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
         }
 
-        body.black-glass p {
-            color: rgba(255, 255, 255, 0.8);
+        .subtitle {
+            color: #aaa;
+            font-size: 1rem;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
         }
 
-        body.black-glass .status {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 217, 255, 0.2);
+        /* ── CYBERPUNK STATUS SECTION ── */
+        .status-section {
+            background: rgba(0, 217, 255, 0.03);
+            border: 1px solid rgba(0, 217, 255, 0.25);
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow:
+                0 0 20px rgba(0, 217, 255, 0.06),
+                inset 0 0 30px rgba(0, 217, 255, 0.03);
+            text-align: left;
         }
 
-        body.black-glass .links a {
-            background: transparent;
-            color: var(--accent-cyan);
-            border: 1px solid var(--accent-cyan);
-        }📡 Signal
-
-        body.black-glass .links a:hover {
-            background: var(--accent-cyan);
-            color: var(--bg-primary);
-            box-shadow: 0 0 20px var(--accent-cyan);
+        /* Animated pulsing top border */
+        .status-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                #00D9FF 30%,
+                #00ffff 50%,
+                #00D9FF 70%,
+                transparent 100%);
+            animation: glow-border 3s ease-in-out infinite;
         }
 
-        @media (max-width: 768px) {
-            h1 { font-size: 2em; }
-            .container { padding: 20px; }
+        /* Corner accent */
+        .status-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border-right: 1px solid rgba(0, 217, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 0 0 12px 0;
+        }
+
+        @keyframes glow-border {
+            0%, 100% { opacity: 0.4; filter: blur(0px); }
+            50%       { opacity: 1;   filter: blur(1px); }
+        }
+
+        .status-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #00D9FF;
+            text-shadow: 0 0 15px rgba(0, 217, 255, 0.6);
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-title .badge {
+            font-size: 0.65rem;
+            background: rgba(0, 217, 255, 0.15);
+            border: 1px solid rgba(0, 217, 255, 0.4);
+            color: #00D9FF;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { opacity: 0.6; }
+            50%       { opacity: 1; }
+        }
+
+        .status-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #c8c8c8;
+            line-height: 1.7;
+            letter-spacing: 0.2px;
+        }
+
+        .status-text .date {
+            color: #00D9FF;
+            opacity: 0.8;
+        }
+
+        /* Hoverable path keywords */
+        .status-text .path {
+            color: #00D9FF;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .status-text .path::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #00D9FF;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .status-text .path:hover {
+            color: #fff;
+            text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
+            transform: scale(1.05);
+        }
+
+        .status-text .path:hover::after {
+            opacity: 1;
+        }
+
+        /* Scan-line overlay inside status box */
+        .status-scanlines {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+            pointer-events: none;
+            border-radius: 12px;
+        }
+        /* ── END STATUS SECTION ── */
+
+        /* CTA Buttons */
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-signal {
+            background: rgba(0, 217, 255, 0.08);
+            border-color: rgba(0, 217, 255, 0.4);
+            color: #00D9FF;
+        }
+
+        .btn-signal:hover {
+            background: rgba(0, 217, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-systems {
+            background: rgba(0, 217, 255, 0.06);
+            border-color: rgba(0, 217, 255, 0.3);
+            color: #80e8ff;
+        }
+
+        .btn-systems:hover {
+            background: rgba(0, 217, 255, 0.12);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        .btn-support {
+            background: rgba(255, 60, 60, 0.08);
+            border-color: rgba(255, 80, 80, 0.35);
+            color: #ff8080;
+        }
+
+        .btn-support:hover {
+            background: rgba(255, 60, 60, 0.15);
+            box-shadow: 0 0 20px rgba(255, 60, 60, 0.2);
+        }
+
+        footer {
+            margin-top: 36px;
+            font-size: 0.75rem;
+            color: #444;
+            letter-spacing: 0.5px;
+        }
+
+        footer span {
+            color: #00D9FF;
+            opacity: 0.5;
         }
     </style>
 </head>
-<body>
+<body class="black-glass">
+
     <div class="container">
         <h1>🚀 The Ultimate Journey</h1>
-        <p>Career Optimization Platform</p>
-        
-        <div class="status">
-            <h2>⚡ Level 0: Theme Shift Incoming</h2>
-                        <p>February 17, 2026 marks the beginning. Three paths await—Signal, Systems, Support—but only those who read between the lines will unlock what comes next.</p>
+        <p class="subtitle">Career Optimization Platform</p>
+
+        <!-- CYBERPUNK STATUS SECTION -->
+        <div class="status-section">
+            <div class="status-scanlines"></div>
+
+            <div class="status-title">
+                ⚡ Level 1: Test Flight 221826 🚀
+                <span class="badge">LIVE</span>
+            </div>
+
+            <p class="status-text">
+                <span class="date">February 20, 2026</span> marks the beginning.
+                Three paths await—<span class="path">Signal</span>,
+                <span class="path">Systems</span>,
+                <span class="path">Support</span>—but only those who
+                read between the lines will unlock what comes next.
+            </p>
         </div>
-        
-        <div class="links">
-            <a href="https://newsletter.thispagedoesnotexist12345.us/?modal=signup" target="_blank">📡 Signal</a>
-            <a href="https://www.thispagedoesnotexist12345.tech" target="_blank">⚙️ Systems</a>
-            <a href="https://www.thispagedoesnotexist12345.info" target="_blank">🛑 Support</a>
+
+        <div class="btn-row">
+            <a href="#" class="btn btn-signal">📡 Signal</a>
+            <a href="#" class="btn btn-systems">⚙️ Systems</a>
+            <a href="#" class="btn btn-support">🛑 Support</a>
         </div>
-        
-        <p style="margin-top: 40px; font-size: 0.8em; opacity: 0.6;">
-            © 2026 The Ultimate Journey | <span id="theme-status"></span>
-        </p>
+
+        <footer>
+            © 2026 The Ultimate Journey | <span id="theme-status">February Black Glass Theme Active</span>
+        </footer>
     </div>
 
     <script>
@@ -155,10 +307,8 @@
             const launchDate = new Date('2026-02-17T00:00:00');
             const expiryDate = new Date('2026-03-01T00:00:00');
             const themeStatus = document.getElementById('theme-status');
-            
-            // Check localStorage for manual override
+
             const manualTheme = localStorage.getItem('preferred-theme');
-            
             if (manualTheme === 'black-glass' || (!manualTheme && now >= launchDate && now < expiryDate)) {
                 document.body.classList.add('black-glass');
                 themeStatus.textContent = "February Black Glass Theme Active";
@@ -168,10 +318,7 @@
             }
         }
 
-        // Initialize theme
         manageTheme();
-        
-        // Optional: Re-check every minute
         setInterval(manageTheme, 60000);
     </script>
 </body>
