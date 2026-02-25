@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Ultimate Journey - Career Optimization Platform</title>
+    <title>The Ultimate Journey – Career Optimization Platform</title>
     <style>
         * {
             margin: 0;
@@ -23,126 +23,103 @@
 
         /* Black Glass Theme */
         body.black-glass {
-            background: radial-gradient(ellipse at 20% 50%, #001a1a 0%, #000 60%),
-                        radial-gradient(ellipse at 80% 20%, #001020 0%, transparent 50%);
+            background: #0A0A0A;
+        }
+
+        body.black-glass .container {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.black-glass h1 {
+            color: #00D9FF;
+        }
+
+        body.black-glass .links a,
+        body.black-glass .btn {
+            background: #00D9FF;
+            color: #0A0A0A;
+        }
+
+        body.black-glass .links a:hover,
+        body.black-glass .btn:hover {
+            box-shadow: 0 0 15px #00D9FF;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 60px 50px;
-            max-width: 760px;
+            max-width: 700px;
             width: 90%;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 8px 40px rgba(0, 217, 255, 0.08), 0 0 0 1px rgba(0,217,255,0.05);
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            border-radius: 16px;
             text-align: center;
         }
 
         h1 {
-            font-size: 2.6rem;
-            font-weight: 700;
-            color: #00D9FF;
-            text-shadow: 0 0 30px rgba(0, 217, 255, 0.4);
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
         }
 
         .subtitle {
-            color: #aaa;
             font-size: 1rem;
-            margin-bottom: 40px;
-            letter-spacing: 1px;
+            opacity: 0.6;
+            margin-bottom: 2rem;
         }
 
-        /* ── CYBERPUNK STATUS SECTION ── */
+        /* Cyberpunk status section */
         .status-section {
-            background: rgba(0, 217, 255, 0.03);
-            border: 1px solid rgba(0, 217, 255, 0.25);
-            border-radius: 12px;
-            padding: 28px 32px;
-            margin-bottom: 40px;
             position: relative;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow:
-                0 0 20px rgba(0, 217, 255, 0.06),
-                inset 0 0 30px rgba(0, 217, 255, 0.03);
-            text-align: left;
         }
 
-        /* Animated pulsing top border */
-        .status-section::before {
-            content: '';
+        .status-scanlines {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                #00D9FF 30%,
-                #00ffff 50%,
-                #00D9FF 70%,
-                transparent 100%);
-            animation: glow-border 3s ease-in-out infinite;
-        }
-
-        /* Corner accent */
-        .status-section::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 40px;
-            height: 40px;
-            border-right: 1px solid rgba(0, 217, 255, 0.3);
-            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
-            border-radius: 0 0 12px 0;
-        }
-
-        @keyframes glow-border {
-            0%, 100% { opacity: 0.4; filter: blur(0px); }
-            50%       { opacity: 1;   filter: blur(1px); }
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 217, 255, 0.02) 2px,
+                rgba(0, 217, 255, 0.02) 4px
+            );
+            pointer-events: none;
         }
 
         .status-title {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
             color: #00D9FF;
-            text-shadow: 0 0 15px rgba(0, 217, 255, 0.6);
-            margin-bottom: 14px;
-            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 0.75rem;
         }
 
-        .status-title .badge {
-            font-size: 0.65rem;
+        .badge {
             background: rgba(0, 217, 255, 0.15);
             border: 1px solid rgba(0, 217, 255, 0.4);
-            color: #00D9FF;
-            padding: 2px 8px;
             border-radius: 4px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            animation: badge-pulse 2s ease-in-out infinite;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.7rem;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        @keyframes badge-pulse {
-            0%, 100% { opacity: 0.6; }
-            50%       { opacity: 1; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .status-text {
-            font-family: 'Courier New', Courier, monospace;
             font-size: 0.9rem;
-            color: #c8c8c8;
             line-height: 1.7;
-            letter-spacing: 0.2px;
+            opacity: 0.85;
         }
 
         .status-text .date {
@@ -182,92 +159,71 @@
             opacity: 1;
         }
 
-        /* Scan-line overlay inside status box */
-        .status-scanlines {
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 0, 0, 0.08) 2px,
-                rgba(0, 0, 0, 0.08) 4px
-            );
-            pointer-events: none;
-            border-radius: 12px;
-        }
-        /* ── END STATUS SECTION ── */
-
-        /* CTA Buttons */
+        /* Buttons */
         .btn-row {
             display: flex;
+            gap: 1rem;
             justify-content: center;
-            gap: 16px;
             flex-wrap: wrap;
+            margin-bottom: 2rem;
         }
 
         .btn {
-            padding: 14px 28px;
-            border-radius: 10px;
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             font-size: 0.95rem;
             font-weight: 600;
-            cursor: pointer;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            cursor: pointer;
             transition: all 0.2s ease;
-            border: 1px solid transparent;
+            border: none;
+            letter-spacing: 0.05em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
         }
 
         .btn-signal {
-            background: rgba(0, 217, 255, 0.08);
-            border-color: rgba(0, 217, 255, 0.4);
-            color: #00D9FF;
+            background: #00D9FF;
+            color: #0A0A0A;
         }
 
         .btn-signal:hover {
-            background: rgba(0, 217, 255, 0.15);
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
         }
 
         .btn-systems {
-            background: rgba(0, 217, 255, 0.06);
-            border-color: rgba(0, 217, 255, 0.3);
-            color: #80e8ff;
+            background: rgba(0, 217, 255, 0.15);
+            color: #00D9FF;
+            border: 1px solid rgba(0, 217, 255, 0.4);
         }
 
         .btn-systems:hover {
-            background: rgba(0, 217, 255, 0.12);
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+            background: rgba(0, 217, 255, 0.25);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
         }
 
         .btn-support {
-            background: rgba(255, 60, 60, 0.08);
-            border-color: rgba(255, 80, 80, 0.35);
-            color: #ff8080;
+            background: rgba(255, 221, 0, 0.15);
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.4);
         }
 
         .btn-support:hover {
-            background: rgba(255, 60, 60, 0.15);
-            box-shadow: 0 0 20px rgba(255, 60, 60, 0.2);
+            background: rgba(255, 221, 0, 0.25);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
         }
 
         footer {
-            margin-top: 36px;
             font-size: 0.75rem;
-            color: #444;
-            letter-spacing: 0.5px;
-        }
-
-        footer span {
-            color: #00D9FF;
-            opacity: 0.5;
+            opacity: 0.4;
+            margin-top: 1.5rem;
         }
     </style>
 </head>
 <body class="black-glass">
-
     <div class="container">
         <h1>🚀 The Ultimate Journey</h1>
         <p class="subtitle">Career Optimization Platform</p>
@@ -275,14 +231,12 @@
         <!-- CYBERPUNK STATUS SECTION -->
         <div class="status-section">
             <div class="status-scanlines"></div>
-
             <div class="status-title">
-                ⚡ Level 1: Next Flight 22026 🚀
+                ⚡ Loading Dock Info: Next Flight 032126 🚀
                 <span class="badge">Now Arriving</span>
             </div>
-
             <p class="status-text">
-                <span class="date">February 20, 2026</span> marks the beginning.
+                <span class="date">March 21st, 2026</span> marks the beginning.
                 Three paths await—<span class="path">Signal</span>,
                 <span class="path">Systems</span>,
                 <span class="path">Support</span>—but only those who
@@ -291,23 +245,71 @@
         </div>
 
         <div class="btn-row">
-            <a href="#" class="btn btn-signal">📡 Signal</a>
-            <a href="#" class="btn btn-systems">⚙️ Systems</a>
-            <a href="#" class="btn btn-support">🛑 Support</a>
+            <a
+                href="https://newsletter.thispagedoesnotexist12345.us/"
+                class="btn btn-signal"
+                data-path="signal"
+                target="_blank"
+                rel="noopener"
+            >
+                📡 Signal
+            </a>
+
+            <a
+                href="https://resume-builderone-resume-builder.netlify.app/"
+                class="btn btn-systems"
+                data-path="systems"
+                target="_blank"
+                rel="noopener"
+            >
+                ⚙️ Systems
+            </a>
+
+            <a
+                href="https://buymeacoffee.com/findapalmtree"
+                class="btn btn-support"
+                data-path="support"
+                target="_blank"
+                rel="noopener"
+            >
+                ☕ Support
+            </a>
         </div>
 
         <footer>
-            © 2026 The Ultimate Journey | <span id="theme-status">February Black Glass Theme Active</span>
+            &copy; 2026 The Ultimate Journey | <span id="theme-status">February Black Glass Theme Active</span>
         </footer>
     </div>
 
     <script>
+        // Puzzle behavior — track path chosen
+        document.querySelectorAll('.btn-row .btn').forEach(btn => {
+            btn.addEventListener('click', event => {
+                const path = btn.dataset.path;
+                // Log choice for future puzzle logic
+                console.log('[TUJ] Path chosen:', path);
+                // Store in localStorage for downstream puzzle state
+                localStorage.setItem('last-path', path);
+                const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+                if (!chosen.includes(path)) {
+                    chosen.push(path);
+                    localStorage.setItem('paths-chosen', JSON.stringify(chosen));
+                }
+                // If all 3 paths chosen, unlock next stage
+                if (chosen.length === 3) {
+                    console.log('[TUJ] All paths activated — next stage unlocked');
+                    localStorage.setItem('puzzle-stage', 'unlocked');
+                }
+                // Allow default navigation to proceed
+            });
+        });
+
+        // Theme management
         function manageTheme() {
             const now = new Date();
             const launchDate = new Date('2026-02-17T00:00:00');
             const expiryDate = new Date('2026-03-01T00:00:00');
             const themeStatus = document.getElementById('theme-status');
-
             const manualTheme = localStorage.getItem('preferred-theme');
             if (manualTheme === 'black-glass' || (!manualTheme && now >= launchDate && now < expiryDate)) {
                 document.body.classList.add('black-glass');
@@ -317,7 +319,6 @@
                 themeStatus.textContent = "Default Theme Active";
             }
         }
-
         manageTheme();
         setInterval(manageTheme, 60000);
     </script>
