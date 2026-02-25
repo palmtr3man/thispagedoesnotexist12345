@@ -11,7 +11,7 @@ body.black-glass {
 
 .black-glass .container {
     background: rgba(10, 10, 10, 0.5);
-    backdrop-filter: blur(var(--glass-blur));
+    --backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
