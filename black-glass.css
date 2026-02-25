@@ -1,30 +1,39 @@
 :root {
-    --bg-primary: #0A0A0A;
-    --accent-cyan: #00D9FF;
-    --glass-blur: 10px;
+  --bg-primary: #0A0A0A;
+  --accent-cyan: #00D9FF;
+  --glass-blur: 10px;
 }
 
+/* Base black background */
 body.black-glass {
-    background: var(--bg-primary);
-    color: white;
+  background: var(--bg-primary);
+  color: white;
 }
 
-.black-glass .container {
-    background: rgba(10, 10, 10, 0.5);
-    --backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* Full-width glass layer – change `main` if your outer wrapper is different */
+body.black-glass main {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
-.black-glass h1 {
-    color: var(--accent-cyan);
+/* Optional card/container */
+body.black-glass .container {
+  background: rgba(10, 10, 10, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.black-glass .links a {
-    background: var(--accent-cyan);
-    color: var(--bg-primary);
+/* Accent heading */
+body.black-glass h1 {
+  color: var(--accent-cyan);
 }
 
-.black-glass .links a:hover {
-    box-shadow: 0 0 15px var(--accent-cyan);
+/* Links/buttons */
+body.black-glass .links a {
+  background: var(--accent-cyan);
+  color: var(--bg-primary);
+}
+
+body.black-glass .links a:hover {
+  box-shadow: 0 0 15px var(--accent-cyan);
 }
