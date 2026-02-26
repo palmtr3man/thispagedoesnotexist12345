@@ -91,24 +91,19 @@
             pointer-events: none;
         }
 
-        .status-title {
-            font-size: 0.85rem;
-            letter-spacing: 0.1em;
-            color: #00D9FF;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
+.status-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;      /* space between label and badge */
+  margin-bottom: 0.35rem; /* space between rows */
+}
 
-        .badge {
-            background: rgba(0, 217, 255, 0.15);
-            border: 1px solid rgba(0, 217, 255, 0.4);
-            border-radius: 4px;
-            padding: 0.1rem 0.5rem;
-            font-size: 0.7rem;
-            animation: pulse 2s ease-in-out infinite;
+.badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
         }
 
         @keyframes pulse {
@@ -231,21 +226,31 @@
 <!-- CYBERPUNK STATUS SECTION -->
 <div class="status-section">
   <div class="status-scanlines"></div>
+
   <div class="status-title">
     Loading Dock:
-    <span class="badge">OPEN</span>
-    <br>
+    <span class="badge badge--status">OPEN</span>
+  </div>
+
+  <div class="status-title">
     Next Flight:
-    <span class="badge">FL 030126 🚀</span>
-    <br>
+    <span class="badge badge--flight">FL 030126 🚀</span>
+  </div>
+
+  <div class="status-title">
     Status:
-    <span class="badge">Early Arrival — Ahead of Schedule ✈️⚡</span>
-    <br>
+    <span class="badge badge--highlight">
+      Early Arrival — Ahead of Schedule ✈️⚡
+    </span>
+  </div>
+
+  <div class="status-title">
     Carrier:
-    <span class="badge">PageForward Airways</span>
-    <span class="badge">TBD</span>
+    <span class="badge badge--carrier">PageForward Airways</span>
+    <span class="badge badge--meta">TBD</span>
   </div>
 </div>
+
 
             </div>
             <p class="status-text">
