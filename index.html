@@ -118,3 +118,246 @@
     }
 
     .badge--highlight {
+      border-color: rgba(0, 255, 170, 0.6);
+      background: rgba(0, 255, 170, 0.15);
+      color: #00FFAA;
+    }
+
+    .badge--meta {
+      opacity: 0.7;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      opacity: 0.85;
+      margin-bottom: 1.5rem;
+    }
+
+    .status-text .date {
+      color: #00D9FF;
+      opacity: 0.8;
+    }
+
+    /* Hoverable path keywords */
+    .status-text .path {
+      color: #00D9FF;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-block;
+      position: relative;
+    }
+
+    .status-text .path::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #00D9FF;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .status-text .path:hover {
+      color: #fff;
+      text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
+      transform: scale(1.05);
+    }
+
+    .status-text .path:hover::after {
+      opacity: 1;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      letter-spacing: 0.05em;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-signal {
+      background: #00D9FF;
+      color: #0A0A0A;
+    }
+
+    .btn-signal:hover {
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+    }
+
+    .btn-systems {
+      background: rgba(0, 217, 255, 0.15);
+      color: #00D9FF;
+      border: 1px solid rgba(0, 217, 255, 0.4);
+    }
+
+    .btn-systems:hover {
+      background: rgba(0, 217, 255, 0.25);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+    }
+
+    .btn-support {
+      background: rgba(255, 221, 0, 0.15);
+      color: #FFD700;
+      border: 1px solid rgba(255, 215, 0, 0.4);
+    }
+
+    .btn-support:hover {
+      background: rgba(255, 221, 0, 0.25);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+
+    footer {
+      font-size: 0.75rem;
+      opacity: 0.4;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body class="black-glass">
+  <div class="container">
+    <h1>🚀 The Ultimate Journey</h1>
+    <p class="subtitle">Career Optimization Platform</p>
+
+    <!-- CYBERPUNK STATUS SECTION -->
+    <div class="status-section">
+      <div class="status-scanlines"></div>
+
+      <div class="status-title">
+        <span class="status-title-label">Loading Dock:</span>
+        <span class="badge badge--status">OPEN</span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Next Flight:</span>
+        <span class="badge badge--flight">FL 030126 🚀</span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Status:</span>
+        <span class="badge badge--highlight">
+          Early Arrival — Ahead of Schedule ✈️⚡
+        </span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Carrier:</span>
+        <span class="badge badge--carrier">PageForward Airways</span>
+        <span class="badge badge--meta">TBD</span>
+      </div>
+    </div>
+
+    <p class="status-text">
+      <span class="date">Update:</span> Originally scheduled for
+      <span style="text-decoration:line-through;opacity:0.5;">03-21-26</span> — arriving
+      <span class="date">20 days early</span>. Wheels down
+      <span class="date">March 1st, 2026</span>.
+      Three paths await—<span class="path">Signal</span>,
+      <span class="path">Systems</span>,
+      <span class="path">Support</span>—but only those who
+      read between the lines will unlock what comes next.
+    </p>
+
+    <!-- THREE BUTTONS KEPT -->
+    <div class="btn-row">
+      <a
+        href="https://newsletter.thispagedoesnotexist12345.us/"
+        class="btn btn-signal"
+        data-path="signal"
+        target="_blank"
+        rel="noopener"
+      >
+        📡 Signal
+      </a>
+
+      <a
+        href="https://www.thispagedoesnotexist12345.info/"
+        class="btn btn-systems"
+        data-path="systems"
+        target="_blank"
+        rel="noopener"
+      >
+        ⚙️ Systems
+      </a>
+
+      <a
+        href="https://buymeacoffee.com/wagonman"
+        class="btn btn-support"
+        data-path="support"
+        target="_blank"
+        rel="noopener"
+      >
+        ☕ Support
+      </a>
+    </div>
+
+    <footer>
+      &copy; 2026 The Ultimate Journey | <span id="theme-status">February Black Glass Theme Active</span>
+    </footer>
+  </div>
+
+  <script>
+    // Puzzle behavior — track path chosen
+    document.querySelectorAll('.btn-row .btn').forEach(btn => {
+      btn.addEventListener('click', event => {
+        const path = btn.dataset.path;
+        console.log('[TUJ] Path chosen:', path);
+        localStorage.setItem('last-path', path);
+        const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+        if (!chosen.includes(path)) {
+          chosen.push(path);
+          localStorage.setItem('paths-chosen', JSON.stringify(chosen));
+        }
+        if (chosen.length === 3) {
+          console.log('[TUJ] All paths activated — next stage unlocked');
+          localStorage.setItem('puzzle-stage', 'unlocked');
+        }
+      });
+    });
+
+    // Theme management
+    function manageTheme() {
+      const now = new Date();
+      const launchDate = new Date('2026-02-17T00:00:00');
+      const expiryDate = new Date('2026-03-01T00:00:00');
+      const themeStatus = document.getElementById('theme-status');
+      const manualTheme = localStorage.getItem('preferred-theme');
+      if (manualTheme === 'black-glass' || (!manualTheme && now >= launchDate && now < expiryDate)) {
+        document.body.classList.add('black-glass');
+        themeStatus.textContent = "February Black Glass Theme Active";
+      } else {
+        document.body.classList.remove('black-glass');
+        themeStatus.textContent = "Default Theme Active";
+      }
+    }
+    manageTheme();
+    setInterval(manageTheme, 60000);
+  </script>
+</body>
+</html>
