@@ -233,6 +233,32 @@
       box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
     }
 
+            /* Arriving Now badge */
+            @keyframes pulse-green {
+                        0%, 100% { opacity: 1; transform: scale(1); }
+                        50% { opacity: 0.4; transform: scale(1.5); }
+            }
+            @keyframes arriving-glow {
+                        0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 100, 0.4); }
+                        50% { box-shadow: 0 0 14px rgba(0, 255, 100, 0.9); }
+            }
+            .badge--arriving {
+                        background: rgba(0, 255, 100, 0.12);
+                        color: #00ff64;
+                        border: 1px solid rgba(0, 255, 100, 0.5);
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        animation: arriving-glow 2s ease-in-out infinite;
+            }
+            .arriving-dot {
+                        display: inline-block;
+                        width: 8px;
+                        height: 8px;
+                        background: #00ff64;
+                        border-radius: 50%;
+                        animation: pulse-green 1.2s ease-in-out infinite;
+            }
     footer {
       font-size: 0.75rem;
       opacity: 0.4;
@@ -270,7 +296,7 @@
         <span class="status-title-label">Carrier:</span>
         <span class="badge badge--carrier">PageForward Airways</span>
         <span class="status-title-label">Arrival Time:</span>
-        <span class="badge badge--meta">TBD</span>
+                  <span class="badge badge--arriving"><span class="arriving-dot"></span>span>Arriving Now</span>span>
       </div>
     </div>
 
