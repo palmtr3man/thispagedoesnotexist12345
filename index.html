@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,259 +12,317 @@
       box-sizing: border-box;
     }
 
-    body {
-      background: #000;
-      color: #fff;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+```
+body {
+  background: #000;
+  color: #fff;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    /* Black Glass Theme */
-    body.black-glass {
-      background: #0A0A0A;
-    }
+/* Black Glass Theme */
+body.black-glass {
+  background: #0A0A0A;
+}
 
-    body.black-glass .container {
-      background: rgba(10, 10, 10, 0.6);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+body.black-glass .container {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-    body.black-glass h1 {
-      color: #00D9FF;
-    }
+body.black-glass h1 {
+  color: #00D9FF;
+}
 
-    body.black-glass .links a,
-    body.black-glass .btn {
-      background: #00D9FF;
-      color: #0A0A0A;
-    }
+body.black-glass .links a,
+body.black-glass .btn {
+  background: #00D9FF;
+  color: #0A0A0A;
+}
 
-    body.black-glass .links a:hover,
-    body.black-glass .btn:hover {
-      box-shadow: 0 0 15px #00D9FF;
-    }
+body.black-glass .links a:hover,
+body.black-glass .btn:hover {
+  box-shadow: 0 0 15px #00D9FF;
+}
 
-    .container {
-      max-width: 700px;
-      width: 90%;
-      margin: 0 auto;
-      padding: 3rem 2rem;
-      border-radius: 16px;
-      text-align: center;
-    }
+.container {
+  max-width: 700px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  text-align: center;
+}
 
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-    }
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
 
-    .subtitle {
-      font-size: 1rem;
-      opacity: 0.6;
-      margin-bottom: 2rem;
-    }
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.6;
+  margin-bottom: 2rem;
+}
 
-    /* Cyberpunk status section */
-    .status-section {
-      position: relative;
-      border: 1px solid rgba(0, 217, 255, 0.3);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      overflow: hidden;
-      text-align: left;
-    }
+/* Cyberpunk status section */
+.status-section {
+  position: relative;
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  text-align: left;
+}
 
-    .status-scanlines {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 217, 255, 0.02) 2px,
-        rgba(0, 217, 255, 0.02) 4px
-      );
-      pointer-events: none;
-    }
+.status-scanlines {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 217, 255, 0.02) 2px,
+    rgba(0, 217, 255, 0.02) 4px
+  );
+  pointer-events: none;
+}
 
-    .status-title {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.4rem;
-      font-size: 0.85rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
+.status-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  /* FIX: allow wrapping on small screens */
+  flex-wrap: wrap;
+}
 
-    .status-title-label {
-      opacity: 0.75;
-    }
+.status-title-label {
+  opacity: 0.75;
+  /* FIX: prevent label from shrinking too small */
+  white-space: nowrap;
+}
 
-    .badge {
-      padding: 0.15rem 0.55rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      border: 1px solid rgba(0, 217, 255, 0.5);
-      background: rgba(0, 217, 255, 0.12);
-      color: #00D9FF;
-      white-space: nowrap;
-    }
+.badge {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(0, 217, 255, 0.5);
+  background: rgba(0, 217, 255, 0.12);
+  color: #00D9FF;
+  white-space: nowrap;
+}
 
-    .badge--highlight {
-      border-color: rgba(0, 255, 170, 0.6);
-      background: rgba(0, 255, 170, 0.15);
-      color: #00FFAA;
-    }
+.badge--highlight {
+  border-color: rgba(0, 255, 170, 0.6);
+  background: rgba(0, 255, 170, 0.15);
+  color: #00FFAA;
+}
 
-    .badge--meta {
-      opacity: 0.7;
-    }
+.badge--meta {
+  opacity: 0.7;
+}
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
-    .status-text {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      opacity: 0.85;
-      margin-bottom: 1.5rem;
-    }
+.status-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  opacity: 0.85;
+  margin-bottom: 1.5rem;
+}
 
-    .status-text .date {
-      color: #00D9FF;
-      opacity: 0.8;
-    }
+.status-text .date {
+  color: #00D9FF;
+  opacity: 0.8;
+}
 
-    /* Hoverable path keywords */
-    .status-text .path {
-      color: #00D9FF;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-block;
-      position: relative;
-    }
+/* Hoverable path keywords */
+.status-text .path {
+  color: #00D9FF;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  position: relative;
+}
 
-    .status-text .path::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: #00D9FF;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
+.status-text .path::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #00D9FF;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 
-    .status-text .path:hover {
-      color: #fff;
-      text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
-      transform: scale(1.05);
-    }
+.status-text .path:hover {
+  color: #fff;
+  text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
+  transform: scale(1.05);
+}
 
-    .status-text .path:hover::after {
-      opacity: 1;
-    }
+.status-text .path:hover::after {
+  opacity: 1;
+}
 
-    /* Buttons */
-    .btn-row {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
+/* Buttons */
+.btn-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
 
-    .btn {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-      letter-spacing: 0.05em;
-    }
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  letter-spacing: 0.05em;
+}
 
-    .btn:hover {
-      transform: translateY(-2px);
-    }
+.btn:hover {
+  transform: translateY(-2px);
+}
 
-    .btn-signal {
-      background: #00D9FF;
-      color: #0A0A0A;
-    }
+.btn-signal {
+  background: #00D9FF;
+  color: #0A0A0A;
+}
 
-    .btn-signal:hover {
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
-    }
+.btn-signal:hover {
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+}
 
-    .btn-systems {
-      background: rgba(0, 217, 255, 0.15);
-      color: #00D9FF;
-      border: 1px solid rgba(0, 217, 255, 0.4);
-    }
+.btn-systems {
+  background: rgba(0, 217, 255, 0.15);
+  color: #00D9FF;
+  border: 1px solid rgba(0, 217, 255, 0.4);
+}
 
-    .btn-systems:hover {
-      background: rgba(0, 217, 255, 0.25);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-    }
+.btn-systems:hover {
+  background: rgba(0, 217, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+}
 
-    .btn-support {
-      background: rgba(255, 221, 0, 0.15);
-      color: #FFD700;
-      border: 1px solid rgba(255, 215, 0, 0.4);
-    }
+.btn-support {
+  background: rgba(255, 221, 0, 0.15);
+  color: #FFD700;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+}
 
-    .btn-support:hover {
-      background: rgba(255, 221, 0, 0.25);
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-    }
+.btn-support:hover {
+  background: rgba(255, 221, 0, 0.25);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
 
-            /* Arriving Now badge */
-            @keyframes pulse-green {
-                        0%, 100% { opacity: 1; transform: scale(1); }
-                        50% { opacity: 0.4; transform: scale(1.5); }
-            }
-            @keyframes arriving-glow {
-                        0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 100, 0.4); }
-                        50% { box-shadow: 0 0 14px rgba(0, 255, 100, 0.9); }
-            }
-            .badge--arriving {
-                        background: rgba(0, 255, 100, 0.12);
-                        color: #00ff64;
-                        border: 1px solid rgba(0, 255, 100, 0.5);
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 6px;
-                        animation: arriving-glow 2s ease-in-out infinite;
-            }
-            .arriving-dot {
-                        display: inline-block;
-                        width: 8px;
-                        height: 8px;
-                        background: #00ff64;
-                        border-radius: 50%;
-                        animation: pulse-green 1.2s ease-in-out infinite;
-            }
-    footer {
-      font-size: 0.75rem;
-      opacity: 0.4;
-      margin-top: 1.5rem;
-    }
+/* Arriving Now badge */
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.5); }
+}
+@keyframes arriving-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 100, 0.4); }
+  50% { box-shadow: 0 0 14px rgba(0, 255, 100, 0.9); }
+}
+.badge--arriving {
+  background: rgba(0, 255, 100, 0.12);
+  color: #00ff64;
+  border: 1px solid rgba(0, 255, 100, 0.5);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  animation: arriving-glow 2s ease-in-out infinite;
+}
+.arriving-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #00ff64;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse-green 1.2s ease-in-out infinite;
+}
+
+/* FIX: Split Carrier row into two rows on small screens */
+.status-title--carrier {
+  flex-wrap: wrap;
+  row-gap: 0.4rem;
+}
+
+/* Mobile-only short label for the Status badge */
+.badge--highlight .full-text { display: inline; }
+.badge--highlight .short-text { display: none; }
+
+@media (max-width: 600px) {
+  .badge--highlight .full-text { display: none; }
+  .badge--highlight .short-text { display: inline; }
+}
+
+footer {
+  font-size: 0.75rem;
+  opacity: 0.4;
+  margin-top: 1.5rem;
+}
+
+/* =====================
+   MOBILE FIXES
+===================== */
+@media (max-width: 480px) {
+  .container {
+    width: 95%;
+    padding: 2rem 1.25rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .status-section {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Stack each status row more gracefully */
+  .status-title {
+    font-size: 0.8rem;
+  }
+
+  /* Make buttons full-width on very small screens */
+  .btn-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    text-align: center;
+    width: 100%;
+  }
+}
+```
+
   </style>
 </head>
 <body class="black-glass">
@@ -271,93 +330,99 @@
     <h1>🚀 The Ultimate Journey</h1>
     <p class="subtitle">Career Optimization Platform</p>
 
-    <!-- CYBERPUNK STATUS SECTION -->
-    <div class="status-section">
-      <div class="status-scanlines"></div>
+```
+<!-- CYBERPUNK STATUS SECTION -->
+<div class="status-section">
+  <div class="status-scanlines"></div>
 
-      <div class="status-title">
-        <span class="status-title-label">Loading Dock:</span>
-        <span class="badge badge--status">OPEN</span>
-      </div>
+  <div class="status-title">
+    <span class="status-title-label">Loading Dock:</span>
+    <span class="badge badge--status">OPEN</span>
+  </div>
 
-      <div class="status-title">
-        <span class="status-title-label">Next Flight:</span>
-        <span class="badge badge--flight">FL 030126 🚀</span>
-      </div>
+  <div class="status-title">
+    <span class="status-title-label">Next Flight:</span>
+    <span class="badge badge--flight">FL 030126 🚀</span>
+  </div>
 
-      <div class="status-title">
-        <span class="status-title-label">Status:</span>
-        <span class="badge badge--highlight">
-          Early Arrival — Ahead of Schedule ✈️⚡
-        </span>
-      </div>
+  <div class="status-title">
+    <span class="status-title-label">Status:</span>
+    <span class="badge badge--highlight">
+      <span class="full-text">Early Arrival — Ahead of Schedule ✈️⚡</span>
+      <span class="short-text">Early Arrival ✈️⚡</span>
+    </span>
+  </div>
 
-      <div class="status-title">
-        <span class="status-title-label">Carrier:</span>
-        <span class="badge badge--carrier">PageForward Airways</span>
-        <span class="status-title-label">Arrival Time:</span>
-                  <span class="badge badge--arriving"><span class="arriving-dot"></span>span>Arriving Now</span>span>
-      </div>
-    </div>
+  <!-- FIX: Split Carrier and Arrival Time into separate rows -->
+  <div class="status-title">
+    <span class="status-title-label">Carrier:</span>
+    <span class="badge badge--carrier">PageForward Airways</span>
+  </div>
+  <div class="status-title">
+    <span class="status-title-label">Arrival Time:</span>
+    <span class="badge badge--arriving"><span class="arriving-dot"></span>Arriving Now</span>
+  </div>
+</div>
 
-    <p class="status-text">
-      <span class="date">Update:</span> Originally scheduled for
-      <span style="text-decoration:line-through;opacity:0.5;">03-21-26</span> — arriving
-      <span class="date">20 days early</span>. Wheels down
-      <span class="date">March 1st, 2026</span>.
-      Three paths await—<span class="path">Signal</span>,
-      <span class="path">Systems</span>,
-      <span class="path">Support</span>—but only those who
-      read between the lines will unlock what comes next.
-    </p>
+<p class="status-text">
+  <span class="date">Update:</span> Originally scheduled for
+  <span style="text-decoration:line-through;opacity:0.5;">03-21-26</span> — arriving
+  <span class="date">20 days early</span>. Wheels down
+  <span class="date">March 1st, 2026</span>.
+  Three paths await—<span class="path">Signal</span>,
+  <span class="path">Systems</span>,
+  <span class="path">Support</span>—but only those who
+  read between the lines will unlock what comes next.
+</p>
 
-    <!-- THREE BUTTONS KEPT -->
-    <div class="btn-row">
-      <a
-        href="https://newsletter.thispagedoesnotexist12345.us/"
-        class="btn btn-signal"
-        data-path="signal"
-        target="_blank"
-        rel="noopener"
-      >
-        📡 Signal
-      </a>
+<!-- THREE BUTTONS KEPT -->
+<div class="btn-row">
+  <a
+    href="https://newsletter.thispagedoesnotexist12345.us/"
+    class="btn btn-signal"
+    data-path="signal"
+    target="_blank"
+    rel="noopener"
+  >
+    📡 Signal
+  </a>
 
-      <a
-        href="https://www.thispagedoesnotexist12345.info/"
-        class="btn btn-systems"
-        data-path="systems"
-        target="_blank"
-        rel="noopener"
-      >
-        ⚙️ Systems
-      </a>
+  <a
+    href="https://www.thispagedoesnotexist12345.info/"
+    class="btn btn-systems"
+    data-path="systems"
+    target="_blank"
+    rel="noopener"
+  >
+    ⚙️ Systems
+  </a>
 
-      <a
-        href="https://buymeacoffee.com/wagonman"
-        class="btn btn-support"
-        data-path="support"
-        target="_blank"
-        rel="noopener"
-      >
-        ☕ Support
-      </a>
+  <a
+    href="https://buymeacoffee.com/wagonman"
+    class="btn btn-support"
+    data-path="support"
+    target="_blank"
+    rel="noopener"
+  >
+    ☕ Support
+  </a>
 
-              <a
-                          href="https://resume-builderone-resume-builder.netlify.app"
-                          class="btn btn-systems"
-                          data-path="studio"
-                          target="_blank"
-                          rel="noopener"
-                        >
-                          📄 Studio
-              </a>
-                        </a>
-    </div>
+  <a
+    href="https://resume-builderone-resume-builder.netlify.app"
+    class="btn btn-systems"
+    data-path="studio"
+    target="_blank"
+    rel="noopener"
+  >
+    📄 Studio
+  </a>
+</div>
 
-    <footer>
-      &copy; 2026 The Ultimate Journey | <span id="theme-status">February Black Glass Theme Active</span>
-    </footer>
+<footer>
+  &copy; 2026 The Ultimate Journey | <span id="theme-status">February Black Glass Theme Active</span>
+</footer>
+```
+
   </div>
 
   <script>
@@ -379,23 +444,14 @@
       });
     });
 
-    // Theme management
+    // Theme management — Black Glass always active
     function manageTheme() {
-      const now = new Date();
-      const launchDate = new Date('2026-02-17T00:00:00');
-      const expiryDate = new Date('2026-03-01T00:00:00');
       const themeStatus = document.getElementById('theme-status');
-      const manualTheme = localStorage.getItem('preferred-theme');
-      if (manualTheme === 'black-glass' || (!manualTheme && now >= launchDate && now < expiryDate)) {
-        document.body.classList.add('black-glass');
-        themeStatus.textContent = "February Black Glass Theme Active";
-      } else {
-        document.body.classList.remove('black-glass');
-        themeStatus.textContent = "Default Theme Active";
-      }
+      document.body.classList.add('black-glass');
+      themeStatus.textContent = "Black Glass Theme Active";
     }
     manageTheme();
-    setInterval(manageTheme, 60000);
   </script>
+
 </body>
 </html>
