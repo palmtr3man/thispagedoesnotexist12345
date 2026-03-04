@@ -12,319 +12,469 @@
       box-sizing: border-box;
     }
 
-```
-body {
-  background: #000;
-  color: #ffffff;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    body {
+      background: #000;
+      color: #ffffff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-/* Black Glass Theme */
-body.black-glass {
-  background: #0A0A0A;
-}
+    /* Black Glass Theme */
+    body.black-glass {
+      background: #0A0A0A;
+    }
 
-body.black-glass .container {
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
+    body.black-glass .container {
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-body.black-glass h1 {
-  color: #00D9FF;
-}
+    body.black-glass h1 {
+      color: #00D9FF;
+    }
 
-body.black-glass .links a,
-body.black-glass .btn {
-  background: #00D9FF;
-  color: #ffffff;
-}
+    .container {
+      max-width: 700px;
+      width: 90%;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      text-align: center;
+    }
 
-body.black-glass .links a:hover,
-body.black-glass .btn:hover {
-  box-shadow: 0 0 15px #00D9FF;
-}
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
 
-.container {
-  max-width: 700px;
-  width: 90%;
-  margin: 0 auto;
-  padding: 3rem 2rem;
-  border-radius: 16px;
-  text-align: center;
-}
+    .subtitle {
+      font-size: 1rem;
+      opacity: 1;
+      color: #ffffff;
+      margin-bottom: 2rem;
+    }
 
-h1 {
-  font-size: 2.2rem;
-  margin-bottom: 0.5rem;
-}
+    /* Cyberpunk status section */
+    .status-section {
+      position: relative;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      text-align: left;
+    }
 
-.subtitle {
-  font-size: 1rem;
-  opacity: 1;
-  color: #ffffff;
-  margin-bottom: 2rem;
-}
+    .status-scanlines {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 217, 255, 0.02) 2px,
+        rgba(0, 217, 255, 0.02) 4px
+      );
+      pointer-events: none;
+    }
 
-/* Cyberpunk status section */
-.status-section {
-  position: relative;
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  overflow: hidden;
-  text-align: left;
-}
+    .status-title {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      flex-wrap: wrap;
+    }
 
-.status-scanlines {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 217, 255, 0.02) 2px,
-    rgba(0, 217, 255, 0.02) 4px
-  );
-  pointer-events: none;
-}
+    .status-title-label {
+      opacity: 1;
+      color: #ffffff;
+      white-space: nowrap;
+    }
 
-.status-title {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.4rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  /* FIX: allow wrapping on small screens */
-  flex-wrap: wrap;
-}
+    .badge {
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(0, 217, 255, 0.5);
+      background: rgba(0, 217, 255, 0.12);
+      color: #00D9FF;
+      white-space: nowrap;
+    }
 
-.status-title-label {
-  opacity: 1;
-  color: #ffffff;
-  white-space: nowrap;
-}
+    .badge--highlight {
+      border-color: rgba(0, 255, 170, 0.6);
+      background: rgba(0, 255, 170, 0.15);
+      color: #00FFAA;
+    }
 
-.badge {
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  border: 1px solid rgba(0, 217, 255, 0.5);
-  background: rgba(0, 217, 255, 0.12);
-  color: #00D9FF;
-  white-space: nowrap;
-}
+    .badge--meta {
+      opacity: 0.7;
+    }
 
-.badge--highlight {
-  border-color: rgba(0, 255, 170, 0.6);
-  background: rgba(0, 255, 170, 0.15);
-  color: #00FFAA;
-}
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
 
-.badge--meta {
-  opacity: 0.7;
-}
+    .status-text {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      opacity: 1;
+      color: #ffffff;
+      margin-bottom: 1.5rem;
+    }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
+    .status-text .date {
+      color: #00D9FF;
+      opacity: 0.8;
+    }
 
-.status-text {
-  font-size: 0.9rem;
-  line-height: 1.7;
-  opacity: 1;
-  color: #ffffff;
-  margin-bottom: 1.5rem;
-}
+    /* Hoverable path keywords */
+    .status-text .path {
+      color: #00D9FF;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-block;
+      position: relative;
+    }
 
-.status-text .date {
-  color: #00D9FF;
-  opacity: 0.8;
-}
+    .status-text .path::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #00D9FF;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
 
-/* Hoverable path keywords */
-.status-text .path {
-  color: #00D9FF;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-block;
-  position: relative;
-}
+    .status-text .path:hover {
+      color: #fff;
+      text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
+      transform: scale(1.05);
+    }
 
-.status-text .path::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #00D9FF;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
+    .status-text .path:hover::after {
+      opacity: 1;
+    }
 
-.status-text .path:hover {
-  color: #fff;
-  text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
-  transform: scale(1.05);
-}
+    /* =====================
+       CHANGE 1 — Black Glass Buttons
+    ===================== */
+    .btn-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
 
-.status-text .path:hover::after {
-  opacity: 1;
-}
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      letter-spacing: 0.05em;
+      /* Black Glass base */
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      color: #00e5ff;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
 
-/* Buttons */
-.btn-row {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 255, 255, 0.6);
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+    }
 
-.btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  letter-spacing: 0.05em;
-}
+    /* Support button — non-competing, no glow, no primary styling */
+    .btn-support {
+      border-color: rgba(0, 255, 255, 0.15);
+      color: rgba(0, 229, 255, 0.7);
+    }
 
-.btn:hover {
-  transform: translateY(-2px);
-}
+    .btn-support:hover {
+      border-color: rgba(0, 255, 255, 0.35);
+      box-shadow: none;
+    }
 
-.btn-signal {
-  background: #00D9FF;
-  color: #ffffff;
-}
+    /* Waitlist divider row */
+    .btn-row-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
 
-.btn-signal:hover {
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
-}
+    .btn-row-divider::before,
+    .btn-row-divider::after {
+      content: '';
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: rgba(0, 255, 255, 0.4);
+    }
 
-.btn-systems {
-  background: rgba(0, 217, 255, 0.15);
-  color: #00D9FF;
-  border: 1px solid rgba(0, 217, 255, 0.4);
-}
+    .btn-row-divider span {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(0, 229, 255, 0.8);
+    }
 
-.btn-systems:hover {
-  background: rgba(0, 217, 255, 0.25);
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-}
+    /* Waitlist button row */
+    .btn-row-waitlist {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
 
-.btn-support {
-  background: rgba(255, 221, 0, 0.15);
-  color: #FFD700;
-  border: 1px solid rgba(255, 215, 0, 0.4);
-}
+    /* CHANGE 4 — Waitlist button */
+    .btn-waitlist {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      color: #00e5ff;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
 
-.btn-support:hover {
-  background: rgba(255, 221, 0, 0.25);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-}
+    .btn-waitlist:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 255, 255, 0.6);
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+    }
 
-/* Arriving Now badge */
-@keyframes pulse-green {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.5); }
-}
-@keyframes arriving-glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 100, 0.4); }
-  50% { box-shadow: 0 0 14px rgba(0, 255, 100, 0.9); }
-}
-.badge--arriving {
-  background: rgba(0, 255, 100, 0.12);
-  color: #00ff64;
-  border: 1px solid rgba(0, 255, 100, 0.5);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  animation: arriving-glow 2s ease-in-out infinite;
-}
-.arriving-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #00ff64;
-  border-radius: 50%;
-  flex-shrink: 0;
-  animation: pulse-green 1.2s ease-in-out infinite;
-}
+    .btn-waitlist.unlocked {
+      border-color: rgba(0, 255, 255, 0.8);
+      box-shadow: 0 0 16px rgba(0, 255, 255, 0.35);
+    }
 
-/* FIX: Split Carrier row into two rows on small screens */
-.status-title--carrier {
-  flex-wrap: wrap;
-  row-gap: 0.4rem;
-}
+    /* Arriving Now badge */
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.5); }
+    }
+    @keyframes arriving-glow {
+      0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 100, 0.4); }
+      50% { box-shadow: 0 0 14px rgba(0, 255, 100, 0.9); }
+    }
+    .badge--arriving {
+      background: rgba(0, 255, 100, 0.12);
+      color: #00ff64;
+      border: 1px solid rgba(0, 255, 100, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      animation: arriving-glow 2s ease-in-out infinite;
+    }
+    .arriving-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #00ff64;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse-green 1.2s ease-in-out infinite;
+    }
 
-/* Mobile-only short label for the Status badge */
-.badge--highlight .full-text { display: inline; }
-.badge--highlight .short-text { display: none; }
+    /* FIX: Split Carrier row into two rows on small screens */
+    .status-title--carrier {
+      flex-wrap: wrap;
+      row-gap: 0.4rem;
+    }
 
-@media (max-width: 600px) {
-  .badge--highlight .full-text { display: none; }
-  .badge--highlight .short-text { display: inline; }
-}
+    /* Mobile-only short label for the Status badge */
+    .badge--highlight .full-text { display: inline; }
+    .badge--highlight .short-text { display: none; }
 
-footer {
-  font-size: 0.75rem;
-  opacity: 0.4;
-  margin-top: 1.5rem;
-}
+    @media (max-width: 600px) {
+      .badge--highlight .full-text { display: none; }
+      .badge--highlight .short-text { display: inline; }
+    }
 
-/* =====================
-   MOBILE FIXES
-===================== */
-@media (max-width: 480px) {
-  .container {
-    width: 95%;
-    padding: 2rem 1.25rem;
-  }
+    footer {
+      font-size: 0.75rem;
+      opacity: 0.4;
+      margin-top: 1.5rem;
+    }
 
-  h1 {
-    font-size: 1.6rem;
-  }
+    /* =====================
+       CHANGE 2 — Carousel
+    ===================== */
+    .carousel-wrap {
+      margin-bottom: 2rem;
+      position: relative;
+    }
 
-  .status-section {
-    padding: 1.25rem 1rem;
-  }
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      touch-action: pan-y;
+      user-select: none;
+    }
 
-  /* Stack each status row more gracefully */
-  .status-title {
-    font-size: 0.8rem;
-  }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
 
-  /* Make buttons full-width on very small screens */
-  .btn-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
+    .carousel-slide {
+      min-width: 100%;
+      padding: 1.75rem 1.5rem;
+      text-align: left;
+    }
 
-  .btn {
-    text-align: center;
-    width: 100%;
-  }
-}
-```
+    .carousel-slide h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #00e5ff;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.02em;
+    }
 
+    .carousel-slide p {
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 0.75rem;
+    }
+
+    .carousel-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(0, 229, 255, 0.25);
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      cursor: pointer;
+      transition: background 0.25s, box-shadow 0.25s;
+    }
+
+    .carousel-dot.active {
+      background: #00e5ff;
+      box-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
+    }
+
+    /* =====================
+       CHANGE 3 — Puzzle Tracker
+    ===================== */
+    .puzzle-tracker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .puzzle-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(0, 229, 255, 0.3);
+    }
+
+    .puzzle-diamonds {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .puzzle-diamond {
+      font-size: 1.1rem;
+      color: rgba(0, 229, 255, 0.2);
+      transition: color 0.35s ease, text-shadow 0.35s ease;
+    }
+
+    .puzzle-diamond.lit {
+      color: #00e5ff;
+      text-shadow: 0 0 8px rgba(0, 229, 255, 0.7), 0 0 16px rgba(0, 229, 255, 0.4);
+    }
+
+    /* =====================
+       MOBILE FIXES
+    ===================== */
+    @media (max-width: 480px) {
+      .container {
+        width: 95%;
+        padding: 2rem 1.25rem;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .status-section {
+        padding: 1.25rem 1rem;
+      }
+
+      .status-title {
+        font-size: 0.8rem;
+      }
+
+      .btn-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn {
+        text-align: center;
+        width: 100%;
+      }
+
+      .btn-row-waitlist {
+        padding: 0 0;
+      }
+
+      .btn-waitlist {
+        width: 100%;
+        text-align: center;
+      }
+
+      .carousel-slide {
+        padding: 1.25rem 1rem;
+      }
+    }
   </style>
 </head>
 <body class="black-glass">
@@ -332,127 +482,280 @@ footer {
     <h1>🚀 The Ultimate Journey</h1>
     <p class="subtitle">Career Optimization Platform</p>
 
-```
-<!-- CYBERPUNK STATUS SECTION -->
-<div class="status-section">
-  <div class="status-scanlines"></div>
+    <!-- CYBERPUNK STATUS SECTION -->
+    <div class="status-section">
+      <div class="status-scanlines"></div>
 
-  <div class="status-title">
-    <span class="status-title-label">Loading Dock:</span>
-    <span class="badge badge--status">OPEN</span>
-  </div>
+      <div class="status-title">
+        <span class="status-title-label">Loading Dock:</span>
+        <span class="badge badge--status">OPEN</span>
+      </div>
 
-  <div class="status-title">
-    <span class="status-title-label">Next Flight:</span>
-    <span class="badge badge--flight">FL 030126 🚀</span>
-  </div>
+      <div class="status-title">
+        <span class="status-title-label">Next Flight:</span>
+        <span class="badge badge--flight">FL 030126 🚀</span>
+      </div>
 
-  <div class="status-title">
-    <span class="status-title-label">Status:</span>
-    <span class="badge badge--highlight">
-      <span class="full-text">Early Arrival — Ahead of Schedule ✈️⚡</span>
-      <span class="short-text">Early Arrival ✈️⚡</span>
-    </span>
-  </div>
+      <div class="status-title">
+        <span class="status-title-label">Status:</span>
+        <span class="badge badge--highlight">
+          <span class="full-text">Early Arrival — Ahead of Schedule ✈️⚡</span>
+          <span class="short-text">Early Arrival ✈️⚡</span>
+        </span>
+      </div>
 
-  <!-- FIX: Split Carrier and Arrival Time into separate rows -->
-  <div class="status-title">
-    <span class="status-title-label">Carrier:</span>
-    <span class="badge badge--carrier">PageForward Airways</span>
-  </div>
-  <div class="status-title">
-    <span class="status-title-label">Arrival Time:</span>
-    <span class="badge badge--arriving"><span class="arriving-dot"></span>Arriving Now</span>
-  </div>
-</div>
+      <!-- FIX: Split Carrier and Arrival Time into separate rows -->
+      <div class="status-title">
+        <span class="status-title-label">Carrier:</span>
+        <span class="badge badge--carrier">PageForward Airways</span>
+      </div>
+      <div class="status-title">
+        <span class="status-title-label">Arrival Time:</span>
+        <span class="badge badge--arriving"><span class="arriving-dot"></span>Arriving Now</span>
+      </div>
+    </div>
 
-<p class="status-text">
-  <span class="date">Update:</span> Originally scheduled for
-  <span style="text-decoration:line-through;opacity:0.5;">03-21-26</span> — arriving
-  <span class="date">20 days early</span>. Wheels down
-  <span class="date">March 1st, 2026</span>.
-  Three paths await—<span class="path">Signal</span>,
-  <span class="path">Systems</span>,
-  <span class="path">Support</span>—but only those who
-  read between the lines will unlock what comes next.
-</p>
+    <p class="status-text">
+      <span class="date">Update:</span> Originally scheduled for
+      <span style="text-decoration:line-through;opacity:0.5;">03-21-26</span> — arriving
+      <span class="date">20 days early</span>. Wheels down
+      <span class="date">March 1st, 2026</span>.
+      Three paths await—<span class="path">Signal</span>,
+      <span class="path">Systems</span>,
+      <span class="path">Support</span>—but only those who
+      read between the lines will unlock what comes next.
+    </p>
 
-<!-- THREE BUTTONS KEPT -->
-<div class="btn-row">
-  <a
-    href="https://newsletter.thispagedoesnotexist12345.us/"
-    class="btn btn-signal"
-    data-path="signal"
-    target="_blank"
-    rel="noopener"
-  >
-    📡 Signal
-  </a>
+    <!-- CHANGE 2 — CAROUSEL (between boarding card and buttons) -->
+    <div class="carousel-wrap">
+      <div class="carousel" id="mainCarousel">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide">
+            <h3>Your career has a story.</h3>
+            <p>The Ultimate Journey helps you align your experience with what the market is actually looking for — using AI, real job descriptions, and a system that works.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>Built for the overlooked operator.</h3>
+            <p>If you've been out of the market, restarting, or just stuck — this platform was built for you. No experience floor. No gatekeeping.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>5 seats. One flight.</h3>
+            <p>PageForward Airways FL 030126 is carrying 5 passengers through the full TUJ system. Every result gets tracked and shared in the newsletter.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>You're watching it get built.</h3>
+            <p>Every bug, every fix, every passenger milestone — documented and shared. If it works for the cohort, the dock reopens for you.</p>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots">
+        <div class="carousel-dot active" data-index="0"></div>
+        <div class="carousel-dot" data-index="1"></div>
+        <div class="carousel-dot" data-index="2"></div>
+        <div class="carousel-dot" data-index="3"></div>
+      </div>
+    </div>
 
-  <a
-    href="https://www.thispagedoesnotexist12345.info/"
-    class="btn btn-systems"
-    data-path="systems"
-    target="_blank"
-    rel="noopener"
-  >
-    ⚙️ Systems
-  </a>
+    <!-- CHANGE 1 — BLACK GLASS BUTTONS (all 4 path buttons) -->
+    <div class="btn-row">
+      <a
+        href="https://newsletter.thispagedoesnotexist12345.us/"
+        class="btn btn-signal"
+        data-path="signal"
+        target="_blank"
+        rel="noopener"
+        data-umami-event="Signal Click"
+      >
+        📡 Signal
+      </a>
 
-  <a
-    href="https://buymeacoffee.com/wagonman"
-    class="btn btn-support"
-    data-path="support"
-    target="_blank"
-    rel="noopener"
-  >
-    ☕ Support
-  </a>
+      <a
+        href="https://www.thispagedoesnotexist12345.info/"
+        class="btn btn-systems"
+        data-path="systems"
+        target="_blank"
+        rel="noopener"
+        data-umami-event="Systems Click"
+      >
+        ⚙️ Systems
+      </a>
 
-  <a
-    href="https://resume-builderone-resume-builder.netlify.app"
-    class="btn btn-systems"
-    data-path="studio"
-    target="_blank"
-    rel="noopener"
-  >
-    📄 Studio
-  </a>
-</div>
+      <!-- CHANGE 1 — Support: updated href + label, non-competing style -->
+      <a
+        href="https://buymeacoffee.com/builderone"
+        class="btn btn-support"
+        data-path="support"
+        target="_blank"
+        rel="noopener"
+        data-umami-event="Support Click"
+      >
+        Support the Journey ☕
+      </a>
 
-<footer>
-  &copy; 2026 The Ultimate Journey | <span id="theme-status">February Black Glass Theme Active</span>
-</footer>
-```
+      <a
+        href="https://resume-buildero.netlify.app"
+        class="btn btn-studio"
+        data-path="studio"
+        target="_blank"
+        rel="noopener"
+        data-umami-event="Studio Click"
+      >
+        📄 Studio
+      </a>
+    </div>
 
+    <!-- CHANGE 3 — PUZZLE PATH TRACKER (3 diamonds) -->
+    <div class="puzzle-tracker" id="puzzleTracker">
+      <span class="puzzle-label">Paths Activated</span>
+      <div class="puzzle-diamonds">
+        <span class="puzzle-diamond" id="diamond-signal" title="Signal">✦</span>
+        <span class="puzzle-diamond" id="diamond-systems" title="Systems">✦</span>
+        <span class="puzzle-diamond" id="diamond-support" title="Support">✦</span>
+      </div>
+    </div>
+
+    <!-- Divider between path buttons and waitlist CTA -->
+    <div class="btn-row-divider">
+      <span>next step</span>
+    </div>
+
+    <!-- CHANGE 4 — WAITLIST CTA as 5th button (separate row) -->
+    <div class="btn-row-waitlist">
+      <a
+        href="https://calendarjet.com/palmtr3man/pageforward-airways"
+        class="btn-waitlist"
+        id="waitlistBtn"
+        target="_blank"
+        rel="noopener"
+        data-umami-event="Waitlist Click"
+      >
+        ✈️ Join the Waitlist
+      </a>
+    </div>
+
+    <footer>
+      &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
+    </footer>
   </div>
 
   <script>
-    // Puzzle behavior — track path chosen
-    document.querySelectorAll('.btn-row .btn').forEach(btn => {
-      btn.addEventListener('click', event => {
-        const path = btn.dataset.path;
-        console.log('[TUJ] Path chosen:', path);
-        localStorage.setItem('last-path', path);
-        const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
-        if (!chosen.includes(path)) {
-          chosen.push(path);
-          localStorage.setItem('paths-chosen', JSON.stringify(chosen));
-        }
-        if (chosen.length === 3) {
-          console.log('[TUJ] All paths activated — next stage unlocked');
-          localStorage.setItem('puzzle-stage', 'unlocked');
-        }
+    // =====================
+    // CHANGE 2 — Carousel logic
+    // =====================
+    (function() {
+      const track = document.getElementById('carouselTrack');
+      const dots = document.querySelectorAll('.carousel-dot');
+      const carousel = document.getElementById('mainCarousel');
+      let current = 0;
+      const total = 4;
+      let autoTimer;
+      let touchStartX = 0;
+      let touchDeltaX = 0;
+      let isDragging = false;
+
+      function goTo(index) {
+        current = (index + total) % total;
+        track.style.transform = 'translateX(-' + (current * 100) + '%)';
+        dots.forEach(function(d, i) {
+          d.classList.toggle('active', i === current);
+        });
+      }
+
+      function startAuto() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(function() { goTo(current + 1); }, 4000);
+      }
+
+      dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          goTo(parseInt(dot.dataset.index));
+          startAuto();
+        });
       });
-    });
+
+      // Touch / swipe support
+      carousel.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+        isDragging = true;
+        clearInterval(autoTimer);
+      }, { passive: true });
+
+      carousel.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        touchDeltaX = e.touches[0].clientX - touchStartX;
+      }, { passive: true });
+
+      carousel.addEventListener('touchend', function() {
+        if (Math.abs(touchDeltaX) > 40) {
+          goTo(touchDeltaX < 0 ? current + 1 : current - 1);
+        }
+        touchDeltaX = 0;
+        isDragging = false;
+        startAuto();
+      });
+
+      goTo(0);
+      startAuto();
+    })();
+
+    // =====================
+    // CHANGE 3 + 4 — Puzzle tracker + Waitlist unlock
+    // =====================
+    (function() {
+      const pathDiamonds = {
+        signal:  document.getElementById('diamond-signal'),
+        systems: document.getElementById('diamond-systems'),
+        support: document.getElementById('diamond-support')
+      };
+      const waitlistBtn = document.getElementById('waitlistBtn');
+
+      function updatePuzzleUI() {
+        const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+        ['signal', 'systems', 'support'].forEach(function(path) {
+          if (chosen.includes(path)) {
+            pathDiamonds[path].classList.add('lit');
+          }
+        });
+        if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
+          waitlistBtn.classList.add('unlocked');
+        }
+      }
+
+      // Track path clicks (all buttons in btn-row)
+      document.querySelectorAll('.btn-row .btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const path = btn.dataset.path;
+          if (!path) return;
+          console.log('[TUJ] Path chosen:', path);
+          localStorage.setItem('last-path', path);
+          const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+          if (!chosen.includes(path)) {
+            chosen.push(path);
+            localStorage.setItem('paths-chosen', JSON.stringify(chosen));
+          }
+          // Light up the corresponding diamond immediately
+          if (pathDiamonds[path]) {
+            pathDiamonds[path].classList.add('lit');
+          }
+          // Check if all 3 puzzle paths are activated
+          if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
+            console.log('[TUJ] All paths activated — waitlist unlocked');
+            localStorage.setItem('puzzle-stage', 'unlocked');
+            waitlistBtn.classList.add('unlocked');
+          }
+        });
+      });
+
+      // Restore state from localStorage on page load
+      updatePuzzleUI();
+    })();
 
     // Theme management — Black Glass always active
-    function manageTheme() {
+    (function() {
       const themeStatus = document.getElementById('theme-status');
       document.body.classList.add('black-glass');
-      themeStatus.textContent = "Black Glass Theme Active";
-    }
-    manageTheme();
+      themeStatus.textContent = 'Black Glass Theme Active';
+    })();
   </script>
 
 </body>
