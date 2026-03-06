@@ -5,6 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Ultimate Journey – Career Optimization Platform</title>
+
+  <!-- Umami Analytics — replace data-website-id with your .com domain ID from Umami dashboard -->
+  <script defer src="https://your-umami.vercel.app/script.js" data-website-id="DOMAIN_ID_FROM_UMAMI_COM"></script>
+
   <style>
     * {
       margin: 0;
@@ -132,6 +136,9 @@
       opacity: 1;
       color: #ffffff;
       margin-bottom: 1.5rem;
+      max-width: 100%;
+      box-sizing: border-box;
+      word-wrap: break-word;
     }
 
     .status-text .date {
@@ -206,16 +213,8 @@
       box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
     }
 
-    /* Support button — non-competing, no glow, no primary styling */
-    .btn-support {
-      border-color: rgba(0, 255, 255, 0.15);
-      color: rgba(0, 229, 255, 0.7);
-    }
-
-    .btn-support:hover {
-      border-color: rgba(0, 255, 255, 0.35);
-      box-shadow: none;
-    }
+    /* FIX 2 — Support button: same styling as all other .btn buttons (no special override) */
+    /* .btn-support special overrides removed so it matches Signal, Systems, Studio exactly */
 
     /* Waitlist divider row */
     .btn-row-divider {
@@ -336,6 +335,7 @@
       position: relative;
     }
 
+    /* FIX 1 — Carousel full-width clip: ensure overflow hidden so only one slide shows */
     .carousel {
       position: relative;
       overflow: hidden;
@@ -354,10 +354,14 @@
       will-change: transform;
     }
 
+    /* FIX 1 — Each slide must be exactly 100% width, no overflow */
     .carousel-slide {
       min-width: 100%;
+      width: 100%;
+      flex-shrink: 0;
       padding: 1.75rem 1.5rem;
       text-align: left;
+      box-sizing: border-box;
     }
 
     .carousel-slide h3 {
@@ -432,6 +436,50 @@
     }
 
     /* =====================
+       FIX 4 — St. Patrick's Day Theme (March 17 only)
+    ===================== */
+    .st-patricks {
+      --accent: #2E8B3A;
+    }
+
+    .st-patricks .btn,
+    .st-patricks .btn-waitlist,
+    .st-patricks .boarding-card,
+    .st-patricks .status-section,
+    .st-patricks .carousel,
+    .st-patricks .carousel-slide h3,
+    .st-patricks .puzzle-label,
+    .st-patricks .puzzle-diamond.lit {
+      border-color: #2E8B3A;
+      color: #2E8B3A;
+      text-shadow: none;
+    }
+
+    .st-patricks h1 {
+      color: #2E8B3A;
+    }
+
+    .st-patricks .badge {
+      border-color: rgba(46, 139, 58, 0.5);
+      background: rgba(46, 139, 58, 0.12);
+      color: #2E8B3A;
+    }
+
+    .st-patricks .badge--highlight {
+      border-color: rgba(46, 139, 58, 0.6);
+      background: rgba(46, 139, 58, 0.15);
+      color: #2E8B3A;
+    }
+
+    .st-patricks .btn-waitlist.unlocked {
+      box-shadow: 0 0 16px rgba(46, 139, 58, 0.4);
+    }
+
+    footer .st-patricks-accent {
+      color: #2E8B3A;
+    }
+
+    /* =====================
        MOBILE FIXES
     ===================== */
     @media (max-width: 480px) {
@@ -483,24 +531,25 @@
     <p class="subtitle">Career Optimization Platform</p>
 
     <!-- CYBERPUNK STATUS SECTION -->
-    <div class="status-section">
+    <div class="status-section" id="loading-dock">
       <div class="status-scanlines"></div>
 
       <div class="status-title">
         <span class="status-title-label">Loading Dock:</span>
-        <span class="badge badge--status">OPEN</span>
+        <span class="badge badge--status" id="dock-status">OPEN</span>
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Next Flight:</span>
-        <span class="badge badge--flight">FL 030126 🚀</span>
+        <!-- FIX 3 + FIX 5 — flight number updated; JS will overwrite dynamically -->
+        <span class="badge badge--flight" id="flight-number">FL 030626 ✈️</span>
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Status:</span>
-        <span class="badge badge--highlight">
-          <span class="full-text">Early Arrival — Ahead of Schedule ✈️⚡</span>
-          <span class="short-text">Early Arrival ✈️⚡</span>
+        <span class="badge badge--highlight" id="dock-status-badge">
+          <span class="full-text">WHEELS DOWN ✈️ GATE OPEN</span>
+          <span class="short-text">WHEELS DOWN ✈️</span>
         </span>
       </div>
 
@@ -511,20 +560,14 @@
       </div>
       <div class="status-title">
         <span class="status-title-label">Arrival Time:</span>
-        <span class="badge badge--arriving"><span class="arriving-dot"></span>Arriving Now</span>
+        <span class="badge badge--arriving" id="arrival-time"><span class="arriving-dot"></span>ARRIVES Mar 21, 12:34 PM ET</span>
       </div>
-    </div>
 
-    <p class="status-text">
-      <span class="date">Update:</span> Originally scheduled for
-      <span style="text-decoration:line-through;opacity:0.5;">03-21-26</span> — arriving
-      <span class="date">20 days early</span>. Wheels down
-      <span class="date">March 1st, 2026</span>.
-      Three paths await—<span class="path">Signal</span>,
-      <span class="path">Systems</span>,
-      <span class="path">Support</span>—but only those who
-      read between the lines will unlock what comes next.
-    </p>
+      <!-- FIX 7 — status-text moved inside glass window; updated copy -->
+      <p class="status-text">
+        Wheels down. TUJ is live and in early access — board now, shape what gets built next. Issue #001 drops March 16.
+      </p>
+    </div>
 
     <!-- CHANGE 2 — CAROUSEL (between boarding card and buttons) -->
     <div class="carousel-wrap">
@@ -540,7 +583,7 @@
           </div>
           <div class="carousel-slide">
             <h3>5 seats. One flight.</h3>
-            <p>PageForward Airways FL 030126 is carrying 5 passengers through the full TUJ system. Every result gets tracked and shared in the newsletter.</p>
+            <p>PageForward Airways is carrying 5 passengers through the full TUJ system. Every result gets tracked and shared in the newsletter.</p>
           </div>
           <div class="carousel-slide">
             <h3>You're watching it get built.</h3>
@@ -568,7 +611,8 @@
       >
         📄 Studio
       </a>
-<a
+
+      <a
         href="https://newsletter.thispagedoesnotexist12345.us/"
         class="btn btn-signal"
         data-path="signal"
@@ -590,10 +634,10 @@
         ⚙️ Systems
       </a>
 
-      <!-- CHANGE 1 — Support: updated href + label, non-competing style -->
+      <!-- FIX 2 — Support: same .btn class as other buttons, no special override class -->
       <a
         href="https://buymeacoffee.com/builderone"
-        class="btn btn-support"
+        class="btn"
         data-path="support"
         target="_blank"
         rel="noopener"
@@ -601,8 +645,7 @@
       >
         Support the Journey ☕
       </a>
-
-          </div>
+    </div>
 
     <!-- CHANGE 3 — PUZZLE PATH TRACKER (3 diamonds) -->
     <div class="puzzle-tracker" id="puzzleTracker">
@@ -622,7 +665,7 @@
     <!-- CHANGE 4 — WAITLIST CTA as 5th button (separate row) -->
     <div class="btn-row-waitlist">
       <a
-        href="https://calendarjet.com/palmtr3man/pageforward-airways"
+        href="https://www.calendarjet.com/kevinclark/thispagedoesnotexist12345"
         class="btn-waitlist"
         id="waitlistBtn"
         target="_blank"
@@ -755,6 +798,81 @@
       const themeStatus = document.getElementById('theme-status');
       document.body.classList.add('black-glass');
       themeStatus.textContent = 'Black Glass Theme Active';
+    })();
+
+    // =====================
+    // FIX 4 — St. Patrick's Day theme (March 17 only)
+    // =====================
+    (function() {
+      const now = new Date();
+      if (now.getMonth() === 2 && now.getDate() === 17) { // March = month index 2
+        document.body.classList.add('st-patricks');
+      }
+    })();
+
+    // =====================
+    // FIX 5 — Dynamic flight number (updates daily)
+    // =====================
+    (function() {
+      function updateFlightNumber() {
+        const now = new Date();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const yy = String(now.getFullYear()).slice(-2);
+        // St. Patrick's Day special format
+        const isStPats = now.getMonth() === 2 && now.getDate() === 17;
+        const flightNum = isStPats ? 'FL ☘️1726 ✈️' : 'FL ' + mm + dd + yy + ' ✈️';
+        const el = document.getElementById('flight-number');
+        if (el) el.textContent = flightNum;
+      }
+      updateFlightNumber();
+    })();
+
+    // =====================
+    // FIX 6 — Dynamic dock state machine
+    // =====================
+    (function() {
+      function updateDockState() {
+        // March 16-21, 2026 is after DST spring forward (Mar 8), so ET = EDT = UTC-4
+        const openTime    = new Date('2026-03-16T16:34:00Z'); // 12:34 PM EDT = 16:34 UTC
+        const departTime  = new Date('2026-03-21T16:34:00Z'); // 12:34 PM EDT = 16:34 UTC
+        const arrivingWindowMs = 15 * 60 * 1000;              // ±15 min window
+        const now = new Date();
+
+        const dockEl    = document.getElementById('dock-status');
+        const statusEl  = document.getElementById('dock-status-badge');
+        const arrivalEl = document.getElementById('arrival-time');
+
+        if (!dockEl || !arrivalEl) return;
+
+        if (now >= departTime) {
+          const inWindow = Math.abs(now - departTime) <= arrivingWindowMs;
+          if (inWindow) {
+            // ARRIVING NOW
+            dockEl.textContent = 'OPEN';
+            arrivalEl.innerHTML = '<span class="arriving-dot"></span>ARRIVING NOW';
+          } else {
+            // CLOSED
+            dockEl.textContent = 'CLOSED';
+            arrivalEl.textContent = 'ARRIVED Mar 21, 12:34 PM ET';
+            if (statusEl) {
+              statusEl.innerHTML = 'DEPARTED';
+            }
+          }
+        } else if (now >= openTime) {
+          // OPEN
+          dockEl.textContent = 'OPEN';
+          arrivalEl.textContent = 'ARRIVES Mar 21, 12:34 PM ET';
+        } else {
+          // STANDBY
+          dockEl.textContent = 'STANDBY';
+          arrivalEl.textContent = 'ARRIVES Mar 21, 12:34 PM ET';
+          if (statusEl) {
+            statusEl.innerHTML = 'SCHEDULED';
+          }
+        }
+      }
+      updateDockState();
     })();
   </script>
 
