@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -178,9 +177,6 @@
       opacity: 1;
     }
 
-    /* =====================
-       CHANGE 1 — Black Glass Buttons
-    ===================== */
     .btn-row {
       display: flex;
       gap: 1rem;
@@ -199,7 +195,6 @@
       cursor: pointer;
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
       letter-spacing: 0.05em;
-      /* Black Glass base */
       background: rgba(0, 0, 0, 0.6);
       border: 1px solid rgba(0, 255, 255, 0.25);
       color: #00e5ff;
@@ -213,10 +208,6 @@
       box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
     }
 
-    /* FIX 2 — Support button: same styling as all other .btn buttons (no special override) */
-    /* .btn-support special overrides removed so it matches Signal, Systems, Studio exactly */
-
-    /* Waitlist divider row */
     .btn-row-divider {
       display: flex;
       align-items: center;
@@ -242,14 +233,12 @@
       color: rgba(0, 229, 255, 0.8);
     }
 
-    /* Waitlist button row */
     .btn-row-waitlist {
       display: flex;
       justify-content: center;
       margin-bottom: 2rem;
     }
 
-    /* CHANGE 4 — Waitlist button */
     .btn-waitlist {
       display: inline-block;
       padding: 0.75rem 2rem;
@@ -278,7 +267,6 @@
       box-shadow: 0 0 16px rgba(0, 255, 255, 0.35);
     }
 
-    /* Arriving Now badge */
     @keyframes pulse-green {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(1.5); }
@@ -306,13 +294,11 @@
       animation: pulse-green 1.2s ease-in-out infinite;
     }
 
-    /* FIX: Split Carrier row into two rows on small screens */
     .status-title--carrier {
       flex-wrap: wrap;
       row-gap: 0.4rem;
     }
 
-    /* Mobile-only short label for the Status badge */
     .badge--highlight .full-text { display: inline; }
     .badge--highlight .short-text { display: none; }
 
@@ -327,15 +313,11 @@
       margin-top: 1.5rem;
     }
 
-    /* =====================
-       CHANGE 2 — Carousel
-    ===================== */
     .carousel-wrap {
       margin-bottom: 2rem;
       position: relative;
     }
 
-    /* FIX 1 — Carousel full-width clip: ensure overflow hidden so only one slide shows */
     .carousel {
       position: relative;
       overflow: hidden;
@@ -354,7 +336,6 @@
       will-change: transform;
     }
 
-    /* FIX 1 — Each slide must be exactly 100% width, no overflow */
     .carousel-slide {
       min-width: 100%;
       width: 100%;
@@ -400,9 +381,6 @@
       box-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
     }
 
-    /* =====================
-       CHANGE 3 — Puzzle Tracker
-    ===================== */
     .puzzle-tracker {
       display: flex;
       flex-direction: column;
@@ -435,12 +413,8 @@
       text-shadow: 0 0 8px rgba(0, 229, 255, 0.7), 0 0 16px rgba(0, 229, 255, 0.4);
     }
 
-    /* =====================
-       FIX 4 — St. Patrick's Day Theme (March 17 only)
-    ===================== */
-    .st-patricks {
-      --accent: #2E8B3A;
-    }
+    /* St. Patrick's Day Theme (March 17 only) */
+    .st-patricks { --accent: #2E8B3A; }
 
     .st-patricks .btn,
     .st-patricks .btn-waitlist,
@@ -455,9 +429,7 @@
       text-shadow: none;
     }
 
-    .st-patricks h1 {
-      color: #2E8B3A;
-    }
+    .st-patricks h1 { color: #2E8B3A; }
 
     .st-patricks .badge {
       border-color: rgba(46, 139, 58, 0.5);
@@ -475,53 +447,18 @@
       box-shadow: 0 0 16px rgba(46, 139, 58, 0.4);
     }
 
-    footer .st-patricks-accent {
-      color: #2E8B3A;
-    }
+    footer .st-patricks-accent { color: #2E8B3A; }
 
-    /* =====================
-       MOBILE FIXES
-    ===================== */
     @media (max-width: 480px) {
-      .container {
-        width: 95%;
-        padding: 2rem 1.25rem;
-      }
-
-      h1 {
-        font-size: 1.6rem;
-      }
-
-      .status-section {
-        padding: 1.25rem 1rem;
-      }
-
-      .status-title {
-        font-size: 0.8rem;
-      }
-
-      .btn-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .btn {
-        text-align: center;
-        width: 100%;
-      }
-
-      .btn-row-waitlist {
-        padding: 0 0;
-      }
-
-      .btn-waitlist {
-        width: 100%;
-        text-align: center;
-      }
-
-      .carousel-slide {
-        padding: 1.25rem 1rem;
-      }
+      .container { width: 95%; padding: 2rem 1.25rem; }
+      h1 { font-size: 1.6rem; }
+      .status-section { padding: 1.25rem 1rem; }
+      .status-title { font-size: 0.8rem; }
+      .btn-row { flex-direction: column; align-items: stretch; }
+      .btn { text-align: center; width: 100%; }
+      .btn-row-waitlist { padding: 0 0; }
+      .btn-waitlist { width: 100%; text-align: center; }
+      .carousel-slide { padding: 1.25rem 1rem; }
     }
   </style>
 </head>
@@ -536,62 +473,76 @@
 
       <div class="status-title">
         <span class="status-title-label">Loading Dock:</span>
-        <span class="badge badge--status" id="dock-status">OPEN</span>
+        <span class="badge badge--status" id="dock-status">STANDBY</span>
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Next Flight:</span>
-        <!-- FIX 3 + FIX 5 — flight number updated; JS will overwrite dynamically -->
-        <span class="badge badge--flight" id="flight-number">FL 030626 ✈️</span>
+        <span class="badge badge--flight" id="flight-number">FL 032126 ✈️</span>
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Status:</span>
         <span class="badge badge--highlight" id="dock-status-badge">
-          <span class="full-text">WHEELS DOWN ✈️ GATE OPEN</span>
-          <span class="short-text">WHEELS DOWN ✈️</span>
+          <span class="full-text">SCHEDULED</span>
+          <span class="short-text">SCHED</span>
         </span>
       </div>
 
-      <!-- FIX: Split Carrier and Arrival Time into separate rows -->
-<div class="status-title">
-  <span class="status-title-label">Arrival Date:</span>
-  <span class="badge badge--arriving" id="arrival-date">
-    <span class="arriving-dot"></span>March 21, 2026
-  </span>
-</div>
-<div class="status-title">
-  <span class="status-title-label">Arrival Time:</span>
-  <span class="badge badge--arriving" id="arrival-time">
-    <span class="arriving-dot"></span>12:34 PM ET
-  </span>
-</div>
+      <div class="status-title">
+        <span class="status-title-label">Departure Date:</span>
+        <span class="badge badge--arriving" id="departure-date">
+          <span class="arriving-dot"></span>Mar 21, 2026
+        </span>
+      </div>
 
-      <!-- FIX 7 — status-text moved inside glass window; updated copy -->
+      <div class="status-title">
+        <span class="status-title-label">Departure Time:</span>
+        <span class="badge badge--arriving" id="arrival-time">
+          <span class="arriving-dot"></span>
+          <span id="arrival-text">DEPARTS Mar 21, 12:34 PM ET</span>
+        </span>
+      </div>
+
       <p class="status-text">
-        Wheels down. TUJ is live and in early access — board now, shape what gets built next. Issue #001 drops March 16.
+        Gate open. TUJ is live in early access — board now and shape what gets built next. Issue #001 taxis out March 16.
+      </p>
+
+      <a
+        href="https://calendarjet.com/palmtr3man/thispagedoesnotexist12345"
+        class="btn-waitlist"
+        id="waitlistBtn"
+        target="_blank"
+        rel="noopener"
+        data-umami-event="Waitlist Click"
+      >
+        ✈️ Request a Seat
+      </a>
+
+      <p class="status-text" style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
+        Request a seat on this flight. If selected, you will be confirmed on this flight. Boarding instructions will be sent by email.
       </p>
     </div>
 
-    <!-- CHANGE 2 — CAROUSEL (between boarding card and buttons) -->
+    <!-- CAROUSEL -->
     <div class="carousel-wrap">
       <div class="carousel" id="mainCarousel">
         <div class="carousel-track" id="carouselTrack">
           <div class="carousel-slide">
-            <h3>Your career has a story.</h3>
-            <p>The Ultimate Journey helps you align your experience with what the market is actually looking for — using AI, real job descriptions, and a system that works.</p>
+            <h3>Your career has a flight plan.</h3>
+            <p>The Ultimate Journey runs one focused cohort through the full system — mapping your experience to what the market is actually hiring for.</p>
           </div>
           <div class="carousel-slide">
             <h3>Built for the overlooked operator.</h3>
-            <p>If you've been out of the market, restarting, or just stuck — this platform was built for you. No experience floor. No gatekeeping.</p>
+            <p>This first cohort is for operators who've been out of the market, restarting, or stuck. No experience floor. No gatekeeping — just clear checkpoints.</p>
           </div>
           <div class="carousel-slide">
-            <h3>5 seats. One flight.</h3>
-            <p>PageForward Airways is carrying 5 passengers through the full TUJ system. Every result gets tracked and shared in the newsletter.</p>
+            <h3>One flight. Five seats.</h3>
+            <p>PageForward Airways is carrying 5 passengers on this flight through the TUJ system. Every outcome is logged to the manifest and shared in the newsletter.</p>
           </div>
           <div class="carousel-slide">
-            <h3>You're watching it get built.</h3>
-            <p>Every bug, every fix, every passenger milestone — documented and shared. If it works for the cohort, the dock reopens for you.</p>
+            <h3>Gate open. Then wheels up.</h3>
+            <p>Every bug, fix, and passenger milestone is recorded. When this flight departs, the gate closes until the next cohort is scheduled.</p>
           </div>
         </div>
       </div>
@@ -603,55 +554,15 @@
       </div>
     </div>
 
-    <!-- CHANGE 1 — BLACK GLASS BUTTONS (all 4 path buttons) -->
+    <!-- BLACK GLASS BUTTONS -->
     <div class="btn-row">
-      <a
-        href="https://resume-builderone-resume-builder.netlify.app/"
-        class="btn btn-studio"
-        data-path="studio"
-        target="_blank"
-        rel="noopener"
-        data-umami-event="Studio Click"
-      >
-        📄 Studio
-      </a>
-
-      <a
-        href="https://newsletter.thispagedoesnotexist12345.us/"
-        class="btn btn-signal"
-        data-path="signal"
-        target="_blank"
-        rel="noopener"
-        data-umami-event="Signal Click"
-      >
-        📡 Signal
-      </a>
-
-      <a
-        href="https://www.thispagedoesnotexist12345.info/"
-        class="btn btn-systems"
-        data-path="systems"
-        target="_blank"
-        rel="noopener"
-        data-umami-event="Systems Click"
-      >
-        ⚙️ Systems
-      </a>
-
-      <!-- FIX 2 — Support: same .btn class as other buttons, no special override class -->
-      <a
-        href="https://buymeacoffee.com/builderone"
-        class="btn"
-        data-path="support"
-        target="_blank"
-        rel="noopener"
-        data-umami-event="Support Click"
-      >
-        Support the Journey ☕
-      </a>
+      <a href="https://resume-builderone-resume-builder.netlify.app/" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener" data-umami-event="Studio Click">📄 Studio</a>
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener" data-umami-event="Signal Click">📡 Signal</a>
+      <a href="https://www.thispagedoesnotexist12345.info/" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener" data-umami-event="Systems Click">⚙️ Systems</a>
+      <a href="https://buymeacoffee.com/builderone" class="btn" data-path="support" target="_blank" rel="noopener" data-umami-event="Support Click">Support the Journey ☕</a>
     </div>
 
-    <!-- CHANGE 3 — PUZZLE PATH TRACKER (3 diamonds) -->
+    <!-- PUZZLE PATH TRACKER -->
     <div class="puzzle-tracker" id="puzzleTracker">
       <span class="puzzle-label">Paths Activated</span>
       <div class="puzzle-diamonds">
@@ -661,22 +572,22 @@
       </div>
     </div>
 
-    <!-- Divider between path buttons and waitlist CTA -->
+    <!-- Divider -->
     <div class="btn-row-divider">
       <span>next step</span>
     </div>
 
-    <!-- CHANGE 4 — WAITLIST CTA as 5th button (separate row) -->
+    <!-- WAITLIST CTA -->
     <div class="btn-row-waitlist">
       <a
         href="https://calendarjet.com/palmtr3man/thispagedoesnotexist12345"
         class="btn-waitlist"
-        id="waitlistBtn"
+        id="waitlistBtnBottom"
         target="_blank"
         rel="noopener"
-        data-umami-event="Waitlist Click"
+        data-umami-event="Waitlist Click Bottom"
       >
-        ✈️ Join the Waitlist
+        ✈️ Request a Seat
       </a>
     </div>
 
@@ -686,9 +597,7 @@
   </div>
 
   <script>
-    // =====================
-    // CHANGE 2 — Carousel logic
-    // =====================
+    // Carousel logic
     (function() {
       const track = document.getElementById('carouselTrack');
       const dots = document.querySelectorAll('.carousel-dot');
@@ -703,9 +612,7 @@
       function goTo(index) {
         current = (index + total) % total;
         track.style.transform = 'translateX(-' + (current * 100) + '%)';
-        dots.forEach(function(d, i) {
-          d.classList.toggle('active', i === current);
-        });
+        dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
       }
 
       function startAuto() {
@@ -720,7 +627,6 @@
         });
       });
 
-      // Touch / swipe support
       carousel.addEventListener('touchstart', function(e) {
         touchStartX = e.touches[0].clientX;
         isDragging = true;
@@ -745,9 +651,7 @@
       startAuto();
     })();
 
-    // =====================
-    // CHANGE 3 + 4 — Puzzle tracker + Waitlist unlock
-    // =====================
+    // Puzzle tracker + Waitlist unlock
     (function() {
       const pathDiamonds = {
         signal:  document.getElementById('diamond-signal'),
@@ -755,128 +659,124 @@
         support: document.getElementById('diamond-support')
       };
       const waitlistBtn = document.getElementById('waitlistBtn');
+      const waitlistBtnBottom = document.getElementById('waitlistBtnBottom');
 
       function updatePuzzleUI() {
         const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
         ['signal', 'systems', 'support'].forEach(function(path) {
-          if (chosen.includes(path)) {
-            pathDiamonds[path].classList.add('lit');
-          }
+          if (chosen.includes(path)) { pathDiamonds[path].classList.add('lit'); }
         });
         if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
-          waitlistBtn.classList.add('unlocked');
+          if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+          if (waitlistBtnBottom) waitlistBtnBottom.classList.add('unlocked');
         }
       }
 
-      // Track path clicks (all buttons in btn-row)
       document.querySelectorAll('.btn-row .btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
           const path = btn.dataset.path;
           if (!path) return;
-          console.log('[TUJ] Path chosen:', path);
           localStorage.setItem('last-path', path);
           const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
           if (!chosen.includes(path)) {
             chosen.push(path);
             localStorage.setItem('paths-chosen', JSON.stringify(chosen));
           }
-          // Light up the corresponding diamond immediately
-          if (pathDiamonds[path]) {
-            pathDiamonds[path].classList.add('lit');
-          }
-          // Check if all 3 puzzle paths are activated
+          if (pathDiamonds[path]) { pathDiamonds[path].classList.add('lit'); }
           if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
-            console.log('[TUJ] All paths activated — waitlist unlocked');
             localStorage.setItem('puzzle-stage', 'unlocked');
-            waitlistBtn.classList.add('unlocked');
+            if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+            if (waitlistBtnBottom) waitlistBtnBottom.classList.add('unlocked');
           }
         });
       });
 
-      // Restore state from localStorage on page load
       updatePuzzleUI();
     })();
 
-    // Theme management — Black Glass always active
+    // Black Glass always active
     (function() {
       const themeStatus = document.getElementById('theme-status');
       document.body.classList.add('black-glass');
       themeStatus.textContent = 'Black Glass Theme Active';
     })();
 
-    // =====================
-    // FIX 4 — St. Patrick's Day theme (March 17 only)
-    // =====================
+    // St. Patrick's Day theme (March 17 only)
     (function() {
       const now = new Date();
-      if (now.getMonth() === 2 && now.getDate() === 17) { // March = month index 2
+      if (now.getMonth() === 2 && now.getDate() === 17) {
         document.body.classList.add('st-patricks');
       }
     })();
 
-    // =====================
-    // FIX 5 — Dynamic flight number (updates daily)
-    // =====================
-    (function() {
-      function updateFlightNumber() {
-        const now = new Date();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const dd = String(now.getDate()).padStart(2, '0');
-        const yy = String(now.getFullYear()).slice(-2);
-        // St. Patrick's Day special format
-        const isStPats = now.getMonth() === 2 && now.getDate() === 17;
-        const flightNum = isStPats ? 'FL ☘️1726 ✈️' : 'FL ' + mm + dd + yy + ' ✈️';
-        const el = document.getElementById('flight-number');
-        if (el) el.textContent = flightNum;
-      }
-      updateFlightNumber();
-    })();
-
-    // =====================
-    // FIX 6 — Dynamic dock state machine
-    // =====================
-    (function() {
+    // Flight number + dock state (cohort-based)
+    (function () {
       function updateDockState() {
-        // March 16-21, 2026 is after DST spring forward (Mar 8), so ET = EDT = UTC-4
-        const openTime    = new Date('2026-03-16T16:34:00Z'); // 12:34 PM EDT = 16:34 UTC
-        const departTime  = new Date('2026-03-21T16:34:00Z'); // 12:34 PM EDT = 16:34 UTC
-        const arrivingWindowMs = 15 * 60 * 1000;              // ±15 min window
-        const now = new Date();
+        const departTime = new Date('2026-03-21T16:34:00Z');
+        const openTime   = new Date(departTime.getTime() - 60 * 60 * 1000);
+        const closeTime  = new Date(departTime.getTime());
+        const now        = new Date();
 
-        const dockEl    = document.getElementById('dock-status');
-        const statusEl  = document.getElementById('dock-status-badge');
-        const arrivalEl = document.getElementById('arrival-time');
+        // DEV ONLY: force a dock state via URL for screenshots/QA.
+        // ?force_state=STANDBY | OPEN | CLOSED
+        let FORCE_STATE = new URLSearchParams(location.search).get('force_state');
+        if (FORCE_STATE === '') FORCE_STATE = null;
+        if (FORCE_STATE) FORCE_STATE = FORCE_STATE.trim();
 
-        if (!dockEl || !arrivalEl) return;
-
-        if (now >= departTime) {
-          const inWindow = Math.abs(now - departTime) <= arrivingWindowMs;
-          if (inWindow) {
-            // ARRIVING NOW
-            dockEl.textContent = 'OPEN';
-            arrivalEl.innerHTML = '<span class="arriving-dot"></span>ARRIVING NOW';
-          } else {
-            // CLOSED
-            dockEl.textContent = 'CLOSED';
-            arrivalEl.textContent = 'ARRIVED Mar 21, 12:34 PM ET';
-            if (statusEl) {
-              statusEl.innerHTML = 'DEPARTED';
-            }
-          }
-        } else if (now >= openTime) {
-          // OPEN
-          dockEl.textContent = 'OPEN';
-          arrivalEl.textContent = 'ARRIVES Mar 21, 12:34 PM ET';
-        } else {
-          // STANDBY
-          dockEl.textContent = 'STANDBY';
-          arrivalEl.textContent = 'ARRIVES Mar 21, 12:34 PM ET';
-          if (statusEl) {
-            statusEl.innerHTML = 'SCHEDULED';
-          }
+        let effectiveNow = now;
+        if (FORCE_STATE === 'STANDBY') {
+          effectiveNow = new Date(openTime.getTime() - 1000);
+        } else if (FORCE_STATE === 'OPEN') {
+          effectiveNow = new Date(openTime.getTime() + 1000);
+        } else if (FORCE_STATE === 'CLOSED') {
+          effectiveNow = new Date(closeTime.getTime() + 1000);
         }
+
+        const dockEl        = document.getElementById('dock-status');
+        const statusEl      = document.getElementById('dock-status-badge');
+        const flightEl      = document.getElementById('flight-number');
+        const arrivalTextEl = document.getElementById('arrival-text');
+
+        if (!dockEl || !arrivalTextEl) return FORCE_STATE;
+
+        // Flight number from cohort departure date
+        const mm = String(departTime.getMonth() + 1).padStart(2, '0');
+        const dd = String(departTime.getDate()).padStart(2, '0');
+        const yy = String(departTime.getFullYear()).slice(-2);
+        const isStPatsCohort = departTime.getMonth() === 2 && departTime.getDate() === 17;
+        const flightNum = isStPatsCohort ? 'FL 031726' : `FL ${mm}${dd}${yy}`;
+        if (flightEl) { flightEl.textContent = `${flightNum} ✈️`; }
+
+        const depLabel = 'Mar 21, 12:34 PM ET';
+        const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
+        const short = statusEl ? statusEl.querySelector('.short-text') : null;
+
+        if (effectiveNow >= closeTime) {
+          dockEl.textContent = 'CLOSED';
+          arrivalTextEl.textContent = `DEPARTED ${depLabel}`;
+          if (full)  full.textContent  = 'DEPARTED';
+          if (short) short.textContent = 'DEPARTED';
+        } else if (effective
+        } else if (effectiveNow >= openTime) {
+          dockEl.textContent = 'OPEN';
+          arrivalTextEl.textContent = `DEPARTING ${depLabel}`;
+          if (full)  full.textContent  = 'BOARDING ✈️ GATE OPEN';
+          if (short) short.textContent = 'BOARDING';
+        } else {
+          dockEl.textContent = 'STANDBY';
+          arrivalTextEl.textContent = `DEPARTS ${depLabel}`;
+          if (full)  full.textContent  = 'SCHEDULED';
+          if (short) short.textContent = 'SCHED';
+        }
+
+        return FORCE_STATE;
       }
-      updateDockState();
+
+      const FORCE_STATE = updateDockState();
+      const UPDATE_MS = 30000;
+      if (FORCE_STATE === null) {
+        setInterval(updateDockState, UPDATE_MS);
+      }
     })();
   </script>
 
