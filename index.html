@@ -500,12 +500,12 @@
         <span class="status-title-label">Departure Time:</span>
         <span class="badge badge--arriving" id="arrival-time">
           <span class="arriving-dot"></span>
-          <span id="arrival-text">DEPARTS Mar 21, 12:34 PM ET</span>
+          <span id="arrival-text">12:34 PM ET</span>
         </span>
       </div>
 
-      <p class="status-text">
-        Gate open. TUJ is live in early access — board now and shape what gets built next. Issue #001 taxis out March 16.
+      <p class="status-text" style="font-size: 0.8rem; font-style: italic; opacity: 0.75; margin-bottom: 1rem;">
+        <strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next. Issue #001 taxis out March 16.
       </p>
 
       <a
@@ -577,18 +577,9 @@
       <span>next step</span>
     </div>
 
-    <!-- WAITLIST CTA -->
-    <div class="btn-row-waitlist">
-      <a
-        href="https://calendarjet.com/palmtr3man/thispagedoesnotexist12345"
-        class="btn-waitlist"
-        id="waitlistBtnBottom"
-        target="_blank"
-        rel="noopener"
-        data-umami-event="Waitlist Click Bottom"
-      >
-        ✈️ Request a Seat
-      </a>
+    <!-- NEXT STEP GUIDANCE -->
+    <div class="btn-row-waitlist" style="display: block; text-align: center; margin-bottom: 2rem;">
+      <p style="font-size: 0.85rem; color: rgba(0,229,255,0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
     </div>
 
     <footer>
@@ -659,7 +650,6 @@
         support: document.getElementById('diamond-support')
       };
       const waitlistBtn = document.getElementById('waitlistBtn');
-      const waitlistBtnBottom = document.getElementById('waitlistBtnBottom');
 
       function updatePuzzleUI() {
         const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
@@ -668,7 +658,6 @@
         });
         if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
           if (waitlistBtn) waitlistBtn.classList.add('unlocked');
-          if (waitlistBtnBottom) waitlistBtnBottom.classList.add('unlocked');
         }
       }
 
@@ -686,7 +675,6 @@
           if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
             localStorage.setItem('puzzle-stage', 'unlocked');
             if (waitlistBtn) waitlistBtn.classList.add('unlocked');
-            if (waitlistBtnBottom) waitlistBtnBottom.classList.add('unlocked');
           }
         });
       });
@@ -747,24 +735,23 @@
         const flightNum = isStPatsCohort ? 'FL 031726' : `FL ${mm}${dd}${yy}`;
         if (flightEl) { flightEl.textContent = `${flightNum} ✈️`; }
 
-        const depLabel = 'Mar 21, 12:34 PM ET';
+        const timeLabel = '12:34 PM ET';
         const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
         const short = statusEl ? statusEl.querySelector('.short-text') : null;
 
         if (effectiveNow >= closeTime) {
           dockEl.textContent = 'CLOSED';
-          arrivalTextEl.textContent = `DEPARTED ${depLabel}`;
+          arrivalTextEl.textContent = timeLabel;
           if (full)  full.textContent  = 'DEPARTED';
           if (short) short.textContent = 'DEPARTED';
-        } else if (effective
         } else if (effectiveNow >= openTime) {
           dockEl.textContent = 'OPEN';
-          arrivalTextEl.textContent = `DEPARTING ${depLabel}`;
+          arrivalTextEl.textContent = timeLabel;
           if (full)  full.textContent  = 'BOARDING ✈️ GATE OPEN';
           if (short) short.textContent = 'BOARDING';
         } else {
           dockEl.textContent = 'STANDBY';
-          arrivalTextEl.textContent = `DEPARTS ${depLabel}`;
+          arrivalTextEl.textContent = timeLabel;
           if (full)  full.textContent  = 'SCHEDULED';
           if (short) short.textContent = 'SCHED';
         }
