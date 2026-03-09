@@ -460,6 +460,31 @@
       .btn-waitlist { width: 100%; text-align: center; }
       .carousel-slide { padding: 1.25rem 1rem; }
     }
+
+    .gate-locked-msg {
+      display: none;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      color: rgba(0, 229, 255, 0.4);
+      text-align: center;
+      cursor: default;
+      margin-bottom: 1rem;
+    }
+
+    .gate-closed-reveal {
+      display: none;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      background: rgba(0, 0, 0, 0.5);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body class="black-glass">
@@ -473,11 +498,11 @@
 
       <div class="status-title">
         <span class="status-title-label">Loading Dock:</span>
-        <span class="badge badge--status" id="dock-status">STANDBY</span>
+        <span class="badge badge--status" id="dock-status">GATE OPEN</span>
       </div>
 
       <div class="status-title">
-        <span class="status-title-label">Next Flight:</span>
+        <span class="status-title-label">Flight:</span>
         <span class="badge badge--flight" id="flight-number">FL 032126 ✈️</span>
       </div>
 
@@ -520,8 +545,22 @@
       </a>
 
       <p class="status-text" style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
-        Request a seat on this flight. If selected, you will be confirmed on this flight. Boarding instructions will be sent by email.
+        Request a seat on this flight. If selected, you will be confirmed on this flight and boarding instructions will be sent by email. Five passengers will be selected based on how closely your experience and target role align with this cohort's focus.
       </p>
+
+      <!-- Gate-closed locked state (hidden when gate is open) -->
+      <div class="gate-locked-msg" style="display:none">
+        🔒 Next Flight — Complete the path to unlock
+      </div>
+
+      <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
+      <div class="gate-closed-reveal" style="display:none">
+        <h3 style="color:#00e5ff;margin-bottom:0.5rem">Next cohort assembling.</h3>
+        <p style="opacity:0.8;margin-bottom:1.25rem">Stay on the manifest — you'll be first to know when the gate opens.</p>
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-waitlist" target="_blank" rel="noopener">
+          📡 Join Signal — Stay on the manifest
+        </a>
+      </div>
     </div>
 
     <!-- CAROUSEL -->
@@ -657,7 +696,14 @@
           if (chosen.includes(path)) { pathDiamonds[path].classList.add('lit'); }
         });
         if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
-          if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+          if (document.body.classList.contains('gate-closed')) {
+            const reveal = document.querySelector('.gate-closed-reveal');
+            const lockedMsg = document.querySelector('.gate-locked-msg');
+            if (reveal) reveal.style.display = 'block';
+            if (lockedMsg) lockedMsg.style.display = 'none';
+          } else {
+            if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+          }
         }
       }
 
@@ -674,7 +720,14 @@
           if (pathDiamonds[path]) { pathDiamonds[path].classList.add('lit'); }
           if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
             localStorage.setItem('puzzle-stage', 'unlocked');
-            if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+            if (document.body.classList.contains('gate-closed')) {
+              const reveal = document.querySelector('.gate-closed-reveal');
+              const lockedMsg = document.querySelector('.gate-locked-msg');
+              if (reveal) reveal.style.display = 'block';
+              if (lockedMsg) lockedMsg.style.display = 'none';
+            } else {
+              if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+            }
           }
         });
       });
@@ -744,6 +797,16 @@
           arrivalTextEl.textContent = timeLabel;
           if (full)  full.textContent  = 'DEPARTED';
           if (short) short.textContent = 'DEPARTED';
+
+          document.body.classList.add('gate-closed');
+
+          const statusText = document.querySelector('.status-text');
+          if (statusText) statusText.textContent = 'Flight TUJ-001 has departed. The next cohort is being assembled. Complete the path below to see what\'s coming.';
+
+          const lockedMsg = document.querySelector('.gate-locked-msg');
+          const waitlistBtnTop = document.getElementById('waitlistBtn');
+          if (waitlistBtnTop) waitlistBtnTop.style.display = 'none';
+          if (lockedMsg) lockedMsg.style.display = 'block';
         } else if (effectiveNow >= openTime) {
           dockEl.textContent = 'OPEN';
           arrivalTextEl.textContent = timeLabel;
