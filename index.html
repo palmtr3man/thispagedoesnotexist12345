@@ -735,6 +735,55 @@
       updatePuzzleUI();
     })();
 
+    // #118 — ALPHA_MODE gate + live seat status
+    (function() {
+      var waitlistBtn = document.getElementById('waitlistBtn');
+
+      async function fetchSeatStatus() {
+        try {
+          var res = await fetch('/api/seat-status');
+          if (!res.ok) return null;
+          return await res.json();
+        } catch (e) {
+          console.warn('[seat-status] Could not fetch:', e);
+          return null;
+        }
+      }
+
+      async function applySeatGate() {
+        var status = await fetchSeatStatus();
+        if (!status) return; // fail open — show button as normal if API unreachable
+
+        // If alpha mode is off, hide the seat request button entirely
+        if (!status.alpha_mode) {
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          return;
+        }
+
+        // If no seats remain, replace button with sold-out state
+        if (status.seats_remaining <= 0) {
+          if (waitlistBtn) {
+            waitlistBtn.textContent = '🚫 Flight Full — All Seats Filled';
+            waitlistBtn.style.pointerEvents = 'none';
+            waitlistBtn.style.opacity = '0.5';
+            waitlistBtn.removeAttribute('href');
+          }
+          return;
+        }
+
+        // Show live seat count below the button
+        var seatWord = status.seats_remaining === 1 ? 'seat' : 'seats';
+        var seatInfo = document.createElement('span');
+        seatInfo.style.cssText = 'display:block;font-size:0.75rem;opacity:0.6;margin-top:0.35rem;color:rgba(0,229,255,0.7);';
+        seatInfo.textContent = status.seats_remaining + ' of ' + status.seats_total + ' ' + seatWord + ' remaining';
+        if (waitlistBtn && waitlistBtn.parentNode) {
+          waitlistBtn.parentNode.insertBefore(seatInfo, waitlistBtn.nextSibling);
+        }
+      }
+
+      applySeatGate();
+    })();
+
     // Black Glass always active
     (function() {
       const themeStatus = document.getElementById('theme-status');

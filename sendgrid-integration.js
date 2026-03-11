@@ -11,19 +11,23 @@
  * - boarding_pass_free_v1
  */
 
-// Configuration - Replace with your actual SendGrid API key and template IDs
+// Configuration - template IDs from SendGrid Dynamic Templates
+// API key and platform URL are injected at runtime via Netlify env vars
 const SENDGRID_CONFIG = {
-    apiKey: 'YOUR_SENDGRID_API_KEY', // Set this in environment variables
+    apiKey: typeof process !== 'undefined' ? process.env.SENDGRID_API_KEY : 'YOUR_SENDGRID_API_KEY',
     templates: {
         sponsoredDenied: 'd-TEMPLATE_ID_1',
         sponsoredApproved: 'd-TEMPLATE_ID_2',
         birthdaySend: 'd-TEMPLATE_ID_3',
         internalSignup: 'd-TEMPLATE_ID_4',
         boardingPassPaid: 'd-TEMPLATE_ID_5',
-        boardingPassFree: 'd-TEMPLATE_ID_6'
+        boardingPassFree: 'd-TEMPLATE_ID_6',
+        // #116 — Seat confirmation / onboarding (welcome_onboarding_v1)
+        onboardingConfirm: 'd-9e8a25a22d1b438c84b8f5b7bb25c46c'
     },
     fromEmail: 'noreply@thispagedoesnotexist12345.com',
-    adminEmail: 'YOUR_ADMIN_EMAIL' // For internal notifications
+    adminEmail: 'YOUR_ADMIN_EMAIL', // For internal notifications
+    platformUrl: typeof process !== 'undefined' ? process.env.PLATFORM_URL : 'https://app.base44.com/apps/697140e628131a06045ebd18/editor/preview'
 };
 
 /**
@@ -210,6 +214,27 @@ function sendSponsorshipDenied(sponsorEmail, sponsorData) {
 }
 
 /**
+ * 7. SEAT CONFIRMATION (onboarding)
+ * #116 — Triggered by handleSeatOpened (Base44 function) when a seat is opened/confirmed.
+ * Sends welcome_onboarding_v1 with seat context.
+ * Dynamic fields: first_name, last_name, seat_id, platform_url, unsubscribe_url
+ */
+function sendSeatConfirmation(passengerEmail, passengerData) {
+    const dynamicData = {
+        first_name: passengerData.first_name || passengerData.name || 'Passenger',
+        last_name: passengerData.last_name || '',
+        seat_id: passengerData.seat_id || '',
+        platform_url: passengerData.platform_url || SENDGRID_CONFIG.platformUrl,
+        unsubscribe_url: passengerData.unsubscribe_url || ''
+    };
+    return sendEmail(
+        SENDGRID_CONFIG.templates.onboardingConfirm,
+        passengerEmail,
+        dynamicData
+    );
+}
+
+/**
  * EVENT LISTENERS - Connect to existing platform actions
  */
 function initializeSendGridIntegration() {
@@ -246,6 +271,14 @@ function initializeSendGridIntegration() {
         } else {
             await sendSponsorshipDenied(sponsorData.email, sponsorData);
         }
+    });
+
+    // #116 — Listen for seat-opened events from Base44 handleSeatOpened
+    // Payload: { email, first_name, last_name, seat_id, platform_url, unsubscribe_url }
+    window.addEventListener('seat-opened', async (event) => {
+        const passengerData = event.detail;
+        console.log('[SendGrid] Seat opened for:', passengerData.email);
+        await sendSeatConfirmation(passengerData.email, passengerData);
     });
 
     // Birthday check (run daily)
@@ -329,6 +362,7 @@ if (typeof module !== 'undefined' && module.exports) {
         sendBirthdayEmail,
         sendSponsorshipApproved,
         sendSponsorshipDenied,
+        sendSeatConfirmation, // #116
         initializeSendGridIntegration
     };
 }
