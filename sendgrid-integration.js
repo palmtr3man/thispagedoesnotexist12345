@@ -149,7 +149,7 @@ function sendBirthdayEmail(userEmail, userData) {
         birthday_year: new Date().getFullYear(),
         special_offer: 'Unlock premium access with birthday discount',
         gift_message: 'Your journey continues to evolve',
-        cta_url: 'https://buymeacoffee.com/wagonman'
+        cta_url: 'https://buymeacoffee.com/theultimatejourney'
     };
 
     return sendEmail(
