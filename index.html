@@ -533,16 +533,53 @@
         <strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next. Issue #001 taxis out March 16.
       </p>
 
-      <a
-        href="https://calendarjet.com/palmtr3man/thispagedoesnotexist12345"
+      <!-- F148: Primary CTA → POST /api/request-seat -->
+      <button
         class="btn-waitlist"
         id="waitlistBtn"
-        target="_blank"
-        rel="noopener"
         data-umami-event="Waitlist Click"
+        onclick="(function(){
+          var btn = document.getElementById('waitlistBtn');
+          btn.disabled = true;
+          btn.textContent = '⏳ Submitting…';
+          fetch('/api/request-seat', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({source:'landing'}) })
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+              btn.textContent = '✅ Seat Requested — Check your email';
+              btn.style.pointerEvents = 'none';
+            })
+            .catch(function(){
+              btn.disabled = false;
+              btn.textContent = '✈️ Request a Seat';
+              alert('Something went wrong — please try again.');
+            });
+        })()"
       >
         ✈️ Request a Seat
-      </a>
+      </button>
+
+      <!-- F148: Secondary CalendarJet split links -->
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.75rem;">
+        <a
+          href="https://calendarjet.com/palmtr3man/thispagedoesnotexist12345"
+          class="btn"
+          target="_blank"
+          rel="noopener"
+          data-umami-event="CalendarJet Public Click"
+          style="font-size:0.8rem;padding:0.5rem 1rem;"
+        >🎟️ Ticket counter window (public)</a>
+        <!-- Priority counter window: only render inside newsletter/door/email confirmation flows -->
+        <!-- data-flow="invite-only" — hidden on public landing page by default -->
+        <a
+          href="https://calendarjet.com/palmtr3man/thispagedoesnotexist12345-priority"
+          class="btn"
+          target="_blank"
+          rel="noopener"
+          data-umami-event="CalendarJet Priority Click"
+          data-flow="invite-only"
+          style="font-size:0.8rem;padding:0.5rem 1rem;display:none;"
+        >⭐ Priority counter window (invite-only)</a>
+      </div>
 
       <p class="status-text" style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
         Request a seat on this flight. If selected, you will be confirmed on this flight and boarding instructions will be sent by email. Five passengers will be selected based on how closely your experience and target role align with this cohort's focus.
@@ -595,7 +632,7 @@
 
     <!-- BLACK GLASS BUTTONS -->
     <div class="btn-row">
-      <a href="https://resume-builderone-resume-builder.netlify.app/ResumeOnePageStudio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener" data-umami-event="Studio Click">📄 Studio</a>
+      <a href="/ResumeOnePageStudio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener" data-umami-event="Studio Click">📄 Studio</a>
       <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener" data-umami-event="Signal Click">📡 Signal</a>
       <a href="https://thispagedoesnotexist12345.tech/" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener" data-umami-event="Systems Click">⚙️ Systems</a>
       <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener" data-umami-event="Support Click">Support the Journey ☕</a>
@@ -720,6 +757,7 @@
           if (pathDiamonds[path]) { pathDiamonds[path].classList.add('lit'); }
           if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
             localStorage.setItem('puzzle-stage', 'unlocked');
+            if (typeof umami !== 'undefined') { umami.track('Puzzle Unlocked'); }
             if (document.body.classList.contains('gate-closed')) {
               const reveal = document.querySelector('.gate-closed-reveal');
               const lockedMsg = document.querySelector('.gate-locked-msg');
