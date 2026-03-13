@@ -534,32 +534,36 @@
       </p>
 
       <!-- F148: Primary CTA → POST /api/request-seat -->
-      <button
-        class="btn-waitlist"
-        id="waitlistBtn"
-        data-umami-event="Waitlist Click"
-        onclick="(function(){
-          var btn = document.getElementById('waitlistBtn');
-          btn.disabled = true;
-          btn.textContent = '⏳ Submitting…';
-          fetch('/api/request-seat', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({source:'landing'}) })
-            .then(function(r){ return r.json(); })
-            .then(function(d){
-              btn.textContent = '✅ Seat Requested — Check your email';
-              btn.style.pointerEvents = 'none';
-            })
-            .catch(function(){
-              btn.disabled = false;
-              btn.textContent = '✈️ Request a Seat';
-              alert('Something went wrong — please try again.');
-            });
-        })()"
-      >
-        ✈️ Request a Seat
-      </button>
+      <!-- #cta-wrapper: stacked + centered so seat-count note renders below the button, not inline -->
+      <div id="cta-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:1.25rem auto;text-align:center;">
+        <button
+          class="btn-waitlist"
+          id="waitlistBtn"
+          data-umami-event="Waitlist Click"
+          onclick="(function(){
+            var btn = document.getElementById('waitlistBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Submitting…';
+            fetch('/api/request-seat', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({source:'landing'}) })
+              .then(function(r){ return r.json(); })
+              .then(function(d){
+                btn.textContent = '✅ Seat Requested — Check your email';
+                btn.style.pointerEvents = 'none';
+              })
+              .catch(function(){
+                btn.disabled = false;
+                btn.textContent = '✈️ Request a Seat';
+                alert('Something went wrong — please try again.');
+              });
+          })()"
+        >
+          ✈️ Request a Seat
+        </button>
+        <!-- seat-count span appended here by applySeatGate() -->
+      </div>
 
-      <!-- F148: Secondary CalendarJet split links -->
-      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.75rem;">
+      <!-- F148: Secondary CalendarJet split links (visually separated from primary CTA) -->
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.25rem;padding-top:1rem;border-top:1px solid rgba(0,255,255,0.1);">
         <a
           href="https://calendarjet.com/palmtr3man/thispagedoesnotexist12345"
           class="btn"
@@ -809,12 +813,20 @@
           return;
         }
 
-        // Show live seat count below the button
+        // Show live seat count below the button — appended inside #cta-wrapper so it stacks, not inline
         var seatWord = status.seats_remaining === 1 ? 'seat' : 'seats';
         var seatInfo = document.createElement('span');
-        seatInfo.style.cssText = 'display:block;font-size:0.75rem;opacity:0.6;margin-top:0.35rem;color:rgba(0,229,255,0.7);';
+        seatInfo.id = 'cta-seat-count';
+        seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(0,229,255,0.7);letter-spacing:0.03em;';
         seatInfo.textContent = status.seats_remaining + ' of ' + status.seats_total + ' ' + seatWord + ' remaining';
-        if (waitlistBtn && waitlistBtn.parentNode) {
+        var ctaWrapper = document.getElementById('cta-wrapper');
+        if (ctaWrapper) {
+          // Remove any previously injected count to avoid duplicates
+          var existing = document.getElementById('cta-seat-count');
+          if (existing) existing.remove();
+          ctaWrapper.appendChild(seatInfo);
+        } else if (waitlistBtn && waitlistBtn.parentNode) {
+          // Fallback: insert after button if wrapper not found
           waitlistBtn.parentNode.insertBefore(seatInfo, waitlistBtn.nextSibling);
         }
       }
