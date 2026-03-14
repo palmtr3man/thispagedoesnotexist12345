@@ -23,3 +23,16 @@
   from = "/api/seat-status"
   to = "/.netlify/functions/seat-status"
   status = 200
+
+# One Page Studio — serve /Studio from the Studio subfolder
+[[redirects]]
+  from = "/ResumeOnePageStudio"
+  to = "/Studio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ResumeOnePageStudio/*"
+  to = "/Studio/:splat"
+  status = 301
+  force = true
