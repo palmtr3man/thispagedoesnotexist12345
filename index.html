@@ -509,8 +509,8 @@
       <div class="status-title">
         <span class="status-title-label">Status:</span>
         <span class="badge badge--highlight" id="dock-status-badge">
-          <span class="full-text">SCHEDULED</span>
-          <span class="short-text">SCHED</span>
+          <span class="full-text">BOARDING ZONE 4</span>
+          <span class="short-text">ZONE 4</span>
         </span>
       </div>
 
@@ -901,10 +901,10 @@
           if (full)  full.textContent  = 'BOARDING ✈️ GATE OPEN';
           if (short) short.textContent = 'BOARDING';
         } else {
-          dockEl.textContent = 'STANDBY';
+          dockEl.textContent = 'BOARDING';
           arrivalTextEl.textContent = timeLabel;
-          if (full)  full.textContent  = 'SCHEDULED';
-          if (short) short.textContent = 'SCHED';
+          if (full)  full.textContent  = 'BOARDING ZONE 4';
+          if (short) short.textContent = 'ZONE 4';
         }
 
         return FORCE_STATE;
