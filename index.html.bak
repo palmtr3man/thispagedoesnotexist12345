@@ -38,7 +38,7 @@
     }
 
     body.black-glass h1 {
-      color: #A8C400;
+      color: #00D9FF;
     }
 
     .container {
@@ -65,7 +65,7 @@
     /* Cyberpunk status section */
     .status-section {
       position: relative;
-      border: 1px solid rgba(168, 196, 0, 0.3);
+      border: 1px solid rgba(0, 217, 255, 0.3);
       border-radius: 8px;
       padding: 1.5rem;
       margin-bottom: 2rem;
@@ -80,8 +80,8 @@
         0deg,
         transparent,
         transparent 2px,
-        rgba(168, 196, 0, 0.02) 2px,
-        rgba(168, 196, 0, 0.02) 4px
+        rgba(0, 217, 255, 0.02) 2px,
+        rgba(0, 217, 255, 0.02) 4px
       );
       pointer-events: none;
     }
@@ -108,16 +108,16 @@
       padding: 0.15rem 0.55rem;
       border-radius: 999px;
       font-size: 0.75rem;
-      border: 1px solid rgba(168, 196, 0, 0.5);
-      background: rgba(168, 196, 0, 0.12);
-      color: #A8C400;
+      border: 1px solid rgba(0, 217, 255, 0.5);
+      background: rgba(0, 217, 255, 0.12);
+      color: #00D9FF;
       white-space: nowrap;
     }
 
     .badge--highlight {
-      border-color: rgba(168, 196, 0, 0.6);
-      background: rgba(168, 196, 0, 0.15);
-      color: #A8C400;
+      border-color: rgba(0, 255, 170, 0.6);
+      background: rgba(0, 255, 170, 0.15);
+      color: #00FFAA;
     }
 
     .badge--meta {
@@ -141,13 +141,13 @@
     }
 
     .status-text .date {
-      color: #A8C400;
+      color: #00D9FF;
       opacity: 0.8;
     }
 
     /* Hoverable path keywords */
     .status-text .path {
-      color: #A8C400;
+      color: #00D9FF;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -162,14 +162,14 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: #A8C400;
+      background: #00D9FF;
       opacity: 0;
       transition: opacity 0.2s;
     }
 
     .status-text .path:hover {
       color: #fff;
-      text-shadow: 0 0 12px rgba(168, 196, 0, 0.9);
+      text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
       transform: scale(1.05);
     }
 
@@ -196,16 +196,16 @@
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(168, 196, 0, 0.25);
-      color: #A8C400;
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      color: #00e5ff;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
     .btn:hover {
       transform: translateY(-2px);
-      border-color: rgba(168, 196, 0, 0.6);
-      box-shadow: 0 0 12px rgba(168, 196, 0, 0.2);
+      border-color: rgba(0, 255, 255, 0.6);
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
     }
 
     .btn-row-divider {
@@ -223,14 +223,14 @@
       flex: 1;
       max-width: 80px;
       height: 1px;
-      background: rgba(168, 196, 0, 0.4);
+      background: rgba(0, 255, 255, 0.4);
     }
 
     .btn-row-divider span {
       font-size: 0.65rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(168, 196, 0, 0.8);
+      color: rgba(0, 229, 255, 0.8);
     }
 
     .btn-row-waitlist {
@@ -249,8 +249,8 @@
       cursor: pointer;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(168, 196, 0, 0.25);
-      color: #A8C400;
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      color: #00e5ff;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
@@ -258,13 +258,13 @@
 
     .btn-waitlist:hover {
       transform: translateY(-2px);
-      border-color: rgba(168, 196, 0, 0.6);
-      box-shadow: 0 0 12px rgba(168, 196, 0, 0.2);
+      border-color: rgba(0, 255, 255, 0.6);
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
     }
 
     .btn-waitlist.unlocked {
-      border-color: rgba(168, 196, 0, 0.8);
-      box-shadow: 0 0 16px rgba(168, 196, 0, 0.35);
+      border-color: rgba(0, 255, 255, 0.8);
+      box-shadow: 0 0 16px rgba(0, 255, 255, 0.35);
     }
 
     @keyframes pulse-green {
@@ -321,7 +321,7 @@
     .carousel {
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(168, 196, 0, 0.2);
+      border: 1px solid rgba(0, 255, 255, 0.2);
       border-radius: 10px;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
@@ -348,7 +348,7 @@
     .carousel-slide h3 {
       font-size: 1rem;
       font-weight: 700;
-      color: #A8C400;
+      color: #00e5ff;
       margin-bottom: 0.6rem;
       letter-spacing: 0.02em;
     }
@@ -370,15 +370,15 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: rgba(168, 196, 0, 0.25);
-      border: 1px solid rgba(168, 196, 0, 0.4);
+      background: rgba(0, 229, 255, 0.25);
+      border: 1px solid rgba(0, 229, 255, 0.4);
       cursor: pointer;
       transition: background 0.25s, box-shadow 0.25s;
     }
 
     .carousel-dot.active {
-      background: #A8C400;
-      box-shadow: 0 0 6px rgba(168, 196, 0, 0.6);
+      background: #00e5ff;
+      box-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
     }
 
     .puzzle-tracker {
@@ -393,7 +393,7 @@
       font-size: 0.65rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(168, 196, 0, 0.3);
+      color: rgba(0, 229, 255, 0.3);
     }
 
     .puzzle-diamonds {
@@ -404,13 +404,13 @@
 
     .puzzle-diamond {
       font-size: 1.1rem;
-      color: rgba(168, 196, 0, 0.2);
+      color: rgba(0, 229, 255, 0.2);
       transition: color 0.35s ease, text-shadow 0.35s ease;
     }
 
     .puzzle-diamond.lit {
-      color: #A8C400;
-      text-shadow: 0 0 8px rgba(168, 196, 0, 0.7), 0 0 16px rgba(168, 196, 0, 0.4);
+      color: #00e5ff;
+      text-shadow: 0 0 8px rgba(0, 229, 255, 0.7), 0 0 16px rgba(0, 229, 255, 0.4);
     }
 
     /* St. Patrick's Day Theme (March 17 only) */
@@ -469,8 +469,8 @@
       font-weight: 600;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(168, 196, 0, 0.15);
-      color: rgba(168, 196, 0, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.15);
+      color: rgba(0, 229, 255, 0.4);
       text-align: center;
       cursor: default;
       margin-bottom: 1rem;
@@ -480,7 +480,7 @@
       display: none;
       padding: 1.5rem;
       border-radius: 10px;
-      border: 1px solid rgba(168, 196, 0, 0.25);
+      border: 1px solid rgba(0, 255, 255, 0.25);
       background: rgba(0, 0, 0, 0.5);
       text-align: center;
       margin-bottom: 1rem;
@@ -503,7 +503,7 @@
 
       <div class="status-title">
         <span class="status-title-label">Flight:</span>
-        <span class="badge badge--flight" id="flight-number">FL 031426 ✈️</span>
+        <span class="badge badge--flight" id="flight-number">FL 032126 ✈️</span>
       </div>
 
       <div class="status-title">
@@ -560,11 +560,11 @@
           ✈️ Request a Seat
         </button>
         <!-- seat-count span appended here by applySeatGate() -->
-        <span style="display:block;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Join the list for the next departure</span>
+        <span style="display:block;font-size:0.75rem;opacity:0.6;color:rgba(0,229,255,0.7);letter-spacing:0.03em;margin-top:0.25rem;">Join the list for the next departure</span>
       </div>
 
       <!-- F148: CalendarJet link (public only; single source of truth) -->
-      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.25rem;padding-top:1rem;border-top:1px solid rgba(168, 196, 0, 0.1);">
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.25rem;padding-top:1rem;border-top:1px solid rgba(0,255,255,0.1);">
         <a
           href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345"
           class="btn"
@@ -586,7 +586,7 @@
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
       <div class="gate-closed-reveal" style="display:none">
-        <h3 style="color:#A8C400;margin-bottom:0.5rem">Next cohort assembling.</h3>
+        <h3 style="color:#00e5ff;margin-bottom:0.5rem">Next cohort assembling.</h3>
         <p style="opacity:0.8;margin-bottom:1.25rem">Stay on the manifest — you'll be first to know when the gate opens.</p>
         <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-waitlist" target="_blank" rel="noopener noreferrer">
           📡 Join Signal — Stay on the manifest
@@ -649,7 +649,7 @@
 
     <!-- NEXT STEP GUIDANCE -->
     <div class="btn-row-waitlist" style="display: block; text-align: center; margin-bottom: 2rem;">
-      <p style="font-size: 0.85rem; color: rgba(168, 196, 0, 0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
+      <p style="font-size: 0.85rem; color: rgba(0,229,255,0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
     </div>
 
     <footer>
@@ -807,7 +807,7 @@
         var seatWord = status.seats_remaining === 1 ? 'seat' : 'seats';
         var seatInfo = document.createElement('span');
         seatInfo.id = 'cta-seat-count';
-        seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;';
+        seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(0,229,255,0.7);letter-spacing:0.03em;';
         seatInfo.textContent = 'This flight is full';
         var ctaWrapper = document.getElementById('cta-wrapper');
         if (ctaWrapper) {
@@ -842,7 +842,7 @@
     // Flight number + dock state (cohort-based)
     (function () {
       function updateDockState() {
-        const departTime = new Date('2026-03-14T16:34:00Z');
+        const departTime = new Date('2026-03-21T16:34:00Z');
         const openTime   = new Date(departTime.getTime() - 60 * 60 * 1000);
         const closeTime  = new Date(departTime.getTime());
         const now        = new Date();
