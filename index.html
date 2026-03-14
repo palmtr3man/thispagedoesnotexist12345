@@ -517,7 +517,7 @@
       <div class="status-title">
         <span class="status-title-label">Departure Date:</span>
         <span class="badge badge--arriving" id="departure-date">
-          <span class="arriving-dot"></span>March 21, 2026
+          <span class="arriving-dot"></span>March 15, 2026
         </span>
       </div>
 
@@ -571,7 +571,8 @@
           target="_blank"
           rel="noopener noreferrer"
           data-umami-event="CalendarJet Seat Request Click"
-          style="font-size:0.8rem;padding:0.5rem 1rem;"
+          style="font-size:0.8rem;padding:0.5rem 1rem;pointer-events:none;opacity:0.4;cursor:not-allowed;"
+          disabled
         >🎟️ Request a Seat via Calendar</a>
       </div>
 
@@ -581,7 +582,7 @@
 
       <!-- Gate-closed locked state (hidden when gate is open) -->
       <div class="gate-locked-msg" style="display:none">
-        🔒 Next Flight — Complete the path to unlock
+        🔒 Next Flight — Studio → Signal → Systems
       </div>
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
@@ -842,7 +843,7 @@
     // Flight number + dock state (cohort-based)
     (function () {
       function updateDockState() {
-        const departTime = new Date('2026-03-14T16:34:00Z');
+        const departTime = new Date('2026-03-15T17:34:00Z');
         const openTime   = new Date(departTime.getTime() - 60 * 60 * 1000);
         const closeTime  = new Date(departTime.getTime());
         const now        = new Date();
