@@ -560,6 +560,7 @@
           ✈️ Request a Seat
         </button>
         <!-- seat-count span appended here by applySeatGate() -->
+        <span style="display:block;font-size:0.75rem;opacity:0.6;color:rgba(0,229,255,0.7);letter-spacing:0.03em;margin-top:0.25rem;">Join the list for the next departure</span>
       </div>
 
       <!-- F148: CalendarJet link (public only; single source of truth) -->
@@ -575,7 +576,7 @@
       </div>
 
       <p class="status-text" style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.7;">
-        Request a seat on this flight. If selected, you will be confirmed on this flight and boarding instructions will be sent by email. Five passengers will be selected based on how closely your experience and target role align with this cohort's focus.
+        Two passengers. One founding flight. Issue #001 taxis out March 16.
       </p>
 
       <!-- Gate-closed locked state (hidden when gate is open) -->
@@ -807,7 +808,7 @@
         var seatInfo = document.createElement('span');
         seatInfo.id = 'cta-seat-count';
         seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(0,229,255,0.7);letter-spacing:0.03em;';
-        seatInfo.textContent = status.seats_remaining + ' of ' + status.seats_total + ' ' + seatWord + ' remaining';
+        seatInfo.textContent = 'This flight is full';
         var ctaWrapper = document.getElementById('cta-wrapper');
         if (ctaWrapper) {
           // Remove any previously injected count to avoid duplicates
