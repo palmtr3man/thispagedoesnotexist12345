@@ -815,7 +815,7 @@
         var seatInfo = document.createElement('span');
         seatInfo.id = 'cta-seat-count';
         seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;';
-        seatInfo.textContent = 'This flight is full';
+        seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining on FL 032126';
         var ctaWrapper = document.getElementById('cta-wrapper');
         if (ctaWrapper) {
           // Remove any previously injected count to avoid duplicates
