@@ -529,9 +529,7 @@
         </span>
       </div>
 
-      <p class="status-text" style="font-size: 0.8rem; font-style: italic; opacity: 0.75; margin-bottom: 1rem;">
-        <strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next.
-      </p>
+
 
       <!-- F148: Primary CTA → POST /api/request-seat -->
       <!-- #cta-wrapper: stacked + centered so seat-count note renders below the button, not inline -->
@@ -560,7 +558,7 @@
           ✈️ Request a Seat
         </button>
         <!-- seat-count span appended here by applySeatGate() -->
-        <span style="display:block;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat on FL 032126. Five seats. One flight.</span>
+        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat on FL 032126. Five seats. One flight.</span>
       </div>
 
       <!-- F148: CalendarJet link (public only; single source of truth) -->
@@ -884,7 +882,7 @@
         const statusNote    = document.querySelector('.status-text');
         const waitlistBtn   = document.getElementById('waitlistBtn');
         const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
-        const ctaSubtext    = document.querySelector('#cta-wrapper > span');
+        const ctaSubtext    = document.getElementById('cta-subtext');
         const lockedMsg     = document.querySelector('.gate-locked-msg');
         const nextStepRow   = document.querySelector('.btn-row-waitlist p');
 
@@ -893,16 +891,29 @@
         const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
         const short = statusEl ? statusEl.querySelector('.short-text') : null;
 
+        // Helper: set the departure date text node (after the .arriving-dot span)
+        function setDepartureDate(text) {
+          if (!departureDateEl) return;
+          // The text node is the last child after the .arriving-dot span
+          const dot = departureDateEl.querySelector('.arriving-dot');
+          if (dot && dot.nextSibling) {
+            dot.nextSibling.textContent = text;
+          } else if (dot) {
+            departureDateEl.appendChild(document.createTextNode(text));
+          }
+        }
+
         // ── STATE: FL 032126 DEPARTED (after Mar 21 8:34 AM ET) ──────────────
         if (effectiveNow >= fl032126Depart) {
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'CLOSED';
           arrivalTextEl.textContent = '8:34 AM ET';
-          if (departureDateEl) { departureDateEl.querySelector('span:last-child') && (departureDateEl.querySelector('.arriving-dot').nextSibling.textContent = 'March 21, 2026'); }
+          setDepartureDate('March 21, 2026');
           if (full)  full.textContent  = 'DEPARTED';
           if (short) short.textContent = 'DEPARTED';
           document.body.classList.add('gate-closed');
-          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 032126 has departed. Manifest is closed. Follow Signal for next cohort announcement.';
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  ctaSubtext.style.display = 'none';
           if (waitlistBtn) waitlistBtn.style.display = 'none';
           if (lockedMsg)   lockedMsg.style.display = 'block';
           if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
@@ -913,14 +924,15 @@
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
+          setDepartureDate('March 21, 2026');
           if (full)  full.textContent  = 'SCHEDULED';
           if (short) short.textContent = 'SCHEDULED';
           document.body.classList.remove('gate-closed');
-          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next.';
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  { ctaSubtext.textContent = 'Request a seat on FL 032126. Five seats. One flight.'; ctaSubtext.style.display = 'block'; }
           if (waitlistBtn) { waitlistBtn.style.display = ''; waitlistBtn.style.pointerEvents = ''; waitlistBtn.style.opacity = ''; }
           if (lockedMsg)   lockedMsg.style.display = 'none';
           if (calBtn) { calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
-          if (ctaSubtext)  ctaSubtext.textContent = 'Request a seat on FL 032126. Five seats. One flight.';
           if (nextStepRow) nextStepRow.innerHTML = 'Next step: Use the <strong>Request a Seat</strong> button above to board.';
 
         // ── STATE: FL 031526 BOARDING ✈️ GATE OPEN (16:34Z → 17:34Z Mar 15) ──
@@ -928,9 +940,11 @@
           if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
           dockEl.textContent = 'BOARDING';
           arrivalTextEl.textContent = '12:34 PM ET';
+          setDepartureDate('March 15, 2026');
           if (full)  full.textContent  = 'BOARDING ✈️ GATE OPEN';
           if (short) short.textContent = 'BOARDING';
-          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 031526 is boarding.';
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  ctaSubtext.style.display = 'none';
           if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
           if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
 
@@ -939,9 +953,11 @@
           if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
           dockEl.textContent = 'BOARDING';
           arrivalTextEl.textContent = '12:34 PM ET';
+          setDepartureDate('March 15, 2026');
           if (full)  full.textContent  = 'BOARDING ZONE 4';
           if (short) short.textContent = 'ZONE 4';
-          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 031526 — boarding opens 12:34 PM ET.';
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  ctaSubtext.style.display = 'none';
           if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
           if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
         }
