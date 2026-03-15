@@ -844,132 +844,42 @@
       }
     })();
 
-    // Flight number + dock state (two-phase: FL 031526 boarding → FL 032126 arrival)
+    // ⛔ LAUNCH HOLD — FL 032126 paused. State frozen at FL 031526 BOARDING ZONE 4.
+    // To re-enable: restore the two-phase state machine from git history (commit 4e885e5).
     (function () {
-      // ── Phase 1: FL 031526 ──────────────────────────────────────────────────
-      // Departure: 2026-03-15 12:34 PM ET = 17:34Z
-      // Open window starts 1 hr before: 16:34Z
-      const fl031526Depart = new Date('2026-03-15T17:34:00Z');
-      const fl031526Open   = new Date(fl031526Depart.getTime() - 60 * 60 * 1000); // 16:34Z
+      const dockEl        = document.getElementById('dock-status');
+      const statusEl      = document.getElementById('dock-status-badge');
+      const flightEl      = document.getElementById('flight-number');
+      const arrivalTextEl = document.getElementById('arrival-text');
+      const departureDateEl = document.getElementById('departure-date');
+      const statusNote    = document.querySelector('.status-text');
+      const waitlistBtn   = document.getElementById('waitlistBtn');
+      const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
+      const ctaSubtext    = document.getElementById('cta-subtext');
+      const lockedMsg     = document.querySelector('.gate-locked-msg');
 
-      // ── Phase 2: FL 032126 ──────────────────────────────────────────────────
-      // Arrival (gate opens): 2026-03-15 8:34 AM ET = 13:34Z
-      // Departure: 2026-03-21 8:34 AM ET = 13:34Z
-      const fl032126Arrival  = new Date('2026-03-15T13:34:00Z'); // gate opens for FL 032126
-      const fl032126Depart   = new Date('2026-03-21T13:34:00Z'); // FL 032126 wheels up
-      const fl032126ClosePre = new Date(fl032126Depart.getTime() - 60 * 60 * 1000); // 1 hr before departure
+      if (!dockEl || !arrivalTextEl) return;
 
-      function updateDockState() {
-        const now = new Date();
+      const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
+      const short = statusEl ? statusEl.querySelector('.short-text') : null;
 
-        // DEV ONLY: force a dock state via URL for screenshots/QA.
-        // ?force_state=ZONE4 | BOARDING | FL032126_OPEN | FL032126_CLOSED
-        let FORCE_STATE = new URLSearchParams(location.search).get('force_state');
-        if (FORCE_STATE === '') FORCE_STATE = null;
-        if (FORCE_STATE) FORCE_STATE = FORCE_STATE.trim();
-
-        let effectiveNow = now;
-        if (FORCE_STATE === 'ZONE4')           { effectiveNow = new Date(fl031526Open.getTime() - 1000); }
-        else if (FORCE_STATE === 'BOARDING')   { effectiveNow = new Date(fl031526Open.getTime() + 1000); }
-        else if (FORCE_STATE === 'FL032126_OPEN')   { effectiveNow = new Date(fl032126Arrival.getTime() + 1000); }
-        else if (FORCE_STATE === 'FL032126_CLOSED')  { effectiveNow = new Date(fl032126Depart.getTime() + 1000); }
-
-        const dockEl        = document.getElementById('dock-status');
-        const statusEl      = document.getElementById('dock-status-badge');
-        const flightEl      = document.getElementById('flight-number');
-        const arrivalTextEl = document.getElementById('arrival-text');
-        const departureDateEl = document.getElementById('departure-date');
-        const statusNote    = document.querySelector('.status-text');
-        const waitlistBtn   = document.getElementById('waitlistBtn');
-        const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
-        const ctaSubtext    = document.getElementById('cta-subtext');
-        const lockedMsg     = document.querySelector('.gate-locked-msg');
-        const nextStepRow   = document.querySelector('.btn-row-waitlist p');
-
-        if (!dockEl || !arrivalTextEl) return FORCE_STATE;
-
-        const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
-        const short = statusEl ? statusEl.querySelector('.short-text') : null;
-
-        // Helper: set the departure date text node (after the .arriving-dot span)
-        function setDepartureDate(text) {
-          if (!departureDateEl) return;
-          // The text node is the last child after the .arriving-dot span
-          const dot = departureDateEl.querySelector('.arriving-dot');
-          if (dot && dot.nextSibling) {
-            dot.nextSibling.textContent = text;
-          } else if (dot) {
-            departureDateEl.appendChild(document.createTextNode(text));
-          }
-        }
-
-        // ── STATE: FL 032126 DEPARTED (after Mar 21 8:34 AM ET) ──────────────
-        if (effectiveNow >= fl032126Depart) {
-          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
-          dockEl.textContent = 'CLOSED';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
-          if (full)  full.textContent  = 'DEPARTED';
-          if (short) short.textContent = 'DEPARTED';
-          document.body.classList.add('gate-closed');
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  ctaSubtext.style.display = 'none';
-          if (waitlistBtn) waitlistBtn.style.display = 'none';
-          if (lockedMsg)   lockedMsg.style.display = 'block';
-          if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
-          if (nextStepRow) nextStepRow.innerHTML = 'Next step: <strong>Follow Signal</strong> for next cohort announcement.';
-
-        // ── STATE: FL 032126 GATE OPEN (8:34 AM ET Mar 15 → 8:34 AM ET Mar 21) ──
-        } else if (effectiveNow >= fl032126Arrival) {
-          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
-          dockEl.textContent = 'GATE OPEN';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
-          if (full)  full.textContent  = 'SCHEDULED';
-          if (short) short.textContent = 'SCHEDULED';
-          document.body.classList.remove('gate-closed');
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  { ctaSubtext.textContent = 'Request a seat on FL 032126. Five seats. One flight.'; ctaSubtext.style.display = 'block'; }
-          if (waitlistBtn) { waitlistBtn.style.display = ''; waitlistBtn.style.pointerEvents = ''; waitlistBtn.style.opacity = ''; }
-          if (lockedMsg)   lockedMsg.style.display = 'none';
-          if (calBtn) { calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
-          if (nextStepRow) nextStepRow.innerHTML = 'Next step: Use the <strong>Request a Seat</strong> button above to board.';
-
-        // ── STATE: FL 031526 BOARDING ✈️ GATE OPEN (16:34Z → 17:34Z Mar 15) ──
-        } else if (effectiveNow >= fl031526Open) {
-          if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
-          dockEl.textContent = 'BOARDING';
-          arrivalTextEl.textContent = '12:34 PM ET';
-          setDepartureDate('March 15, 2026');
-          if (full)  full.textContent  = 'BOARDING ✈️ GATE OPEN';
-          if (short) short.textContent = 'BOARDING';
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  ctaSubtext.style.display = 'none';
-          if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
-          if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
-
-        // ── STATE: FL 031526 BOARDING ZONE 4 (before 16:34Z Mar 15) ───────────
-        } else {
-          if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
-          dockEl.textContent = 'BOARDING';
-          arrivalTextEl.textContent = '12:34 PM ET';
-          setDepartureDate('March 15, 2026');
-          if (full)  full.textContent  = 'BOARDING ZONE 4';
-          if (short) short.textContent = 'ZONE 4';
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  ctaSubtext.style.display = 'none';
-          if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
-          if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
-        }
-
-        return FORCE_STATE;
+      // Set departure date text node
+      if (departureDateEl) {
+        const dot = departureDateEl.querySelector('.arriving-dot');
+        if (dot && dot.nextSibling) { dot.nextSibling.textContent = 'March 15, 2026'; }
+        else if (dot) { departureDateEl.appendChild(document.createTextNode('March 15, 2026')); }
       }
 
-      const FORCE_STATE = updateDockState();
-      const UPDATE_MS = 30000; // re-check every 30s for live flip
-      if (FORCE_STATE === null) {
-        setInterval(updateDockState, UPDATE_MS);
-      }
+      if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
+      dockEl.textContent = 'BOARDING';
+      arrivalTextEl.textContent = '12:34 PM ET';
+      if (full)  full.textContent  = 'BOARDING ZONE 4';
+      if (short) short.textContent = 'ZONE 4';
+      if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+      if (ctaSubtext)  ctaSubtext.style.display = 'none';
+      if (waitlistBtn) waitlistBtn.style.display = 'none';
+      if (lockedMsg)   lockedMsg.style.display = 'none';
+      if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
     })();
   </script>
 
