@@ -503,21 +503,21 @@
 
       <div class="status-title">
         <span class="status-title-label">Flight:</span>
-        <span class="badge badge--flight" id="flight-number">FL 031426 ✈️</span>
+        <span class="badge badge--flight" id="flight-number">FL 032126 ✈️</span>
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Status:</span>
         <span class="badge badge--highlight" id="dock-status-badge">
-          <span class="full-text">BOARDING ZONE 4</span>
-          <span class="short-text">ZONE 4</span>
+          <span class="full-text">SCHEDULED</span>
+          <span class="short-text">SCHEDULED</span>
         </span>
       </div>
 
       <div class="status-title">
-        <span class="status-title-label">Next Departure Date:</span>
+        <span class="status-title-label">Departure Date:</span>
         <span class="badge badge--arriving" id="departure-date">
-          <span class="arriving-dot"></span>March 15, 2026
+          <span class="arriving-dot"></span>March 21, 2026
         </span>
       </div>
 
@@ -525,14 +525,7 @@
         <span class="status-title-label">Departure Time:</span>
         <span class="badge badge--arriving" id="arrival-time">
           <span class="arriving-dot"></span>
-          <span id="arrival-text">12:34 PM ET</span>
-        </span>
-      </div>
-
-      <div class="status-title">
-        <span class="status-title-label">Next Arrival Date:</span>
-        <span class="badge badge--arriving" id="arrival-date">
-          <span class="arriving-dot"></span>March 21, 2026
+          <span id="arrival-text">8:34 AM ET</span>
         </span>
       </div>
 
@@ -544,7 +537,7 @@
       <!-- #cta-wrapper: stacked + centered so seat-count note renders below the button, not inline -->
       <div id="cta-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:1.25rem auto;text-align:center;">
         <button
-          class="btn-waitlist"
+          class="btn-waitlist unlocked"
           id="waitlistBtn"
           data-umami-event="Waitlist Click"
           onclick="(function(){
@@ -567,7 +560,7 @@
           ✈️ Request a Seat
         </button>
         <!-- seat-count span appended here by applySeatGate() -->
-        <span style="display:block;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Join the list for the next departure</span>
+        <span style="display:block;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat on FL 032126. Five seats. One flight.</span>
       </div>
 
       <!-- F148: CalendarJet link (public only; single source of truth) -->
@@ -578,8 +571,7 @@
           target="_blank"
           rel="noopener noreferrer"
           data-umami-event="CalendarJet Seat Request Click"
-          style="font-size:0.8rem;padding:0.5rem 1rem;pointer-events:none;opacity:0.4;cursor:not-allowed;"
-          disabled
+          style="font-size:0.8rem;padding:0.5rem 1rem;"
         >🎟️ Request a Seat via Calendar</a>
       </div>
 
@@ -854,80 +846,111 @@
       }
     })();
 
-    // Flight number + dock state (cohort-based)
+    // Flight number + dock state (two-phase: FL 031526 boarding → FL 032126 arrival)
     (function () {
+      // ── Phase 1: FL 031526 ──────────────────────────────────────────────────
+      // Departure: 2026-03-15 12:34 PM ET = 17:34Z
+      // Open window starts 1 hr before: 16:34Z
+      const fl031526Depart = new Date('2026-03-15T17:34:00Z');
+      const fl031526Open   = new Date(fl031526Depart.getTime() - 60 * 60 * 1000); // 16:34Z
+
+      // ── Phase 2: FL 032126 ──────────────────────────────────────────────────
+      // Arrival (gate opens): 2026-03-15 8:34 AM ET = 13:34Z
+      // Departure: 2026-03-21 8:34 AM ET = 13:34Z
+      const fl032126Arrival  = new Date('2026-03-15T13:34:00Z'); // gate opens for FL 032126
+      const fl032126Depart   = new Date('2026-03-21T13:34:00Z'); // FL 032126 wheels up
+      const fl032126ClosePre = new Date(fl032126Depart.getTime() - 60 * 60 * 1000); // 1 hr before departure
+
       function updateDockState() {
-        const departTime = new Date('2026-03-15T17:34:00Z');
-        const openTime   = new Date(departTime.getTime() - 60 * 60 * 1000);
-        const closeTime  = new Date(departTime.getTime());
-        const now        = new Date();
+        const now = new Date();
 
         // DEV ONLY: force a dock state via URL for screenshots/QA.
-        // ?force_state=STANDBY | OPEN | CLOSED
+        // ?force_state=ZONE4 | BOARDING | FL032126_OPEN | FL032126_CLOSED
         let FORCE_STATE = new URLSearchParams(location.search).get('force_state');
         if (FORCE_STATE === '') FORCE_STATE = null;
         if (FORCE_STATE) FORCE_STATE = FORCE_STATE.trim();
 
         let effectiveNow = now;
-        if (FORCE_STATE === 'STANDBY') {
-          effectiveNow = new Date(openTime.getTime() - 1000);
-        } else if (FORCE_STATE === 'OPEN') {
-          effectiveNow = new Date(openTime.getTime() + 1000);
-        } else if (FORCE_STATE === 'CLOSED') {
-          effectiveNow = new Date(closeTime.getTime() + 1000);
-        }
+        if (FORCE_STATE === 'ZONE4')           { effectiveNow = new Date(fl031526Open.getTime() - 1000); }
+        else if (FORCE_STATE === 'BOARDING')   { effectiveNow = new Date(fl031526Open.getTime() + 1000); }
+        else if (FORCE_STATE === 'FL032126_OPEN')   { effectiveNow = new Date(fl032126Arrival.getTime() + 1000); }
+        else if (FORCE_STATE === 'FL032126_CLOSED')  { effectiveNow = new Date(fl032126Depart.getTime() + 1000); }
 
         const dockEl        = document.getElementById('dock-status');
         const statusEl      = document.getElementById('dock-status-badge');
         const flightEl      = document.getElementById('flight-number');
         const arrivalTextEl = document.getElementById('arrival-text');
+        const departureDateEl = document.getElementById('departure-date');
+        const statusNote    = document.querySelector('.status-text');
+        const waitlistBtn   = document.getElementById('waitlistBtn');
+        const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
+        const ctaSubtext    = document.querySelector('#cta-wrapper > span');
+        const lockedMsg     = document.querySelector('.gate-locked-msg');
+        const nextStepRow   = document.querySelector('.btn-row-waitlist p');
 
         if (!dockEl || !arrivalTextEl) return FORCE_STATE;
 
-        // Flight number from cohort departure date
-        const mm = String(departTime.getMonth() + 1).padStart(2, '0');
-        const dd = String(departTime.getDate()).padStart(2, '0');
-        const yy = String(departTime.getFullYear()).slice(-2);
-        const isStPatsCohort = departTime.getMonth() === 2 && departTime.getDate() === 17;
-        const flightNum = isStPatsCohort ? 'FL 031726' : `FL ${mm}${dd}${yy}`;
-        if (flightEl) { flightEl.textContent = `${flightNum} ✈️`; }
-
-        const timeLabel = '12:34 PM ET';
         const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
         const short = statusEl ? statusEl.querySelector('.short-text') : null;
 
-        if (effectiveNow >= closeTime) {
+        // ── STATE: FL 032126 DEPARTED (after Mar 21 8:34 AM ET) ──────────────
+        if (effectiveNow >= fl032126Depart) {
+          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'CLOSED';
-          arrivalTextEl.textContent = timeLabel;
+          arrivalTextEl.textContent = '8:34 AM ET';
+          if (departureDateEl) { departureDateEl.querySelector('span:last-child') && (departureDateEl.querySelector('.arriving-dot').nextSibling.textContent = 'March 21, 2026'); }
           if (full)  full.textContent  = 'DEPARTED';
           if (short) short.textContent = 'DEPARTED';
-
           document.body.classList.add('gate-closed');
+          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 032126 has departed. Manifest is closed. Follow Signal for next cohort announcement.';
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          if (lockedMsg)   lockedMsg.style.display = 'block';
+          if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
+          if (nextStepRow) nextStepRow.innerHTML = 'Next step: <strong>Follow Signal</strong> for next cohort announcement.';
 
-          const statusText = document.querySelector('.status-text');
-          if (statusText) statusText.textContent = 'Flight TUJ-001 has departed. The next cohort is being assembled. Complete the path below to see what\'s coming.';
+        // ── STATE: FL 032126 GATE OPEN (8:34 AM ET Mar 15 → 8:34 AM ET Mar 21) ──
+        } else if (effectiveNow >= fl032126Arrival) {
+          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          dockEl.textContent = 'GATE OPEN';
+          arrivalTextEl.textContent = '8:34 AM ET';
+          if (full)  full.textContent  = 'SCHEDULED';
+          if (short) short.textContent = 'SCHEDULED';
+          document.body.classList.remove('gate-closed');
+          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next. Issue #001 taxis out March 16.';
+          if (waitlistBtn) { waitlistBtn.style.display = ''; waitlistBtn.style.pointerEvents = ''; waitlistBtn.style.opacity = ''; }
+          if (lockedMsg)   lockedMsg.style.display = 'none';
+          if (calBtn) { calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
+          if (ctaSubtext)  ctaSubtext.textContent = 'Request a seat on FL 032126. Five seats. One flight.';
+          if (nextStepRow) nextStepRow.innerHTML = 'Next step: Use the <strong>Request a Seat</strong> button above to board.';
 
-          const lockedMsg = document.querySelector('.gate-locked-msg');
-          const waitlistBtnTop = document.getElementById('waitlistBtn');
-          if (waitlistBtnTop) waitlistBtnTop.style.display = 'none';
-          if (lockedMsg) lockedMsg.style.display = 'block';
-        } else if (effectiveNow >= openTime) {
-          dockEl.textContent = 'OPEN';
-          arrivalTextEl.textContent = timeLabel;
+        // ── STATE: FL 031526 BOARDING ✈️ GATE OPEN (16:34Z → 17:34Z Mar 15) ──
+        } else if (effectiveNow >= fl031526Open) {
+          if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
+          dockEl.textContent = 'BOARDING';
+          arrivalTextEl.textContent = '12:34 PM ET';
           if (full)  full.textContent  = 'BOARDING ✈️ GATE OPEN';
           if (short) short.textContent = 'BOARDING';
+          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 031526 is boarding. Two passengers. One founding flight. Issue #001 taxis out March 16.';
+          if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
+          if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
+
+        // ── STATE: FL 031526 BOARDING ZONE 4 (before 16:34Z Mar 15) ───────────
         } else {
+          if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
           dockEl.textContent = 'BOARDING';
-          arrivalTextEl.textContent = timeLabel;
+          arrivalTextEl.textContent = '12:34 PM ET';
           if (full)  full.textContent  = 'BOARDING ZONE 4';
           if (short) short.textContent = 'ZONE 4';
+          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> Two passengers. One founding flight. Issue #001 taxis out March 16.';
+          if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
+          if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
         }
 
         return FORCE_STATE;
       }
 
       const FORCE_STATE = updateDockState();
-      const UPDATE_MS = 30000;
+      const UPDATE_MS = 30000; // re-check every 30s for live flip
       if (FORCE_STATE === null) {
         setInterval(updateDockState, UPDATE_MS);
       }

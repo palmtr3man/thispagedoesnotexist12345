@@ -19,9 +19,9 @@
  */
 
 const COHORT_CONFIG = {
-  departure: '2026-03-21T16:34:00Z',
+  departure: '2026-03-21T13:34:00Z', // FL 032126 — 8:34 AM ET
   seats_total: 5,
-  cohort_id: '2026-03-17'
+  cohort_id: '032126'
 };
 
 exports.handler = async function (event, context) {
