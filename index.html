@@ -530,7 +530,7 @@
       </div>
 
       <p class="status-text" style="font-size: 0.8rem; font-style: italic; opacity: 0.75; margin-bottom: 1rem;">
-        <strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next. Issue #001 taxis out March 16.
+        <strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next.
       </p>
 
       <!-- F148: Primary CTA → POST /api/request-seat -->
@@ -806,7 +806,7 @@
           if (status.seats_filled >= 3) {
             statusNote.textContent = 'Five seats. One mission. FL 032126 departs March 21.';
           } else {
-            statusNote.textContent = 'Two passengers. One founding flight. Issue #001 taxis out March 16.';
+            statusNote.textContent = '';
           }
         }
 
@@ -916,7 +916,7 @@
           if (full)  full.textContent  = 'SCHEDULED';
           if (short) short.textContent = 'SCHEDULED';
           document.body.classList.remove('gate-closed');
-          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next. Issue #001 taxis out March 16.';
+          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> Gate open. TUJ is live in early access — board now and shape what gets built next.';
           if (waitlistBtn) { waitlistBtn.style.display = ''; waitlistBtn.style.pointerEvents = ''; waitlistBtn.style.opacity = ''; }
           if (lockedMsg)   lockedMsg.style.display = 'none';
           if (calBtn) { calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
@@ -930,7 +930,7 @@
           arrivalTextEl.textContent = '12:34 PM ET';
           if (full)  full.textContent  = 'BOARDING ✈️ GATE OPEN';
           if (short) short.textContent = 'BOARDING';
-          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 031526 is boarding. Two passengers. One founding flight. Issue #001 taxis out March 16.';
+          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 031526 is boarding.';
           if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
           if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
 
@@ -941,7 +941,7 @@
           arrivalTextEl.textContent = '12:34 PM ET';
           if (full)  full.textContent  = 'BOARDING ZONE 4';
           if (short) short.textContent = 'ZONE 4';
-          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> Two passengers. One founding flight. Issue #001 taxis out March 16.';
+          if (statusNote) statusNote.innerHTML = '<strong>Quick Note:</strong> FL 031526 — boarding opens 12:34 PM ET.';
           if (waitlistBtn) { waitlistBtn.style.display = 'none'; }
           if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
         }
