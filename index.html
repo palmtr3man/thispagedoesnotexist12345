@@ -811,6 +811,17 @@
           return;
         }
 
+        // Flip the status-text note based on seats filled:
+        // ≤ 2 filled = founding flight message; ≥ 3 filled = full cohort message
+        var statusNote = document.querySelector('p.status-text[style*="opacity: 0.7"]');
+        if (statusNote) {
+          if (status.seats_filled >= 3) {
+            statusNote.textContent = 'Five seats. One mission. FL 032126 departs March 21.';
+          } else {
+            statusNote.textContent = 'Two passengers. One founding flight. Issue #001 taxis out March 16.';
+          }
+        }
+
         // Show live seat count below the button — appended inside #cta-wrapper so it stacks, not inline
         var seatWord = status.seats_remaining === 1 ? 'seat' : 'seats';
         var seatInfo = document.createElement('span');
