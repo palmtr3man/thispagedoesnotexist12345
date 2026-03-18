@@ -844,42 +844,155 @@
       }
     })();
 
-    // ⛔ LAUNCH HOLD — FL 032126 paused. State frozen at FL 031526 BOARDING ZONE 4.
-    // To re-enable: restore the two-phase state machine from git history (commit 4e885e5).
+    // F-Holiday: FL 032126 four-phase gate state machine
+    // Phases: HOLD → EXECUTIVE PRE-BOARD (3/16) → HOLIDAY BOARDING (3/17) → POST-HOLIDAY BOARDING (3/18–3/21) → DEPARTED
     (function () {
-      const dockEl        = document.getElementById('dock-status');
-      const statusEl      = document.getElementById('dock-status-badge');
-      const flightEl      = document.getElementById('flight-number');
-      const arrivalTextEl = document.getElementById('arrival-text');
-      const departureDateEl = document.getElementById('departure-date');
-      const statusNote    = document.querySelector('.status-text');
-      const waitlistBtn   = document.getElementById('waitlistBtn');
-      const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
-      const ctaSubtext    = document.getElementById('cta-subtext');
-      const lockedMsg     = document.querySelector('.gate-locked-msg');
+      // ── Phase timestamps (all EDT = UTC−4, post-DST spring forward Mar 8) ────────────────
+      // Pre-board opens: March 16, 2026 at 3:16 PM EDT = 19:16 UTC
+      const preBoardOpen  = new Date('2026-03-16T19:16:00Z');
+      // Holiday boarding opens: March 17, 2026 at 12:00 AM EDT = 04:00 UTC
+      const holidayOpen   = new Date('2026-03-17T04:00:00Z');
+      // Holiday boarding ends: March 18, 2026 at 12:00 AM EDT = 04:00 UTC
+      const holidayEnd    = new Date('2026-03-18T04:00:00Z');
+      // Departure: March 21, 2026 at 12:34 PM EDT = 16:34 UTC
+      const departureTime = new Date('2026-03-21T16:34:00Z');
 
-      if (!dockEl || !arrivalTextEl) return;
+      function updateDockState() {
+        const now = new Date();
+        // DEV ONLY: force a dock state via URL for QA/screenshots.
+        // ?force_state=PRE_BOARD | HOLIDAY | POST_HOLIDAY | DEPARTED
+        const allowedForceStates = new Set(['PRE_BOARD', 'HOLIDAY', 'POST_HOLIDAY', 'DEPARTED']);
+        let FORCE_STATE = new URLSearchParams(location.search).get('force_state');
+        FORCE_STATE = FORCE_STATE ? FORCE_STATE.trim().toUpperCase() : null;
+        if (!allowedForceStates.has(FORCE_STATE)) FORCE_STATE = null;
 
-      const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
-      const short = statusEl ? statusEl.querySelector('.short-text') : null;
+        let effectiveNow = now;
+        if (FORCE_STATE === 'PRE_BOARD')         { effectiveNow = new Date(preBoardOpen.getTime() + 1000); }
+        else if (FORCE_STATE === 'HOLIDAY')      { effectiveNow = new Date(holidayOpen.getTime() + 1000); }
+        else if (FORCE_STATE === 'POST_HOLIDAY') { effectiveNow = new Date(holidayEnd.getTime() + 1000); }
+        else if (FORCE_STATE === 'DEPARTED')     { effectiveNow = new Date(departureTime.getTime() + 1000); }
 
-      // Set departure date text node
-      if (departureDateEl) {
-        const dot = departureDateEl.querySelector('.arriving-dot');
-        if (dot && dot.nextSibling) { dot.nextSibling.textContent = 'March 15, 2026'; }
-        else if (dot) { departureDateEl.appendChild(document.createTextNode('March 15, 2026')); }
+        const isHolidayPhase = effectiveNow >= holidayOpen && effectiveNow < holidayEnd;
+        document.body.classList.toggle('st-patricks', isHolidayPhase);
+
+        const dockEl        = document.getElementById('dock-status');
+        const statusEl      = document.getElementById('dock-status-badge');
+        const flightEl      = document.getElementById('flight-number');
+        const arrivalTextEl = document.getElementById('arrival-text');
+        const departureDateEl = document.getElementById('departure-date');
+        const statusNote    = document.querySelector('.status-text');
+        const waitlistBtn   = document.getElementById('waitlistBtn');
+        const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
+        const ctaSubtext    = document.getElementById('cta-subtext');
+        const lockedMsg     = document.querySelector('.gate-locked-msg');
+        const nextStepRow   = document.querySelector('.btn-row-waitlist p');
+        if (!dockEl || !arrivalTextEl) return FORCE_STATE;
+        const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
+        const short = statusEl ? statusEl.querySelector('.short-text') : null;
+
+        function setDepartureDate(text) {
+          if (!departureDateEl) return;
+          const dot = departureDateEl.querySelector('.arriving-dot');
+          if (dot && dot.nextSibling) { dot.nextSibling.textContent = text; }
+          else if (dot) { departureDateEl.appendChild(document.createTextNode(text)); }
+        }
+
+        // ── STATE: DEPARTED (after Mar 21 12:34 PM EDT) ───────────────────────────
+        if (effectiveNow >= departureTime) {
+          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          dockEl.textContent = 'CLOSED';
+          arrivalTextEl.textContent = '12:34 PM ET';
+          setDepartureDate('March 21, 2026');
+          if (full)  full.textContent  = 'DEPARTED';
+          if (short) short.textContent = 'DEPARTED';
+          document.body.classList.add('gate-closed');
+          (function() {
+            var chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+            if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
+              var reveal = document.querySelector('.gate-closed-reveal');
+              var lMsg   = document.querySelector('.gate-locked-msg');
+              if (reveal) reveal.style.display = 'block';
+              if (lMsg)   lMsg.style.display   = 'none';
+            }
+          })();
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  ctaSubtext.style.display = 'none';
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          if (lockedMsg)   lockedMsg.style.display = 'block';
+          if (calBtn) { calBtn.removeAttribute('href'); calBtn.setAttribute('aria-disabled','true'); calBtn.setAttribute('tabindex','-1'); calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
+          if (nextStepRow) nextStepRow.innerHTML = 'Next step: <strong>Follow Signal</strong> for next cohort announcement.';
+
+        // ── STATE: POST-HOLIDAY BOARDING (Mar 18 – Mar 21, general boarding open) ────────
+        } else if (effectiveNow >= holidayEnd) {
+          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          dockEl.textContent = 'BOARDING';
+          arrivalTextEl.textContent = '12:34 PM ET';
+          setDepartureDate('March 21, 2026');
+          if (full)  full.textContent  = 'BOARDING OPEN';
+          if (short) short.textContent = 'BOARDING';
+          document.body.classList.remove('gate-closed');
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  { ctaSubtext.textContent = 'Request a seat on FL 032126. Five seats. One flight.'; ctaSubtext.style.display = 'block'; }
+          if (waitlistBtn) { waitlistBtn.style.display = ''; }
+          if (typeof applySeatGate === 'function') applySeatGate();
+          if (lockedMsg)   lockedMsg.style.display = 'none';
+          if (calBtn) { calBtn.setAttribute('href','https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'); calBtn.removeAttribute('aria-disabled'); calBtn.setAttribute('tabindex','0'); calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
+          if (nextStepRow) nextStepRow.innerHTML = 'Next step: Use the <strong>Request a Seat</strong> button above to board.';
+
+        // ── STATE: HOLIDAY BOARDING 🍀 (March 17 only — St. Patrick\'s Day) ────────────
+        } else if (effectiveNow >= holidayOpen) {
+          if (flightEl)      { flightEl.textContent = 'FL ☘️1726 ✈️'; }
+          dockEl.textContent = 'BOARDING';
+          arrivalTextEl.textContent = '12:34 PM ET';
+          setDepartureDate('March 21, 2026');
+          if (full)  full.textContent  = 'HOLIDAY BOARDING 🍀';
+          if (short) short.textContent = 'HOLIDAY';
+          document.body.classList.remove('gate-closed');
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  { ctaSubtext.textContent = '🍀 Happy St. Patrick\'s Day! Holiday boarding is open — request your seat on FL 032126.'; ctaSubtext.style.display = 'block'; }
+          if (waitlistBtn) { waitlistBtn.style.display = ''; }
+          if (typeof applySeatGate === 'function') applySeatGate();
+          if (lockedMsg)   lockedMsg.style.display = 'none';
+          if (calBtn) { calBtn.setAttribute('href','https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'); calBtn.removeAttribute('aria-disabled'); calBtn.setAttribute('tabindex','0'); calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
+          if (nextStepRow) nextStepRow.innerHTML = '🍀 <strong>Holiday Boarding: St. Patrick\'s Day</strong> — Request your seat now!';
+
+        // ── STATE: EXECUTIVE PRE-BOARD (March 16 from 3:16 PM EDT) ────────────────
+        } else if (effectiveNow >= preBoardOpen) {
+          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          dockEl.textContent = 'PRE-BOARD';
+          arrivalTextEl.textContent = '12:34 PM ET';
+          setDepartureDate('March 21, 2026');
+          if (full)  full.textContent  = 'EXECUTIVE PRE-BOARD';
+          if (short) short.textContent = 'PRE-BOARD';
+          document.body.classList.remove('gate-closed');
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  ctaSubtext.style.display = 'none';
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          if (lockedMsg)   lockedMsg.style.display = 'none';
+          if (calBtn) { calBtn.removeAttribute('href'); calBtn.setAttribute('aria-disabled','true'); calBtn.setAttribute('tabindex','-1'); calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
+          if (nextStepRow) nextStepRow.innerHTML = 'Executive pre-boarding is active. <strong>Holiday boarding opens March 17.</strong>';
+
+        // ── STATE: HOLD (before pre-board opens) ────────────────────────────────
+        } else {
+          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          dockEl.textContent = 'HOLD';
+          arrivalTextEl.textContent = '12:34 PM ET';
+          setDepartureDate('March 21, 2026');
+          if (full)  full.textContent  = 'HOLD';
+          if (short) short.textContent = 'HOLD';
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  ctaSubtext.style.display = 'none';
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          if (lockedMsg)   lockedMsg.style.display = 'none';
+          if (calBtn) { calBtn.removeAttribute('href'); calBtn.setAttribute('aria-disabled','true'); calBtn.setAttribute('tabindex','-1'); calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
+        }
+        return FORCE_STATE;
       }
-
-      if (flightEl)      { flightEl.textContent = 'FL 031526 ✈️'; }
-      dockEl.textContent = 'BOARDING';
-      arrivalTextEl.textContent = '12:34 PM ET';
-      if (full)  full.textContent  = 'BOARDING ZONE 4';
-      if (short) short.textContent = 'ZONE 4';
-      if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-      if (ctaSubtext)  ctaSubtext.style.display = 'none';
-      if (waitlistBtn) waitlistBtn.style.display = 'none';
-      if (lockedMsg)   lockedMsg.style.display = 'none';
-      if (calBtn) { calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
+      const FORCE_STATE = updateDockState();
+      const UPDATE_MS = 30000; // re-check every 30s for live flip
+      if (FORCE_STATE === null) {
+        setInterval(updateDockState, UPDATE_MS);
+      }
     })();
   </script>
 
