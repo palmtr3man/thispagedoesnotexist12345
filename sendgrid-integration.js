@@ -23,7 +23,9 @@ const SENDGRID_CONFIG = {
         boardingPassPaid: 'd-TEMPLATE_ID_5',
         boardingPassFree: 'd-TEMPLATE_ID_6',
         // #116 — Seat confirmation / onboarding (welcome_onboarding_v1)
-        onboardingConfirm: 'd-9e8a25a22d1b438c84b8f5b7bb25c46c'
+        onboardingConfirm: 'd-9e8a25a22d1b438c84b8f5b7bb25c46c',
+        // #118 — Seat request acknowledgement (seat_request_acknowledgement_v1)
+        seatRequest: 'd-740595dc07be40129569bc731f1bc454'
     },
     fromEmail: 'noreply@thispagedoesnotexist12345.com',
     adminEmail: 'YOUR_ADMIN_EMAIL', // For internal notifications
@@ -302,17 +304,41 @@ async function checkBirthdays() {
 
 /**
  * HELPER: Trigger signup from form submission
+ * #118 — POSTs to /api/seat-request server-side (SendGrid call moved off client).
+ * The user-signup event still fires with skipSeatRequest: true so analytics
+ * listeners remain undisturbed.
  */
-function handleFormSubmit(formData) {
-    const userData = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        source: formData.get('source') || 'Website',
-        isPaid: false,
-        firstPath: localStorage.getItem('last-path') || 'None'
-    };
+async function handleFormSubmit(formData) {
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const source = formData.get('source') || 'Website';
 
-    // Dispatch event to trigger emails
+    // --- Server-side seat request acknowledgement (#118) ---
+    try {
+        const response = await fetch('/api/seat-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, source })
+        });
+        const result = await response.json();
+        if (result.ok) {
+            console.log('[SendGrid] Seat request acknowledgement sent via server-side handler');
+        } else {
+            console.error('[SendGrid] Seat request handler error:', result.error);
+        }
+    } catch (err) {
+        console.error('[SendGrid] Failed to reach /api/seat-request:', err);
+    }
+
+    // --- Analytics event (skipSeatRequest: true keeps listeners undisturbed) ---
+    const userData = {
+        name,
+        email,
+        source,
+        isPaid: false,
+        firstPath: localStorage.getItem('last-path') || 'None',
+        skipSeatRequest: true
+    };
     window.dispatchEvent(new CustomEvent('user-signup', { detail: userData }));
 }
 

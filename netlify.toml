@@ -24,6 +24,11 @@
   to = "/.netlify/functions/seat-status"
   status = 200
 
+[[redirects]]
+  from = "/api/seat-request"
+  to = "/.netlify/functions/seat-request"
+  status = 200
+
 # One Page Studio — serve /Studio from the Studio subfolder
 [[redirects]]
   from = "/ResumeOnePageStudio"
