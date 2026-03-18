@@ -22,7 +22,8 @@
  * Closes Ambiguity 2 (Go/No-Go Contract) → feeds FL 032126 Go/No-Go gate.
  */
 
-const TEMPLATE_ID = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
+const TEMPLATE_ID  = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
+const ASM_GROUP_ID = 33047; // "The Ultimate Journey — Transactional" unsubscribe group
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -119,13 +120,12 @@ exports.handler = async function (event, context) {
       },
       body: JSON.stringify({
         from: { email: fromEmail },
-        personalizations: [
-          {
-            to: [{ email: emailTrimmed }],
-            dynamic_template_data: dynamicTemplateData
-          }
-        ],
-        template_id: TEMPLATE_ID
+        personalizations: [{
+          to: [{ email: emailTrimmed }],
+          dynamic_template_data: dynamicTemplateData
+        }],
+        template_id: TEMPLATE_ID,
+        asm: { group_id: ASM_GROUP_ID }
       })
     });
 
