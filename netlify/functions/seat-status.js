@@ -39,8 +39,8 @@ const BASE44_API_URL = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7
 const FALLBACK_CONFIG = {
   departure: '2026-03-21T13:34:00Z',
   seats_total: 5,
-  cohort_id: '032126',
-  flight_label: 'FL 032126'
+  cohort_id: 'FL032126',
+  flight_id_display: 'FL 032126'
 };
 
 /**
@@ -111,8 +111,8 @@ async function fetchActiveFlight(apiKey) {
   return {
     gate,
     seats_total: typeof flight.max_seats === 'number' ? flight.max_seats : 5,
-    cohort_id: flight.flight_label || flight._id || FALLBACK_CONFIG.cohort_id,
-    flight_label: flight.flight_label || FALLBACK_CONFIG.flight_label,
+    cohort_id: flight.flight_code || flight._id || FALLBACK_CONFIG.cohort_id,
+    flight_id_display: flight.flight_id_display || FALLBACK_CONFIG.flight_id_display,
     departure: flight.departure_date || FALLBACK_CONFIG.departure
   };
 }
@@ -174,7 +174,7 @@ exports.handler = async function (event, context) {
     let gate = 'STANDBY';
     let seats_total = FALLBACK_CONFIG.seats_total;
     let cohort_id = FALLBACK_CONFIG.cohort_id;
-    let flight_label = FALLBACK_CONFIG.flight_label;
+    let flight_id_display = FALLBACK_CONFIG.flight_id_display;
     let cohort_departure = FALLBACK_CONFIG.departure;
     let seats_filled = 0;
 
@@ -188,8 +188,8 @@ exports.handler = async function (event, context) {
       ]);
 
       if (flightResult.status === 'fulfilled') {
-        ({ gate, seats_total, cohort_id, flight_label, departure: cohort_departure } = flightResult.value);
-        console.log(`[seat-status] Active flight: ${flight_label}, gate: ${gate}, max_seats: ${seats_total}`);
+        ({ gate, seats_total, cohort_id, flight_id_display, departure: cohort_departure } = flightResult.value);
+        console.log(`[seat-status] Active flight: ${flight_id_display} (${cohort_id}), gate: ${gate}, max_seats: ${seats_total}`);
       } else {
         console.error('[seat-status] Failed to query Flight entity:', flightResult.reason?.message);
       }
@@ -211,7 +211,7 @@ exports.handler = async function (event, context) {
       seats_remaining,
       cohort_departure,
       cohort_id,
-      flight_label,
+      flight_id_display,
       alpha_mode: alphaMode,
       timestamp: now.toISOString()
     };
