@@ -135,11 +135,14 @@ async function fetchOccupiedSeatCount(apiKey) {
 
   const data = await response.json();
   const seats = Array.isArray(data) ? data : (data.records || data.items || data.data || []);
-  const occupied = seats.filter(
-    (seat) => seat.status && seat.status.toLowerCase() === 'occupied'
+
+  // Count any seat that is actively claimed — 'occupied' (legacy) or 'open' (triggered)
+  const FILLED_STATUSES = ['occupied', 'open'];
+  const filled = seats.filter(
+    (seat) => seat.status && FILLED_STATUSES.includes(seat.status.toLowerCase())
   );
 
-  return occupied.length;
+  return filled.length;
 }
 
 exports.handler = async function (event, context) {
