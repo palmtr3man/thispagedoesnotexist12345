@@ -1,11 +1,20 @@
 /**
  * #117 — /api/seat-status Netlify Function
  *
- * Returns the current seat availability and gate status for the active cohort.
+ * Returns the current seat availability and gate status for the active flight.
  * Used by the landing page to show real-time seat count and gate state.
  *
- * Query params:
- *   ?cohort=2026-03-17  (optional — defaults to active cohort)
+ * Active flight resolution:
+ *   1. Fetch all Flight records from Base44
+ *   2. Prefer the first record with status "boarding" or "open"
+ *   3. Fall back to the most recently created record if none match
+ *
+ * Flight.status → gate mapping:
+ *   "open"      → OPEN
+ *   "boarding"  → OPEN
+ *   "departed"  → CLOSED
+ *   "closed"    → CLOSED
+ *   (anything else) → STANDBY
  *
  * Response:
  *   {
@@ -13,48 +22,118 @@
  *     seats_total: 5,
  *     seats_filled: 2,
  *     seats_remaining: 3,
- *     cohort_departure: "2026-03-21T16:34:00Z",
- *     alpha_mode: true | false
+ *     cohort_departure: "2026-03-21T13:34:00Z",
+ *     cohort_id: "032126",
+ *     flight_label: "FL 032126",
+ *     alpha_mode: true | false,
+ *     timestamp: "2026-03-19T..."
  *   }
  *
  * Required env vars:
- *   BASE44APIKEY  — Base44 API key for querying the Seat entity
+ *   BASE44APIKEY  — Base44 API key for querying Flight and Seat entities
  */
 
-const COHORT_CONFIG = {
-  departure: '2026-03-21T13:34:00Z', // FL 032126 — 8:34 AM ET
+const BASE44_API_URL = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities';
+
+// Fallback values used only if the Base44 Flight query fails entirely
+const FALLBACK_CONFIG = {
+  departure: '2026-03-21T13:34:00Z',
   seats_total: 5,
-  cohort_id: '032126'
+  cohort_id: '032126',
+  flight_label: 'FL 032126'
 };
 
-// Base44 entity name for seats — adjust if the entity is named differently in your schema
-const BASE44_ENTITY = 'Seat';
-const BASE44_API_URL = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities';
+/**
+ * Build the shared auth headers for all Base44 requests.
+ */
+function base44Headers(apiKey) {
+  return {
+    'ApiKey': apiKey,
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  };
+}
+
+/**
+ * Fetch all Flight records from Base44 and return the active one.
+ * Active = first record with status "boarding" or "open";
+ * falls back to the most recent record by created_date / _id order.
+ *
+ * Returns an object with: { gate, seats_total, cohort_id, flight_label, departure }
+ * or throws on API failure.
+ */
+async function fetchActiveFlight(apiKey) {
+  const url = `${BASE44_API_URL}/Flight`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: base44Headers(apiKey)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Base44 Flight API error ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  const flights = Array.isArray(data) ? data : (data.records || data.items || data.data || []);
+
+  if (flights.length === 0) {
+    throw new Error('Base44 returned no Flight records');
+  }
+
+  // Prefer the first actively open/boarding flight
+  const ACTIVE_STATUSES = ['boarding', 'open'];
+  let flight = flights.find(
+    (f) => f.status && ACTIVE_STATUSES.includes(f.status.toLowerCase())
+  );
+
+  // Fall back to most recent record (last in array, or sort by created_date descending)
+  if (!flight) {
+    const sorted = [...flights].sort((a, b) => {
+      const aDate = a.created_date || a.createdAt || a._id || '';
+      const bDate = b.created_date || b.createdAt || b._id || '';
+      return bDate > aDate ? 1 : -1;
+    });
+    flight = sorted[0];
+  }
+
+  // Map Flight.status → canonical gate value
+  const statusLower = (flight.status || '').toLowerCase();
+  let gate;
+  if (statusLower === 'open' || statusLower === 'boarding') {
+    gate = 'OPEN';
+  } else if (statusLower === 'departed' || statusLower === 'closed') {
+    gate = 'CLOSED';
+  } else {
+    gate = 'STANDBY';
+  }
+
+  return {
+    gate,
+    seats_total: typeof flight.max_seats === 'number' ? flight.max_seats : 5,
+    cohort_id: flight.flight_label || flight._id || FALLBACK_CONFIG.cohort_id,
+    flight_label: flight.flight_label || FALLBACK_CONFIG.flight_label,
+    departure: flight.departure_date || FALLBACK_CONFIG.departure
+  };
+}
 
 /**
  * Query the Base44 Seat entity and count records with status === 'occupied'.
  * Returns the count of occupied seats, or throws on API failure.
  */
 async function fetchOccupiedSeatCount(apiKey) {
-  const url = `${BASE44_API_URL}/${BASE44_ENTITY}`;
-
+  const url = `${BASE44_API_URL}/Seat`;
   const response = await fetch(url, {
     method: 'GET',
-    headers: {
-      'ApiKey': apiKey,
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    }
+    headers: base44Headers(apiKey)
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Base44 API error ${response.status}: ${errorText}`);
+    throw new Error(`Base44 Seat API error ${response.status}: ${errorText}`);
   }
 
   const data = await response.json();
-
-  // data is expected to be an array of seat records
   const seats = Array.isArray(data) ? data : (data.records || data.items || data.data || []);
   const occupied = seats.filter(
     (seat) => seat.status && seat.status.toLowerCase() === 'occupied'
@@ -88,48 +167,51 @@ exports.handler = async function (event, context) {
 
   try {
     const now = new Date();
-    const departureTime = new Date(COHORT_CONFIG.departure);
-    const openTime = new Date(departureTime.getTime() - 60 * 60 * 1000); // 1hr before departure
-    const closeTime = departureTime;
-
-    // Determine gate state
-    let gate;
-    if (now >= closeTime) {
-      gate = 'CLOSED';
-    } else if (now >= openTime) {
-      gate = 'OPEN';
-    } else {
-      gate = 'STANDBY';
-    }
-
-    // Alpha mode flag — controls whether the seat request form is live
     const alphaMode = process.env.ALPHA_MODE === 'true';
-
-    // --- Live seat count from Base44 ---
     const apiKey = process.env.BASE44APIKEY;
+
+    // --- Defaults (used if Base44 is unreachable) ---
+    let gate = 'STANDBY';
+    let seats_total = FALLBACK_CONFIG.seats_total;
+    let cohort_id = FALLBACK_CONFIG.cohort_id;
+    let flight_label = FALLBACK_CONFIG.flight_label;
+    let cohort_departure = FALLBACK_CONFIG.departure;
     let seats_filled = 0;
 
     if (!apiKey) {
-      console.warn('[seat-status] BASE44APIKEY is not set — defaulting seats_filled to 0');
+      console.warn('[seat-status] BASE44APIKEY is not set — using fallback values');
     } else {
-      try {
-        seats_filled = await fetchOccupiedSeatCount(apiKey);
-        console.log(`[seat-status] Base44 occupied seats: ${seats_filled}`);
-      } catch (queryErr) {
-        // Non-fatal: log the error but still return a response so the UI doesn't break
-        console.error('[seat-status] Failed to query Base44 seat count:', queryErr.message);
+      // Run both queries in parallel for speed
+      const [flightResult, seatResult] = await Promise.allSettled([
+        fetchActiveFlight(apiKey),
+        fetchOccupiedSeatCount(apiKey)
+      ]);
+
+      if (flightResult.status === 'fulfilled') {
+        ({ gate, seats_total, cohort_id, flight_label, departure: cohort_departure } = flightResult.value);
+        console.log(`[seat-status] Active flight: ${flight_label}, gate: ${gate}, max_seats: ${seats_total}`);
+      } else {
+        console.error('[seat-status] Failed to query Flight entity:', flightResult.reason?.message);
+      }
+
+      if (seatResult.status === 'fulfilled') {
+        seats_filled = seatResult.value;
+        console.log(`[seat-status] Occupied seats: ${seats_filled}`);
+      } else {
+        console.error('[seat-status] Failed to query Seat entity:', seatResult.reason?.message);
       }
     }
 
-    const seats_remaining = Math.max(0, COHORT_CONFIG.seats_total - seats_filled);
+    const seats_remaining = Math.max(0, seats_total - seats_filled);
 
     const payload = {
       gate,
-      seats_total: COHORT_CONFIG.seats_total,
+      seats_total,
       seats_filled,
       seats_remaining,
-      cohort_departure: COHORT_CONFIG.departure,
-      cohort_id: COHORT_CONFIG.cohort_id,
+      cohort_departure,
+      cohort_id,
+      flight_label,
       alpha_mode: alphaMode,
       timestamp: now.toISOString()
     };
@@ -140,7 +222,7 @@ exports.handler = async function (event, context) {
       body: JSON.stringify(payload)
     };
   } catch (err) {
-    console.error('[seat-status] Error:', err);
+    console.error('[seat-status] Unexpected error:', err);
     return {
       statusCode: 500,
       headers,
