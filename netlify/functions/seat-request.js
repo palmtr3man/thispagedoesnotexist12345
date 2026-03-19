@@ -1,1 +1,160 @@
-LyoqCiAqICMxMTgg4oCUIC9hcGkvc2VhdC1yZXF1ZXN0IE5ldGxpZnkgRnVuY3Rpb24KICoKICogU2VydmVyLXNpZGUgUE9TVCBoYW5kbGVyIGZvciB0aGUgc2VhdCByZXF1ZXN0IGZvcm0uCiAqIFZhbGlkYXRlcyBuYW1lICsgZW1haWwsIHRoZW4gc2VuZHMgdGhlIHNlYXRfcmVxdWVzdF9hY2tub3dsZWRnZW1lbnRfdjEKICogU2VuZEdyaWQgZHluYW1pYyB0ZW1wbGF0ZSAoZC03NDA1OTVkYzA3YmU0MDEyOTU2OWJjNzMxZjFiYzQ1NCkgdG8gdGhlIHJlcXVlc3Rlci4KICoKICogUmVxdWlyZWQgTmV0bGlmeSBlbnYgdmFyczoKICogICBTRU5ER1JJRF9BUElfS0VZICAgICAg4oCUIFNlbmRHcmlkIEFQSSBrZXkgKHJlcXVpcmVkKQogKiAgIFNFTkRHUklEX0ZST01fRU1BSUwgICDigJQgU2VuZGVyIGFkZHJlc3MgKGRlZmF1bHQ6IG5vcmVwbHlAdGhpc3BhZ2Vkb2Vzbm90ZXhpc3QxMjM0NS5jb20pCiAqICAgUExBVEZPUk1fVVJMICAgICAgICAgIOKAlCBQbGF0Zm9ybSBVUkwgaW5qZWN0ZWQgaW50byBlbWFpbCAoZGVmYXVsdDogaHR0cHM6Ly90aGlzcGFnZWRvZXNub3RleGlzdDEyMzQ1LnRlY2gpCiAqICAgU0lHTkFMX1VSTCAgICAgICAgICAgIOKAlCBTaWduYWwgbmV3c2xldHRlciBVUkwgaW5qZWN0ZWQgaW50byBlbWFpbCAoZGVmYXVsdDogUGVycGxleGl0eSBUVUogZGVwYXJ0dXJlIHBvcnRhbCkKICoKICogUmVxdWVzdCBib2R5IChKU09OKToKICogICB7IG5hbWU6IHN0cmluZywgZW1haWw6IHN0cmluZywgc291cmNlPzogc3RyaW5nIH0KICoKICogU3VjY2VzcyByZXNwb25zZToKICogICB7IG9rOiB0cnVlIH0KICoKICogRXJyb3IgcmVzcG9uc2U6CiAqICAgeyBvazogZmFsc2UsIGVycm9yOiBzdHJpbmcgfQogKgogKiBDbG9zZXMgQW1iaWd1aXR5IDIgKEdvL05vLUdvIENvbnRyYWN0KSDihpIgZmVlZHMgRkwgMDMyMTI2IEdvL05vLUdvIGdhdGUuCiAqLwoKY29uc3QgVEVNUExBVEVfSUQgID0gJ2QtNzQwNTk1ZGMwN2JlNDAxMjk1NjliYzczMWYxYmM0NTQnOyAvLyBzZWF0X3JlcXVlc3RfYWNrbm93bGVkZ2VtZW50X3YxCmNvbnN0IEFTTV9HUk9VUF9JRCA9IDMzMDQ3OyAvLyAiVGhlIFVsdGltYXRlIEpvdXJuZXkg4oCUIFRyYW5zYWN0aW9uYWwiIHVuc3Vic2NyaWJlIGdyb3VwCgpleHBvcnRzLmhhbmRsZXIgPSBhc3luYyBmdW5jdGlvbiAoZXZlbnQsIGNvbnRleHQpIHsKICBjb25zdCBoZWFkZXJzID0gewogICAgJ0FjY2Vzcy1Db250cm9sLUFsbG93LU9yaWdpbic6ICcqJywKICAgICdBY2Nlc3MtQ29udHJvbC1BbGxvdy1IZWFkZXJzJzogJ0NvbnRlbnQtVHlwZScsCiAgICAnQWNjZXNzLUNvbnRyb2wtQWxsb3ctTWV0aG9kcyc6ICdQT1NULCBPUFRJT05TJywKICAgICdDb250ZW50LVR5cGUnOiAnYXBwbGljYXRpb24vanNvbicKICB9OwoKICAvLyBIYW5kbGUgQ09SUyBwcmVmbGlnaHQKICBpZiAoZXZlbnQuaHR0cE1ldGhvZCA9PT0gJ09QVElPTlMnKSB7CiAgICByZXR1cm4geyBzdGF0dXNDb2RlOiAyMDQsIGhlYWRlcnMsIGJvZHk6ICcnIH07CiAgfQoKICBpZiAoZXZlbnQuaHR0cE1ldGhvZCAhPT0gJ1BPU1QnKSB7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA0MDUsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ01ldGhvZCBub3QgYWxsb3dlZCcgfSkKICAgIH07CiAgfQoKICAvLyAtLS0gUGFyc2UgYm9keSAtLS0KICBsZXQgYm9keTsKICB0cnkgewogICAgYm9keSA9IEpTT04ucGFyc2UoZXZlbnQuYm9keSB8fCAne30nKTsKICB9IGNhdGNoIChlcnIpIHsKICAgIHJldHVybiB7CiAgICAgIHN0YXR1c0NvZGU6IDQwMCwKICAgICAgaGVhZGVycywKICAgICAgYm9keTogSlNPTi5zdHJpbmdpZnkoeyBvazogZmFsc2UsIGVycm9yOiAnSW52YWxpZCBKU09OIGJvZHknIH0pCiAgICB9OwogIH0KCiAgY29uc3QgeyBuYW1lLCBlbWFpbCwgc291cmNlIH0gPSBib2R5OwoKICAvLyAtLS0gVmFsaWRhdGUgcmVxdWlyZWQgZmllbGRzIC0tLQogIGlmICghbmFtZSB8fCB0eXBlb2YgbmFtZSAhPT0gJ3N0cmluZycgfHwgbmFtZS50cmltKCkubGVuZ3RoID09PSAwKSB7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA0MDAsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ01pc3Npbmcgb3IgaW52YWxpZCBmaWVsZDogbmFtZScgfSkKICAgIH07CiAgfQoKICBjb25zdCBlbWFpbFJlZ2V4ID0gL15bXlxzQF0rQFteXHNAXStcLlteXHNAXSskLzsKICBpZiAoIWVtYWlsIHx8IHR5cGVvZiBlbWFpbCAhPT0gJ3N0cmluZycgfHwgIWVtYWlsUmVnZXgudGVzdChlbWFpbC50cmltKCkpKSB7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA0MDAsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ01pc3Npbmcgb3IgaW52YWxpZCBmaWVsZDogZW1haWwnIH0pCiAgICB9OwogIH0KCiAgLy8gLS0tIFJlc29sdmUgZW52IHZhcnMgLS0tCiAgY29uc3QgYXBpS2V5ID0gcHJvY2Vzcy5lbnYuU0VOREdSSURfQVBJX0tFWTsKICBpZiAoIWFwaUtleSkgewogICAgY29uc29sZS5lcnJvcignW3NlYXQtcmVxdWVzdF0gU0VOREdSSURfQVBJX0tFWSBpcyBub3Qgc2V0Jyk7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA1MDAsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ1NlcnZlciBjb25maWd1cmF0aW9uIGVycm9yJyB9KQogICAgfTsKICB9CgogIGNvbnN0IGZyb21FbWFpbCA9CiAgICBwcm9jZXNzLmVudi5TRU5ER1JJRF9GUk9NX0VNQUlMIHx8ICdub3JlcGx5QHRoaXNwYWdlZG9lc25vdGV4aXN0MTIzNDUuY29tJzsKICBjb25zdCBwbGF0Zm9ybVVybCA9CiAgICBwcm9jZXNzLmVudi5QTEFURk9STV9VUkwgfHwgJ2h0dHBzOi8vdGhpc3BhZ2Vkb2Vzbm90ZXhpc3QxMjM0NS50ZWNoJzsKICBjb25zdCBzaWduYWxVcmwgPQogICAgcHJvY2Vzcy5lbnYuU0lHTkFMX1VSTCB8fCAnaHR0cHM6Ly93d3cucGVycGxleGl0eS5haS9jb21wdXRlci9hL3BhZ2Vmb3J3YXJkLWFpcndheXMtdHVqLWRlcGFydC0uUlRMSFBtLlE1dXpBT2pRTHZCaFdBJzsKCiAgLy8gLS0tIEJ1aWxkIGR5bmFtaWMgdGVtcGxhdGUgZGF0YSAtLS0KICBjb25zdCBuYW1lVHJpbW1lZCA9IG5hbWUudHJpbSgpOwogIGNvbnN0IGVtYWlsVHJpbW1lZCA9IGVtYWlsLnRyaW0oKS50b0xvd2VyQ2FzZSgpOwogIGNvbnN0IG5hbWVQYXJ0cyA9IG5hbWVUcmltbWVkLnNwbGl0KC9ccysvKTsKICBjb25zdCBmaXJzdE5hbWUgPSBuYW1lUGFydHNbMF0gfHwgbmFtZVRyaW1tZWQ7CiAgY29uc3QgcmVxdWVzdERhdGUgPSBuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCk7CgogIGNvbnN0IGR5bmFtaWNUZW1wbGF0ZURhdGEgPSB7CiAgICBmaXJzdF9uYW1lOiBmaXJzdE5hbWUsCiAgICBmdWxsX25hbWU6IG5hbWVUcmltbWVkLAogICAgZW1haWw6IGVtYWlsVHJpbW1lZCwKICAgIHNvdXJjZTogKHNvdXJjZSAmJiB0eXBlb2Ygc291cmNlID09PSAnc3RyaW5nJyA/IHNvdXJjZS50cmltKCkgOiAnV2Vic2l0ZScpLAogICAgcGxhdGZvcm1fdXJsOiBwbGF0Zm9ybVVybCwKICAgIHNpZ25hbF91cmw6IHNpZ25hbFVybCwKICAgIHJlcXVlc3RfZGF0ZTogcmVxdWVzdERhdGUKICB9OwoKICAvLyAtLS0gU2VuZCB2aWEgU2VuZEdyaWQgLS0tCiAgdHJ5IHsKICAgIGNvbnN0IHNnUmVzcG9uc2UgPSBhd2FpdCBmZXRjaCgnaHR0cHM6Ly9hcGkuc2VuZGdyaWQuY29tL3YzL21haWwvc2VuZCcsIHsKICAgICAgbWV0aG9kOiAnUE9TVCcsCiAgICAgIGhlYWRlcnM6IHsKICAgICAgICBBdXRob3JpemF0aW9uOiBgQmVhcmVyICR7YXBpS2V5fWAsCiAgICAgICAgJ0NvbnRlbnQtVHlwZSc6ICdhcHBsaWNhdGlvbi9qc29uJwogICAgICB9LAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7CiAgICAgICAgZnJvbTogeyBlbWFpbDogZnJvbUVtYWlsIH0sCiAgICAgICAgcGVyc29uYWxpemF0aW9uczogW3sKICAgICAgICAgIHRvOiBbeyBlbWFpbDogZW1haWxUcmltbWVkIH1dLAogICAgICAgICAgZHluYW1pY190ZW1wbGF0ZV9kYXRhOiBkeW5hbWljVGVtcGxhdGVEYXRhCiAgICAgICAgfV0sCiAgICAgICAgdGVtcGxhdGVfaWQ6IFRFTVBMQVRFX0lELAogICAgICAgIGFzbTogeyBncm91cF9pZDogQVNNX0dST1VQX0lEIH0KICAgICAgfSkKICAgIH0pOwoKICAgIGlmIChzZ1Jlc3BvbnNlLm9rIHx8IHNnUmVzcG9uc2Uuc3RhdHVzID09PSAyMDIpIHsKICAgICAgY29uc29sZS5sb2coYFtzZWF0LXJlcXVlc3RdIEFja25vd2xlZGdlbWVudCBzZW50IHRvICR7ZW1haWxUcmltbWVkfWApOwogICAgICByZXR1cm4gewogICAgICAgIHN0YXR1c0NvZGU6IDIwMCwKICAgICAgICBoZWFkZXJzLAogICAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IHRydWUgfSkKICAgICAgfTsKICAgIH0KCiAgICBjb25zdCBlcnJvclRleHQgPSBhd2FpdCBzZ1Jlc3BvbnNlLnRleHQoKTsKICAgIGNvbnNvbGUuZXJyb3IoYFtzZWF0LXJlcXVlc3RdIFNlbmRHcmlkIGVycm9yICR7c2dSZXNwb25zZS5zdGF0dXN9OmAsIGVycm9yVGV4dCk7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA1MDIsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ0ZhaWxlZCB0byBzZW5kIGFja25vd2xlZGdlbWVudCBlbWFpbCcgfSkKICAgIH07CiAgfSBjYXRjaCAoZXJyKSB7CiAgICBjb25zb2xlLmVycm9yKCdbc2VhdC1yZXF1ZXN0XSBVbmV4cGVjdGVkIGVycm9yOicsIGVycik7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA1MDAsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ0ludGVybmFsIHNlcnZlciBlcnJvcicgfSkKICAgIH07CiAgfQp9Owo=
+/**
+ * #118 — /api/seat-request Netlify Function
+ *
+ * Server-side POST handler for the seat request form.
+ * Validates name + email, then sends the seat_request_acknowledgement_v1
+ * SendGrid dynamic template (d-740595dc07be40129569bc731f1bc454) to the requester.
+ *
+ * Required Netlify env vars:
+ *   SENDGRID_API_KEY      — SendGrid API key (required)
+ *   SENDGRID_FROM_EMAIL   — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   PLATFORM_URL          — Platform URL injected into email (default: https://thispagedoesnotexist12345.tech)
+ *   SIGNAL_URL            — Signal newsletter URL injected into email (default: Perplexity TUJ departure portal)
+ *
+ * Request body (JSON):
+ *   { name: string, email: string, source?: string }
+ *
+ * Success response:
+ *   { ok: true }
+ *
+ * Error response:
+ *   { ok: false, error: string }
+ *
+ * Closes Ambiguity 2 (Go/No-Go Contract) → feeds FL 032126 Go/No-Go gate.
+ */
+
+const TEMPLATE_ID  = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
+const ASM_GROUP_ID = 33047; // "The Ultimate Journey — Transactional" unsubscribe group
+
+exports.handler = async function (event, context) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' })
+    };
+  }
+
+  // --- Parse body ---
+  let body;
+  try {
+    body = JSON.parse(event.body || '{}');
+  } catch (err) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Invalid JSON body' })
+    };
+  }
+
+  const { name, email, source } = body;
+
+  // --- Validate required fields ---
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Missing or invalid field: name' })
+    };
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || typeof email !== 'string' || !emailRegex.test(email.trim())) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Missing or invalid field: email' })
+    };
+  }
+
+  // --- Resolve env vars ---
+  const apiKey = process.env.SENDGRID_API_KEY;
+  if (!apiKey) {
+    console.error('[seat-request] SENDGRID_API_KEY is not set');
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Server configuration error' })
+    };
+  }
+
+  const fromEmail =
+    process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const platformUrl =
+    process.env.PLATFORM_URL || 'https://thispagedoesnotexist12345.tech';
+  const signalUrl =
+    process.env.SIGNAL_URL || 'https://www.perplexity.ai/computer/a/pageforward-airways-tuj-depart-.RTLHPm.Q5uzAOjQLvBhWA';
+
+  // --- Build dynamic template data ---
+  const nameTrimmed = name.trim();
+  const emailTrimmed = email.trim().toLowerCase();
+  const nameParts = nameTrimmed.split(/\s+/);
+  const firstName = nameParts[0] || nameTrimmed;
+  const requestDate = new Date().toISOString();
+
+  const dynamicTemplateData = {
+    first_name: firstName,
+    full_name: nameTrimmed,
+    email: emailTrimmed,
+    source: (source && typeof source === 'string' ? source.trim() : 'Website'),
+    platform_url: platformUrl,
+    signal_url: signalUrl,
+    request_date: requestDate
+  };
+
+  // --- Send via SendGrid ---
+  try {
+    const sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: { email: fromEmail },
+        personalizations: [{
+          to: [{ email: emailTrimmed }],
+          dynamic_template_data: dynamicTemplateData
+        }],
+        template_id: TEMPLATE_ID,
+        asm: { group_id: ASM_GROUP_ID }
+      })
+    });
+
+    if (sgResponse.ok || sgResponse.status === 202) {
+      console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed}`);
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ ok: true })
+      };
+    }
+
+    const errorText = await sgResponse.text();
+    console.error(`[seat-request] SendGrid error ${sgResponse.status}:`, errorText);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Failed to send acknowledgement email' })
+    };
+  } catch (err) {
+    console.error('[seat-request] Unexpected error:', err);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Internal server error' })
+    };
+  }
+};
