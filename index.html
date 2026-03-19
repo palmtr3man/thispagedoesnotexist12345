@@ -531,32 +531,112 @@
 
 
 
-      <!-- F148: Primary CTA → POST /api/request-seat -->
+      <!-- F148: Primary CTA → POST /api/seat-request -->
       <!-- #cta-wrapper: stacked + centered so seat-count note renders below the button, not inline -->
       <div id="cta-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:1.25rem auto;text-align:center;">
+
+        <!-- Step 1: Request a Seat button (shown by default) -->
         <button
           class="btn-waitlist unlocked"
           id="waitlistBtn"
           data-umami-event="Waitlist Click"
           onclick="(function(){
-            var btn = document.getElementById('waitlistBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Submitting…';
-            fetch('/api/request-seat', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({source:'landing'}) })
-              .then(function(r){ return r.json(); })
-              .then(function(d){
-                btn.textContent = '✅ Seat Requested — Check your email';
-                btn.style.pointerEvents = 'none';
-              })
-              .catch(function(){
-                btn.disabled = false;
-                btn.textContent = '✈️ Request a Seat';
-                alert('Something went wrong — please try again.');
-              });
+            document.getElementById('waitlistBtn').style.display = 'none';
+            var f = document.getElementById('seat-request-form');
+            f.style.display = 'flex';
+            f.querySelector('input[name=name]').focus();
           })()"
         >
           ✈️ Request a Seat
         </button>
+
+        <!-- Step 2: Inline name + email form (hidden until button clicked) -->
+        <form
+          id="seat-request-form"
+          style="display:none;flex-direction:column;align-items:center;gap:0.6rem;width:100%;max-width:340px;"
+          onsubmit="(function(e){
+            e.preventDefault();
+            var form  = document.getElementById('seat-request-form');
+            var name  = form.querySelector('input[name=name]').value.trim();
+            var email = form.querySelector('input[name=email]').value.trim();
+            var errEl = document.getElementById('seat-form-error');
+            var subBtn = document.getElementById('seat-submit-btn');
+            errEl.textContent = '';
+            if (!name)  { errEl.textContent = 'Name is required.'; return; }
+            if (!email) { errEl.textContent = 'Email is required.'; return; }
+            subBtn.disabled = true;
+            subBtn.textContent = '⏳ Submitting…';
+            fetch('/api/seat-request', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({ name: name, email: email, source: 'landing' })
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+              if (d.ok) {
+                form.style.display = 'none';
+                var conf = document.getElementById('seat-request-confirm');
+                conf.style.display = 'block';
+              } else {
+                errEl.textContent = d.error || 'Something went wrong — please try again.';
+                subBtn.disabled = false;
+                subBtn.textContent = '✈️ Submit Request';
+              }
+            })
+            .catch(function(){
+              errEl.textContent = 'Network error — please try again.';
+              subBtn.disabled = false;
+              subBtn.textContent = '✈️ Submit Request';
+            });
+          })(event)"
+        >
+          <input
+            name="name"
+            type="text"
+            placeholder="Your name"
+            autocomplete="name"
+            required
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(168,196,0,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
+            onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Your email"
+            autocomplete="email"
+            required
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(168,196,0,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
+            onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
+          />
+          <span id="seat-form-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1em;"></span>
+          <div style="display:flex;gap:0.5rem;width:100%;">
+            <button
+              type="button"
+              style="flex:0 0 auto;padding:0.6rem 1rem;border-radius:6px;border:1px solid rgba(168,196,0,0.25);background:rgba(0,0,0,0.4);color:rgba(168,196,0,0.6);font-size:0.85rem;cursor:pointer;"
+              onclick="(function(){
+                document.getElementById('seat-request-form').style.display = 'none';
+                document.getElementById('waitlistBtn').style.display = '';
+              })()"
+            >Cancel</button>
+            <button
+              id="seat-submit-btn"
+              type="submit"
+              class="btn-waitlist unlocked"
+              style="flex:1;padding:0.6rem 1rem;"
+            >✈️ Submit Request</button>
+          </div>
+        </form>
+
+        <!-- Step 3: Confirmation (hidden until successful submit) -->
+        <div
+          id="seat-request-confirm"
+          style="display:none;font-size:0.9rem;color:#A8C400;letter-spacing:0.03em;padding:0.5rem 0;"
+        >
+          ✅ Seat requested — check your inbox for confirmation.
+        </div>
+
         <!-- seat-count span appended here by applySeatGate() -->
         <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat on FL 032126. Five seats. One flight.</span>
       </div>
