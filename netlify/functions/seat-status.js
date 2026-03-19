@@ -16,6 +16,9 @@
  *     cohort_departure: "2026-03-21T16:34:00Z",
  *     alpha_mode: true | false
  *   }
+ *
+ * Required env vars:
+ *   BASE44APIKEY  — Base44 API key for querying the Seat entity
  */
 
 const COHORT_CONFIG = {
@@ -23,6 +26,42 @@ const COHORT_CONFIG = {
   seats_total: 5,
   cohort_id: '032126'
 };
+
+// Base44 entity name for seats — adjust if the entity is named differently in your schema
+const BASE44_ENTITY = 'Seat';
+const BASE44_API_URL = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities';
+
+/**
+ * Query the Base44 Seat entity and count records with status === 'occupied'.
+ * Returns the count of occupied seats, or throws on API failure.
+ */
+async function fetchOccupiedSeatCount(apiKey) {
+  const url = `${BASE44_API_URL}/${BASE44_ENTITY}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'ApiKey': apiKey,
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Base44 API error ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+
+  // data is expected to be an array of seat records
+  const seats = Array.isArray(data) ? data : (data.records || data.items || data.data || []);
+  const occupied = seats.filter(
+    (seat) => seat.status && seat.status.toLowerCase() === 'occupied'
+  );
+
+  return occupied.length;
+}
 
 exports.handler = async function (event, context) {
   // CORS headers
@@ -66,9 +105,22 @@ exports.handler = async function (event, context) {
     // Alpha mode flag — controls whether the seat request form is live
     const alphaMode = process.env.ALPHA_MODE === 'true';
 
-    // Seat count — in production this would query the Base44 Seat entity
-    // For now, returns static config. Replace with Base44 API call when #113 lands.
-    const seats_filled = 0; // TODO: query Base44 Seat entity after #113
+    // --- Live seat count from Base44 ---
+    const apiKey = process.env.BASE44APIKEY;
+    let seats_filled = 0;
+
+    if (!apiKey) {
+      console.warn('[seat-status] BASE44APIKEY is not set — defaulting seats_filled to 0');
+    } else {
+      try {
+        seats_filled = await fetchOccupiedSeatCount(apiKey);
+        console.log(`[seat-status] Base44 occupied seats: ${seats_filled}`);
+      } catch (queryErr) {
+        // Non-fatal: log the error but still return a response so the UI doesn't break
+        console.error('[seat-status] Failed to query Base44 seat count:', queryErr.message);
+      }
+    }
+
     const seats_remaining = Math.max(0, COHORT_CONFIG.seats_total - seats_filled);
 
     const payload = {
