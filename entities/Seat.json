@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Seat",
+  "type": "object",
+  "required": ["user_email", "first_name", "last_name"],
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the seat holder"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "First name of the seat holder"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Last name of the seat holder"
+    },
+    "seat_label": {
+      "type": "string",
+      "description": "Label identifier for the seat"
+    }
+  }
+}
