@@ -551,7 +551,7 @@
         <span class="status-title-label">Departure Time:</span>
         <span class="badge badge--arriving" id="arrival-time">
           <span class="arriving-dot"></span>
-          <span id="arrival-text">3:21 PM ET</span>
+          <span id="arrival-text">12:34 PM ET</span>
         </span>
       </div>
 
@@ -1063,7 +1063,7 @@
         if (effectiveNow >= departureTime) {
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'CLOSED';
-          arrivalTextEl.textContent = '3:21 PM ET';
+          arrivalTextEl.textContent = '12:34 PM ET';
           setDepartureDate('March 21, 2026');
           if (full)  full.textContent  = 'DEPARTED';
           if (short) short.textContent = 'DEPARTED';
@@ -1088,7 +1088,7 @@
         } else if (effectiveNow >= holidayEnd) {
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'BOARDING';
-          arrivalTextEl.textContent = '3:21 PM ET';
+          arrivalTextEl.textContent = '12:34 PM ET';
           setDepartureDate('March 21, 2026');
           if (full)  full.textContent  = 'BOARDING OPEN';
           if (short) short.textContent = 'BOARDING';
@@ -1105,7 +1105,7 @@
         } else if (effectiveNow >= holidayOpen) {
           if (flightEl)      { flightEl.textContent = 'FL ☘️1726 ✈️'; }
           dockEl.textContent = 'BOARDING';
-          arrivalTextEl.textContent = '3:21 PM ET';
+          arrivalTextEl.textContent = '12:34 PM ET';
           setDepartureDate('March 21, 2026');
           if (full)  full.textContent  = 'HOLIDAY BOARDING 🍀';
           if (short) short.textContent = 'HOLIDAY';
@@ -1122,7 +1122,7 @@
         } else if (effectiveNow >= preBoardOpen) {
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'PRE-BOARD';
-          arrivalTextEl.textContent = '3:21 PM ET';
+          arrivalTextEl.textContent = '12:34 PM ET';
           setDepartureDate('March 21, 2026');
           if (full)  full.textContent  = 'EXECUTIVE PRE-BOARD';
           if (short) short.textContent = 'PRE-BOARD';
@@ -1138,7 +1138,7 @@
         } else {
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'HOLD';
-          arrivalTextEl.textContent = '3:21 PM ET';
+          arrivalTextEl.textContent = '12:34 PM ET';
           setDepartureDate('March 21, 2026');
           if (full)  full.textContent  = 'HOLD';
           if (short) short.textContent = 'HOLD';
