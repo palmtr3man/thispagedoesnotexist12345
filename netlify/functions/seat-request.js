@@ -4,12 +4,14 @@
  * Server-side POST handler for the seat request form.
  * Validates name + email, then sends the seat_request_acknowledgement_v1
  * SendGrid dynamic template (d-740595dc07be40129569bc731f1bc454) to the requester.
+ * After the SendGrid call, POSTs the seat data to Base44 so the count increments.
  *
  * Required Netlify env vars:
  *   SENDGRID_API_KEY      — SendGrid API key (required)
  *   SENDGRID_FROM_EMAIL   — Sender address (default: noreply@thispagedoesnotexist12345.com)
  *   PLATFORM_URL          — Platform URL injected into email (default: https://thispagedoesnotexist12345.tech)
  *   SIGNAL_URL            — Signal newsletter URL injected into email (default: Perplexity TUJ departure portal)
+ *   BASE44_SEAT_REQUEST_URL — Base44 endpoint for seat-request writes (required for count)
  *
  * Request body (JSON):
  *   { name: string, email: string, source?: string }
@@ -117,6 +119,7 @@ exports.handler = async function (event, context) {
   };
 
   // --- Send via SendGrid ---
+  let sgOk = false;
   try {
     const sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
@@ -138,26 +141,72 @@ exports.handler = async function (event, context) {
 
     if (sgResponse.ok || sgResponse.status === 202) {
       console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed}`);
+      sgOk = true;
+    } else {
+      const errorText = await sgResponse.text();
+      console.error(`[seat-request] SendGrid error ${sgResponse.status}:`, errorText);
       return {
-        statusCode: 200,
+        statusCode: 502,
         headers,
-        body: JSON.stringify({ ok: true })
+        body: JSON.stringify({ ok: false, error: 'Failed to send acknowledgement email' })
       };
     }
-
-    const errorText = await sgResponse.text();
-    console.error(`[seat-request] SendGrid error ${sgResponse.status}:`, errorText);
-    return {
-      statusCode: 502,
-      headers,
-      body: JSON.stringify({ ok: false, error: 'Failed to send acknowledgement email' })
-    };
   } catch (err) {
-    console.error('[seat-request] Unexpected error:', err);
+    console.error('[seat-request] Unexpected error during SendGrid call:', err);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ ok: false, error: 'Internal server error' })
     };
   }
+
+  // --- Write to Base44 (seat count increment) ---
+  const base44Url = process.env.BASE44_SEAT_REQUEST_URL;
+  if (!base44Url) {
+    console.warn('[seat-request] BASE44_SEAT_REQUEST_URL is not set — skipping Base44 write');
+    // SendGrid succeeded; return ok so the user experience is not broken,
+    // but log the gap so the team can action the missing env var.
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ ok: true })
+    };
+  }
+
+  try {
+    const base44Response = await fetch(base44Url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: nameTrimmed,
+        email: emailTrimmed,
+        source: (source && typeof source === 'string' ? source.trim() : 'Website')
+      })
+    });
+
+    if (!base44Response.ok) {
+      const errorText = await base44Response.text();
+      console.error(`[seat-request] Base44 write failed ${base44Response.status}:`, errorText);
+      return {
+        statusCode: 502,
+        headers,
+        body: JSON.stringify({ ok: false, error: 'Base44 write failed — seat count not incremented' })
+      };
+    }
+
+    console.log(`[seat-request] Base44 write succeeded for ${emailTrimmed}`);
+  } catch (err) {
+    console.error('[seat-request] Unexpected error during Base44 call:', err);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Internal server error during Base44 write' })
+    };
+  }
+
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({ ok: true })
+  };
 };
