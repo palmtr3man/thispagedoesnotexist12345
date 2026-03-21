@@ -557,14 +557,14 @@
 
       <div class="status-title">
         <span class="status-title-label">Departure Time:</span>
-        <span class="badge badge--highlight" id="departure-time-badge">3:21 PM ET</span>
+        <span class="badge badge--highlight" id="departure-time-badge">2:22 PM ET</span>
 
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Departure Date:</span>
         <span class="badge badge--arriving" id="departure-date">
-          <span class="arriving-dot"></span>March 21, 2026
+          <span class="arriving-dot"></span>March 22, 2026
         </span>
       </div>
 
@@ -970,7 +970,7 @@
         var statusNote = document.querySelector('p.status-text[style*="opacity: 0.7"]');
         if (statusNote) {
           if (status.seats_filled >= 3) {
-            statusNote.textContent = 'Five seats. One mission. FL 032126 departs March 21.';
+            statusNote.textContent = 'Five seats. One mission. FL 032126 departs March 22.';
           } else {
             statusNote.textContent = '';
           }
@@ -1022,8 +1022,8 @@
       const holidayOpen   = new Date('2026-03-17T04:00:00Z');
       // Holiday boarding ends: March 18, 2026 at 12:00 AM EDT = 04:00 UTC
       const holidayEnd    = new Date('2026-03-18T04:00:00Z');
-      // Departure: March 21, 2026 at 3:21 PM EDT = 19:21 UTC
-      const departureTime = new Date('2026-03-21T19:21:00Z');
+      // Departure: March 22, 2026 at 2:22 PM EDT = 18:22 UTC
+      const departureTime = new Date('2026-03-22T18:22:00Z');
       // DELAYED override — set true to hold the gate open past departure time
       const FLIGHT_DELAYED = true;
       window.FLIGHT_DELAYED = FLIGHT_DELAYED; // expose to other IIFEs (e.g. countdown timer)
@@ -1077,7 +1077,7 @@
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
+          setDepartureDate('March 22, 2026');
           if (statusEl) {
             statusEl.style.color = '#ff4444';
             statusEl.style.borderColor = 'rgba(255,68,68,0.6)';
@@ -1101,7 +1101,7 @@
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'GATE CLOSED';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
+          setDepartureDate('March 22, 2026');
           if (full)  full.textContent  = 'DEPARTED';
           if (short) short.textContent = 'DEPARTED';
           document.body.classList.add('gate-closed');
@@ -1127,7 +1127,7 @@
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
+          setDepartureDate('March 22, 2026');
           if (full)  full.textContent  = 'BOARDING OPEN';
           if (short) short.textContent = 'BOARDING';
           document.body.classList.remove('gate-closed');
@@ -1144,7 +1144,7 @@
           if (flightEl)      { flightEl.textContent = 'FL ☘️1726 ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
+          setDepartureDate('March 22, 2026');
           if (full)  full.textContent  = 'HOLIDAY BOARDING 🍀';
           if (short) short.textContent = 'HOLIDAY';
           document.body.classList.remove('gate-closed');
@@ -1161,7 +1161,7 @@
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
+          setDepartureDate('March 22, 2026');
           if (full)  full.textContent  = 'EXECUTIVE PRE-BOARD';
           if (short) short.textContent = 'PRE-BOARD';
           document.body.classList.remove('gate-closed');
@@ -1177,7 +1177,7 @@
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'GATE CLOSED';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 21, 2026');
+          setDepartureDate('March 22, 2026');
           if (full)  full.textContent  = 'HOLD';
           if (short) short.textContent = 'HOLD';
           if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
@@ -1197,9 +1197,9 @@
       }
     })();
 
-    // Live countdown timer to March 21, 2026 at 3:21 PM ET (19:21 UTC)
+    // Live countdown timer to March 22, 2026 at 2:22 PM ET (18:22 UTC)
     (function() {
-      var target = new Date('2026-03-21T19:21:00Z');
+      var target = new Date('2026-03-22T18:22:00Z');
       var wrap   = document.getElementById('countdown-wrap');
       var departed = document.getElementById('countdown-departed');
       var cdHours   = document.getElementById('cd-hours');
