@@ -5,6 +5,8 @@
  * Validates name + email, then sends the seat_request_acknowledgement_v1
  * SendGrid dynamic template (d-740595dc07be40129569bc731f1bc454) to the requester.
  * After the SendGrid call, POSTs the seat data to Base44 so the count increments.
+ * Finally, sends an internal notification (internalsignupnotification_v1) to
+ * support@thispagedoesnotexist12345.com with the requester's name and email.
  *
  * Required Netlify env vars:
  *   SENDGRID_API_KEY      — SendGrid API key (required)
@@ -25,13 +27,15 @@
  * Closes Ambiguity 2 (Go/No-Go Contract) → feeds FL 032126 Go/No-Go gate.
  */
 
-const TEMPLATE_ID  = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
+const TEMPLATE_ID          = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
+const INTERNAL_TEMPLATE_ID = 'd-073dc68a683348f18133d78c9879ced8'; // internalsignupnotification_v1
+const INTERNAL_NOTIFY_EMAIL = 'support@thispagedoesnotexist12345.com';
 const ASM_GROUP_ID = 33047; // "The Ultimate Journey — Transactional" unsubscribe group
 const SUBJECT      = 'Your seat request is in — FL 032126 ✈️';
 
 exports.handler = async function (event, context) {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
@@ -118,7 +122,7 @@ exports.handler = async function (event, context) {
     request_date: requestDate
   };
 
-  // --- Send via SendGrid ---
+  // --- Send user acknowledgement via SendGrid ---
   let sgOk = false;
   try {
     const sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -202,6 +206,39 @@ exports.handler = async function (event, context) {
       headers,
       body: JSON.stringify({ ok: false, error: 'Internal server error during Base44 write' })
     };
+  }
+
+  // --- Send internal signup notification via SendGrid ---
+  try {
+    const internalSgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: { email: fromEmail },
+        personalizations: [{
+          to: [{ email: INTERNAL_NOTIFY_EMAIL }],
+          dynamic_template_data: {
+            name: nameTrimmed,
+            email: emailTrimmed
+          }
+        }],
+        template_id: INTERNAL_TEMPLATE_ID
+      })
+    });
+
+    if (internalSgResponse.ok || internalSgResponse.status === 202) {
+      console.log(`[seat-request] Internal notification sent to ${INTERNAL_NOTIFY_EMAIL} for requester ${emailTrimmed}`);
+    } else {
+      const errorText = await internalSgResponse.text();
+      // Log but do not fail the request — user ack and Base44 write already succeeded
+      console.error(`[seat-request] Internal notification SendGrid error ${internalSgResponse.status}:`, errorText);
+    }
+  } catch (err) {
+    // Log but do not fail the request
+    console.error('[seat-request] Unexpected error during internal notification SendGrid call:', err);
   }
 
   return {
