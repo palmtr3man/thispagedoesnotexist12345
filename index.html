@@ -1050,6 +1050,7 @@
         const departureDateEl = document.getElementById('departure-date');
         const statusNote    = document.querySelector('.status-text');
         const waitlistBtn   = document.getElementById('waitlistBtn');
+        const joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
         const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
         const ctaSubtext    = document.getElementById('cta-subtext');
         const lockedMsg     = document.querySelector('.gate-locked-msg');
@@ -1085,7 +1086,8 @@
           })();
           if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
           if (ctaSubtext)  ctaSubtext.style.display = 'none';
-          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
           if (lockedMsg)   lockedMsg.style.display = 'block';
           if (calBtn) { calBtn.removeAttribute('href'); calBtn.setAttribute('aria-disabled','true'); calBtn.setAttribute('tabindex','-1'); calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
           if (nextStepRow) nextStepRow.innerHTML = 'Next step: <strong>Follow Signal</strong> for next cohort announcement.';
