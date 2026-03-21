@@ -570,7 +570,7 @@
 
       <div class="status-title">
         <span class="status-title-label">Status:</span>
-        <span class="badge badge--highlight" id="dock-status-badge" style="color: red;">
+        <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
           <span class="full-text">DELAYED</span>
           <span class="short-text">DELAYED</span>
         </span>
@@ -1024,6 +1024,8 @@
       const holidayEnd    = new Date('2026-03-18T04:00:00Z');
       // Departure: March 21, 2026 at 3:21 PM EDT = 19:21 UTC
       const departureTime = new Date('2026-03-21T19:21:00Z');
+      // DELAYED override — set true to hold the gate open past departure time
+      const FLIGHT_DELAYED = true;
 
       function updateDockState() {
         const now = new Date();
@@ -1064,6 +1066,30 @@
           const dot = departureDateEl.querySelector('.arriving-dot');
           if (dot && dot.nextSibling) { dot.nextSibling.textContent = text; }
           else if (dot) { departureDateEl.appendChild(document.createTextNode(text)); }
+        }
+
+        // ── STATE: DELAYED — overrides clock-based departure when FLIGHT_DELAYED is true ──
+        if (FLIGHT_DELAYED) {
+          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          dockEl.textContent = 'GATE OPEN';
+          arrivalTextEl.textContent = '8:34 AM ET';
+          setDepartureDate('March 21, 2026');
+          if (statusEl) {
+            statusEl.style.color = '#ff4444';
+            statusEl.style.borderColor = 'rgba(255,68,68,0.6)';
+            statusEl.style.background = 'rgba(255,68,68,0.15)';
+          }
+          if (full)  full.textContent  = 'DELAYED';
+          if (short) short.textContent = 'DELAYED';
+          document.body.classList.remove('gate-closed');
+          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
+          if (ctaSubtext)  { ctaSubtext.textContent = 'Flight delayed — gate remains open. Request a seat on FL 032126.'; ctaSubtext.style.display = 'block'; }
+          if (waitlistBtn) { waitlistBtn.style.display = ''; }
+          if (typeof applySeatGate === 'function') applySeatGate();
+          if (lockedMsg)   lockedMsg.style.display = 'none';
+          if (calBtn) { calBtn.setAttribute('href','https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'); calBtn.removeAttribute('aria-disabled'); calBtn.setAttribute('tabindex','0'); calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
+          if (nextStepRow) nextStepRow.innerHTML = '✈️ Flight delayed — use the <strong>Request a Seat</strong> button above to board.';
+          return FORCE_STATE;
         }
 
         // ── STATE: DEPARTED (after Mar 21 3:21 PM EDT) ───────────────────────
