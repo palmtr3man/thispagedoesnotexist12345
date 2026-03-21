@@ -558,7 +558,7 @@
       <div class="status-title">
         <span class="status-title-label">Departure Time:</span>
         <span class="badge badge--highlight" id="departure-time-badge">3:21 PM ET</span>
-        <span class="badge" id="delayed-badge" style="background:rgba(255,165,0,0.15);color:#FFA500;border:1px solid rgba(255,165,0,0.5);">DELAYED</span>
+
       </div>
 
       <div class="status-title">
@@ -1186,7 +1186,9 @@
       }
       const FORCE_STATE = updateDockState();
       const UPDATE_MS = 30000; // re-check every 30s for live flip
-      if (FORCE_STATE === null) {
+      // Do not start the live-update interval when FLIGHT_DELAYED is true —
+      // the DELAYED state must remain frozen regardless of wall-clock time.
+      if (FORCE_STATE === null && !FLIGHT_DELAYED) {
         setInterval(updateDockState, UPDATE_MS);
       }
     })();
@@ -1206,6 +1208,8 @@
         var now  = new Date();
         var diff = target - now;
         if (diff <= 0) {
+          // Do not show "Departed" message while flight is in DELAYED state
+          if (typeof FLIGHT_DELAYED !== 'undefined' && FLIGHT_DELAYED) return;
           if (wrap)     wrap.style.display = 'none';
           if (departed) departed.style.display = 'block';
           return;
