@@ -1026,6 +1026,7 @@
       const departureTime = new Date('2026-03-21T19:21:00Z');
       // DELAYED override — set true to hold the gate open past departure time
       const FLIGHT_DELAYED = true;
+      window.FLIGHT_DELAYED = FLIGHT_DELAYED; // expose to other IIFEs (e.g. countdown timer)
 
       function updateDockState() {
         const now = new Date();
@@ -1070,6 +1071,9 @@
 
         // ── STATE: DELAYED — overrides clock-based departure when FLIGHT_DELAYED is true ──
         if (FLIGHT_DELAYED) {
+          // Hard-lock #countdown-departed hidden so it cannot appear regardless of timer state
+          var _dep = document.getElementById('countdown-departed');
+          if (_dep) { _dep.style.setProperty('display', 'none', 'important'); }
           if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
@@ -1208,8 +1212,11 @@
         var now  = new Date();
         var diff = target - now;
         if (diff <= 0) {
-          // Do not show "Departed" message while flight is in DELAYED state
-          if (typeof FLIGHT_DELAYED !== 'undefined' && FLIGHT_DELAYED) return;
+          // FLIGHT_DELAYED guard — keep countdown-departed permanently hidden while delayed
+          if (window.FLIGHT_DELAYED) {
+            if (departed) departed.style.setProperty('display', 'none', 'important');
+            return;
+          }
           if (wrap)     wrap.style.display = 'none';
           if (departed) departed.style.display = 'block';
           return;
