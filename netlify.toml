@@ -22,10 +22,10 @@
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
 
-# www → apex 301 redirect (path-preserving) for .tech domain
+# www → apex 301 redirect (path-preserving) for .net domain
 [[redirects]]
-  from = "https://www.thispagedoesnotexist12345.tech/*"
-  to = "https://thispagedoesnotexist12345.tech/:splat"
+  from = "https://www.thispagedoesnotexist12345.net/*"
+  to = "https://thispagedoesnotexist12345.net/:splat"
   status = 301
   force = true
 
