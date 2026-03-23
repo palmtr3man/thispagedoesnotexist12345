@@ -1037,17 +1037,17 @@
       function updateDockState() {
         const now = new Date();
         // DEV ONLY: force a dock state via URL for QA/screenshots.
-        // ?force_state=PRE_BOARD | HOLIDAY | POST_HOLIDAY | DEPARTED
-        const allowedForceStates = new Set(['PRE_BOARD', 'HOLIDAY', 'POST_HOLIDAY', 'DEPARTED']);
+        // ?force_state=PRE_BOARD | HOLIDAY | POST_HOLIDAY | DEPARTED | CLOSED
+        const allowedForceStates = new Set(['PRE_BOARD', 'HOLIDAY', 'POST_HOLIDAY', 'DEPARTED', 'CLOSED']);
         let FORCE_STATE = new URLSearchParams(location.search).get('force_state');
         FORCE_STATE = FORCE_STATE ? FORCE_STATE.trim().toUpperCase() : null;
         if (!allowedForceStates.has(FORCE_STATE)) FORCE_STATE = null;
-
         let effectiveNow = now;
         if (FORCE_STATE === 'PRE_BOARD')         { effectiveNow = new Date(preBoardOpen.getTime() + 1000); }
         else if (FORCE_STATE === 'HOLIDAY')      { effectiveNow = new Date(holidayOpen.getTime() + 1000); }
         else if (FORCE_STATE === 'POST_HOLIDAY') { effectiveNow = new Date(holidayEnd.getTime() + 1000); }
         else if (FORCE_STATE === 'DEPARTED')     { effectiveNow = new Date(departureTime.getTime() + 1000); }
+        else if (FORCE_STATE === 'CLOSED')       { effectiveNow = new Date(0); } // pre-preboard epoch → resolves to HOLD/CLOSED branch}
 
         const isHolidayPhase = effectiveNow >= holidayOpen && effectiveNow < holidayEnd;
         document.body.classList.toggle('st-patricks', isHolidayPhase);
@@ -1060,7 +1060,7 @@
         const statusNote    = document.querySelector('.status-text');
         const waitlistBtn   = document.getElementById('waitlistBtn');
         const joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
-        const calBtn        = document.querySelector('[data-umami-event="CalendarJet Seat Request Click"]');
+        const calBtn        = document.querySelector('[data-umami-event="Book a Consultation Click"]');
         const ctaSubtext    = document.getElementById('cta-subtext');
         const lockedMsg     = document.querySelector('.gate-locked-msg');
         const nextStepRow   = document.querySelector('.btn-row-waitlist p');
