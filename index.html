@@ -1076,7 +1076,8 @@
         }
 
         // ── STATE: DELAYED — overrides clock-based departure when FLIGHT_DELAYED is true ──
-        if (FLIGHT_DELAYED) {
+        // Skip DELAYED override if an explicit force_state is set (allows QA/dev override)
+        if (FLIGHT_DELAYED && !FORCE_STATE) {
           // Hard-lock #countdown-departed hidden so it cannot appear regardless of timer state
           var _dep = document.getElementById('countdown-departed');
           if (_dep) { _dep.style.setProperty('display', 'none', 'important'); }
