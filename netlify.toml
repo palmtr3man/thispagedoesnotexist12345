@@ -51,7 +51,20 @@
   to = "/Studio/:splat"
   status = 301
   force = true
+
 [[redirects]]
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
+  status = 200
+
+# SPA route: Jobs board — serve index.html with 200 so client-side routing handles the view
+[[redirects]]
+  from = "/Jobs"
+  to = "/index.html"
+  status = 200
+
+# SPA route: Resume Fit Check — serve index.html with 200 so client-side routing handles the view
+[[redirects]]
+  from = "/ResumeFitCheck"
+  to = "/index.html"
   status = 200
