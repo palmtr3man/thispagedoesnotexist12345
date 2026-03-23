@@ -51,3 +51,7 @@
   to = "/Studio/:splat"
   status = 301
   force = true
+[[redirects]]
+  from = "/api/set-departure"
+  to = "/.netlify/functions/set-departure"
+  status = 200

@@ -71,6 +71,18 @@
         <!-- Status bar -->
         <div id="statusBar" class="status-bar status-info hidden"></div>
 
+        <!-- Departure Date Selector (FL Next)
+             Renders only when seat_id param is present AND scheduled_departure_date is null.
+             Hidden by default; JS controls visibility.
+             Pilot seat (WagonMan) is fully exempt — selector never renders.
+        -->
+        <div id="departureSelectorPanel" class="hidden glass rounded-lg px-5 py-4 mb-4" style="border: 1px solid rgba(0,217,255,0.25);">
+            <p class="text-slate-300 mb-3" style="font-size:14px;">Your flight window is ready. Select your departure date:</p>
+            <div id="departureDateOptions" class="flex flex-col gap-2 mb-2"></div>
+            <div id="departureConfirmMsg" class="hidden status-bar status-success" style="margin-top:8px; margin-bottom:0;"></div>
+            <div id="departureErrorMsg" class="hidden status-bar status-error" style="margin-top:8px; margin-bottom:0;"></div>
+        </div>
+
         <!-- Resume title bar (shown when loaded from Career Navigator) -->
         <div id="resumeTitleBar" class="hidden glass rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
             <div>
@@ -720,6 +732,130 @@ function loadLocalDraft() {
 }
 
 // ============================================================
+// DEPARTURE DATE SELECTOR — FL Next
+// ============================================================
+(function () {
+    var PILOT_SEAT_LABEL = 'WagonMan'; // Pilot seat — exempt from all departure scheduling
+    var SET_DEPARTURE_URL = '/api/set-departure';
+    var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
+
+    function formatDateLabel(dateStr) {
+        if (!dateStr) return dateStr;
+        var d = new Date(dateStr + 'T00:00:00.000Z');
+        return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+    }
+
+    function midpointDate(startStr, endStr) {
+        var start = new Date(startStr + 'T00:00:00.000Z');
+        var end   = new Date(endStr   + 'T00:00:00.000Z');
+        var mid   = new Date((start.getTime() + end.getTime()) / 2);
+        return mid.toISOString().slice(0, 10);
+    }
+
+    function renderDateOptions(windowStart, windowEnd, seatId, passengerEmail) {
+        var optionA = windowStart;
+        var optionB = midpointDate(windowStart, windowEnd);
+        var optionC = windowEnd;
+        var container = document.getElementById('departureDateOptions');
+        if (!container) return;
+        container.innerHTML = '';
+        var options = [
+            { label: 'Earliest — ' + formatDateLabel(optionA), value: optionA },
+            { label: 'Mid-window — ' + formatDateLabel(optionB), value: optionB },
+            { label: 'Latest — ' + formatDateLabel(optionC), value: optionC }
+        ];
+        options.forEach(function (opt) {
+            var btn = document.createElement('button');
+            btn.className = 'btn-secondary';
+            btn.style.cssText = 'text-align:left; padding:10px 16px; font-size:13px; width:100%;';
+            btn.textContent = opt.label;
+            btn.addEventListener('click', function () {
+                handleDateSelection(opt.value, seatId, passengerEmail, container);
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    function handleDateSelection(selectedDate, seatId, passengerEmail, optionsContainer) {
+        var confirmMsg = document.getElementById('departureConfirmMsg');
+        var errorMsg   = document.getElementById('departureErrorMsg');
+        if (confirmMsg) { confirmMsg.classList.add('hidden'); confirmMsg.textContent = ''; }
+        if (errorMsg)   { errorMsg.classList.add('hidden');   errorMsg.textContent = ''; }
+        if (optionsContainer) {
+            optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = true; b.style.opacity = '0.5'; });
+        }
+        fetch(SET_DEPARTURE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ seat_id: seatId, passenger_email: passengerEmail, selected_date: selectedDate })
+        }).then(function (resp) {
+            if (resp.ok) {
+                if (optionsContainer) optionsContainer.classList.add('hidden');
+                var label = formatDateLabel(selectedDate);
+                if (confirmMsg) {
+                    confirmMsg.textContent = 'Your departure is confirmed for ' + label + '. Your flight is ready.';
+                    confirmMsg.classList.remove('hidden');
+                }
+            } else {
+                resp.json().then(function (data) {
+                    var errMsg = (data && data.error) ? data.error : 'Something went wrong. Please try again or contact support.';
+                    if (errorMsg) { errorMsg.textContent = errMsg; errorMsg.classList.remove('hidden'); }
+                }).catch(function () {
+                    if (errorMsg) { errorMsg.textContent = 'Something went wrong. Please try again or contact support.'; errorMsg.classList.remove('hidden'); }
+                });
+                if (optionsContainer) {
+                    optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+                }
+            }
+        }).catch(function () {
+            if (errorMsg) { errorMsg.textContent = 'Something went wrong. Please try again or contact support.'; errorMsg.classList.remove('hidden'); }
+            if (optionsContainer) {
+                optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+            }
+        });
+    }
+
+    function initDepartureSelector() {
+        var params = new URLSearchParams(window.location.search);
+        var seatId = params.get('seat_id');
+        if (!seatId) return;
+        var panel = document.getElementById('departureSelectorPanel');
+        if (!panel) return;
+        var token = (typeof getAuthToken === 'function') ? getAuthToken() : null;
+        var headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        fetch(BASE44_SEAT_API + '/' + seatId, { headers: headers })
+            .then(function (resp) {
+                if (!resp.ok) return null;
+                return resp.json();
+            })
+            .then(function (seat) {
+                if (!seat) return;
+                // Pilot exemption
+                if (seat.seat_label === PILOT_SEAT_LABEL || seat.role === 'pilot') return;
+                // Already confirmed — show confirmation state
+                if (seat.scheduled_departure_date) {
+                    var confirmMsg = document.getElementById('departureConfirmMsg');
+                    if (confirmMsg) {
+                        confirmMsg.textContent = 'Your departure is confirmed for ' + formatDateLabel(seat.scheduled_departure_date) + '. Your flight is ready.';
+                        confirmMsg.classList.remove('hidden');
+                    }
+                    panel.classList.remove('hidden');
+                    return;
+                }
+                // Window must be set
+                if (!seat.departure_window_start || !seat.departure_window_end) return;
+                var passengerEmail = seat.user_email || '';
+                renderDateOptions(seat.departure_window_start, seat.departure_window_end, seatId, passengerEmail);
+                panel.classList.remove('hidden');
+            })
+            .catch(function () { /* silently skip on error */ });
+    }
+
+    window._initDepartureSelector = initDepartureSelector;
+})();
+
+// ============================================================
 // INIT
 // ============================================================
 window.addEventListener('load', () => {
@@ -731,6 +867,11 @@ window.addEventListener('load', () => {
         loadResumeFromCareerNavigator(resumeId);
     } else {
         loadLocalDraft();
+    }
+
+    // Initialise departure date selector (FL Next)
+    if (typeof window._initDepartureSelector === 'function') {
+        window._initDepartureSelector();
     }
 
     // Real-time preview updates on input
