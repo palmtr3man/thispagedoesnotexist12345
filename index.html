@@ -957,17 +957,20 @@
           return;
         }
 
+        // If gate is closed, never show joinWaitlistBtn from this function — gate state machine owns that
+        var isGateClosed = document.body.classList.contains('gate-closed');
+
         // If flight is full (open_count >= 5), replace button with "Join the waitlist" CTA
         if (status.open_count >= 5) {
           if (waitlistBtn) waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
+          if (!isGateClosed && joinWaitlistBtn) joinWaitlistBtn.style.display = '';
           return;
         }
 
         // If no seats remain (legacy fallback), replace button with "Join the waitlist" CTA
         if (status.seats_remaining <= 0) {
           if (waitlistBtn) waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
+          if (!isGateClosed && joinWaitlistBtn) joinWaitlistBtn.style.display = '';
           return;
         }
 
@@ -1095,7 +1098,8 @@
           document.body.classList.remove('gate-closed');
           if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
           if (ctaSubtext)  { ctaSubtext.textContent = 'Flight delayed — gate remains open. Request a seat on FL 032126.'; ctaSubtext.style.display = 'block'; }
-          if (waitlistBtn) { waitlistBtn.style.display = ''; }
+          if (waitlistBtn)     { waitlistBtn.style.display = ''; }
+          if (joinWaitlistBtn) { joinWaitlistBtn.style.display = 'none'; } // gate-closed fix: DELAYED state must never show joinWaitlistBtn
           if (typeof applySeatGate === 'function') applySeatGate();
           if (lockedMsg)   lockedMsg.style.display = 'none';
           if (calBtn) { calBtn.setAttribute('href','https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'); calBtn.removeAttribute('aria-disabled'); calBtn.setAttribute('tabindex','0'); calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
