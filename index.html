@@ -570,15 +570,15 @@
 
       <div class="status-title">
         <span class="status-title-label">Status:</span>
-        <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
-          <span class="full-text">DELAYED</span>
-          <span class="short-text">DELAYED</span>
+        <span class="badge badge--highlight" id="dock-status-badge">
+          <span class="full-text">DEPARTED</span>
+          <span class="short-text">DEPARTED</span>
         </span>
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Loading Dock:</span>
-        <span class="badge badge--status" id="dock-status">GATE OPEN</span>
+        <span class="badge badge--status" id="dock-status">GATE CLOSED</span>
       </div>
 
       <!-- Countdown Timer -->
@@ -1034,7 +1034,7 @@
       // Departure: March 22, 2026 at 2:22 PM EDT = 18:22 UTC
       const departureTime = new Date('2026-03-22T18:22:00Z');
       // DELAYED override — set true to hold the gate open past departure time
-      const FLIGHT_DELAYED = true;
+      const FLIGHT_DELAYED = false;
       window.FLIGHT_DELAYED = FLIGHT_DELAYED; // expose to other IIFEs (e.g. countdown timer)
 
       function updateDockState() {
