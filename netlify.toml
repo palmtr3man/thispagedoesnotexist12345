@@ -6,12 +6,7 @@
   node_bundler = "esbuild"
 
 [[headers]]
-  for = "/*"
-  [headers.values]
-    Content-Type = "text/html; charset=UTF-8"
-
-[[headers]]
-  for = "/index.html"
+  for = "/*.html"
   [headers.values]
     Content-Type = "text/html; charset=UTF-8"
 
