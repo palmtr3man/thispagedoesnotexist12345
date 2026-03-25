@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://www.thispagedoesnotexist12345.com/sitemap.xml
+Sitemap: https://thispagedoesnotexist12345.tech/sitemap.xml
