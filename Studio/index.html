@@ -15,19 +15,53 @@
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.thispagedoesnotexist12345.com/Studio">
+    <meta property="og:url" content="https://thispagedoesnotexist12345.tech/Studio">
     <meta property="og:title" content="One Page Studio - AI Resume Builder | The Ultimate Journey">
     <meta property="og:description" content="AI-powered resume builder with optimization tools and wordsmith capabilities.">
-    <meta property="og:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+    <meta property="og:image" content="https://thispagedoesnotexist12345.tech/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="One Page Studio - AI Resume Builder">
     <meta name="twitter:description" content="AI-powered resume builder with optimization tools and wordsmith capabilities.">
-    <meta name="twitter:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+    <meta name="twitter:image" content="https://thispagedoesnotexist12345.tech/og-image.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- JSON-LD: SoftwareApplication schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": "https://thispagedoesnotexist12345.tech/Studio#app",
+    "name": "One Page Studio",
+    "description": "AI-powered resume builder with optimization tools and wordsmith capabilities. Part of The Ultimate Journey career platform.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "url": "https://thispagedoesnotexist12345.tech/Studio",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "isPartOf": {
+      "@type": "Organization",
+      "name": "The Ultimate Journey",
+      "url": "https://thispagedoesnotexist12345.tech/"
+    }
+  }
+  </script>
+
+  <!-- Critical CSS: above-fold paint before Tailwind loads -->
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;padding:0;min-height:100vh}
+    body{background:linear-gradient(135deg,#0f172a 0%,#1a2332 50%,#0f1419 100%);color:#e0e7ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+    .tap-target{min-height:48px;min-width:48px;display:inline-flex;align-items:center;justify-content:center;padding:.5rem 1rem}
+  </style>
+
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -72,8 +106,7 @@
 </head>
 <body>
 <div class="min-h-screen p-6">
-    <!-- Header -->
-    <div class="max-w-7xl mx-auto mb-8">
+    <header role="banner" class="max-w-7xl mx-auto mb-8">
         <div class="flex items-center justify-between mb-4">
             <div>
                 <h1 class="text-4xl font-bold cyan-glow mb-1">One Page Studio</h1>
@@ -83,7 +116,7 @@
                 <button id="saveBackBtn" class="btn-success hidden" onclick="saveBackToCareerNavigator()">
                     &#x2713; Save to Career Navigator
                 </button>
-               <a href="https://thispagedoesnotexist12345.com/" class="text-cyan-400 hover:text-cyan-300 text-sm">
+               <a href="https://thispagedoesnotexist12345.tech/" class="tap-target text-cyan-400 hover:text-cyan-300 text-sm">
   &larr; Back to the Dock
 </a>
 
@@ -93,11 +126,6 @@
         <!-- Status bar -->
         <div id="statusBar" class="status-bar status-info hidden"></div>
 
-        <!-- Departure Date Selector (FL Next)
-             Renders only when seat_id param is present AND scheduled_departure_date is null.
-             Hidden by default; JS controls visibility.
-             Pilot seat (WagonMan) is fully exempt — selector never renders.
-        -->
         <div id="departureSelectorPanel" class="hidden glass rounded-lg px-5 py-4 mb-4" style="border: 1px solid rgba(0,217,255,0.25);">
             <p class="text-slate-300 mb-3" style="font-size:14px;">Your flight window is ready. Select your departure date:</p>
             <div id="departureDateOptions" class="flex flex-col gap-2 mb-2"></div>
@@ -105,7 +133,6 @@
             <div id="departureErrorMsg" class="hidden status-bar status-error" style="margin-top:8px; margin-bottom:0;"></div>
         </div>
 
-        <!-- Resume title bar (shown when loaded from Career Navigator) -->
         <div id="resumeTitleBar" class="hidden glass rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
             <div>
                 <span class="text-slate-400 text-xs uppercase tracking-wider">Editing Resume &bull;</span>
@@ -121,17 +148,12 @@
             <button class="tab-inactive pb-4 font-semibold transition-colors" onclick="switchTab('optimize', event)">AI Optimizer</button>
             <button class="tab-inactive pb-4 font-semibold transition-colors" onclick="switchTab('export', event)">Export</button>
         </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto">
+    </header><!-- /header -->
+    <main id="studio-main" role="main" class="max-w-7xl mx-auto">
         <!-- Editor Tab -->
         <div id="editor-tab" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Form Section -->
             <div class="glass rounded-lg p-6">
                 <h2 class="text-2xl font-bold cyan-glow mb-6">Edit Resume</h2>
-
-                <!-- Personal Info -->
                 <div class="mb-8">
                     <h3 class="section-header text-lg font-semibold">Personal Information</h3>
                     <input type="text" id="fullName" placeholder="Full Name" class="input-field mb-3">
@@ -143,43 +165,31 @@
                     <input type="url" id="website" placeholder="Portfolio / Website URL" class="input-field mb-3">
                     <textarea id="summary" placeholder="Professional Summary" class="input-field mb-3 resize-none" rows="3"></textarea>
                 </div>
-
-                <!-- Experience -->
                 <div class="mb-8">
                     <h3 class="section-header text-lg font-semibold">Experience</h3>
                     <div class="space-y-4" id="experienceList"></div>
                     <button class="btn-secondary w-full mt-4" onclick="addExperience()">+ Add Experience</button>
                 </div>
-
-                <!-- Education -->
                 <div class="mb-8">
                     <h3 class="section-header text-lg font-semibold">Education</h3>
                     <div class="space-y-4" id="educationList"></div>
                     <button class="btn-secondary w-full mt-4" onclick="addEducation()">+ Add Education</button>
                 </div>
-
-                <!-- Skills -->
                 <div class="mb-8">
                     <h3 class="section-header text-lg font-semibold">Skills</h3>
                     <textarea id="skills" placeholder="Enter skills separated by commas" class="input-field resize-none" rows="3"></textarea>
                 </div>
-
-                <!-- Certifications -->
                 <div class="mb-8">
                     <h3 class="section-header text-lg font-semibold">Certifications</h3>
                     <div class="space-y-3" id="certificationsList"></div>
                     <button class="btn-secondary w-full mt-4" onclick="addCertification()">+ Add Certification</button>
                 </div>
-
-                <!-- Projects -->
                 <div class="mb-8">
                     <h3 class="section-header text-lg font-semibold">Projects</h3>
                     <div class="space-y-3" id="projectsList"></div>
                     <button class="btn-secondary w-full mt-4" onclick="addProject()">+ Add Project</button>
                 </div>
             </div>
-
-            <!-- Preview Section -->
             <div class="glass rounded-lg p-6">
                 <h2 class="text-2xl font-bold cyan-glow mb-6">Live Preview</h2>
                 <div id="preview" class="resume-preview fade-in"></div>
@@ -239,10 +249,21 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main><!-- /main -->
 </div>
 
 <script>
+// ── TBT reduction: yield between long init tasks ────────────────────────────
+function yieldToMain() {
+    return new Promise(resolve => {
+        if (typeof scheduler !== 'undefined' && scheduler.postTask) {
+            scheduler.postTask(resolve, { priority: 'background' });
+        } else {
+            setTimeout(resolve, 0);
+        }
+    });
+}
+
 // ============================================================
 // STATE
 // ============================================================
@@ -251,18 +272,16 @@ let currentResumeData = {};
 let hasUnsavedChanges = false;
 
 // ============================================================
-// CAREER NAVIGATOR INTEGRATION — URL param + base44 fetch/save
+// CAREER NAVIGATOR INTEGRATION
 // ============================================================
 const BASE44_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Resume';
 
 function getAuthToken() {
-    // base44 stores the auth token in localStorage under these keys
     const keys = ['base44_token', 'auth_token', 'access_token', 'token'];
     for (const key of keys) {
         const val = localStorage.getItem(key);
         if (val) return val;
     }
-    // Also try sessionStorage
     for (const key of keys) {
         const val = sessionStorage.getItem(key);
         if (val) return val;
@@ -387,9 +406,6 @@ function buildResumePayload() {
     };
 }
 
-// ============================================================
-// POPULATE FORM FROM base44 Resume entity
-// ============================================================
 function populateFormFromResume(resume) {
     const pi = resume.personal_info || {};
     setVal('fullName', pi.full_name || pi.name || '');
@@ -401,24 +417,19 @@ function populateFormFromResume(resume) {
     setVal('website', pi.website || pi.portfolio_url || '');
     setVal('summary', pi.summary || pi.professional_summary || '');
 
-    // Experience
     document.getElementById('experienceList').innerHTML = '';
     (resume.experience || []).forEach(exp => addExperience(exp));
 
-    // Education
     document.getElementById('educationList').innerHTML = '';
     (resume.education || []).forEach(edu => addEducation(edu));
 
-    // Skills — normalize both array-of-objects and comma string formats
     const skillsArr = resume.skills || [];
     const skillsStr = skillsArr.map(s => (typeof s === 'string' ? s : s.name || '')).filter(Boolean).join(', ');
     setVal('skills', skillsStr);
 
-    // Certifications
     document.getElementById('certificationsList').innerHTML = '';
     (resume.certifications || []).forEach(cert => addCertification(cert));
 
-    // Projects
     document.getElementById('projectsList').innerHTML = '';
     (resume.projects || []).forEach(proj => addProject(proj));
 
@@ -430,9 +441,6 @@ function setVal(id, value) {
     if (el) el.value = value || '';
 }
 
-// ============================================================
-// STATUS BAR
-// ============================================================
 function showStatus(type, message) {
     const bar = document.getElementById('statusBar');
     bar.classList.remove('hidden', 'status-loading', 'status-success', 'status-error', 'status-info');
@@ -451,9 +459,6 @@ function hideStatus() {
     document.getElementById('statusBar').classList.add('hidden');
 }
 
-// ============================================================
-// TAB SWITCHING
-// ============================================================
 function switchTab(tabName, event) {
     ['editor', 'optimize', 'export'].forEach(t => {
         document.getElementById(t + '-tab').classList.add('hidden');
@@ -470,9 +475,6 @@ function switchTab(tabName, event) {
     if (tabName === 'preview') updatePreview();
 }
 
-// ============================================================
-// DYNAMIC SECTION BUILDERS
-// ============================================================
 function addExperience(data = {}) {
     const list = document.getElementById('experienceList');
     const div = document.createElement('div');
@@ -540,9 +542,6 @@ function esc(str) {
     return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ============================================================
-// LIVE PREVIEW
-// ============================================================
 function updatePreview() {
     const fullName = document.getElementById('fullName')?.value || '';
     const jobTitle = document.getElementById('jobTitle')?.value || '';
@@ -623,9 +622,6 @@ function updatePreview() {
     hasUnsavedChanges = true;
 }
 
-// ============================================================
-// OPTIMIZATION FUNCTIONS (simulated)
-// ============================================================
 function optimizeContent() {
     document.getElementById('optimizeResults').innerHTML = `
         <div class="glass-accent p-6 rounded">
@@ -693,9 +689,6 @@ function analyzeResume() {
     `;
 }
 
-// ============================================================
-// EXPORT FUNCTIONS
-// ============================================================
 function downloadPDF() {
     const element = document.getElementById('preview');
     const name = document.getElementById('fullName')?.value || 'resume';
@@ -734,7 +727,6 @@ function loadLocalDraft() {
             setTimeout(() => hideStatus(), 2500);
         } catch (e) {}
     } else {
-        // Show placeholder data
         populateFormFromResume({
             personal_info: {
                 full_name: 'Your Name',
@@ -754,10 +746,10 @@ function loadLocalDraft() {
 }
 
 // ============================================================
-// DEPARTURE DATE SELECTOR — FL Next
+// DEPARTURE DATE SELECTOR
 // ============================================================
 (function () {
-    var PILOT_SEAT_LABEL = 'WagonMan'; // Pilot seat — exempt from all departure scheduling
+    var PILOT_SEAT_LABEL = 'WagonMan';
     var SET_DEPARTURE_URL = '/api/set-departure';
     var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
 
@@ -853,9 +845,7 @@ function loadLocalDraft() {
             })
             .then(function (seat) {
                 if (!seat) return;
-                // Pilot exemption
                 if (seat.seat_label === PILOT_SEAT_LABEL || seat.role === 'pilot') return;
-                // Already confirmed — show confirmation state
                 if (seat.scheduled_departure_date) {
                     var confirmMsg = document.getElementById('departureConfirmMsg');
                     if (confirmMsg) {
@@ -865,7 +855,6 @@ function loadLocalDraft() {
                     panel.classList.remove('hidden');
                     return;
                 }
-                // Window must be set
                 if (!seat.departure_window_start || !seat.departure_window_end) return;
                 var passengerEmail = seat.user_email || '';
                 renderDateOptions(seat.departure_window_start, seat.departure_window_end, seatId, passengerEmail);
@@ -878,38 +867,42 @@ function loadLocalDraft() {
 })();
 
 // ============================================================
-// INIT
+// INIT — chunked to reduce TBT
 // ============================================================
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+    // Chunk 1: register DOM listeners (fast, synchronous)
     const params = new URLSearchParams(window.location.search);
     const resumeId = params.get('resumeId');
 
-    if (resumeId) {
-        currentResumeId = resumeId;
-        loadResumeFromCareerNavigator(resumeId);
-    } else {
-        loadLocalDraft();
-    }
-
-    // Initialise departure date selector (FL Next)
-    if (typeof window._initDepartureSelector === 'function') {
-        window._initDepartureSelector();
-    }
-
-    // Real-time preview updates on input
     document.addEventListener('input', (e) => {
         if (e.target.matches('input, textarea')) {
             updatePreview();
         }
     });
 
-    // Warn if leaving with unsaved changes and loaded from Career Navigator
     window.addEventListener('beforeunload', (e) => {
         if (hasUnsavedChanges && currentResumeId) {
             e.preventDefault();
             e.returnValue = '';
         }
     });
+
+    await yieldToMain(); // yield — let browser paint before heavy work
+
+    // Chunk 2: load resume data (network / localStorage)
+    if (resumeId) {
+        currentResumeId = resumeId;
+        await loadResumeFromCareerNavigator(resumeId);
+    } else {
+        loadLocalDraft();
+    }
+
+    await yieldToMain(); // yield before departure selector
+
+    // Chunk 3: departure date selector
+    if (typeof window._initDepartureSelector === 'function') {
+        window._initDepartureSelector();
+    }
 });
 </script>
 </body>
