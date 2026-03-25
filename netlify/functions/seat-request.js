@@ -11,7 +11,7 @@
  * Required Netlify env vars:
  *   SENDGRID_API_KEY      — SendGrid API key (required)
  *   SENDGRID_FROM_EMAIL   — Sender address (default: noreply@thispagedoesnotexist12345.com)
- *   PLATFORM_URL          — Platform URL injected into email (default: https://thispagedoesnotexist12345.tech)
+ *   PLATFORM_URL          — Platform URL injected into email (default: https://www.thispagedoesnotexist12345.com)
  *   SIGNAL_URL            — Signal newsletter URL injected into email (default: Perplexity TUJ departure portal)
  *   BASE44_SEAT_REQUEST_URL — Base44 endpoint for seat-request writes (required for count)
  *
@@ -100,7 +100,7 @@ exports.handler = async function (event, context) {
   const fromEmail =
     process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
   const platformUrl =
-    process.env.PLATFORM_URL || 'https://thispagedoesnotexist12345.tech';
+    process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com';
   const signalUrl =
     process.env.SIGNAL_URL || 'https://www.perplexity.ai/computer/a/pageforward-airways-tuj-depart-.RTLHPm.Q5uzAOjQLvBhWA';
 

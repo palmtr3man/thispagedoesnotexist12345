@@ -1,1 +1,51 @@
-W2J1aWxkXQogIHB1Ymxpc2ggPSAiLiIKICBmdW5jdGlvbnMgPSAibmV0bGlmeS9mdW5jdGlvbnMiCgpbZnVuY3Rpb25zXQogIG5vZGVfYnVuZGxlciA9ICJlc2J1aWxkIgoKW1toZWFkZXJzXV0KICBmb3IgPSAiLyouaHRtbCIKICBbaGVhZGVycy52YWx1ZXNdCiAgICBDb250ZW50LVR5cGUgPSAidGV4dC9odG1sOyBjaGFyc2V0PVVURi04IgoKW1toZWFkZXJzXV0KICBmb3IgPSAiLyouanMiCiAgW2hlYWRlcnMudmFsdWVzXQogICAgQ29udGVudC1UeXBlID0gImFwcGxpY2F0aW9uL2phdmFzY3JpcHQ7IGNoYXJzZXQ9VVRGLTgiCgpbW2hlYWRlcnNdXQogIGZvciA9ICIvYXBpLyoiCiAgW2hlYWRlcnMudmFsdWVzXQogICAgQWNjZXNzLUNvbnRyb2wtQWxsb3ctT3JpZ2luID0gIioiCiAgICBBY2Nlc3MtQ29udHJvbC1BbGxvdy1NZXRob2RzID0gIkdFVCwgUE9TVCwgT1BUSU9OUyIKICAgIEFjY2Vzcy1Db250cm9sLUFsbG93LUhlYWRlcnMgPSAiQ29udGVudC1UeXBlIgoKIyB3d3cg4oaSIGFwZXggMzAxIHJlZGlyZWN0IChwYXRoLXByZXNlcnZpbmcpIGZvciAubmV0IGRvbWFpbgpbW3JlZGlyZWN0c11dCiAgZnJvbSA9ICJodHRwczovL3d3dy50aGlzcGFnZWRvZXNub3RleGlzdDEyMzQ1Lm5ldC8qIgogIHRvID0gImh0dHBzOi8vdGhpc3BhZ2Vkb2Vzbm90ZXhpc3QxMjM0NS5uZXQvOnNwbGF0IgogIHN0YXR1cyA9IDMwMQogIGZvcmNlID0gdHJ1ZQoKW1tyZWRpcmVjdHNdXQogIGZyb20gPSAiL2FwaS9zZWF0LXN0YXR1cyIKICB0byA9ICIvLm5ldGxpZnkvZnVuY3Rpb25zL3NlYXQtc3RhdHVzIgogIHN0YXR1cyA9IDIwMAoKW1tyZWRpcmVjdHNdXQogIGZyb20gPSAiL2FwaS9zZWF0LXJlcXVlc3QiCiAgdG8gPSAiLy5uZXRsaWZ5L2Z1bmN0aW9ucy9zZWF0LXJlcXVlc3QiCiAgc3RhdHVzID0gMjAwCgojIE9uZSBQYWdlIFN0dWRpbyDigJQgc2VydmUgL1N0dWRpbyBmcm9tIHRoZSBTdHVkaW8gc3ViZm9sZGVyCltbcmVkaXJlY3RzXV0KICBmcm9tID0gIi9SZXN1bWVPbmVQYWdlU3R1ZGlvIgogIHRvID0gIi9TdHVkaW8iCiAgc3RhdHVzID0gMzAxCiAgZm9yY2UgPSB0cnVlCgpbW3JlZGlyZWN0c11dCiAgZnJvbSA9ICIvUmVzdW1lT25lUGFnZVN0dWRpby8qIgogIHRvID0gIi9TdHVkaW8vOnNwbGF0IgogIHN0YXR1cyA9IDMwMQogIGZvcmNlID0gdHJ1ZQoKW1tyZWRpcmVjdHNdXQogIGZyb20gPSAiL2FwaS9zZXQtZGVwYXJ0dXJlIgogIHRvID0gIi8ubmV0bGlmeS9mdW5jdGlvbnMvc2V0LWRlcGFydHVyZSIKICBzdGF0dXMgPSAyMDAKCg==
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Content-Type = "text/html; charset=UTF-8"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=UTF-8"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+[[redirects]]
+  from = "/api/seat-status"
+  to = "/.netlify/functions/seat-status"
+  status = 200
+
+[[redirects]]
+  from = "/api/seat-request"
+  to = "/.netlify/functions/seat-request"
+  status = 200
+
+# One Page Studio — serve /Studio from the Studio subfolder
+[[redirects]]
+  from = "/ResumeOnePageStudio"
+  to = "/Studio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ResumeOnePageStudio/*"
+  to = "/Studio/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/api/set-departure"
+  to = "/.netlify/functions/set-departure"
+  status = 200
