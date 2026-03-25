@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Ultimate Journey – Career Optimization Platform</title>
 
-  <!-- SEO Meta -->
+  <!-- SEO Meta (≤155 chars) -->
   <meta name="description" content="Career optimization platform running focused cohorts through a full career system — mapping your experience to what the market is actually hiring for.">
   <meta name="robots" content="index,follow">
 
@@ -14,12 +14,12 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
 
-  <!-- Open Graph -->
+  <!-- Open Graph (1200×630 og-image wired to .tech) -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.thispagedoesnotexist12345.com/">
+  <meta property="og:url" content="https://thispagedoesnotexist12345.tech/">
   <meta property="og:title" content="The Ultimate Journey – Career Optimization Platform">
   <meta property="og:description" content="One focused cohort. Five seats. A full career system mapping your experience to what the market is actually hiring for.">
-  <meta property="og:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+  <meta property="og:image" content="https://thispagedoesnotexist12345.tech/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
@@ -27,4 +27,147 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="The Ultimate Journey – Career Optimization Platform">
   <meta name="twitter:description" content="One focused cohort. Five seats. A full career system mapping your experience to what the market is actually hiring for.">
-  <meta name="twitter:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+  <meta name="twitter:image" content="https://thispagedoesnotexist12345.tech/og-image.png">
+
+  <!-- JSON-LD: Organization + Product schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://thispagedoesnotexist12345.tech/#organization",
+        "name": "The Ultimate Journey",
+        "url": "https://thispagedoesnotexist12345.tech/",
+        "logo": "https://thispagedoesnotexist12345.tech/apple-touch-icon.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "support@thispagedoesnotexist12345.com",
+          "contactType": "customer support"
+        }
+      },
+      {
+        "@type": "Product",
+        "@id": "https://thispagedoesnotexist12345.tech/#product",
+        "name": "The Ultimate Journey Career Cohort",
+        "description": "A full career optimization system running focused cohorts — mapping your experience to what the market is actually hiring for.",
+        "brand": {
+          "@type": "Brand",
+          "name": "The Ultimate Journey"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://thispagedoesnotexist12345.tech/",
+          "availability": "https://schema.org/LimitedAvailability",
+          "priceCurrency": "USD"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Critical CSS inlined -->
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px;-webkit-text-size-adjust:100%}
+    body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;min-height:100vh;overflow-x:hidden}
+    header{width:100%;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10}
+    nav{display:flex;align-items:center;gap:1rem}
+    main{width:100%;min-height:80vh}
+    footer{width:100%;padding:1.5rem;text-align:center;font-size:.875rem;color:#666}
+    /* Tap-target fixes: min 48px height */
+    .tap-target{min-height:48px;min-width:48px;display:inline-flex;align-items:center;justify-content:center;padding:.5rem 1rem}
+    a.tap-target,button.tap-target{cursor:pointer}
+  </style>
+
+  <!-- Non-critical CSS loaded async -->
+  <link rel="preload" href="/black-glass.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="/black-glass.css"></noscript>
+</head>
+<body class="black-glass">
+
+<!-- =====================  SEMANTIC LANDMARKS  ===================== -->
+<header id="site-header" role="banner">
+  <a href="/" aria-label="The Ultimate Journey home">
+    <strong style="font-size:1.1rem;letter-spacing:.03em;color:#00D9FF;">The Ultimate Journey</strong>
+  </a>
+  <nav id="site-nav" role="navigation" aria-label="Primary navigation">
+    <!-- Tap targets raised to 48px height -->
+    <a href="/Studio" class="tap-target" style="color:#00D9FF;text-decoration:none;font-size:.9rem;">One Page Studio</a>
+    <a href="#forgot-password" id="forgot-password-link" class="tap-target" style="color:#aaa;text-decoration:none;font-size:.875rem;">Forgot password?</a>
+    <a href="#signup" id="signup-link" class="tap-target" style="background:#00D9FF;color:#000;border-radius:6px;font-weight:600;font-size:.9rem;text-decoration:none;">Sign up</a>
+  </nav>
+</header>
+
+<main id="main-content" role="main">
+  <div id="app-root"></div>
+</main>
+
+<footer id="site-footer" role="contentinfo">
+  <p>&copy; 2026 The Ultimate Journey. All rights reserved.</p>
+</footer>
+
+<!-- =====================  SCRIPTS  ===================== -->
+<!--
+  Render-blocking scripts deferred.
+  Non-critical scripts (black-glass helpers) loaded with defer.
+  Base44 app bundle loaded with defer so it does not block first paint.
+-->
+<script>
+  // Task 9: Reduce TBT — split init into yielded chunks
+  function yieldToMain() {
+    return new Promise(resolve => {
+      if (typeof scheduler !== 'undefined' && scheduler.postTask) {
+        scheduler.postTask(resolve, { priority: 'background' });
+      } else {
+        setTimeout(resolve, 0);
+      }
+    });
+  }
+
+  async function initApp() {
+    // Chunk 1: DOM-ready baseline setup
+    const seatCountEl = document.getElementById('seat-count');
+
+    await yieldToMain();
+
+    // Chunk 2: Seat status fetch (non-blocking)
+    try {
+      const res = await fetch('/api/seat-status');
+      if (res.ok) {
+        const data = await res.json();
+        if (seatCountEl && data.seats_remaining !== undefined) {
+          seatCountEl.textContent = data.seats_remaining;
+        }
+      }
+    } catch (e) {
+      // silently fail — seat count is a progressive enhancement
+    }
+
+    await yieldToMain();
+
+    // Chunk 3: Lazy-load Base44 app bundle after main thread is free
+    // Task 10: Pass app-id via data attribute so Base44 SDK bootstraps
+    // an authenticated session internally, preventing 403s on
+    // /entities/User/me and public-settings from unauthenticated context.
+    const script = document.createElement('script');
+    script.src = 'https://cdn.base44.com/sdk/latest/app-loader.min.js';
+    script.defer = true;
+    script.setAttribute('data-app-id', '67912f60b0c40c4f1a48d1c7');
+    script.setAttribute('data-auto-init', 'true');
+    document.body.appendChild(script);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
+</script>
+
+<!-- PageRouter / Builder loaded with defer (non-render-blocking) -->
+<script src="/PageRouter.jsx" type="module" defer></script>
+<script src="/Builder.jsx" type="module" defer></script>
+
+</body>
+</html>
