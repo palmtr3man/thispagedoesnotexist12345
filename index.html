@@ -5,6 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Ultimate Journey – Career Optimization Platform</title>
 
+  <!-- SEO Meta -->
+  <meta name="description" content="The Ultimate Journey is a career optimization platform running focused cohorts through a full career system — mapping your experience to what the market is actually hiring for.">
+  <meta name="robots" content="index,follow">
+
+  <!-- Favicon & PWA -->
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.thispagedoesnotexist12345.com/">
+  <meta property="og:title" content="The Ultimate Journey – Career Optimization Platform">
+  <meta property="og:description" content="One focused cohort. Five seats. A full career system mapping your experience to what the market is actually hiring for.">
+  <meta property="og:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Ultimate Journey – Career Optimization Platform">
+  <meta name="twitter:description" content="One focused cohort. Five seats. A full career system mapping your experience to what the market is actually hiring for.">
+  <meta name="twitter:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "The Ultimate Journey",
+    "url": "https://www.thispagedoesnotexist12345.com/",
+    "description": "Career optimization platform running focused cohorts through a full career system.",
+    "sameAs": [
+      "https://thispagedoesnotexist12345.tech/",
+      "https://thispagedoesnotexist12345.me/",
+      "https://thispagedoesnotexist12345.info/"
+    ]
+  }
+  </script>
+
   <!-- Umami Analytics — .com domain -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="5c935661-0414-4670-8777-a89e47266187"></script>
 
@@ -534,10 +572,14 @@
   </style>
 </head>
 <body class="black-glass">
-  <div class="container">
+<header>
+  <div class="container" style="text-align:center;padding-top:1.5rem;">
     <h1>🚀 The Ultimate Journey</h1>
     <p class="subtitle">Career Optimization Platform</p>
-
+  </div>
+</header>
+<main>
+  <div class="container">
     <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
     <div class="status-section" id="loading-dock">
       <div class="status-scanlines"></div>
@@ -629,7 +671,7 @@
           target="_blank"
           rel="noopener noreferrer"
           data-umami-event="Follow Signal Click"
-          style="display:none;"
+          style="display:none;min-height:48px;display:none;align-items:center;justify-content:center;"
         >
           📡 Follow Signal
         </a>
@@ -674,7 +716,9 @@
             });
           })(event)"
         >
+          <label for="seat-name" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Your name</label>
           <input
+            id="seat-name"
             name="name"
             type="text"
             placeholder="Your name"
@@ -684,7 +728,9 @@
             onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
             onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
           />
+          <label for="seat-email" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">Your email</label>
           <input
+            id="seat-email"
             name="email"
             type="email"
             placeholder="Your email"
@@ -733,7 +779,7 @@
           target="_blank"
           rel="noopener noreferrer"
           data-umami-event="Book a Consultation Click"
-          style="font-size:0.8rem;padding:0.5rem 1rem;"
+          style="font-size:0.8rem;padding:0.75rem 1rem;min-height:48px;display:inline-flex;align-items:center;"
         >📅 Book a Consultation</a>
       </div>
 
@@ -744,7 +790,7 @@
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
       <div class="gate-closed-reveal" style="display:none">
-        <h3 style="color:#A8C400;margin-bottom:0.5rem">Next cohort assembling.</h3>
+        <h2 style="color:#A8C400;margin-bottom:0.5rem">Next cohort assembling.</h2>
         <p style="opacity:0.8;margin-bottom:1.25rem">Stay on the manifest — you'll be first to know when the gate opens.</p>
         <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-waitlist" target="_blank" rel="noopener noreferrer">
           📡 Join Signal — Stay on the manifest
@@ -812,14 +858,15 @@
 
     <!-- Option B: About / Footer Links -->
     <section style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(168,196,0,0.1); font-size:0.8rem;">
-      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">About / Resources</a>
+      <a href="https://thispagedoesnotexist12345.info" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">About / Resources</a>
       <a href="https://thispagedoesnotexist12345.org" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
       <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
     </section>
-    <footer>
-      &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
-    </footer>
   </div>
+</main>
+<footer style="text-align:center;font-size:0.75rem;opacity:0.4;margin-top:1.5rem;padding-bottom:2rem;">
+  &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
+</footer>
 
   <script>
     // Carousel logic

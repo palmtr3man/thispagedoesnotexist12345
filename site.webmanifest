@@ -1,0 +1,16 @@
+{
+  "name": "The Ultimate Journey",
+  "short_name": "TUJ",
+  "description": "Career Optimization Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#A8C400",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
