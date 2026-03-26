@@ -1097,7 +1097,8 @@
 
         // ── 2. Gate / status badge (#dock-status-badge) ───────────────────
         // Driven by Admin → NextFlightConfig → next_flight_status
-        var nextFlightStatus = status.next_flight_status || 'SCHEDULED';
+        // Base44 emits the collapsed key (nextflightstatus); accept both forms.
+        var nextFlightStatus = status.nextflightstatus || status.next_flight_status || 'SCHEDULED';
         var labels = statusLabels(nextFlightStatus);
         if (fullEl)  fullEl.textContent  = labels.full;
         if (shortEl) shortEl.textContent = labels.short;
@@ -1136,36 +1137,41 @@
 
         // ── 5. Arrival time (#arrival-text) ───────────────────────────────
         // Driven by Admin → next_flight_arrival_date
+        // Base44 emits the collapsed key (nextflightarrivaldate); accept both forms.
         if (arrivalTextEl) {
-          var arrivalTime = fmtTime(status.next_flight_arrival_date);
+          var arrivalTime = fmtTime(status.nextflightarrivaldate || status.next_flight_arrival_date);
           arrivalTextEl.textContent = arrivalTime || '—';
         }
 
         // ── 6. Departure time badge (#departure-time-badge) ───────────────
         // Driven by Admin → next_flight_departure_date
+        // Base44 emits the collapsed key (nextflightdeparturedate); accept both forms.
+        var depDateRaw = status.nextflightdeparturedate || status.next_flight_departure_date || null;
         if (depTimeBadgeEl) {
-          var depTime = fmtTime(status.next_flight_departure_date);
+          var depTime = fmtTime(depDateRaw);
           depTimeBadgeEl.textContent = depTime || '—';
         }
 
         // ── 7. Departure date badge (#departure-date) ─────────────────────
         // Driven by Admin → next_flight_departure_date
-        var depDateText = fmtDate(status.next_flight_departure_date) || 'Next Departure';
+        var depDateText = fmtDate(depDateRaw) || 'Next Departure';
         setDepartureDate(depDateText);
 
         // ── 8. Live countdown target ──────────────────────────────────────
         // Expose the departure date for the countdown timer IIFE to pick up.
         // If no departure date is set, the countdown stays hidden.
         window.__seatStatusReady = {
-          departureDate: status.next_flight_departure_date || null,
+          departureDate: depDateRaw,
           gateOpen:      gateOpen,
         };
 
         // ── 9. CTA subtext (custom_status_message) ────────────────────────
         // Driven by Admin → current_flight_status_message (or auto-generated)
+        // Base44 emits the collapsed key (customstatusmessage); accept both forms.
         if (ctaSubtextEl) {
-          if (status.custom_status_message) {
-            ctaSubtextEl.textContent = status.custom_status_message;
+          var customMsg = status.customstatusmessage || status.custom_status_message || '';
+          if (customMsg) {
+            ctaSubtextEl.textContent = customMsg;
             ctaSubtextEl.style.display = 'block';
           } else {
             ctaSubtextEl.style.display = 'none';
