@@ -988,10 +988,54 @@
       updatePuzzleUI();
     })();
 
-    // #118 — ALPHA_MODE gate + live seat status
-    (function() {
-      var waitlistBtn = document.getElementById('waitlistBtn');
-      var joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
+    // ── API-driven gate + seat status (replaces clock-based state machine) ──
+    // Reads all Admin/Base44 fields from /api/seat-status and drives every
+    // DOM element: flight badge, status badge, dock label, dates, countdown,
+    // CTA button visibility, intake mode, and seat count.
+    (function () {
+
+      // ── Helpers ────────────────────────────────────────────────────────────
+
+      /**
+       * Format an ISO timestamp (e.g. "2026-04-15T14:00:00Z") to a short time string
+       * in US Eastern time ("2:00 PM ET").
+       */
+      function fmtTime(iso) {
+        if (!iso) return null;
+        var d = new Date(iso);
+        if (isNaN(d)) return null;
+        return d.toLocaleTimeString('en-US', {
+          hour: 'numeric', minute: '2-digit',
+          timeZone: 'America/New_York', timeZoneName: 'short'
+        });
+      }
+
+      /**
+       * Format an ISO timestamp to a short date string ("April 15").
+       */
+      function fmtDate(iso) {
+        if (!iso) return null;
+        var d = new Date(iso);
+        if (isNaN(d)) return null;
+        return d.toLocaleDateString('en-US', {
+          month: 'long', day: 'numeric', timeZone: 'America/New_York'
+        });
+      }
+
+      /**
+       * Map next_flight_status → human-readable full/short badge labels.
+       * These go into #dock-status-badge (.full-text / .short-text).
+       */
+      function statusLabels(nextFlightStatus) {
+        switch (nextFlightStatus) {
+          case 'BOARDING_SOON': return { full: 'BOARDING SOON', short: 'BOARDING' };
+          case 'DEPARTED':      return { full: 'DEPARTED',      short: 'DEPARTED' };
+          case 'SCHEDULED':
+          default:              return { full: 'SCHEDULED',     short: 'SCHED' };
+        }
+      }
+
+      // ── Fetch ──────────────────────────────────────────────────────────────
 
       async function fetchSeatStatus() {
         try {
@@ -1004,60 +1048,296 @@
         }
       }
 
+      // ── Countdown integration ──────────────────────────────────────────────
+      // Exposed on window so the countdown timer IIFE can pick up the live
+      // departure date instead of the old hardcoded timestamp.
+      window.__seatStatusReady = null; // will be set after first fetch
+
+      // ── Main function ──────────────────────────────────────────────────────
+
       async function applySeatGate() {
         var status = await fetchSeatStatus();
-        if (!status) return; // fail open — show button as normal if API unreachable
+        if (!status) return; // fail open — leave DOM as-is if API is unreachable
 
-        // If alpha mode is off, hide the seat request button entirely
+        // ── DOM refs ─────────────────────────────────────────────���───────────
+        var flightEl        = document.getElementById('flight-number');
+        var dockEl          = document.getElementById('dock-status');
+        var statusBadgeEl   = document.getElementById('dock-status-badge');
+        var fullEl          = statusBadgeEl ? statusBadgeEl.querySelector('.full-text') : null;
+        var shortEl         = statusBadgeEl ? statusBadgeEl.querySelector('.short-text') : null;
+        var arrivalTextEl   = document.getElementById('arrival-text');
+        var depTimeBadgeEl  = document.getElementById('departure-time-badge');
+        var depDateEl       = document.getElementById('departure-date');
+        var ctaSubtextEl    = document.getElementById('cta-subtext');
+        var waitlistBtn     = document.getElementById('waitlistBtn');
+        var joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
+        var calBtn          = document.querySelector('[data-umami-event="Book a Consultation Click"]');
+        var lockedMsg       = document.querySelector('.gate-locked-msg');
+        var statusNote      = document.querySelector('p.status-text[style*="opacity: 0.7"]');
+
+        // Helper for #departure-date inner text node (after the .arriving-dot span)
+        function setDepartureDate(text) {
+          if (!depDateEl) return;
+          var dot = depDateEl.querySelector('.arriving-dot');
+          if (dot && dot.nextSibling) {
+            dot.nextSibling.textContent = text;
+          } else if (dot) {
+            depDateEl.appendChild(document.createTextNode(text));
+          }
+        }
+
+        // ── 1. Flight label badge (#flight-number) ────────────────────────
+        // Driven by Admin → NextFlightConfig → next_flight_number
+        if (flightEl) {
+          var label = status.flight_label && status.flight_label.trim()
+            ? status.flight_label.trim() + ' ✈️'
+            : 'Next Departure ✈️';
+          flightEl.textContent = label;
+        }
+
+        // ── 2. Gate / status badge (#dock-status-badge) ───────────────────
+        // Driven by Admin → NextFlightConfig → next_flight_status
+        var nextFlightStatus = status.next_flight_status || 'SCHEDULED';
+        var labels = statusLabels(nextFlightStatus);
+        if (fullEl)  fullEl.textContent  = labels.full;
+        if (shortEl) shortEl.textContent = labels.short;
+
+        // Status badge colour: red for DEPARTED, green/default otherwise
+        if (statusBadgeEl) {
+          if (nextFlightStatus === 'DEPARTED') {
+            statusBadgeEl.style.color       = '#ff4444';
+            statusBadgeEl.style.borderColor = 'rgba(255,68,68,0.6)';
+            statusBadgeEl.style.background  = 'rgba(255,68,68,0.15)';
+          } else if (nextFlightStatus === 'BOARDING_SOON') {
+            statusBadgeEl.style.color       = 'rgb(168,196,0)';
+            statusBadgeEl.style.borderColor = 'rgba(168,196,0,0.6)';
+            statusBadgeEl.style.background  = 'rgba(168,196,0,0.12)';
+          } else {
+            // SCHEDULED — neutral
+            statusBadgeEl.style.color       = '';
+            statusBadgeEl.style.borderColor = '';
+            statusBadgeEl.style.background  = '';
+          }
+        }
+
+        // ── 3. Loading dock label (#dock-status) ──────────────────────────
+        // Driven by gate_status field (derived from next_flight_status in Base44)
+        var gateOpen = status.gate_status !== 'departed' && status.gate_status !== 'closed';
+        if (dockEl) {
+          dockEl.textContent = gateOpen ? 'GATE OPEN' : 'GATE CLOSED';
+        }
+
+        // ── 4. Body class: gate-closed (affects puzzle reveal and CTA layout) ─
+        if (nextFlightStatus === 'DEPARTED') {
+          document.body.classList.add('gate-closed');
+        } else {
+          document.body.classList.remove('gate-closed');
+        }
+
+        // ── 5. Arrival time (#arrival-text) ───────────────────────────────
+        // Driven by Admin → next_flight_arrival_date
+        if (arrivalTextEl) {
+          var arrivalTime = fmtTime(status.next_flight_arrival_date);
+          arrivalTextEl.textContent = arrivalTime || '—';
+        }
+
+        // ── 6. Departure time badge (#departure-time-badge) ───────────────
+        // Driven by Admin → next_flight_departure_date
+        if (depTimeBadgeEl) {
+          var depTime = fmtTime(status.next_flight_departure_date);
+          depTimeBadgeEl.textContent = depTime || '—';
+        }
+
+        // ── 7. Departure date badge (#departure-date) ─────────────────────
+        // Driven by Admin → next_flight_departure_date
+        var depDateText = fmtDate(status.next_flight_departure_date) || 'Next Departure';
+        setDepartureDate(depDateText);
+
+        // ── 8. Live countdown target ──────────────────────────────────────
+        // Expose the departure date for the countdown timer IIFE to pick up.
+        // If no departure date is set, the countdown stays hidden.
+        window.__seatStatusReady = {
+          departureDate: status.next_flight_departure_date || null,
+          gateOpen:      gateOpen,
+        };
+
+        // ── 9. CTA subtext (custom_status_message) ────────────────────────
+        // Driven by Admin → current_flight_status_message (or auto-generated)
+        if (ctaSubtextEl) {
+          if (status.custom_status_message) {
+            ctaSubtextEl.textContent = status.custom_status_message;
+            ctaSubtextEl.style.display = 'block';
+          } else {
+            ctaSubtextEl.style.display = 'none';
+          }
+        }
+
+        // ── 10. status-text note (seats-filled threshold message) ─────────
+        if (statusNote) {
+          if (status.seats_filled >= 3) {
+            statusNote.textContent = 'Five seats. One mission. Next cohort now boarding.';
+            statusNote.style.display = '';
+          } else {
+            statusNote.innerHTML = '';
+            statusNote.style.display = 'none';
+          }
+        }
+
+        // ── 11. CTA button visibility + intake_mode ───────────────────────
+        // DEPARTED gate → show joinWaitlistBtn, hide everything else
+        if (nextFlightStatus === 'DEPARTED') {
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          if (lockedMsg) lockedMsg.style.display = 'block';
+          // Puzzle reveal for users who completed all three paths
+          (function() {
+            var chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+            if (['signal','systems','support'].every(function(p) { return chosen.includes(p); })) {
+              var reveal = document.querySelector('.gate-closed-reveal');
+              var lMsg   = document.querySelector('.gate-locked-msg');
+              if (reveal) reveal.style.display = 'block';
+              if (lMsg)   lMsg.style.display   = 'none';
+            }
+          })();
+          return; // nothing more to do for a departed gate
+        }
+
+        // Gate is open from here down
+        if (lockedMsg) lockedMsg.style.display = 'none';
+
+        // Alpha mode off → hide the seat request button entirely
         if (!status.alpha_mode) {
           if (waitlistBtn) waitlistBtn.style.display = 'none';
           return;
         }
 
-        // If flight is full (open_count >= 5), replace button with "Join the waitlist" CTA
-        if (status.open_count >= 5) {
-          if (waitlistBtn) waitlistBtn.style.display = 'none';
+        // Flight full → show waitlist CTA
+        if (status.open_count >= status.max_seats || status.seats_remaining <= 0) {
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
           if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
           return;
         }
 
-        // If no seats remain (legacy fallback), replace button with "Join the waitlist" CTA
-        if (status.seats_remaining <= 0) {
-          if (waitlistBtn) waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
-          return;
-        }
+        // ── intake_mode → controls which primary CTA is active ───────────
+        // CALENDARJET: hide seat request button, enable consultation booking link
+        // SENDGRID / CONSTANTCONTACT: show seat request button, disable consultation link
+        var intakeMode = status.intake_mode || 'SENDGRID';
+        var calUrl = 'https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345';
 
-        // Flip the status-text note based on seats filled:
-        // ≤ 2 filled = founding flight message; ≥ 3 filled = full cohort message
-        var statusNote = document.querySelector('p.status-text[style*="opacity: 0.7"]');
-        if (statusNote) {
-          if (status.seats_filled >= 3) {
-            statusNote.textContent = 'Five seats. One mission. Next cohort now boarding.';
-          } else {
-            statusNote.textContent = '';
+        if (intakeMode === 'CALENDARJET') {
+          // Hide the SendGrid seat request CTA; show the CalendarJet booking link
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.setAttribute('href', calUrl);
+            calBtn.removeAttribute('aria-disabled');
+            calBtn.setAttribute('tabindex', '0');
+            calBtn.style.pointerEvents = '';
+            calBtn.style.opacity = '';
+            calBtn.style.cursor = '';
+            calBtn.style.display = '';
           }
-        }
+        } else {
+          // SENDGRID or CONSTANTCONTACT: seat request button is the active CTA
+          if (waitlistBtn) waitlistBtn.style.display = '';
+          if (calBtn) {
+            // Keep consultation link present but visually disabled
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
 
-        // Show live seat count below the button — appended inside #cta-wrapper so it stacks, not inline
-        var seatWord = status.seats_remaining === 1 ? 'seat' : 'seats';
-        var seatInfo = document.createElement('span');
-        seatInfo.id = 'cta-seat-count';
-        seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;';
-        seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining — next departure';
-        var ctaWrapper = document.getElementById('cta-wrapper');
-        if (ctaWrapper) {
-          // Remove any previously injected count to avoid duplicates
+          // ── 12. Live seat count below the CTA button ──────────────────
+          var seatWord = status.seats_remaining === 1 ? 'seat' : 'seats';
           var existing = document.getElementById('cta-seat-count');
           if (existing) existing.remove();
-          ctaWrapper.appendChild(seatInfo);
-        } else if (waitlistBtn && waitlistBtn.parentNode) {
-          // Fallback: insert after button if wrapper not found
-          waitlistBtn.parentNode.insertBefore(seatInfo, waitlistBtn.nextSibling);
+          var seatInfo = document.createElement('span');
+          seatInfo.id = 'cta-seat-count';
+          seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(168,196,0,0.7);letter-spacing:0.03em;';
+          seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining — next departure';
+          var ctaWrapper = document.getElementById('cta-wrapper');
+          if (ctaWrapper) {
+            ctaWrapper.appendChild(seatInfo);
+          } else if (waitlistBtn && waitlistBtn.parentNode) {
+            waitlistBtn.parentNode.insertBefore(seatInfo, waitlistBtn.nextSibling);
+          }
         }
       }
 
+      // Run on load; re-run every 60s to catch Admin changes without a page refresh
       applySeatGate();
+      setInterval(applySeatGate, 60000);
+
+    })();
+
+    // ── Live countdown timer — target driven by applySeatGate() ─────────────
+    // Waits for window.__seatStatusReady to be populated by the IIFE above,
+    // then starts counting down to next_flight_departure_date.
+    (function () {
+      var wrap      = document.getElementById('countdown-wrap');
+      var departed  = document.getElementById('countdown-departed');
+      var cdHours   = document.getElementById('cd-hours');
+      var cdMinutes = document.getElementById('cd-minutes');
+      var cdSeconds = document.getElementById('cd-seconds');
+      var timer     = null;
+      var target    = null;
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function tick() {
+        if (!target) { if (wrap) wrap.style.display = 'none'; return; }
+        var now  = new Date();
+        var diff = target - now;
+        if (diff <= 0) {
+          if (wrap)     wrap.style.display = 'none';
+          // Only show "Wheels Up" message if gate is also departed
+          var rdy = window.__seatStatusReady;
+          if (departed && rdy && !rdy.gateOpen) departed.style.display = 'block';
+          if (timer) clearInterval(timer);
+          return;
+        }
+        var totalSec = Math.floor(diff / 1000);
+        var secs  = totalSec % 60;
+        var mins  = Math.floor(totalSec / 60) % 60;
+        var hours = Math.floor(totalSec / 3600);
+        if (cdHours)   cdHours.textContent   = pad(hours);
+        if (cdMinutes) cdMinutes.textContent = pad(mins);
+        if (cdSeconds) cdSeconds.textContent = pad(secs);
+      }
+
+      // Poll until applySeatGate() has populated window.__seatStatusReady
+      var pollInterval = setInterval(function () {
+        var rdy = window.__seatStatusReady;
+        if (rdy === null) return; // not yet populated
+        clearInterval(pollInterval);
+
+        if (!rdy.departureDate) {
+          // No departure date set in Admin — hide countdown entirely
+          if (wrap) wrap.style.display = 'none';
+          return;
+        }
+
+        target = new Date(rdy.departureDate);
+        if (isNaN(target.getTime())) {
+          if (wrap) wrap.style.display = 'none';
+          return;
+        }
+
+        // Show the countdown wrap now that we have a valid target
+        if (wrap) wrap.style.display = '';
+        tick();
+        timer = setInterval(tick, 1000);
+      }, 100);
     })();
 
     // Black Glass always active
@@ -1075,227 +1355,6 @@
       }
     })();
 
-    // F-Holiday: four-phase gate state machine
-    // Phases: HOLD → EXECUTIVE PRE-BOARD (3/16) → HOLIDAY BOARDING (3/17) → POST-HOLIDAY BOARDING (3/18��3/21) → DEPARTED
-    (function () {
-      // ── Phase timestamps (all EDT = UTC−4, post-DST spring forward Mar 8) ──────────────────────────────────────────────
-      // Pre-board opens: March 16, 2026 at 3:16 PM EDT = 19:16 UTC
-      const preBoardOpen  = new Date('2026-03-16T19:16:00Z');
-      // Holiday boarding opens: March 17, 2026 at 12:00 AM EDT = 04:00 UTC
-      const holidayOpen   = new Date('2026-03-17T04:00:00Z');
-      // Holiday boarding ends: March 18, 2026 at 12:00 AM EDT = 04:00 UTC
-      const holidayEnd    = new Date('2026-03-18T04:00:00Z');
-      // Departure: TBD — cohort-neutral (departure date set per cohort)
-      const departureTime = new Date('2026-03-22T18:22:00Z');
-      // DELAYED override — set true to hold the gate open past departure time
-      const FLIGHT_DELAYED = false;
-      window.FLIGHT_DELAYED = FLIGHT_DELAYED; // expose to other IIFEs (e.g. countdown timer)
-
-      function updateDockState() {
-        const now = new Date();
-        // DEV ONLY: force a dock state via URL for QA/screenshots.
-        // ?force_state=PRE_BOARD | HOLIDAY | POST_HOLIDAY | DEPARTED | CLOSED
-        const allowedForceStates = new Set(['PRE_BOARD', 'HOLIDAY', 'POST_HOLIDAY', 'DEPARTED', 'CLOSED']);
-        let FORCE_STATE = new URLSearchParams(location.search).get('force_state');
-        FORCE_STATE = FORCE_STATE ? FORCE_STATE.trim().toUpperCase() : null;
-        if (!allowedForceStates.has(FORCE_STATE)) FORCE_STATE = null;
-        let effectiveNow = now;
-        if (FORCE_STATE === 'PRE_BOARD')         { effectiveNow = new Date(preBoardOpen.getTime() + 1000); }
-        else if (FORCE_STATE === 'HOLIDAY')      { effectiveNow = new Date(holidayOpen.getTime() + 1000); }
-        else if (FORCE_STATE === 'POST_HOLIDAY') { effectiveNow = new Date(holidayEnd.getTime() + 1000); }
-        else if (FORCE_STATE === 'DEPARTED')     { effectiveNow = new Date(departureTime.getTime() + 1000); }
-        else if (FORCE_STATE === 'CLOSED')       { effectiveNow = new Date(departureTime.getTime() + 1000); } // post-departure → resolves to DEPARTED/gate-closed branch
-
-        const isHolidayPhase = effectiveNow >= holidayOpen && effectiveNow < holidayEnd;
-        document.body.classList.toggle('st-patricks', isHolidayPhase);
-
-        const dockEl        = document.getElementById('dock-status');
-        const statusEl      = document.getElementById('dock-status-badge');
-        const flightEl      = document.getElementById('flight-number');
-        const arrivalTextEl = document.getElementById('arrival-text');
-        const departureDateEl = document.getElementById('departure-date');
-        const statusNote    = document.querySelector('.status-text');
-        const waitlistBtn   = document.getElementById('waitlistBtn');
-        const joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
-        const calBtn        = document.querySelector('[data-umami-event="Book a Consultation Click"]');
-        const ctaSubtext    = document.getElementById('cta-subtext');
-        const lockedMsg     = document.querySelector('.gate-locked-msg');
-        const nextStepRow   = document.querySelector('.btn-row-waitlist p');
-        if (!dockEl || !arrivalTextEl) return FORCE_STATE;
-        const full  = statusEl ? statusEl.querySelector('.full-text')  : null;
-        const short = statusEl ? statusEl.querySelector('.short-text') : null;
-
-        function setDepartureDate(text) {
-          if (!departureDateEl) return;
-          const dot = departureDateEl.querySelector('.arriving-dot');
-          if (dot && dot.nextSibling) { dot.nextSibling.textContent = text; }
-          else if (dot) { departureDateEl.appendChild(document.createTextNode(text)); }
-        }
-
-        // ── STATE: DELAYED — overrides clock-based departure when FLIGHT_DELAYED is true ──
-        // Skip DELAYED override if an explicit force_state is set (allows QA/dev override)
-        if (FLIGHT_DELAYED && !FORCE_STATE) {
-          // Hard-lock #countdown-departed hidden so it cannot appear regardless of timer state
-          var _dep = document.getElementById('countdown-departed');
-          if (_dep) { _dep.style.setProperty('display', 'none', 'important'); }
-          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
-          dockEl.textContent = 'GATE OPEN';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('Next Departure');
-          if (statusEl) {
-            statusEl.style.color = '#ff4444';
-            statusEl.style.borderColor = 'rgba(255,68,68,0.6)';
-            statusEl.style.background = 'rgba(255,68,68,0.15)';
-          }
-          if (full)  full.textContent  = 'DELAYED';
-          if (short) short.textContent = 'DELAYED';
-          document.body.classList.remove('gate-closed');
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  { ctaSubtext.textContent = 'Flight delayed — gate remains open. Request a seat for the next departure.'; ctaSubtext.style.display = 'block'; }
-          if (waitlistBtn) { waitlistBtn.style.display = ''; }
-          if (typeof applySeatGate === 'function') applySeatGate();
-          if (lockedMsg)   lockedMsg.style.display = 'none';
-          if (calBtn) { calBtn.setAttribute('href','https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'); calBtn.removeAttribute('aria-disabled'); calBtn.setAttribute('tabindex','0'); calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
-          if (nextStepRow) nextStepRow.innerHTML = '✈️ Flight delayed — use the <strong>Request a Seat</strong> button above to board.';
-          return FORCE_STATE;
-        }
-
-        // ── STATE: DEPARTED (after Mar 21 3:21 PM EDT) ───────────────────────
-        if (effectiveNow >= departureTime) {
-          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
-          dockEl.textContent = 'GATE CLOSED';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('Next Departure');
-          if (full)  full.textContent  = 'DEPARTED';
-          if (short) short.textContent = 'DEPARTED';
-          document.body.classList.add('gate-closed');
-          (function() {
-            var chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
-            if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
-              var reveal = document.querySelector('.gate-closed-reveal');
-              var lMsg   = document.querySelector('.gate-locked-msg');
-              if (reveal) reveal.style.display = 'block';
-              if (lMsg)   lMsg.style.display   = 'none';
-            }
-          })();
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  ctaSubtext.style.display = 'none';
-          if (waitlistBtn)     waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
-          if (lockedMsg)   lockedMsg.style.display = 'block';
-          if (calBtn) { calBtn.removeAttribute('href'); calBtn.setAttribute('aria-disabled','true'); calBtn.setAttribute('tabindex','-1'); calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
-          if (nextStepRow) nextStepRow.innerHTML = 'Next step: <strong>Follow Signal</strong> for next cohort announcement.';
-
-        // ── STATE: POST-HOLIDAY BOARDING (Mar 18 – Mar 21, general boarding open) ────────
-        } else if (effectiveNow >= holidayEnd) {
-          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
-          dockEl.textContent = 'GATE OPEN';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('Next Departure');
-          if (full)  full.textContent  = 'BOARDING OPEN';
-          if (short) short.textContent = 'BOARDING';
-          document.body.classList.remove('gate-closed');
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  { ctaSubtext.textContent = 'Request a seat. Five seats. One flight.'; ctaSubtext.style.display = 'block'; }
-          if (waitlistBtn) { waitlistBtn.style.display = ''; }
-          if (typeof applySeatGate === 'function') applySeatGate();
-          if (lockedMsg)   lockedMsg.style.display = 'none';
-          if (calBtn) { calBtn.setAttribute('href','https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'); calBtn.removeAttribute('aria-disabled'); calBtn.setAttribute('tabindex','0'); calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
-          if (nextStepRow) nextStepRow.innerHTML = 'Next step: Use the <strong>Request a Seat</strong> button above to board.';
-
-        // ── STATE: HOLIDAY BOARDING 🍀 (March 17 only — St. Patrick's Day) ────────────
-        } else if (effectiveNow >= holidayOpen) {
-          if (flightEl)      { flightEl.textContent = 'FL ☘️1726 ✈️'; }
-          dockEl.textContent = 'GATE OPEN';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('Next Departure');
-          if (full)  full.textContent  = 'HOLIDAY BOARDING 🍀';
-          if (short) short.textContent = 'HOLIDAY';
-          document.body.classList.remove('gate-closed');
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  { ctaSubtext.textContent = '🍀 Happy St. Patrick\'s Day! Holiday boarding is open — request your seat for the next departure.'; ctaSubtext.style.display = 'block'; }
-          if (waitlistBtn) { waitlistBtn.style.display = ''; }
-          if (typeof applySeatGate === 'function') applySeatGate();
-          if (lockedMsg)   lockedMsg.style.display = 'none';
-          if (calBtn) { calBtn.setAttribute('href','https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'); calBtn.removeAttribute('aria-disabled'); calBtn.setAttribute('tabindex','0'); calBtn.style.pointerEvents = ''; calBtn.style.opacity = ''; calBtn.style.cursor = ''; }
-          if (nextStepRow) nextStepRow.innerHTML = '🍀 <strong>Holiday Boarding: St. Patrick\'s Day</strong> — Request your seat now!';
-
-        // ── STATE: EXECUTIVE PRE-BOARD (March 16 from 3:16 PM EDT) ────────────
-        } else if (effectiveNow >= preBoardOpen) {
-          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
-          dockEl.textContent = 'GATE OPEN';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('Next Departure');
-          if (full)  full.textContent  = 'EXECUTIVE PRE-BOARD';
-          if (short) short.textContent = 'PRE-BOARD';
-          document.body.classList.remove('gate-closed');
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  ctaSubtext.style.display = 'none';
-          if (waitlistBtn) waitlistBtn.style.display = 'none';
-          if (lockedMsg)   lockedMsg.style.display = 'none';
-          if (calBtn) { calBtn.removeAttribute('href'); calBtn.setAttribute('aria-disabled','true'); calBtn.setAttribute('tabindex','-1'); calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
-          if (nextStepRow) nextStepRow.innerHTML = 'Executive pre-boarding is active. <strong>Holiday boarding opens March 17.</strong>';
-
-        // ── STATE: HOLD (before pre-board opens) ────────────────────────────────────
-        } else {
-          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
-          dockEl.textContent = 'GATE CLOSED';
-          arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('Next Departure');
-          if (full)  full.textContent  = 'HOLD';
-          if (short) short.textContent = 'HOLD';
-          if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  ctaSubtext.style.display = 'none';
-          if (waitlistBtn) waitlistBtn.style.display = 'none';
-          if (lockedMsg)   lockedMsg.style.display = 'none';
-          if (calBtn) { calBtn.removeAttribute('href'); calBtn.setAttribute('aria-disabled','true'); calBtn.setAttribute('tabindex','-1'); calBtn.style.pointerEvents = 'none'; calBtn.style.opacity = '0.4'; calBtn.style.cursor = 'not-allowed'; }
-        }
-        return FORCE_STATE;
-      }
-      const FORCE_STATE = updateDockState();
-      const UPDATE_MS = 30000; // re-check every 30s for live flip
-      // Do not start the live-update interval when FLIGHT_DELAYED is true —
-      // the DELAYED state must remain frozen regardless of wall-clock time.
-      if (FORCE_STATE === null && !FLIGHT_DELAYED) {
-        setInterval(updateDockState, UPDATE_MS);
-      }
-    })();
-
-    // Live countdown timer to next departure date
-    (function() {
-      var target = new Date('2026-03-22T18:22:00Z');
-      var wrap   = document.getElementById('countdown-wrap');
-      var departed = document.getElementById('countdown-departed');
-      var cdHours   = document.getElementById('cd-hours');
-      var cdMinutes = document.getElementById('cd-minutes');
-      var cdSeconds = document.getElementById('cd-seconds');
-
-      function pad(n) { return String(n).padStart(2, '0'); }
-
-      function tick() {
-        var now  = new Date();
-        var diff = target - now;
-        if (diff <= 0) {
-          // FLIGHT_DELAYED guard — keep countdown-departed permanently hidden while delayed
-          if (window.FLIGHT_DELAYED) {
-            if (departed) departed.style.setProperty('display', 'none', 'important');
-            return;
-          }
-          if (wrap)     wrap.style.display = 'none';
-          if (departed) departed.style.display = 'block';
-          return;
-        }
-        var totalSec = Math.floor(diff / 1000);
-        var secs  = totalSec % 60;
-        var mins  = Math.floor(totalSec / 60) % 60;
-        var hours = Math.floor(totalSec / 3600);
-        if (cdHours)   cdHours.textContent   = pad(hours);
-        if (cdMinutes) cdMinutes.textContent = pad(mins);
-        if (cdSeconds) cdSeconds.textContent = pad(secs);
-      }
-
-      tick();
-      setInterval(tick, 1000);
     })();
   </script>
 
