@@ -581,7 +581,7 @@
 
       <div class="status-title">
         <span class="status-title-label">Flight:</span>
-        <span class="badge badge--flight" id="flight-number">FL 032126 ✈️</span>
+        <span class="badge badge--flight" id="flight-number">Next Departure ✈️</span>
       </div>
 
       <div class="status-title">
@@ -601,7 +601,7 @@
       <div class="status-title">
         <span class="status-title-label">Departure Date:</span>
         <span class="badge badge--arriving" id="departure-date">
-          <span class="arriving-dot"></span>March 22, 2026
+          <span class="arriving-dot"></span>Next Departure
         </span>
       </div>
 
@@ -759,7 +759,7 @@
         </div>
 
         <!-- seat-count span appended here by applySeatGate() -->
-        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat on FL 032126. Five seats. One flight.</span>
+        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
       </div>
 
       <!-- Secondary CTA: Book a Consultation via CalendarJet (gate-closed / consultation flow only) -->
@@ -823,7 +823,7 @@
     <div class="btn-row">
       <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
       <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
-      <a href="https://thispagedoesnotexist12345.com/" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
+      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
       <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
     </div>
 
@@ -1013,7 +1013,7 @@
         var statusNote = document.querySelector('p.status-text[style*="opacity: 0.7"]');
         if (statusNote) {
           if (status.seats_filled >= 3) {
-            statusNote.textContent = 'Five seats. One mission. FL 032126 departs March 22.';
+            statusNote.textContent = 'Five seats. One mission. Next cohort now boarding.';
           } else {
             statusNote.textContent = '';
           }
@@ -1024,7 +1024,7 @@
         var seatInfo = document.createElement('span');
         seatInfo.id = 'cta-seat-count';
         seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(168, 196, 0, 0.7);letter-spacing:0.03em;';
-        seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining on FL 032126';
+        seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining — next departure';
         var ctaWrapper = document.getElementById('cta-wrapper');
         if (ctaWrapper) {
           // Remove any previously injected count to avoid duplicates
@@ -1055,8 +1055,8 @@
       }
     })();
 
-    // F-Holiday: FL 032126 four-phase gate state machine
-    // Phases: HOLD → EXECUTIVE PRE-BOARD (3/16) → HOLIDAY BOARDING (3/17) → POST-HOLIDAY BOARDING (3/18–3/21) → DEPARTED
+    // F-Holiday: four-phase gate state machine
+    // Phases: HOLD → EXECUTIVE PRE-BOARD (3/16) → HOLIDAY BOARDING (3/17) → POST-HOLIDAY BOARDING (3/18��3/21) → DEPARTED
     (function () {
       // ── Phase timestamps (all EDT = UTC−4, post-DST spring forward Mar 8) ──────────────────────────────────────────────
       // Pre-board opens: March 16, 2026 at 3:16 PM EDT = 19:16 UTC
@@ -1065,10 +1065,10 @@
       const holidayOpen   = new Date('2026-03-17T04:00:00Z');
       // Holiday boarding ends: March 18, 2026 at 12:00 AM EDT = 04:00 UTC
       const holidayEnd    = new Date('2026-03-18T04:00:00Z');
-      // Departure: March 22, 2026 at 2:22 PM EDT = 18:22 UTC
+      // Departure: TBD — cohort-neutral (departure date set per cohort)
       const departureTime = new Date('2026-03-22T18:22:00Z');
       // DELAYED override — set true to hold the gate open past departure time
-      const FLIGHT_DELAYED = true;
+      const FLIGHT_DELAYED = false;
       window.FLIGHT_DELAYED = FLIGHT_DELAYED; // expose to other IIFEs (e.g. countdown timer)
 
       function updateDockState() {
@@ -1118,10 +1118,10 @@
           // Hard-lock #countdown-departed hidden so it cannot appear regardless of timer state
           var _dep = document.getElementById('countdown-departed');
           if (_dep) { _dep.style.setProperty('display', 'none', 'important'); }
-          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 22, 2026');
+          setDepartureDate('Next Departure');
           if (statusEl) {
             statusEl.style.color = '#ff4444';
             statusEl.style.borderColor = 'rgba(255,68,68,0.6)';
@@ -1131,7 +1131,7 @@
           if (short) short.textContent = 'DELAYED';
           document.body.classList.remove('gate-closed');
           if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  { ctaSubtext.textContent = 'Flight delayed — gate remains open. Request a seat on FL 032126.'; ctaSubtext.style.display = 'block'; }
+          if (ctaSubtext)  { ctaSubtext.textContent = 'Flight delayed — gate remains open. Request a seat for the next departure.'; ctaSubtext.style.display = 'block'; }
           if (waitlistBtn) { waitlistBtn.style.display = ''; }
           if (typeof applySeatGate === 'function') applySeatGate();
           if (lockedMsg)   lockedMsg.style.display = 'none';
@@ -1142,10 +1142,10 @@
 
         // ── STATE: DEPARTED (after Mar 21 3:21 PM EDT) ───────────────────────
         if (effectiveNow >= departureTime) {
-          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
           dockEl.textContent = 'GATE CLOSED';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 22, 2026');
+          setDepartureDate('Next Departure');
           if (full)  full.textContent  = 'DEPARTED';
           if (short) short.textContent = 'DEPARTED';
           document.body.classList.add('gate-closed');
@@ -1168,15 +1168,15 @@
 
         // ── STATE: POST-HOLIDAY BOARDING (Mar 18 – Mar 21, general boarding open) ────────
         } else if (effectiveNow >= holidayEnd) {
-          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 22, 2026');
+          setDepartureDate('Next Departure');
           if (full)  full.textContent  = 'BOARDING OPEN';
           if (short) short.textContent = 'BOARDING';
           document.body.classList.remove('gate-closed');
           if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  { ctaSubtext.textContent = 'Request a seat on FL 032126. Five seats. One flight.'; ctaSubtext.style.display = 'block'; }
+          if (ctaSubtext)  { ctaSubtext.textContent = 'Request a seat. Five seats. One flight.'; ctaSubtext.style.display = 'block'; }
           if (waitlistBtn) { waitlistBtn.style.display = ''; }
           if (typeof applySeatGate === 'function') applySeatGate();
           if (lockedMsg)   lockedMsg.style.display = 'none';
@@ -1188,12 +1188,12 @@
           if (flightEl)      { flightEl.textContent = 'FL ☘️1726 ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 22, 2026');
+          setDepartureDate('Next Departure');
           if (full)  full.textContent  = 'HOLIDAY BOARDING 🍀';
           if (short) short.textContent = 'HOLIDAY';
           document.body.classList.remove('gate-closed');
           if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
-          if (ctaSubtext)  { ctaSubtext.textContent = '🍀 Happy St. Patrick\'s Day! Holiday boarding is open — request your seat on FL 032126.'; ctaSubtext.style.display = 'block'; }
+          if (ctaSubtext)  { ctaSubtext.textContent = '🍀 Happy St. Patrick\'s Day! Holiday boarding is open — request your seat for the next departure.'; ctaSubtext.style.display = 'block'; }
           if (waitlistBtn) { waitlistBtn.style.display = ''; }
           if (typeof applySeatGate === 'function') applySeatGate();
           if (lockedMsg)   lockedMsg.style.display = 'none';
@@ -1202,10 +1202,10 @@
 
         // ── STATE: EXECUTIVE PRE-BOARD (March 16 from 3:16 PM EDT) ────────────
         } else if (effectiveNow >= preBoardOpen) {
-          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
           dockEl.textContent = 'GATE OPEN';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 22, 2026');
+          setDepartureDate('Next Departure');
           if (full)  full.textContent  = 'EXECUTIVE PRE-BOARD';
           if (short) short.textContent = 'PRE-BOARD';
           document.body.classList.remove('gate-closed');
@@ -1218,10 +1218,10 @@
 
         // ── STATE: HOLD (before pre-board opens) ────────────────────────────────────
         } else {
-          if (flightEl)      { flightEl.textContent = 'FL 032126 ✈️'; }
+          if (flightEl)      { flightEl.textContent = 'Next Departure ✈️'; }
           dockEl.textContent = 'GATE CLOSED';
           arrivalTextEl.textContent = '8:34 AM ET';
-          setDepartureDate('March 22, 2026');
+          setDepartureDate('Next Departure');
           if (full)  full.textContent  = 'HOLD';
           if (short) short.textContent = 'HOLD';
           if (statusNote) { statusNote.innerHTML = ''; statusNote.style.display = 'none'; }
@@ -1241,7 +1241,7 @@
       }
     })();
 
-    // Live countdown timer to March 22, 2026 at 2:22 PM ET (18:22 UTC)
+    // Live countdown timer to next departure date
     (function() {
       var target = new Date('2026-03-22T18:22:00Z');
       var wrap   = document.getElementById('countdown-wrap');
