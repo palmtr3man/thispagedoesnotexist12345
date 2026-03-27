@@ -30,7 +30,8 @@
  */
 
 // --- SendGrid template IDs ---
-const TEMPLATE_ID          = 'd-740595dc07be401295 69bc731f1bc454'; // seat_request_acknowledgement_v1
+const FIXED_SENDGRID_TEMPLATE_ID = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
+const TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_ID || FIXED_SENDGRID_TEMPLATE_ID;
 const INTERNAL_TEMPLATE_ID = 'd-073dc68a683348f18133d78c9879ced8'; // internalsignupnotification_v1
 const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
 const ASM_GROUP_ID = 33047; // "The Ultimate Journey — Transactional" unsubscribe group
@@ -237,11 +238,15 @@ exports.handler = async function (event, context) {
       console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed} with seat_id ${seatId}`);
     } else {
       const errorText = await sgResponse.text();
-      console.error(`[seat-request] SendGrid error ${sgResponse.status}:`, errorText);
+      console.error(`[seat-request] SendGrid error ${sgResponse.status}: ${errorText}`);
       return {
         statusCode: 502,
         headers,
-        body: JSON.stringify({ ok: false, error: 'Failed to send acknowledgement email' })
+        body: JSON.stringify({
+          ok: false,
+          error: 'Failed to send acknowledgement email',
+          details: errorText
+        })
       };
     }
   } catch (err) {
