@@ -35,6 +35,8 @@ const TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_ID || FIXED_SENDGRID_TEMPLATE_
 const INTERNAL_TEMPLATE_ID = 'd-073dc68a683348f18133d78c9879ced8'; // internalsignupnotification_v1
 const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
 const ASM_GROUP_ID = 33047; // "The Ultimate Journey — Transactional" unsubscribe group
+const NOTION_API_VERSION = '2022-06-28';
+const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '5e6440af0ad94c6d89a8442ec2c528f3';
 const SUBJECT      = 'Your seat request is in — FL 032126 ✈️';
 
 // --- Gate Contract constants ---
@@ -58,6 +60,45 @@ function generateSeatId() {
     result += SEAT_ID_CHARS[array[i] % SEAT_ID_CHARS.length];
   }
   return result;
+}
+
+function notionRichText(content) {
+  return [{ type: 'text', text: { content: String(content) } }];
+}
+
+async function logSeatRequestToNotion({ seatId, name, email, requestDate, source, notionApiKey, databaseId }) {
+  if (!notionApiKey) {
+    console.warn('[seat-request] NOTION_API_KEY not set — skipping Notion log write');
+    return false;
+  }
+
+  const response = await fetch('https://api.notion.com/v1/pages', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + notionApiKey,
+      'Content-Type': 'application/json',
+      'Notion-Version': NOTION_API_VERSION
+    },
+    body: JSON.stringify({
+      parent: { database_id: databaseId },
+      properties: {
+        Name: { title: notionRichText(name) },
+        Email: { email },
+        'Seat ID': { rich_text: notionRichText(seatId) },
+        Source: { rich_text: notionRichText(source) },
+        'Request Date': { date: { start: requestDate } }
+      }
+    })
+  });
+
+  if (response.ok) {
+    console.log('[seat-request] Notion log written for ' + email + ' seat_id ' + seatId);
+    return true;
+  }
+
+  const errorText = await response.text();
+  console.error('[seat-request] Notion log failed ' + response.status + ': ' + errorText);
+  return false;
 }
 
 /**
@@ -169,6 +210,7 @@ exports.handler = async function (event, context) {
 
   // --- Resolve env vars ---
   const apiKey = process.env.SENDGRID_API_KEY;
+  const notionApiKey = process.env.NOTION_API_KEY;
   if (!apiKey) {
     console.error('[seat-request] SENDGRID_API_KEY is not set');
     return {
@@ -191,6 +233,10 @@ exports.handler = async function (event, context) {
   const nameParts    = nameTrimmed.split(/\s+/);
   const firstName    = nameParts[0] || nameTrimmed;
   const requestDate  = new Date().toISOString();
+  const sourceValue   = (source && typeof source === 'string' ? source.trim() : 'Website');
+  const resolvedTier  = (tier && typeof tier === 'string' ? tier.trim() : 'Alpha (Founding)');
+  const resolvedCabinTier = (cabin_tier && typeof cabin_tier === 'string' ? cabin_tier.trim() : 'Alpha (Founding)');
+  const formattedAmountPaid = (amount_paid !== undefined && amount_paid !== null ? amount_paid : '$0.00');
 
   // --- Generate seat_id (Gate Contract §3) ---
   const seatId = generateSeatId();
@@ -201,6 +247,19 @@ exports.handler = async function (event, context) {
   // but encodeURIComponent is used defensively in case the format ever changes.
   const passportUrl = `${passportBase}?seat_id=${encodeURIComponent(seatId)}`;
 
+  const padInternalAlertValue = (value) => ` ${value}`;
+  const internalDynamicTemplateData = {
+    name:         padInternalAlertValue(nameTrimmed),
+    email:        padInternalAlertValue(emailTrimmed),
+    seat_id:      padInternalAlertValue(seatId),
+    tier:         padInternalAlertValue(resolvedTier),
+    cabin_tier:   padInternalAlertValue(resolvedCabinTier),
+    signup_date:  padInternalAlertValue(requestDate),
+    passport_url: passportUrl,
+    source:       padInternalAlertValue(sourceValue),
+    amount_paid:  padInternalAlertValue(formattedAmountPaid)
+  };
+
   // --- Send user acknowledgement via SendGrid ---
   const dynamicTemplateData = {
     subject:      SUBJECT,
@@ -208,7 +267,7 @@ exports.handler = async function (event, context) {
     full_name:    nameTrimmed,
     email:        emailTrimmed,
     seat_id:      seatId,
-    source:       (source && typeof source === 'string' ? source.trim() : 'Website'),
+    source:       sourceValue,
     platform_url: platformUrl,
     signal_url:   signalUrl,
     passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.tech?seat_id=TUJ-XXXXXX
@@ -256,6 +315,21 @@ exports.handler = async function (event, context) {
       headers,
       body: JSON.stringify({ ok: false, error: 'Internal server error' })
     };
+  }
+
+  // --- Notion log: Seat Request Registry ---
+  try {
+    await logSeatRequestToNotion({
+      seatId,
+      name: nameTrimmed,
+      email: emailTrimmed,
+      requestDate,
+      source: sourceValue,
+      notionApiKey,
+      databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
+    });
+  } catch (err) {
+    console.error('[seat-request] Notion log write failed:', err);
   }
 
   // --- Subscribe to beehiiv Signal newsletter (Gate Contract §2d) ---
@@ -308,15 +382,7 @@ exports.handler = async function (event, context) {
         from: { email: fromEmail },
         personalizations: [{
           to: [{ email: INTERNAL_NOTIFY_EMAIL }],
-          dynamic_template_data: {
-            name:         nameTrimmed,
-            email:        'Email: ' + emailTrimmed,
-            seat_id:      seatId,
-            tier:         (tier && typeof tier === 'string' ? tier.trim() : 'Alpha (Founding)'),
-            cabin_tier:   (cabin_tier && typeof cabin_tier === 'string' ? cabin_tier.trim() : 'Alpha (Founding)'),
-            signup_date:  requestDate,
-            amount_paid:  (amount_paid !== undefined && amount_paid !== null ? amount_paid : '$0.00')
-          }
+          dynamic_template_data: internalDynamicTemplateData
         }],
         template_id: INTERNAL_TEMPLATE_ID
       })
