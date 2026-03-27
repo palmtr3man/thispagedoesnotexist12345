@@ -1,1 +1,337 @@
-LyoqCiAqICMxMTgg4oCUIC9hcGkvc2VhdC1yZXF1ZXN0IE5ldGxpZnkgRnVuY3Rpb24KICoKICogU2VydmVyLXNpZGUgUE9TVCBoYW5kbGVyIGZvciB0aGUgc2VhdCByZXF1ZXN0IGZvcm0uCiAqIFZhbGlkYXRlcyBuYW1lICsgZW1haWwsIHRoZW4gc2VuZHMgdGhlIHNlYXRfcmVxdWVzdF9hY2tub3dsZWRnZW1lbnRfdjEKICogU2VuZEdyaWQgZHluYW1pYyB0ZW1wbGF0ZSAoZC03NDA1OTVkYzA3YmU0MDEyOTU2OWJjNzMxZjFiYzQ1NCkgdG8gdGhlIHJlcXVlc3Rlci4KICogQWZ0ZXIgdGhlIFNlbmRHcmlkIGNhbGwsIFBPU1RzIHRoZSBzZWF0IGRhdGEgdG8gQmFzZTQ0IHNvIHRoZSBjb3VudCBpbmNyZW1lbnRzLgogKiBGaW5hbGx5LCBzZW5kcyBhbiBpbnRlcm5hbCBub3RpZmljYXRpb24gKGludGVybmFsc2lnbnVwbm90aWZpY2F0aW9uX3YxKSB0bwogKiBzdXBwb3J0QHRoZXVsdGltYXRlam91cm5leS5hcHAgd2l0aCB0aGUgcmVxdWVzdGVyJ3MgbmFtZSBhbmQgZW1haWwuCiAqCiAqIFJlcXVpcmVkIE5ldGxpZnkgZW52IHZhcnM6CiAqICAgU0VOREdSSURfQVBJX0tFWSAgICAgIOKAlCBTZW5kR3JpZCBBUEkga2V5IChyZXF1aXJlZCkKICogICBTRU5ER1JJRF9GUk9NX0VNQUlMICAg4oCUIFNlbmRlciBhZGRyZXNzIChkZWZhdWx0OiBub3JlcGx5QHRoaXNwYWdlZG9lc25vdGV4aXN0MTIzNDUuY29tKQogKiAgIFBMQVRGT1JNX1VSTCAgICAgICAgICDigJQgUGxhdGZvcm0gVVJMIGluamVjdGVkIGludG8gZW1haWwgKGRlZmF1bHQ6IGh0dHBzOi8vd3d3LnRoaXNwYWdlZG9lc25vdGV4aXN0MTIzNDUuY29tKQogKiAgIFNJR05BTF9VUkwgICAgICAgICAgICDigJQgU2lnbmFsIG5ld3NsZXR0ZXIgVVJMIGluamVjdGVkIGludG8gZW1haWwgKGRlZmF1bHQ6IFBlcnBsZXhpdHkgVFVKIGRlcGFydHVyZSBwb3J0YWwpCiAqICAgQkFTRTQ0X1NFQVRfUkVRVUVTVF9VUkwg4oCUIEJhc2U0NCBlbmRwb2ludCBmb3Igc2VhdC1yZXF1ZXN0IHdyaXRlcyAocmVxdWlyZWQgZm9yIGNvdW50KQogKgogKiBSZXF1ZXN0IGJvZHkgKEpTT04pOgogKiAgIHsgbmFtZTogc3RyaW5nLCBlbWFpbDogc3RyaW5nLCBzb3VyY2U/OiBzdHJpbmcsIHRpZXI/OiBzdHJpbmcsIGNhYmluX3RpZXI/OiBzdHJpbmcsIGFtb3VudF9wYWlkPzogbnVtYmVyIH0KICoKICogU3VjY2VzcyByZXNwb25zZToKICogICB7IG9rOiB0cnVlIH0KICoKICogRXJyb3IgcmVzcG9uc2U6CiAqICAgeyBvazogZmFsc2UsIGVycm9yOiBzdHJpbmcgfQogKgogKiBDbG9zZXMgQW1iaWd1aXR5IDIgKEdvL05vLUdvIENvbnRyYWN0KSDihpIgZmVlZHMgRkwgMDMyMTI2IEdvL05vLUdvIGdhdGUuCiAqLwoKY29uc3QgVEVNUExBVEVfSUQgICAgICAgICAgPSAnZC03NDA1OTVkYzA3YmU0MDEyOTU2OWJjNzMxZjFiYzQ1NCc7IC8vIHNlYXRfcmVxdWVzdF9hY2tub3dsZWRnZW1lbnRfdjEKY29uc3QgSU5URVJOQUxfVEVNUExBVEVfSUQgPSAnZC0wNzNkYzY4YTY4MzM0OGYxODEzM2Q3OGM5ODc5Y2VkOCc7IC8vIGludGVybmFsc2lnbnVwbm90aWZpY2F0aW9uX3YxCmNvbnN0IElOVEVSTkFMX05PVElGWV9FTUFJTCA9ICdzdXBwb3J0QHRoZXVsdGltYXRlam91cm5leS5hcHAnOwpjb25zdCBBU01fR1JPVVBfSUQgPSAzMzA0NzsgLy8gIlRoZSBVbHRpbWF0ZSBKb3VybmV5IOKAlCBUcmFuc2FjdGlvbmFsIiB1bnN1YnNjcmliZSBncm91cApjb25zdCBTVUJKRUNUICAgICAgPSAnWW91ciBzZWF0IHJlcXVlc3QgaXMgaW4g4oCUIEZMIDAzMjEyNiDinIjvuI8nOwoKZXhwb3J0cy5oYW5kbGVyID0gYXN5bmMgZnVuY3Rpb24gKGV2ZW50LCBjb250ZXh0KSB7CiAgY29uc3QgaGVhZGVycyA9IHsKICAgICAnQWNjZXNzLUNvbnRyb2wtQWxsb3ctT3JpZ2luJzogJyonLAogICAgJ0FjY2Vzcy1Db250cm9sLUFsbG93LUhlYWRlcnMnOiAnQ29udGVudC1UeXBlJywKICAgICdBY2Nlc3MtQ29udHJvbC1BbGxvdy1NZXRob2RzJzogJ1BPU1QsIE9QVElPTlMnLAogICAgJ0NvbnRlbnQtVHlwZSc6ICdhcHBsaWNhdGlvbi9qc29uJwogIH07CgogIC8vIEhhbmRsZSBDT1JTIHByZWZsaWdodAogIGlmIChldmVudC5odHRwTWV0aG9kID09PSAnT1BUSU9OUycpIHsKICAgIHJldHVybiB7IHN0YXR1c0NvZGU6IDIwNCwgaGVhZGVycywgYm9keTogJycgfTsKICB9CgogIGlmIChldmVudC5odHRwTWV0aG9kICE9PSAnUE9TVCcpIHsKICAgIHJldHVybiB7CiAgICAgIHN0YXR1c0NvZGU6IDQwNSwKICAgICAgaGVhZGVycywKICAgICAgYm9keTogSlNPTi5zdHJpbmdpZnkoeyBvazogZmFsc2UsIGVycm9yOiAnTWV0aG9kIG5vdCBhbGxvd2VkJyB9KQogICAgfTsKICB9CgogIC8vIC0tLSBQYXJzZSBib2R5IC0tLQogIGxldCBib2R5OwogIHRyeSB7CiAgICBib2R5ID0gSlNPTi5wYXJzZShldmVudC5ib2R5IHx8ICd7fScpOwogIH0gY2F0Y2ggKGVycikgewogICAgcmV0dXJuIHsKICAgICAgc3RhdHVzQ29kZTogNDAwLAogICAgICBoZWFkZXJzLAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiBmYWxzZSwgZXJyb3I6ICdJbnZhbGlkIEpTT04gYm9keScgfSkKICAgIH07CiAgfQoKICBjb25zdCB7IG5hbWUsIGVtYWlsLCBzb3VyY2UsIHRpZXIsIGNhYmluX3RpZXIsIGFtb3VudF9wYWlkIH0gPSBib2R5OwoKICAvLyAtLS0gVmFsaWRhdGUgcmVxdWlyZWQgZmllbGRzIC0tLQogIGlmICghbmFtZSB8fCB0eXBlb2YgbmFtZSAhPT0gJ3N0cmluZycgfHwgbmFtZS50cmltKCkubGVuZ3RoID09PSAwKSB7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA0MDAsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ01pc3Npbmcgb3IgaW52YWxpZCBmaWVsZDogbmFtZScgfSkKICAgIH07CiAgfQoKICBjb25zdCBlbWFpbFJlZ2V4ID0gbmV3IFJlZ0V4cCgnXlteXFxzQF0rQFteXFxzQF0rXFwuW15cXHNAXSskJyk7CiAgaWYgKCFlbWFpbCB8fCB0eXBlb2YgZW1haWwgIT09ICdzdHJpbmcnIHx8ICFlbWFpbFJlZ2V4LnRlc3QoZW1haWwudHJpbSgpKSkgewogICAgcmV0dXJuIHsKICAgICAgc3RhdHVzQ29kZTogNDAwLAogICAgICBoZWFkZXJzLAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiBmYWxzZSwgZXJyb3I6ICdNaXNzaW5nIG9yIGludmFsaWQgZmllbGQ6IGVtYWlsJyB9KQogICAgfTsKICB9CgogIC8vIC0tLSBSZXNvbHZlIGVudiB2YXJzIC0tLQogIGNvbnN0IGFwaUtleSA9IHByb2Nlc3MuZW52LlNFTkRHUklEX0FQSV9LRVk7CiAgaWYgKCFhcGlLZXkpIHsKICAgIGNvbnNvbGUuZXJyb3IoJ1tzZWF0LXJlcXVlc3RdIFNFTkRHUklEX0FQSV9LRVkgaXMgbm90IHNldCcpOwogICAgcmV0dXJuIHsKICAgICAgc3RhdHVzQ29kZTogNTAwLAogICAgICBoZWFkZXJzLAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiBmYWxzZSwgZXJyb3I6ICdTZXJ2ZXIgY29uZmlndXJhdGlvbiBlcnJvcicgfSkKICAgIH07CiAgfQoKICBjb25zdCBmcm9tRW1haWwgPQogICAgcHJvY2Vzcy5lbnYuU0VOREdSSURfRlJPTV9FTUFJTCB8fCAnbm9yZXBseUB0aGlzcGFnZWRvZXNub3RleGlzdDEyMzQ1LmNvbSc7CiAgY29uc3QgcGxhdGZvcm1VcmwgPQogICAgcHJvY2Vzcy5lbnYuUExBVEZPUk1fVVJMIHx8ICdodHRwczovL3d3dy50aGlzcGFnZWRvZXNub3RleGlzdDEyMzQ1LmNvbSc7CiAgY29uc3Qgc2lnbmFsVXJsID0KICAgIHByb2Nlc3MuZW52LlNJR05BTF9VUkwgfHwgJ2h0dHBzOi8vd3d3LnBlcnBsZXhpdHkuYWkvY29tcHV0ZXIvYS9wYWdlZm9yd2FyZC1haXJ3YXlzLXR1ai1kZXBhcnQtLlJUTEhQbS5RNXV6QU9qUUx2QmhXQSc7CgogIC8vIC0tLSBCdWlsZCBkeW5hbWljIHRlbXBsYXRlIGRhdGEgLS0tCiAgY29uc3QgbmFtZVRyaW1tZWQgPSBuYW1lLnRyaW0oKTsKICBjb25zdCBlbWFpbFRyaW1tZWQgPSBlbWFpbC50cmltKCkudG9Mb3dlckNhc2UoKTsKICBjb25zdCBuYW1lUGFydHMgPSBuYW1lVHJpbW1lZC5zcGxpdChuZXcgUmVnRXhwKCdcXHMrJykpOwogIGNvbnN0IGZpcnN0TmFtZSA9IG5hbWVQYXJ0c1swXSB8fCBuYW1lVHJpbW1lZDsKICBjb25zdCByZXF1ZXN0RGF0ZSA9IG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKTsKCiAgY29uc3QgZHluYW1pY1RlbXBsYXRlRGF0YSA9IHsKICAgIHN1YmplY3Q6IFNVQkpFQ1QsCiAgICBmaXJzdF9uYW1lOiBmaXJzdE5hbWUsCiAgICBmdWxsX25hbWU6IG5hbWVUcmltbWVkLAogICAgZW1haWw6IGVtYWlsVHJpbW1lZCwKICAgIHNvdXJjZTogKHNvdXJjZSAmJiB0eXBlb2Ygc291cmNlID09PSAnc3RyaW5nJyA/IHNvdXJjZS50cmltKCkgOiAnV2Vic2l0ZScpLAogICAgcGxhdGZvcm1fdXJsOiBwbGF0Zm9ybVVybCwKICAgIHNpZ25hbF91cmw6IHNpZ25hbFVybCwKICAgIHJlcXVlc3RfZGF0ZTogcmVxdWVzdERhdGUKICB9OwoKICAvLyAtLS0gU2VuZCB1c2VyIGFja25vd2xlZGdlbWVudCB2aWEgU2VuZEdyaWQgLS0tCiAgbGV0IHNnT2sgPSBmYWxzZTsKICB0cnkgewogICAgY29uc3Qgc2dSZXNwb25zZSA9IGF3YWl0IGZldGNoKCdodHRwczovL2FwaS5zZW5kZ3JpZC5jb20vdjMvbWFpbC9zZW5kJywgewogICAgICBtZXRob2Q6ICdQT1NUJywKICAgICAgaGVhZGVyczogewogICAgICAgIEF1dGhvcml6YXRpb246IGBCZWFyZXIgJHthcGlLZXl9YCwKICAgICAgICAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nCiAgICAgIH0sCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsKICAgICAgICBmcm9tOiB7IGVtYWlsOiBmcm9tRW1haWwgfSwKICAgICAgICBzdWJqZWN0OiBTVUJKRUNULAogICAgICAgIHBlcnNvbmFsaXphdGlvbnM6IFt7CiAgICAgICAgICB0bzogW3sgZW1haWw6IGVtYWlsVHJpbW1lZCB9XSwKICAgICAgICAgIGR5bmFtaWNfdGVtcGxhdGVfZGF0YTogZHluYW1pY1RlbXBsYXRlRGF0YQogICAgICAgIH1dLAogICAgICAgIHRlbXBsYXRlX2lkOiBURU1QTEFURV9JRCwKICAgICAgICBhc206IHsgZ3JvdXBfaWQ6IEFTTV9HUk9VUF9JRCB9CiAgICAgIH0pCiAgICB9KTsKCiAgICBpZiAoc2dSZXNwb25zZS5vayB8fCBzZ1Jlc3BvbnNlLnN0YXR1cyA9PT0gMjAyKSB7CiAgICAgIGNvbnNvbGUubG9nKGBbc2VhdC1yZXF1ZXN0XSBBY2tub3dsZWRnZW1lbnQgc2VudCB0byAke2VtYWlsVHJpbW1lZH1gKTsKICAgICAgc2dPayA9IHRydWU7CiAgICB9IGVsc2UgewogICAgICBjb25zdCBlcnJvclRleHQgPSBhd2FpdCBzZ1Jlc3BvbnNlLnRleHQoKTsKICAgICAgY29uc29sZS5lcnJvcihgW3NlYXQtcmVxdWVzdF0gU2VuZEdyaWQgZXJyb3IgJHtzZ1Jlc3BvbnNlLnN0YXR1c306YCwgZXJyb3JUZXh0KTsKICAgICAgcmV0dXJuIHsKICAgICAgICBzdGF0dXNDb2RlOiA1MDIsCiAgICAgICAgaGVhZGVycywKICAgICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiBmYWxzZSwgZXJyb3I6ICdGYWlsZWQgdG8gc2VuZCBhY2tub3dsZWRnZW1lbnQgZW1haWwnIH0pCiAgICAgIH07CiAgICB9CiAgfSBjYXRjaCAoZXJyKSB7CiAgICBjb25zb2xlLmVycm9yKCdbc2VhdC1yZXF1ZXN0XSBVbmV4cGVjdGVkIGVycm9yIGR1cmluZyBTZW5kR3JpZCBjYWxsOicsIGVycik7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA1MDAsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ0ludGVybmFsIHNlcnZlciBlcnJvcicgfSkKICAgIH07CiAgfQoKICAvLyAtLS0gV3JpdGUgdG8gQmFzZTQ0IChzZWF0IGNvdW50IGluY3JlbWVudCkgLS0tCiAgY29uc3QgYmFzZTQ0VXJsID0gcHJvY2Vzcy5lbnYuQkFTRTQ0X1NFQVRfUkVRVUVTVF9VUkw7CiAgaWYgKCFiYXNlNDRVcmwpIHsKICAgIGNvbnNvbGUud2FybignW3NlYXQtcmVxdWVzdF0gQkFTRTQ0X1NFQVRfUkVRVUVTVF9VUkwgaXMgbm90IHNldCDigJQgc2tpcHBpbmcgQmFzZTQ0IHdyaXRlJyk7CiAgICAvLyBTZW5kR3JpZCBzdWNjZWVkZWQ7IHJldHVybiBvayBzbyB0aGUgdXNlciBleHBlcmllbmNlIGlzIG5vdCBicm9rZW4sCiAgICAvLyBidXQgbG9nIHRoZSBnYXAgc28gdGhlIHRlYW0gY2FuIGFjdGlvbiB0aGUgbWlzc2luZyBlbnYgdmFyLgogICAgcmV0dXJuIHsKICAgICAgc3RhdHVzQ29kZTogMjAwLAogICAgICBoZWFkZXJzLAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiB0cnVlIH0pCiAgICB9OwogIH0KCiAgdHJ5IHsKICAgIGNvbnN0IGJhc2U0NFJlc3BvbnNlID0gYXdhaXQgZmV0Y2goYmFzZTQ0VXJsLCB7CiAgICAgIG1ldGhvZDogJ1BPU1QnLAogICAgICBoZWFkZXJzOiB7ICdDb250ZW50LVR5cGUnOiAnYXBwbGljYXRpb24vanNvbicgfSwKICAgICAgYm9keTogSlNPTi5zdHJpbmdpZnkoewogICAgICAgIG5hbWU6IG5hbWVUcmltbWVkLAogICAgICAgIGVtYWlsOiBlbWFpbFRyaW1tZWQsCiAgICAgICAgc291cmNlOiAoc291cmNlICYmIHR5cGVvZiBzb3VyY2UgPT09ICdzdHJpbmcnID8gc291cmNlLnRyaW0oKSA6ICdXZWJzaXRlJykKICAgICAgfSkKICAgIH0pOwoKICAgIGlmICghYmFzZTQ0UmVzcG9uc2Uub2spIHsKICAgICAgY29uc3QgZXJyb3JUZXh0ID0gYXdhaXQgYmFzZTQ0UmVzcG9uc2UudGV4dCgpOwogICAgICBjb25zb2xlLmVycm9yKGBbc2VhdC1yZXF1ZXN0XSBCYXNlNDQgd3JpdGUgZmFpbGVkICR7YmFzZTQ0UmVzcG9uc2Uuc3RhdHVzfTpgLCBlcnJvclRleHQpOwogICAgICByZXR1cm4gewogICAgICAgIHN0YXR1c0NvZGU6IDUwMiwKICAgICAgICBoZWFkZXJzLAogICAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ0Jhc2U0NCB3cml0ZSBmYWlsZWQg4oCUIHNlYXQgY291bnQgbm90IGluY3JlbWVudGVkJyB9KQogICAgICB9OwogICAgfQoKICAgIGNvbnNvbGUubG9nKGBbc2VhdC1yZXF1ZXN0XSBCYXNlNDQgd3JpdGUgc3VjY2VlZGVkIGZvciAke2VtYWlsVHJpbW1lZH1gKTsKICB9IGNhdGNoIChlcnIpIHsKICAgIGNvbnNvbGUuZXJyb3IoJ1tzZWF0LXJlcXVlc3RdIFVuZXhwZWN0ZWQgZXJyb3IgZHVyaW5nIEJhc2U0NCBjYWxsOicsIGVycik7CiAgICByZXR1cm4gewogICAgICBzdGF0dXNDb2RlOiA1MDAsCiAgICAgIGhlYWRlcnMsCiAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ0ludGVybmFsIHNlcnZlciBlcnJvciBkdXJpbmcgQmFzZTQ0IHdyaXRlJyB9KQogICAgfTsKICB9CgogIC8vIC0tLSBTZW5kIGludGVybmFsIHNpZ251cCBub3RpZmljYXRpb24gdmlhIFNlbmRHcmlkIC0tLQogIHRyeSB7CiAgICBjb25zdCBpbnRlcm5hbFNnUmVzcG9uc2UgPSBhd2FpdCBmZXRjaCgnaHR0cHM6Ly9hcGkuc2VuZGdyaWQuY29tL3YzL21haWwvc2VuZCcsIHsKICAgICAgbWV0aG9kOiAnUE9TVCcsCiAgICAgIGhlYWRlcnM6IHsKICAgICAgICBBdXRob3JpemF0aW9uOiBgQmVhcmVyICR7YXBpS2V5fWAsCiAgICAgICAgJ0NvbnRlbnQtVHlwZSc6ICdhcHBsaWNhdGlvbi9qc29uJwogICAgICB9LAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7CiAgICAgICAgZnJvbTogeyBlbWFpbDogZnJvbUVtYWlsIH0sCiAgICAgICAgcGVyc29uYWxpemF0aW9uczogW3sKICAgICAgICAgIHRvOiBbeyBlbWFpbDogSU5URVJOQUxfTk9USUZZX0VNQUlMIH1dLAogICAgICAgICAgZHluYW1pY190ZW1wbGF0ZV9kYXRhOiB7CiAgICAgICAgICAgIG5hbWU6IG5hbWVUcmltbWVkLAogICAgICAgICAgICBlbWFpbDogJ0VtYWlsOiAnICsgZW1haWxUcmltbWVkLAogICAgICAgICAgICB0aWVyOiAodGllciAmJiB0eXBlb2YgdGllciA9PT0gJ3N0cmluZycgPyB0aWVyLnRyaW0oKSA6ICdBbHBoYSAoRm91bmRpbmcpJyksCiAgICAgICAgICAgIGNhYmluX3RpZXI6IChjYWJpbl90aWVyICYmIHR5cGVvZiBjYWJpbl90aWVyID09PSAnc3RyaW5nJyA/IGNhYmluX3RpZXIudHJpbSgpIDogJ0FscGhhIChGb3VuZGluZyknKSwKICAgICAgICAgICAgc2lnbnVwX2RhdGU6IHJlcXVlc3REYXRlLAogICAgICAgICAgICBhbW91bnRfcGFpZDogKGFtb3VudF9wYWlkICE9PSB1bmRlZmluZWQgJiYgYW1vdW50X3BhaWQgIT09IG51bGwgPyBhbW91bnRfcGFpZCA6ICckMC4wMCcpCiAgICAgICAgICB9CiAgICAgICAgfV0sCiAgICAgICAgdGVtcGxhdGVfaWQ6IElOVEVSTkFMX1RFTVBMQVRFX0lECiAgICAgIH0pCiAgICB9KTsKCiAgICBpZiAoaW50ZXJuYWxTZ1Jlc3BvbnNlLm9rIHx8IGludGVybmFsU2dSZXNwb25zZS5zdGF0dXMgPT09IDIwMikgewogICAgICBjb25zb2xlLmxvZyhgW3NlYXQtcmVxdWVzdF0gSW50ZXJuYWwgbm90aWZpY2F0aW9uIHNlbnQgdG8gJHtJTlRFUk5BTF9OT1RJRllfRU1BSUx9IGZvciByZXF1ZXN0ZXIgJHtlbWFpbFRyaW1tZWR9YCk7CiAgICB9IGVsc2UgewogICAgICBjb25zdCBlcnJvclRleHQgPSBhd2FpdCBpbnRlcm5hbFNnUmVzcG9uc2UudGV4dCgpOwogICAgICAvLyBMb2cgYnV0IGRvIG5vdCBmYWlsIHRoZSByZXF1ZXN0IOKAlCB1c2VyIGFjayBhbmQgQmFzZTQ0IHdyaXRlIGFscmVhZHkgc3VjY2VlZGVkCiAgICAgIGNvbnNvbGUuZXJyb3IoYFtzZWF0LXJlcXVlc3RdIEludGVybmFsIG5vdGlmaWNhdGlvbiBTZW5kR3JpZCBlcnJvciAke2ludGVybmFsU2dSZXNwb25zZS5zdGF0dXN9OmAsIGVycm9yVGV4dCk7CiAgICB9CiAgfSBjYXRjaCAoZXJyKSB7CiAgICAvLyBMb2cgYnV0IGRvIG5vdCBmYWlsIHRoZSByZXF1ZXN0CiAgICBjb25zb2xlLmVycm9yKCdbc2VhdC1yZXF1ZXN0XSBVbmV4cGVjdGVkIGVycm9yIGR1cmluZyBpbnRlcm5hbCBub3RpZmljYXRpb24gU2VuZEdyaWQgY2FsbDonLCBlcnIpOwogIH0KCiAgcmV0dXJuIHsKICAgIHN0YXR1c0NvZGU6IDIwMCwKICAgIGhlYWRlcnMsCiAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiB0cnVlIH0pCiAgfTsKfTsK
+/**
+ * /api/seat-request — Netlify Function (Gate Contract v2)
+ *
+ * Upgrades over v1:
+ *   1. Validates age_confirmed field (rejects if false or missing)
+ *   2. Generates seat_id in TUJ-XXXXXX format
+ *   3. Calls beehiiv API to auto-subscribe email to Signal newsletter
+ *   4. Returns { ok: true, seat_id, status } in response body
+ *   5. Base44 write remains a graceful stub (wires in when credits return)
+ *
+ * Required Netlify env vars:
+ *   SENDGRID_API_KEY         — SendGrid API key
+ *   SENDGRID_FROM_EMAIL      — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   PLATFORM_URL             — Platform URL injected into email (default: https://www.thispagedoesnotexist12345.com)
+ *   SIGNAL_URL               — Signal newsletter URL injected into email
+ *   BASE44_SEAT_REQUEST_URL  — Base44 endpoint for seat-request writes (optional; skipped if unset)
+ *   BEEHIIV_API_KEY          — beehiiv API key
+ *   BEEHIIV_PUB_ID           — beehiiv Publication ID (default: pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf)
+ *
+ * Request body (JSON):
+ *   { name: string, email: string, age_confirmed: boolean, source?: string, tier?: string, cabin_tier?: string, amount_paid?: number }
+ *
+ * Success response:
+ *   { ok: true, seat_id: 'TUJ-XXXXXX', status: 'confirmed' }
+ *
+ * Error response:
+ *   { ok: false, error: string }
+ *
+ * Gate Contract v2 — seat_id bridge + beehiiv auto-subscribe
+ */
+
+// --- SendGrid template IDs ---
+const TEMPLATE_ID          = 'd-740595dc07be401295 69bc731f1bc454'; // seat_request_acknowledgement_v1
+const INTERNAL_TEMPLATE_ID = 'd-073dc68a683348f18133d78c9879ced8'; // internalsignupnotification_v1
+const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
+const ASM_GROUP_ID = 33047; // "The Ultimate Journey — Transactional" unsubscribe group
+const SUBJECT      = 'Your seat request is in — FL 032126 ✈️';
+
+// --- Gate Contract constants ---
+const SEAT_ID_PREFIX = 'TUJ-';
+const SEAT_ID_CHARS  = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I ambiguity
+const SEAT_ID_LENGTH = 6;
+const MIN_AGE        = 21;
+
+// --- beehiiv defaults ---
+const BEEHIIV_PUB_ID_DEFAULT = 'pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf';
+
+/**
+ * Generate a seat_id in TUJ-XXXXXX format.
+ * Uses crypto.getRandomValues for randomness in the Netlify edge runtime.
+ */
+function generateSeatId() {
+  let result = SEAT_ID_PREFIX;
+  const array = new Uint8Array(SEAT_ID_LENGTH);
+  crypto.getRandomValues(array);
+  for (let i = 0; i < SEAT_ID_LENGTH; i++) {
+    result += SEAT_ID_CHARS[array[i] % SEAT_ID_CHARS.length];
+  }
+  return result;
+}
+
+/**
+ * Subscribe an email to the Signal beehiiv newsletter.
+ * Fails gracefully — logs errors but does not block the seat request.
+ */
+async function subscribeToBeehiiv(email, firstName, apiKey, pubId) {
+  const url = `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        reactivate_existing: false,
+        send_welcome_email: true,
+        utm_source: 'seat-request',
+        utm_medium: 'netlify-function',
+        utm_campaign: 'fl032126-gate',
+        custom_fields: [
+          { name: 'first_name', value: firstName }
+        ]
+      })
+    });
+
+    if (res.ok || res.status === 201 || res.status === 200) {
+      const data = await res.json().catch(() => ({}));
+      console.log(`[seat-request] beehiiv subscribe OK for ${email}`, data?.data?.id || '');
+      return true;
+    } else {
+      const errText = await res.text();
+      console.error(`[seat-request] beehiiv subscribe error ${res.status}:`, errText);
+      return false;
+    }
+  } catch (err) {
+    console.error('[seat-request] beehiiv subscribe unexpected error:', err);
+    return false;
+  }
+}
+
+exports.handler = async function (event, context) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' })
+    };
+  }
+
+  // --- Parse body ---
+  let body;
+  try {
+    body = JSON.parse(event.body || '{}');
+  } catch (err) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Invalid JSON body' })
+    };
+  }
+
+  const { name, email, age_confirmed, source, tier, cabin_tier, amount_paid } = body;
+
+  // --- Validate: age_confirmed (Gate Contract §2a / §5) ---
+  if (age_confirmed !== true) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({
+        ok: false,
+        error: `Age verification required. You must confirm you are ${MIN_AGE} or older to request a seat.`
+      })
+    };
+  }
+
+  // --- Validate: name ---
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Missing or invalid field: name' })
+    };
+  }
+
+  // --- Validate: email ---
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || typeof email !== 'string' || !emailRegex.test(email.trim())) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Missing or invalid field: email' })
+    };
+  }
+
+  // --- Resolve env vars ---
+  const apiKey = process.env.SENDGRID_API_KEY;
+  if (!apiKey) {
+    console.error('[seat-request] SENDGRID_API_KEY is not set');
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Server configuration error' })
+    };
+  }
+
+  const fromEmail   = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const platformUrl = process.env.PLATFORM_URL        || 'https://www.thispagedoesnotexist12345.com';
+  const signalUrl   = process.env.SIGNAL_URL          || 'https://newsletter.thispagedoesnotexist12345.us';
+  const beehiivKey  = process.env.BEEHIIV_API_KEY;
+  const beehiivPub  = process.env.BEEHIIV_PUB_ID || BEEHIIV_PUB_ID_DEFAULT;
+
+  // --- Normalise inputs ---
+  const nameTrimmed  = name.trim();
+  const emailTrimmed = email.trim().toLowerCase();
+  const nameParts    = nameTrimmed.split(/\s+/);
+  const firstName    = nameParts[0] || nameTrimmed;
+  const requestDate  = new Date().toISOString();
+
+  // --- Generate seat_id (Gate Contract §3) ---
+  const seatId = generateSeatId();
+  console.log(`[seat-request] Generated seat_id ${seatId} for ${emailTrimmed}`);
+
+  // --- Send user acknowledgement via SendGrid ---
+  const dynamicTemplateData = {
+    subject:      SUBJECT,
+    first_name:   firstName,
+    full_name:    nameTrimmed,
+    email:        emailTrimmed,
+    seat_id:      seatId,
+    source:       (source && typeof source === 'string' ? source.trim() : 'Website'),
+    platform_url: platformUrl,
+    signal_url:   signalUrl,
+    request_date: requestDate
+  };
+
+  try {
+    const sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: { email: fromEmail },
+        subject: SUBJECT,
+        personalizations: [{
+          to: [{ email: emailTrimmed }],
+          dynamic_template_data: dynamicTemplateData
+        }],
+        template_id: TEMPLATE_ID,
+        asm: { group_id: ASM_GROUP_ID }
+      })
+    });
+
+    if (sgResponse.ok || sgResponse.status === 202) {
+      console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed} with seat_id ${seatId}`);
+    } else {
+      const errorText = await sgResponse.text();
+      console.error(`[seat-request] SendGrid error ${sgResponse.status}:`, errorText);
+      return {
+        statusCode: 502,
+        headers,
+        body: JSON.stringify({ ok: false, error: 'Failed to send acknowledgement email' })
+      };
+    }
+  } catch (err) {
+    console.error('[seat-request] Unexpected error during SendGrid call:', err);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Internal server error' })
+    };
+  }
+
+  // --- Subscribe to beehiiv Signal newsletter (Gate Contract §2d) ---
+  if (beehiivKey) {
+    await subscribeToBeehiiv(emailTrimmed, firstName, beehiivKey, beehiivPub);
+  } else {
+    console.warn('[seat-request] BEEHIIV_API_KEY not set — skipping Signal auto-subscribe');
+  }
+
+  // --- Write to Base44 seat store (stub — wires in when credits return) ---
+  const base44Url = process.env.BASE44_SEAT_REQUEST_URL;
+  if (!base44Url) {
+    console.warn('[seat-request] BASE44_SEAT_REQUEST_URL not set — skipping Base44 write (stub active)');
+    // Base44 is blocked; proceed without it. seat_id is still returned to client.
+  } else {
+    try {
+      const base44Response = await fetch(base44Url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name:    nameTrimmed,
+          email:   emailTrimmed,
+          seat_id: seatId,
+          source:  (source && typeof source === 'string' ? source.trim() : 'Website')
+        })
+      });
+
+      if (!base44Response.ok) {
+        const errorText = await base44Response.text();
+        console.error(`[seat-request] Base44 write failed ${base44Response.status}:`, errorText);
+        // Do not block — seat_id already issued and SendGrid sent. Log for manual reconciliation.
+      } else {
+        console.log(`[seat-request] Base44 write succeeded for ${emailTrimmed} seat_id ${seatId}`);
+      }
+    } catch (err) {
+      console.error('[seat-request] Unexpected error during Base44 call:', err);
+      // Do not block — log for manual reconciliation.
+    }
+  }
+
+  // --- Send internal signup notification via SendGrid ---
+  try {
+    const internalSgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: { email: fromEmail },
+        personalizations: [{
+          to: [{ email: INTERNAL_NOTIFY_EMAIL }],
+          dynamic_template_data: {
+            name:         nameTrimmed,
+            email:        'Email: ' + emailTrimmed,
+            seat_id:      seatId,
+            tier:         (tier && typeof tier === 'string' ? tier.trim() : 'Alpha (Founding)'),
+            cabin_tier:   (cabin_tier && typeof cabin_tier === 'string' ? cabin_tier.trim() : 'Alpha (Founding)'),
+            signup_date:  requestDate,
+            amount_paid:  (amount_paid !== undefined && amount_paid !== null ? amount_paid : '$0.00')
+          }
+        }],
+        template_id: INTERNAL_TEMPLATE_ID
+      })
+    });
+
+    if (internalSgResponse.ok || internalSgResponse.status === 202) {
+      console.log(`[seat-request] Internal notification sent to ${INTERNAL_NOTIFY_EMAIL} for ${emailTrimmed}`);
+    } else {
+      const errorText = await internalSgResponse.text();
+      // Log but do not fail — user ack already succeeded
+      console.error(`[seat-request] Internal notification SendGrid error ${internalSgResponse.status}:`, errorText);
+    }
+  } catch (err) {
+    // Log but do not fail
+    console.error('[seat-request] Unexpected error during internal notification SendGrid call:', err);
+  }
+
+  // --- Return seat_id to client (Gate Contract §2c) ---
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      ok:      true,
+      seat_id: seatId,
+      status:  'confirmed',
+      email:   emailTrimmed,
+      name:    nameTrimmed
+    })
+  };
+};
