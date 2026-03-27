@@ -2022,7 +2022,17 @@
         var waBanner = document.getElementById('welcome-aboard-banner');
 
         if (state === 'dashboard') {
-          if (seatIdEl) seatIdEl.textContent = 'Seat: ' + (seatId || '');
+          if (seatIdEl) seatIdEl.textContent = seatId || '';
+          // Wire seat_id into all .tech links so OnboardingPassport receives it
+          if (seatId) {
+            document.querySelectorAll('a[href*="thispagedoesnotexist12345.tech"]').forEach(function (a) {
+              try {
+                var u = new URL(a.href);
+                u.searchParams.set('seat_id', seatId);
+                a.href = u.toString();
+              } catch (e) { /* skip malformed hrefs */ }
+            });
+          }
           // Welcome Aboard banner: show once if ?status=boarded in URL
           if (waBanner) {
             var params = new URLSearchParams(location.search);
