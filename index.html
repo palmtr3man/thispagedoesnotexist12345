@@ -350,6 +350,140 @@
       margin-top: 1.5rem;
     }
 
+    /* ── State machine: body[data-state] visibility rules ─────────────────── */
+    /* Elements tagged [data-show-state] are hidden unless body matches */
+    [data-show-state] { display: none !important; }
+    body[data-state='loading']   [data-show-state~='loading']   { display: revert !important; }
+    body[data-state='landing']   [data-show-state~='landing']   { display: revert !important; }
+    body[data-state='dashboard'] [data-show-state~='dashboard'] { display: revert !important; }
+    body[data-state='departed']  [data-show-state~='departed']  { display: revert !important; }
+    /* Elements that show in multiple states */
+    body[data-state='landing']   [data-show-state~='any']       { display: revert !important; }
+    body[data-state='dashboard'] [data-show-state~='any']       { display: revert !important; }
+    body[data-state='departed']  [data-show-state~='any']       { display: revert !important; }
+
+    /* ── Age gate overlay ─────────────────────────────────────────────────── */
+    #age-gate-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+    #age-gate-overlay.active {
+      display: flex;
+    }
+    .age-gate-card {
+      max-width: 420px;
+      width: 90%;
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid rgba(168, 196, 0, 0.35);
+      border-radius: 14px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .age-gate-card h2 {
+      color: #A8C400;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .age-gate-card p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 1.75rem;
+      line-height: 1.6;
+    }
+    .age-gate-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .age-gate-confirm {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      background: rgba(168, 196, 0, 0.12);
+      border: 1px solid rgba(168, 196, 0, 0.6);
+      color: #A8C400;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .age-gate-confirm:hover {
+      background: rgba(168, 196, 0, 0.2);
+      box-shadow: 0 0 14px rgba(168, 196, 0, 0.25);
+    }
+    .age-gate-deny {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0.25rem;
+      letter-spacing: 0.04em;
+    }
+    .age-gate-deny:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── Dashboard view (state: dashboard) ───────────────────────────────── */
+    #dashboard-view {
+      display: none;
+      text-align: left;
+      padding: 1.5rem;
+      border: 1px solid rgba(168, 196, 0, 0.25);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.45);
+      margin-bottom: 1.5rem;
+    }
+    #dashboard-view h2 {
+      color: #A8C400;
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.04em;
+    }
+    #dashboard-seat-id {
+      font-size: 0.85rem;
+      color: rgba(168,196,0,0.7);
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+    }
+    .dashboard-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+    }
+    .dashboard-links a {
+      font-size: 0.82rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid rgba(168,196,0,0.3);
+      color: #A8C400;
+      text-decoration: none;
+      background: rgba(0,0,0,0.4);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .dashboard-links a:hover {
+      border-color: rgba(168,196,0,0.7);
+      box-shadow: 0 0 8px rgba(168,196,0,0.18);
+    }
+    /* Welcome Aboard banner (shown once on ?status=boarded) */
+    #welcome-aboard-banner {
+      display: none;
+      background: rgba(168,196,0,0.1);
+      border: 1px solid rgba(168,196,0,0.4);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.88rem;
+      color: #A8C400;
+      letter-spacing: 0.03em;
+    }
+
     .carousel-wrap {
       margin-bottom: 2rem;
       position: relative;
@@ -590,10 +724,36 @@
     }
 </style>
 </head>
-<body class="black-glass">
+<body class="black-glass" data-state="loading">
   <div class="container">
     <h1>🚀 The Ultimate Journey</h1>
     <p class="subtitle">Career Optimization Platform</p>
+
+    <!-- ── Age Gate Overlay (controlled by window.__TUJ.showAgeGate) ─────── -->
+    <div id="age-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
+      <div class="age-gate-card">
+        <h2 id="age-gate-title">✈️ Age Verification</h2>
+        <p>The Ultimate Journey platform is intended for passengers <strong>21 years of age or older</strong>. Please confirm your age to continue.</p>
+        <div class="age-gate-actions">
+          <button class="age-gate-confirm" id="age-gate-confirm-btn">I confirm I am 21 or older — Let me board</button>
+          <button class="age-gate-deny" id="age-gate-deny-btn">I cannot confirm — take me back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Mission Control Dashboard (state: dashboard) ─────────────────── -->
+    <div id="dashboard-view">
+      <div id="welcome-aboard-banner">🎉 Welcome Aboard — your seat is confirmed. Check your inbox for your boarding pass.</div>
+      <h2>✦ Mission Control</h2>
+      <div id="dashboard-seat-id"></div>
+      <p style="font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:0.5rem;">Your seat is reserved. Use the links below to continue your journey.</p>
+      <div class="dashboard-links">
+        <a href="/Studio" target="_blank" rel="noopener noreferrer">📄 Studio — Resume Builder</a>
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">📡 Signal — Newsletter</a>
+        <a href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">⚙️ Systems — Boarding</a>
+        <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">📚 Resources</a>
+      </div>
+    </div>
 
     <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
     <div class="status-section" id="loading-dock">
@@ -1055,8 +1215,9 @@
 
       // ── Main function ──────────────────────────────────────────────────────
 
-      async function applySeatGate() {
-        var status = await fetchSeatStatus();
+      // Expose on window so the TUJ state machine can call with a pre-fetched status
+      window.__applySeatGate = async function applySeatGate(cachedStatus) {
+        var status = cachedStatus || await fetchSeatStatus();
         if (!status) return; // fail open — leave DOM as-is if API is unreachable
 
         // ── DOM refs ─────────────────────────────────────────────���───────────
@@ -1280,9 +1441,260 @@
         }
       }
 
-      // Run on load; re-run every 60s to catch Admin changes without a page refresh
-      applySeatGate();
-      setInterval(applySeatGate, 60000);
+      // Legacy entry point — now driven by window.__TUJ.rerender().
+      // Keep the setInterval removed; rerender() owns the 60s cadence.
+      window.__applySeatGate();
+
+    })();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // TUJ STATE MACHINE — Gate Contract v2
+    // Exposes window.__TUJ with: rerender(), showAgeGate(onConfirm), state
+    // ═══════════════════════════════════════════════════════════════════════
+    (function () {
+
+      // ── Constants ────────────────────────────────────────────────────────
+      var AGE_KEY    = 'tuj_age_verified';   // localStorage — persistent
+      var SEAT_KEY   = 'seat_id';            // sessionStorage — per-session
+      var SEAT_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+      var MIN_AGE    = 21;
+
+      // ── State ────────────────────────────────────────────────────────────
+      var _state      = 'loading';
+      var _status     = null;   // last fetched /api/seat-status payload
+      var _seatId     = null;   // validated seat_id for this session
+      var _ageGateCb  = null;   // pending callback after age confirm
+
+      // ── Helpers ──────────────────────────────────────────────────────────
+      function getSeatId() {
+        var fromSession = sessionStorage.getItem(SEAT_KEY);
+        var fromUrl     = new URLSearchParams(location.search).get('seat_id');
+        var id = fromSession || fromUrl || null;
+        if (id && SEAT_REGEX.test(id)) {
+          sessionStorage.setItem(SEAT_KEY, id); // persist URL param to session
+          return id;
+        }
+        return null;
+      }
+
+      function isAgeVerified() {
+        return localStorage.getItem(AGE_KEY) === '1';
+      }
+
+      function needsAgeGate() {
+        return !isAgeVerified();
+      }
+
+      // ── Core: fetch + resolve state ───────────────────────────────────────
+      async function fetchStatus() {
+        try {
+          var res = await fetch('/api/seat-status');
+          if (!res.ok) return null;
+          return await res.json();
+        } catch (e) {
+          console.warn('[TUJ] seat-status fetch failed:', e);
+          return null;
+        }
+      }
+
+      function computeState(status, seatId) {
+        if (!status) return 'landing'; // fail open
+        var departed = (status.nextflightstatus || status.next_flight_status) === 'DEPARTED'
+                    || status.gate_status === 'departed';
+        if (departed)        return 'departed';
+        if (seatId)          return 'dashboard';
+        return 'landing';
+      }
+
+      // ── Apply state to DOM ────────────────────────────────────────────────
+      function applyState(state, status, seatId) {
+        document.body.setAttribute('data-state', state);
+        _state = state;
+
+        // ── Dashboard view ──────────────────────────────────────────────
+        var dashView  = document.getElementById('dashboard-view');
+        var seatIdEl  = document.getElementById('dashboard-seat-id');
+        var waBanner  = document.getElementById('welcome-aboard-banner');
+
+        if (state === 'dashboard') {
+          if (dashView)  dashView.style.display  = 'block';
+          if (seatIdEl)  seatIdEl.textContent    = 'Seat: ' + (seatId || '');
+          // Welcome Aboard banner: show once if ?status=boarded in URL
+          if (waBanner) {
+            var params = new URLSearchParams(location.search);
+            if (params.get('status') === 'boarded' && !sessionStorage.getItem('wa_shown')) {
+              waBanner.style.display = 'block';
+              sessionStorage.setItem('wa_shown', '1');
+            }
+          }
+        } else {
+          if (dashView) dashView.style.display = 'none';
+        }
+
+        // ── Hand off to window.__applySeatGate() for all badge/CTA logic ──────
+        // Pass the already-fetched status to avoid a second fetch.
+        if (typeof window.__applySeatGate === 'function') {
+          window.__applySeatGate(status || null);
+        }
+
+        console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
+      }
+
+      // ── Public: rerender() ────────────────────────────────────────────────
+      async function rerender() {
+        document.body.setAttribute('data-state', 'loading');
+        _status = await fetchStatus();
+        _seatId = getSeatId();
+        var state = computeState(_status, _seatId);
+        applyState(state, _status, _seatId);
+      }
+
+      // ── Public: showAgeGate(onConfirm) ───────────────────────────────────
+      // Shows the age gate overlay. onConfirm fires after user confirms.
+      function showAgeGate(onConfirm) {
+        _ageGateCb = onConfirm || null;
+        var overlay = document.getElementById('age-gate-overlay');
+        if (overlay) overlay.classList.add('active');
+      }
+
+      function hideAgeGate() {
+        var overlay = document.getElementById('age-gate-overlay');
+        if (overlay) overlay.classList.remove('active');
+      }
+
+      // ── Age gate button wiring ────────────────────────────────────────────
+      document.addEventListener('DOMContentLoaded', function () {
+        var confirmBtn = document.getElementById('age-gate-confirm-btn');
+        var denyBtn    = document.getElementById('age-gate-deny-btn');
+
+        if (confirmBtn) {
+          confirmBtn.addEventListener('click', function () {
+            localStorage.setItem(AGE_KEY, '1');
+            hideAgeGate();
+            if (typeof _ageGateCb === 'function') {
+              _ageGateCb();
+              _ageGateCb = null;
+            }
+          });
+        }
+
+        if (denyBtn) {
+          denyBtn.addEventListener('click', function () {
+            hideAgeGate();
+            _ageGateCb = null;
+          });
+        }
+      });
+
+      // ── Gate the seat request CTA ─────────────────────────────────────────
+      // Intercept the existing waitlistBtn click to check age first.
+      document.addEventListener('DOMContentLoaded', function () {
+        var waitlistBtn = document.getElementById('waitlistBtn');
+        if (!waitlistBtn) return;
+
+        // Replace inline onclick with a gated version
+        waitlistBtn.removeAttribute('onclick');
+        waitlistBtn.addEventListener('click', function () {
+          if (needsAgeGate()) {
+            showAgeGate(function () {
+              // Age confirmed — now reveal the form (original onclick logic)
+              waitlistBtn.style.display = 'none';
+              var f = document.getElementById('seat-request-form');
+              if (f) {
+                f.style.display = 'flex';
+                var nameInput = f.querySelector('input[name=name]');
+                if (nameInput) nameInput.focus();
+              }
+            });
+          } else {
+            // Already verified — reveal form directly
+            waitlistBtn.style.display = 'none';
+            var f = document.getElementById('seat-request-form');
+            if (f) {
+              f.style.display = 'flex';
+              var nameInput = f.querySelector('input[name=name]');
+              if (nameInput) nameInput.focus();
+            }
+          }
+        });
+      });
+
+      // ── Wire seat-request form to return seat_id + trigger rerender ───────
+      document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('seat-request-form');
+        if (!form) return;
+
+        // Replace inline onsubmit with a version that passes age_confirmed
+        // and handles the seat_id response.
+        form.removeAttribute('onsubmit');
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var nameVal  = form.querySelector('input[name=name]').value.trim();
+          var emailVal = form.querySelector('input[name=email]').value.trim();
+          var errEl    = document.getElementById('seat-form-error');
+          var subBtn   = document.getElementById('seat-submit-btn');
+          errEl.textContent = '';
+          if (!nameVal)  { errEl.textContent = 'Name is required.';  return; }
+          if (!emailVal) { errEl.textContent = 'Email is required.'; return; }
+          subBtn.disabled    = true;
+          subBtn.textContent = '⏳ Submitting…';
+
+          fetch('/api/seat-request', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+              name:          nameVal,
+              email:         emailVal,
+              age_confirmed: true,   // age gate already passed
+              source:        'landing'
+            })
+          })
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d.ok && d.seat_id) {
+              sessionStorage.setItem(SEAT_KEY, d.seat_id);
+              form.style.display = 'none';
+              // Redirect to dashboard state with Welcome Aboard banner
+              var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
+              history.replaceState({}, '', newUrl);
+              window.__TUJ.rerender();
+            } else if (d.ok) {
+              // Legacy ok:true without seat_id (Base44 stub path)
+              form.style.display = 'none';
+              var conf = document.getElementById('seat-request-confirm');
+              if (conf) conf.style.display = 'block';
+            } else {
+              errEl.textContent  = d.error || 'Something went wrong — please try again.';
+              subBtn.disabled    = false;
+              subBtn.textContent = '✈️ Submit Request';
+            }
+          })
+          .catch(function () {
+            errEl.textContent  = 'Network error — please try again.';
+            subBtn.disabled    = false;
+            subBtn.textContent = '✈️ Submit Request';
+          });
+        });
+      });
+
+      // ── Expose public API ─────────────────────────────────────────────────
+      window.__TUJ = {
+        rerender:     rerender,
+        showAgeGate:  showAgeGate,
+        get state()   { return _state; },
+        get status()  { return _status; },
+        get seatId()  { return _seatId; }
+      };
+
+      // ── Boot: run on DOMContentLoaded ─────────────────────────────────────
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', rerender);
+      } else {
+        rerender();
+      }
+
+      // Re-run every 60s (same cadence as the old applySeatGate interval)
+      setInterval(rerender, 60000);
 
     })();
 
