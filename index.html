@@ -440,37 +440,281 @@
       background: rgba(0,0,0,0.45);
       margin-bottom: 1.5rem;
     }
-    #dashboard-view h2 {
+    /* ── Mission Control: Header ──────────────────────────────────────────── */
+    .mc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .mc-title {
       color: #A8C400;
-      font-size: 1.1rem;
-      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      margin: 0 0 0.25rem;
+    }
+    .mc-subtitle {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.45);
       letter-spacing: 0.04em;
+      margin: 0;
     }
-    #dashboard-seat-id {
-      font-size: 0.85rem;
+    .mc-seat-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.15rem;
+      flex-shrink: 0;
+    }
+    .mc-seat-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      color: rgba(168,196,0,0.4);
+      text-transform: uppercase;
+    }
+    .mc-seat-id {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #A8C400;
+      letter-spacing: 0.1em;
+      font-family: monospace;
+    }
+
+    /* ── Mission Control: Sections ───────────────────────────────────────── */
+    .mc-section {
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(168,196,0,0.1);
+    }
+    .mc-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .mc-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .mc-section-title {
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       color: rgba(168,196,0,0.7);
-      letter-spacing: 0.06em;
-      margin-bottom: 1rem;
+      margin: 0 0 0.5rem;
     }
-    .dashboard-links {
+    .mc-section-desc {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.45);
+      margin: 0 0 1rem;
+      line-height: 1.5;
+    }
+    .mc-section-link {
+      font-size: 0.75rem;
+      color: rgba(168,196,0,0.55);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .mc-section-link:hover { color: #A8C400; }
+
+    /* ── Mission Control: Boarding Steps ─────────────────────────────────── */
+    .boarding-steps {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .boarding-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid rgba(168,196,0,0.12);
+      background: rgba(0,0,0,0.3);
+      transition: border-color 0.2s;
+    }
+    .boarding-step.done {
+      border-color: rgba(168,196,0,0.4);
+      background: rgba(168,196,0,0.05);
+    }
+    .bstep-num {
+      font-size: 0.65rem;
+      font-family: monospace;
+      color: rgba(168,196,0,0.35);
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+      padding-top: 0.1rem;
+      min-width: 1.5rem;
+    }
+    .boarding-step.done .bstep-num { color: rgba(168,196,0,0.7); }
+    .bstep-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .bstep-name {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+    }
+    .boarding-step.done .bstep-name { color: #A8C400; }
+    .bstep-desc {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.4;
+    }
+    .bstep-status {
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      color: rgba(168,196,0,0.25);
+      padding-top: 0.1rem;
+    }
+    .boarding-step.done .bstep-status { color: #A8C400; }
+
+    /* ── Mission Control: Ecosystem Tiles ───────────────────────────────── */
+    .mc-tiles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+    }
+    .mc-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 0.9rem;
+      border-radius: 8px;
+      border: 1px solid rgba(168,196,0,0.2);
+      background: rgba(0,0,0,0.35);
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      position: relative;
+    }
+    .mc-tile:hover {
+      border-color: rgba(168,196,0,0.55);
+      background: rgba(168,196,0,0.06);
+      box-shadow: 0 0 12px rgba(168,196,0,0.12);
+    }
+    .mc-tile-icon { font-size: 1.2rem; }
+    .mc-tile-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #A8C400;
+      letter-spacing: 0.03em;
+    }
+    .mc-tile-desc {
+      font-size: 0.74rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.4;
+    }
+    .mc-tile-arrow {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.85rem;
+      font-size: 0.85rem;
+      color: rgba(168,196,0,0.3);
+      transition: color 0.2s, transform 0.2s;
+    }
+    .mc-tile:hover .mc-tile-arrow {
+      color: #A8C400;
+      transform: translateX(3px);
+    }
+
+    /* ── Mission Control: The Build table ───────────────────────────────── */
+    .build-table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(168,196,0,0.15);
+      margin-bottom: 0.75rem;
+    }
+    .build-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .build-table thead tr {
+      background: rgba(168,196,0,0.07);
+    }
+    .build-table th {
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      color: rgba(168,196,0,0.6);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(168,196,0,0.12);
+    }
+    .build-table td {
+      padding: 0.5rem 0.75rem;
+      color: rgba(255,255,255,0.7);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .build-table tbody tr:last-child td { border-bottom: none; }
+    .build-table tbody tr:hover td { background: rgba(168,196,0,0.04); }
+    .build-row--empty td {
+      text-align: center;
+      padding: 1.25rem;
+    }
+    .build-empty-msg {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.03em;
+    }
+    .build-status-key {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .build-key-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+    }
+    .build-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Mission Control: Quick Actions ─────────────────────────────────── */
+    .mc-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 0.6rem;
-      margin-top: 0.75rem;
     }
-    .dashboard-links a {
+    .mc-action-btn {
       font-size: 0.82rem;
-      padding: 0.45rem 0.9rem;
+      padding: 0.5rem 1rem;
       border-radius: 6px;
       border: 1px solid rgba(168,196,0,0.3);
       color: #A8C400;
       text-decoration: none;
       background: rgba(0,0,0,0.4);
-      transition: border-color 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.03em;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .dashboard-links a:hover {
+    .mc-action-btn:hover {
       border-color: rgba(168,196,0,0.7);
-      box-shadow: 0 0 8px rgba(168,196,0,0.18);
+      background: rgba(168,196,0,0.08);
+      box-shadow: 0 0 10px rgba(168,196,0,0.18);
+    }
+
+    /* ── Mission Control: Responsive ─────────────────────────────────────── */
+    @media (max-width: 400px) {
+      .mc-tiles { grid-template-columns: 1fr; }
+      .mc-header { flex-direction: column; }
+      .mc-seat-badge { align-items: flex-start; }
     }
     /* ── Smooth state transitions ─────────────────────────────────────────── */
     /* All direct children of .container (except overlays) slide+fade on state change */
@@ -810,19 +1054,189 @@
       </div>
     </div>
 
-    <!-- ── Mission Control Dashboard (state: dashboard) ─────────────────── -->
+    <!-- ── Mission Control Dashboard (state: dashboard) ───────────────── -->
     <div id="dashboard-view">
-      <div id="welcome-aboard-banner">🎉 Welcome Aboard — your seat is confirmed. Check your inbox for your boarding pass.</div>
-      <h2>✦ Mission Control</h2>
-      <div id="dashboard-seat-id"></div>
-      <p style="font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:0.5rem;">Your seat is reserved. Use the links below to continue your journey.</p>
-      <div class="dashboard-links">
-        <a href="/Studio" target="_blank" rel="noopener noreferrer">📄 Studio — Resume Builder</a>
-        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">📡 Signal — Newsletter</a>
-        <a href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">⚙️ Systems — Boarding</a>
-        <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">📚 Resources</a>
+
+      <!-- Welcome Aboard banner (shown once on ?status=boarded) -->
+      <div id="welcome-aboard-banner">
+        🎉 Welcome Aboard — your seat is confirmed. Check your inbox for your boarding pass.
       </div>
-    </div>
+
+      <!-- ── Header row: title + seat badge ───────────────────────────────────── -->
+      <div class="mc-header">
+        <div>
+          <h2 class="mc-title">❖ Mission Control</h2>
+          <p class="mc-subtitle">Your career optimization platform is active.</p>
+        </div>
+        <div class="mc-seat-badge">
+          <span class="mc-seat-label">SEAT</span>
+          <span id="dashboard-seat-id" class="mc-seat-id">—</span>
+        </div>
+      </div>
+
+      <!-- ── Section 1: 8-Step Boarding Sequence ──────────────────────────── -->
+      <div class="mc-section">
+        <h3 class="mc-section-title">📍 Boarding Sequence</h3>
+        <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
+        <ol class="boarding-steps">
+          <li class="boarding-step" id="bstep-1">
+            <span class="bstep-num">01</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Subscribe to Signal</span>
+              <span class="bstep-desc">Your mission brief arrives via newsletter. Issue #001 is your first brief.</span>
+            </div>
+            <span class="bstep-status" data-step="1">✔</span>
+          </li>
+          <li class="boarding-step" id="bstep-2">
+            <span class="bstep-num">02</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Complete Your Profile</span>
+              <span class="bstep-desc">Set your headline, target titles, and location in your passenger record.</span>
+            </div>
+            <span class="bstep-status" data-step="2">○</span>
+          </li>
+          <li class="boarding-step" id="bstep-3">
+            <span class="bstep-num">03</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Link Your Resume to Studio</span>
+              <span class="bstep-desc">Upload or build your one-page resume in the AI Resume Builder.</span>
+            </div>
+            <span class="bstep-status" data-step="3">○</span>
+          </li>
+          <li class="boarding-step" id="bstep-4">
+            <span class="bstep-num">04</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Optimize LinkedIn</span>
+              <span class="bstep-desc">Headline, About, and Skills aligned with your target titles.</span>
+            </div>
+            <span class="bstep-status" data-step="4">○</span>
+          </li>
+          <li class="boarding-step" id="bstep-5">
+            <span class="bstep-num">05</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Book a Consultation</span>
+              <span class="bstep-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
+            </div>
+            <span class="bstep-status" data-step="5">○</span>
+          </li>
+          <li class="boarding-step" id="bstep-6">
+            <span class="bstep-num">06</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Add 5 Target Companies</span>
+              <span class="bstep-desc">Research and log your first five target companies in The Build.</span>
+            </div>
+            <span class="bstep-status" data-step="6">○</span>
+          </li>
+          <li class="boarding-step" id="bstep-7">
+            <span class="bstep-num">07</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Submit 3 Applications</span>
+              <span class="bstep-desc">Apply to three roles. Log each one in The Build pipeline.</span>
+            </div>
+            <span class="bstep-status" data-step="7">○</span>
+          </li>
+          <li class="boarding-step" id="bstep-8">
+            <span class="bstep-num">08</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Set Follow-Up Reminders</span>
+              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission.</span>
+            </div>
+            <span class="bstep-status" data-step="8">○</span>
+          </li>
+        </ol>
+      </div>
+
+      <!-- ── Section 2: Ecosystem Tiles ─────────────────────────────────────── -->
+      <div class="mc-section">
+        <h3 class="mc-section-title">📡 Your Paths</h3>
+        <div class="mc-tiles">
+
+          <a class="mc-tile" href="/Studio" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">📄</span>
+            <span class="mc-tile-name">Studio</span>
+            <span class="mc-tile-desc">AI Resume Builder — ATS-optimized, one-page, PDF export</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+          <a class="mc-tile" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">📡</span>
+            <span class="mc-tile-name">Signal</span>
+            <span class="mc-tile-desc">Weekly mission briefs — strategy, tools, and field intelligence</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+          <a class="mc-tile" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">⚙️</span>
+            <span class="mc-tile-name">Systems</span>
+            <span class="mc-tile-desc">Onboarding passport, boarding documents, and job tracker</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+          <a class="mc-tile" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">📚</span>
+            <span class="mc-tile-name">Resources</span>
+            <span class="mc-tile-desc">Career resource library — subscriber access only</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- ── Section 3: The Build — Application Pipeline ──────────────────────── -->
+      <div class="mc-section">
+        <div class="mc-section-header">
+          <h3 class="mc-section-title">🛠 The Build — Application Pipeline</h3>
+          <a class="mc-section-link" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">Open in Systems →</a>
+        </div>
+        <p class="mc-section-desc">Track every role. Update status as you move through each stage. Full tracker lives in Systems (.tech).</p>
+        <div class="build-table-wrap">
+          <table class="build-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Applied</th>
+                <th>Follow-Up</th>
+              </tr>
+            </thead>
+            <tbody id="build-pipeline-body">
+              <tr class="build-row build-row--empty">
+                <td colspan="6">
+                  <span class="build-empty-msg">🔵 No applications logged yet — add your first target company to get started.</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="build-status-key">
+          <span class="build-key-item"><span class="build-dot" style="background:#4A90D9"></span>Researching</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#F5A623"></span>Applied</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#F8A100"></span>In Review</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#A8C400"></span>Interview</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#7ED321"></span>Offer</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#ff4444"></span>Closed</span>
+        </div>
+      </div>
+
+      <!-- ── Section 4: Quick Actions ───────────────────────────────────────── -->
+      <div class="mc-section mc-section--actions">
+        <h3 class="mc-section-title">⚡ Quick Actions</h3>
+        <div class="mc-actions">
+          <a class="mc-action-btn" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer">
+            📅 Book a Consultation
+          </a>
+          <a class="mc-action-btn" href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer">
+            ☕ Support the Journey
+          </a>
+          <a class="mc-action-btn" href="https://www.linkedin.com/in/kclark27" target="_blank" rel="noopener noreferrer">
+            🔗 LinkedIn
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /#dashboard-view -->v>
 
     <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
     <div class="status-section" id="loading-dock">
