@@ -180,6 +180,7 @@ exports.handler = async function (event, context) {
   const fromEmail   = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
   const platformUrl = process.env.PLATFORM_URL        || 'https://www.thispagedoesnotexist12345.com';
   const signalUrl   = process.env.SIGNAL_URL          || 'https://newsletter.thispagedoesnotexist12345.us';
+  const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.tech';
   const beehiivKey  = process.env.BEEHIIV_API_KEY;
   const beehiivPub  = process.env.BEEHIIV_PUB_ID || BEEHIIV_PUB_ID_DEFAULT;
 
@@ -194,6 +195,11 @@ exports.handler = async function (event, context) {
   const seatId = generateSeatId();
   console.log(`[seat-request] Generated seat_id ${seatId} for ${emailTrimmed}`);
 
+  // --- Build passport URL with seat_id pre-filled (Gate Contract §4 — email handoff) ---
+  // seat_id chars are URL-safe (A-Z, 2-9, hyphen) — no additional encoding needed,
+  // but encodeURIComponent is used defensively in case the format ever changes.
+  const passportUrl = `${passportBase}?seat_id=${encodeURIComponent(seatId)}`;
+
   // --- Send user acknowledgement via SendGrid ---
   const dynamicTemplateData = {
     subject:      SUBJECT,
@@ -204,6 +210,7 @@ exports.handler = async function (event, context) {
     source:       (source && typeof source === 'string' ? source.trim() : 'Website'),
     platform_url: platformUrl,
     signal_url:   signalUrl,
+    passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.tech?seat_id=TUJ-XXXXXX
     request_date: requestDate
   };
 

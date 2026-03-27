@@ -2187,6 +2187,24 @@
             if (d.ok && d.seat_id) {
               sessionStorage.setItem(SEAT_KEY, d.seat_id);
               form.style.display = 'none';
+              // ── Gate Contract: auto-mark Step 1 (Signal subscription) done ──
+              // beehiiv subscribe already fired server-side; mark locally so
+              // OnboardingPassport shows Step 1 as done on first .tech load.
+              try {
+                if (window.__TUJPassport && typeof window.__TUJPassport.saveStepFlag === 'function') {
+                  window.__TUJPassport.saveStepFlag(d.seat_id, 'signal', true);
+                  console.log('[TUJ] Step 1 (signal) marked done for', d.seat_id);
+                } else {
+                  // __TUJPassport is not loaded on .com — this is expected.
+                  // Write the flag directly using the same key contract so
+                  // .tech picks it up when the passenger navigates there.
+                  var _pKey = 'tuj:' + d.seat_id + ':boarding:step:signal';
+                  localStorage.setItem(_pKey, '1');
+                  console.log('[TUJ] Step 1 (signal) flag written directly:', _pKey);
+                }
+              } catch (flagErr) {
+                console.error('[TUJ] Failed to mark Step 1 done — seat_id:', d.seat_id, 'stepKey: signal', flagErr);
+              }
               // Redirect to dashboard state with Welcome Aboard banner
               var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
               history.replaceState({}, '', newUrl);
