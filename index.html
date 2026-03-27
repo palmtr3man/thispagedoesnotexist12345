@@ -430,8 +430,9 @@
     .age-gate-deny:hover { color: rgba(255,255,255,0.6); }
 
     /* ── Dashboard view (state: dashboard) ───────────────────────────────── */
+    /* Note: display, opacity, transform, filter, pointer-events are all owned    */
+    /* by the smooth-transition block above. Only layout/visual props here.       */
     #dashboard-view {
-      display: none;
       text-align: left;
       padding: 1.5rem;
       border: 1px solid rgba(168, 196, 0, 0.25);
@@ -471,6 +472,43 @@
       border-color: rgba(168,196,0,0.7);
       box-shadow: 0 0 8px rgba(168,196,0,0.18);
     }
+    /* ── Smooth state transitions ─────────────────────────────────────────── */
+    /* All direct children of .container (except overlays) slide+fade on state change */
+    .container > :not(#age-gate-overlay):not(#dashboard-view) {
+      will-change: transform, opacity, filter;
+      transition: opacity 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms ease;
+    }
+
+    /* Dashboard starts invisible and shifted down — CSS drives the animation */
+    #dashboard-view {
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(4px);
+      pointer-events: none;
+      transition: opacity 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms ease;
+    }
+
+    /* In dashboard state: landing content slides up + fades out */
+    body[data-state='dashboard'] .container > :not(#age-gate-overlay):not(#dashboard-view) {
+      opacity: 0;
+      transform: translateY(-18px);
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    /* In dashboard state: dashboard view slides in + fades in */
+    body[data-state='dashboard'] #dashboard-view {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      pointer-events: auto;
+    }
+
+    /* Suppress transitions during the loading flash to avoid jank */
+    body[data-state='loading'] .container > * {
+      transition: none !important;
+    }
+
     /* Welcome Aboard banner (shown once on ?status=boarded) */
     #welcome-aboard-banner {
       display: none;
@@ -1506,19 +1544,32 @@
         return 'landing';
       }
 
+      // ── Smooth state transition helper ────────────────────────────────────
+      // Sets body[data-state] inside a rAF so the browser has a chance to
+      // paint the intermediate state before CSS transitions fire.
+      // The 520ms timeout matches the longest transition duration.
+      function transitionToState(nextState) {
+        document.body.classList.add('state-transitioning');
+        requestAnimationFrame(function () {
+          document.body.setAttribute('data-state', nextState);
+        });
+        setTimeout(function () {
+          document.body.classList.remove('state-transitioning');
+        }, 520);
+      }
+
       // ── Apply state to DOM ────────────────────────────────────────────────
       function applyState(state, status, seatId) {
-        document.body.setAttribute('data-state', state);
         _state = state;
 
-        // ── Dashboard view ──────────────────────────────────────────────
-        var dashView  = document.getElementById('dashboard-view');
-        var seatIdEl  = document.getElementById('dashboard-seat-id');
-        var waBanner  = document.getElementById('welcome-aboard-banner');
+        // ── Dashboard content prep (before transition fires) ──────────────
+        // Populate text content while still in loading state so the
+        // dashboard view is ready before CSS makes it visible.
+        var seatIdEl = document.getElementById('dashboard-seat-id');
+        var waBanner = document.getElementById('welcome-aboard-banner');
 
         if (state === 'dashboard') {
-          if (dashView)  dashView.style.display  = 'block';
-          if (seatIdEl)  seatIdEl.textContent    = 'Seat: ' + (seatId || '');
+          if (seatIdEl) seatIdEl.textContent = 'Seat: ' + (seatId || '');
           // Welcome Aboard banner: show once if ?status=boarded in URL
           if (waBanner) {
             var params = new URLSearchParams(location.search);
@@ -1528,14 +1579,18 @@
             }
           }
         } else {
-          if (dashView) dashView.style.display = 'none';
+          // Reset welcome banner when leaving dashboard state
+          if (waBanner) waBanner.style.display = 'none';
         }
 
         // ── Hand off to window.__applySeatGate() for all badge/CTA logic ──────
-        // Pass the already-fetched status to avoid a second fetch.
+        // Fire before the transition so badge text is correct when it fades in.
         if (typeof window.__applySeatGate === 'function') {
           window.__applySeatGate(status || null);
         }
+
+        // ── Animate the state change ───────────────────────────────────────
+        transitionToState(state);
 
         console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
       }
