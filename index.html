@@ -509,6 +509,37 @@
       transition: none !important;
     }
 
+    /* ── Age confirmation checkbox row ─────────────────────────────────────── */
+    .age-check {
+      width: 100%;
+      padding: 0.85rem 0.9rem;
+      border: 1px solid rgba(168, 196, 0, 0.35);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .age-check:has(input:checked) {
+      border-color: rgba(168, 196, 0, 0.7);
+    }
+    .age-check input[type='checkbox'] {
+      margin-top: 0.15rem;
+      flex-shrink: 0;
+      accent-color: #A8C400;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .age-check span {
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
     /* Welcome Aboard banner (shown once on ?status=boarded) */
     #welcome-aboard-banner {
       display: none;
@@ -950,6 +981,13 @@
             onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
           />
           <span id="seat-form-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1em;"></span>
+
+          <!-- Age confirmation checkbox -->
+          <label class="age-check" for="age-confirmed">
+            <input id="age-confirmed" name="age_confirmed" type="checkbox" required />
+            <span>I confirm that I am 21 years of age or older.</span>
+          </label>
+
           <div style="display:flex;gap:0.5rem;width:100%;">
             <button
               type="button"
@@ -964,6 +1002,7 @@
               type="submit"
               class="btn-waitlist unlocked"
               style="flex:1;padding:0.6rem 1rem;"
+              disabled
             >✈️ Submit Request</button>
           </div>
         </form>
@@ -1679,20 +1718,35 @@
         var form = document.getElementById('seat-request-form');
         if (!form) return;
 
-        // Replace inline onsubmit with a version that passes age_confirmed
-        // and handles the seat_id response.
+        var subBtn       = document.getElementById('seat-submit-btn');
+        var ageCheckbox  = document.getElementById('age-confirmed');
+
+        // ── Enable / disable submit based on checkbox state ────────────────
+        if (ageCheckbox && subBtn) {
+          ageCheckbox.addEventListener('change', function () {
+            subBtn.disabled = !ageCheckbox.checked;
+          });
+        }
+
+        // Replace inline onsubmit with a version that reads age_confirmed
+        // from the checkbox and handles the seat_id response.
         form.removeAttribute('onsubmit');
         form.addEventListener('submit', function (e) {
           e.preventDefault();
-          var nameVal  = form.querySelector('input[name=name]').value.trim();
-          var emailVal = form.querySelector('input[name=email]').value.trim();
-          var errEl    = document.getElementById('seat-form-error');
-          var subBtn   = document.getElementById('seat-submit-btn');
+          var nameVal      = form.querySelector('input[name=name]').value.trim();
+          var emailVal     = form.querySelector('input[name=email]').value.trim();
+          var ageConfirmed = ageCheckbox ? ageCheckbox.checked : false;
+          var errEl        = document.getElementById('seat-form-error');
           errEl.textContent = '';
-          if (!nameVal)  { errEl.textContent = 'Name is required.';  return; }
-          if (!emailVal) { errEl.textContent = 'Email is required.'; return; }
+          if (!nameVal)      { errEl.textContent = 'Name is required.';  return; }
+          if (!emailVal)     { errEl.textContent = 'Email is required.'; return; }
+          if (!ageConfirmed) { errEl.textContent = 'Please confirm your age to continue.'; return; }
           subBtn.disabled    = true;
           subBtn.textContent = '⏳ Submitting…';
+
+          // Also store age verification in localStorage now that they've
+          // explicitly checked the box — dismisses the overlay gate too.
+          localStorage.setItem(AGE_KEY, '1');
 
           fetch('/api/seat-request', {
             method:  'POST',
@@ -1700,7 +1754,7 @@
             body:    JSON.stringify({
               name:          nameVal,
               email:         emailVal,
-              age_confirmed: true,   // age gate already passed
+              age_confirmed: true,   // checkbox verified above
               source:        'landing'
             })
           })
