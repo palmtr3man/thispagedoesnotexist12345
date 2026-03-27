@@ -433,6 +433,7 @@
     /* Note: display, opacity, transform, filter, pointer-events are all owned    */
     /* by the smooth-transition block above. Only layout/visual props here.       */
     #dashboard-view {
+      display: none;
       text-align: left;
       padding: 1.5rem;
       border: 1px solid rgba(168, 196, 0, 0.25);
@@ -742,6 +743,7 @@
 
     /* In dashboard state: dashboard view slides in + fades in */
     body[data-state='dashboard'] #dashboard-view {
+      display: block;
       opacity: 1;
       transform: translateY(0);
       filter: blur(0);
@@ -1236,7 +1238,7 @@
         </div>
       </div>
 
-    </div><!-- /#dashboard-view -->v>
+    </div><!-- /#dashboard-view -->
 
     <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
     <div class="status-section" id="loading-dock">
@@ -1738,7 +1740,7 @@
           }
         }
 
-        // ── 1. Flight label badge (#flight-number) ────────────────────────
+        // ── 1. Flight label badge (#flight-number) ───────────────────────��
         // Driven by Admin → NextFlightConfig → next_flight_number
         if (flightEl) {
           var label = status.flight_label && status.flight_label.trim()
@@ -2011,8 +2013,15 @@
         }, 520);
       }
 
+      function setDashboardDisplay(visible) {
+        var dashboardView = document.getElementById('dashboard-view');
+        if (!dashboardView) return;
+        dashboardView.style.display = visible ? 'block' : 'none';
+      }
+
       // ── Apply state to DOM ────────────────────────────────────────────────
       function applyState(state, status, seatId) {
+        var previousState = _state;
         _state = state;
 
         // ── Dashboard content prep (before transition fires) ──────────────
@@ -2020,6 +2029,15 @@
         // dashboard view is ready before CSS makes it visible.
         var seatIdEl = document.getElementById('dashboard-seat-id');
         var waBanner = document.getElementById('welcome-aboard-banner');
+        var dashboardView = document.getElementById('dashboard-view');
+
+        if (dashboardView) {
+          if (state === 'dashboard') {
+            setDashboardDisplay(true);
+          } else if (previousState !== 'dashboard') {
+            setDashboardDisplay(false);
+          }
+        }
 
         if (state === 'dashboard') {
           if (seatIdEl) seatIdEl.textContent = seatId || '';
@@ -2055,10 +2073,18 @@
         // ── Animate the state change ───────────────────────────────────────
         transitionToState(state);
 
+        if (dashboardView && state !== 'dashboard' && previousState === 'dashboard') {
+          setTimeout(function () {
+            if (_state !== 'dashboard' && document.body.getAttribute('data-state') === state) {
+              setDashboardDisplay(false);
+            }
+          }, 540);
+        }
+
         console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
       }
 
-      // ── Public: rerender() ────────────────────────────────────────────────
+      // ── Public: rerender() ────���───────────────────────────────────────────
       async function rerender() {
         document.body.setAttribute('data-state', 'loading');
         _status = await fetchStatus();
