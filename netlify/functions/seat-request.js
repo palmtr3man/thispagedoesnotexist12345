@@ -9,8 +9,9 @@
  *   5. Base44 write remains a graceful stub (wires in when credits return)
  *
  * Required Netlify env vars:
- *   SENDGRID_API_KEY         — SendGrid API key
- *   SENDGRID_FROM_EMAIL      — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   SENDGRID_API_KEY              — SendGrid API key
+ *   SENDGRID_FROM_EMAIL         — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   SENDGRID_TEMPLATE_SEAT_REQUEST — seat_request_acknowledgement_v1 template ID (default: d-740595dc07be40129569bc731f1bc454)
  *   PLATFORM_URL             — Platform URL injected into email (default: https://www.thispagedoesnotexist12345.com)
  *   SIGNAL_URL               — Signal newsletter URL injected into email
  *   BASE44_SEAT_REQUEST_URL  — Base44 endpoint for seat-request writes (optional; skipped if unset)
@@ -31,7 +32,7 @@
 
 // --- SendGrid template IDs ---
 const FIXED_SENDGRID_TEMPLATE_ID = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
-const TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_ID || FIXED_SENDGRID_TEMPLATE_ID;
+const TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_SEAT_REQUEST || process.env.SENDGRID_TEMPLATE_ID || FIXED_SENDGRID_TEMPLATE_ID;
 const INTERNAL_TEMPLATE_ID = 'd-073dc68a683348f18133d78c9879ced8'; // internalsignupnotification_v1
 const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
 const ASM_GROUP_ID = 33047; // "The Ultimate Journey — Transactional" unsubscribe group
