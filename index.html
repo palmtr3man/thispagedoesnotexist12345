@@ -757,7 +757,8 @@
     }
 
     /* Suppress transitions during the loading flash to avoid jank */
-    body[data-state='loading'] .container > * {
+    /* Exclude .carousel-wrap and .carousel-track so slide animation is never killed */
+    body[data-state='loading'] .container > :not(.carousel-wrap) {
       transition: none !important;
     }
 
@@ -1538,59 +1539,73 @@
     </footer>
   </div>
 
-  <script>
-    // Carousel logic
+    <script>
+    // Carousel logic — init is deferred until after the TUJ state machine's
+    // initial rerender() settles, so the loading-state transition-none rule
+    // never suppresses the slide animation on first paint.
     (function() {
-      const track = document.getElementById('carouselTrack');
-      const dots = document.querySelectorAll('.carousel-dot');
-      const carousel = document.getElementById('mainCarousel');
-      let current = 0;
-      const total = 4;
-      let autoTimer;
-      let touchStartX = 0;
-      let touchDeltaX = 0;
-      let isDragging = false;
-
-      function goTo(index) {
-        current = (index + total) % total;
-        track.style.transform = 'translateX(-' + (current * 100) + '%)';
-        dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
-      }
-
-      function startAuto() {
-        clearInterval(autoTimer);
-        autoTimer = setInterval(function() { goTo(current + 1); }, 4000);
-      }
-
-      dots.forEach(function(dot) {
-        dot.addEventListener('click', function() {
-          goTo(parseInt(dot.dataset.index));
+      function initCarousel() {
+        const track = document.getElementById('carouselTrack');
+        const dots = document.querySelectorAll('.carousel-dot');
+        const carousel = document.getElementById('mainCarousel');
+        if (!track || !carousel) return;
+        let current = 0;
+        const total = track.children.length || 4;
+        let autoTimer;
+        let touchStartX = 0;
+        let touchDeltaX = 0;
+        let isDragging = false;
+        function goTo(index) {
+          current = (index + total) % total;
+          track.style.transform = 'translateX(-' + (current * 100) + '%)';
+          dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+        }
+        function startAuto() {
+          clearInterval(autoTimer);
+          autoTimer = setInterval(function() { goTo(current + 1); }, 4000);
+        }
+        dots.forEach(function(dot) {
+          dot.addEventListener('click', function() {
+            goTo(parseInt(dot.dataset.index));
+            startAuto();
+          });
+        });
+        carousel.addEventListener('touchstart', function(e) {
+          touchStartX = e.touches[0].clientX;
+          isDragging = true;
+          clearInterval(autoTimer);
+        }, { passive: true });
+        carousel.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          touchDeltaX = e.touches[0].clientX - touchStartX;
+        }, { passive: true });
+        carousel.addEventListener('touchend', function() {
+          if (Math.abs(touchDeltaX) > 40) {
+            goTo(touchDeltaX < 0 ? current + 1 : current - 1);
+          }
+          touchDeltaX = 0;
+          isDragging = false;
           startAuto();
         });
-      });
-
-      carousel.addEventListener('touchstart', function(e) {
-        touchStartX = e.touches[0].clientX;
-        isDragging = true;
-        clearInterval(autoTimer);
-      }, { passive: true });
-
-      carousel.addEventListener('touchmove', function(e) {
-        if (!isDragging) return;
-        touchDeltaX = e.touches[0].clientX - touchStartX;
-      }, { passive: true });
-
-      carousel.addEventListener('touchend', function() {
-        if (Math.abs(touchDeltaX) > 40) {
-          goTo(touchDeltaX < 0 ? current + 1 : current - 1);
-        }
-        touchDeltaX = 0;
-        isDragging = false;
+        goTo(0);
         startAuto();
-      });
-
-      goTo(0);
-      startAuto();
+      }
+      // Wait for the TUJ state machine to complete its first rerender
+      // (typically 300-800ms for the /api/seat-status fetch) before starting
+      // the carousel, so the loading-state CSS never kills the slide transition.
+      // Falls back to 900ms if the state machine hasn't fired yet.
+      function waitForState() {
+        if (window.__TUJ && window.__TUJ.state && window.__TUJ.state !== 'loading') {
+          initCarousel();
+        } else {
+          setTimeout(initCarousel, 900);
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', waitForState);
+      } else {
+        waitForState();
+      }
     })();
 
     // Puzzle tracker + Waitlist unlock
