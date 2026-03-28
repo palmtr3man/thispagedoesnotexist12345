@@ -30,6 +30,18 @@
  * Gate Contract v2 — seat_id bridge + beehiiv auto-subscribe
  */
 
+const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'seat-request';
+const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
+
+/**
+ * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
+ * Never logs request body, personalizations, or API key.
+ */
+function sgLog(fields) {
+  if (process.env.SENDGRID_DEBUG !== 'true') return;
+  console.log(JSON.stringify({ event: 'tuj_sendgrid_send', function: FUNCTION_NAME, stage: STAGE, ...fields }));
+}
+
 // --- SendGrid template IDs ---
 const FIXED_SENDGRID_TEMPLATE_ID = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
 const TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_SEAT_REQUEST || process.env.SENDGRID_TEMPLATE_ID || FIXED_SENDGRID_TEMPLATE_ID;
@@ -275,7 +287,11 @@ exports.handler = async function (event, context) {
     request_date: requestDate
   };
 
+  // correlation_id: no flight_id or passenger_id at this stage — use seat_id as request anchor
+  const correlationId = `req_${seatId}`;
+
   try {
+    const t0_ack = Date.now();
     const sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
@@ -294,11 +310,14 @@ exports.handler = async function (event, context) {
       })
     });
 
-    if (sgResponse.ok || sgResponse.status === 202) {
+    const ackStatus = sgResponse.status;
+    const ackOk = sgResponse.ok || ackStatus === 202;
+    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'seat_request_acknowledgement_v1', sendgrid_template_id: TEMPLATE_ID, status: ackStatus, elapsed_ms: Date.now() - t0_ack, ok: ackOk, attempt: 1 });
+    if (ackOk) {
       console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed} with seat_id ${seatId}`);
     } else {
       const errorText = await sgResponse.text();
-      console.error(`[seat-request] SendGrid error ${sgResponse.status}: ${errorText}`);
+      console.error(`[seat-request] SendGrid error ${ackStatus}: ${errorText}`);
       return {
         statusCode: 502,
         headers,
@@ -310,6 +329,7 @@ exports.handler = async function (event, context) {
       };
     }
   } catch (err) {
+    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'seat_request_acknowledgement_v1', sendgrid_template_id: TEMPLATE_ID, ok: false, elapsed_ms: 0, error_name: err?.name, error_message: err?.message, status: err?.code || err?.response?.statusCode });
     console.error('[seat-request] Unexpected error during SendGrid call:', err);
     return {
       statusCode: 500,
@@ -373,6 +393,7 @@ exports.handler = async function (event, context) {
 
   // --- Send internal signup notification via SendGrid ---
   try {
+    const t0_int = Date.now();
     const internalSgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
@@ -389,15 +410,19 @@ exports.handler = async function (event, context) {
       })
     });
 
-    if (internalSgResponse.ok || internalSgResponse.status === 202) {
+    const intStatus = internalSgResponse.status;
+    const intOk = internalSgResponse.ok || intStatus === 202;
+    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'internalsignupnotification_v1', sendgrid_template_id: INTERNAL_TEMPLATE_ID, status: intStatus, elapsed_ms: Date.now() - t0_int, ok: intOk, attempt: 1 });
+    if (intOk) {
       console.log(`[seat-request] Internal notification sent to ${INTERNAL_NOTIFY_EMAIL} for ${emailTrimmed}`);
     } else {
       const errorText = await internalSgResponse.text();
       // Log but do not fail — user ack already succeeded
-      console.error(`[seat-request] Internal notification SendGrid error ${internalSgResponse.status}:`, errorText);
+      console.error(`[seat-request] Internal notification SendGrid error ${intStatus}:`, errorText);
     }
   } catch (err) {
     // Log but do not fail
+    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'internalsignupnotification_v1', sendgrid_template_id: INTERNAL_TEMPLATE_ID, ok: false, elapsed_ms: 0, error_name: err?.name, error_message: err?.message, status: err?.code || err?.response?.statusCode });
     console.error('[seat-request] Unexpected error during internal notification SendGrid call:', err);
   }
 

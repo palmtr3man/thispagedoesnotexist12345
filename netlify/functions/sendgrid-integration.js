@@ -13,6 +13,12 @@
  *
  * All sends BCC support@thispagedoesnotexist12345.com per universal BCC rule.
  *
+ * Required env vars:
+ *   SENDGRID_API_KEY    — SendGrid API key
+ *   SENDGRID_FROM_EMAIL — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   BASE44_SEAT_URL     — Base44 Seat record read/update endpoint
+ *   SENDGRID_DEBUG      — Set to "true" to emit structured JSON observability logs
+ *
  * Spec references:
  *   - TUJ Alpha Launch Operational Spec (FL 032126) — Section 2.1
  *   - Manus Handoff — boarding_confirmation_sent_at Stamp (Mar 23, 2026)
@@ -20,43 +26,107 @@
 
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
+const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'sendgrid-integration';
+const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
 
 // Template IDs — Phase 2 boarding sequence (Section 2.1)
 const TEMPLATE_ALPHA_ANNOUNCEMENT = 'd-a33174bd2e4f4682b5b1546f106fb43c';
 const TEMPLATE_BOARDING_CONFIRMATION = 'd-678824bc506c432dae9eadab36c07904';
 
+// Template key map for readable log labels
+const TEMPLATE_KEYS = {
+  [TEMPLATE_ALPHA_ANNOUNCEMENT]:   'alphaflightannouncement_v1',
+  [TEMPLATE_BOARDING_CONFIRMATION]: 'boarding_confirmation_v1'
+};
+
+/**
+ * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
+ * Never logs request body, personalizations, or API key.
+ */
+function sgLog(fields) {
+  if (process.env.SENDGRID_DEBUG !== 'true') return;
+  console.log(JSON.stringify({ event: 'tuj_sendgrid_send', function: FUNCTION_NAME, stage: STAGE, ...fields }));
+}
+
+/**
+ * Build a correlation_id from available identifiers.
+ * Omits any segment that is null/undefined rather than inventing data.
+ */
+function buildCorrelationId({ flightId, passengerId, requestId } = {}) {
+  const parts = [];
+  if (flightId)    parts.push(`fl_${flightId}`);
+  if (passengerId) parts.push(`psg_${passengerId}`);
+  if (requestId)   parts.push(`req_${requestId}`);
+  return parts.length ? parts.join('__') : undefined;
+}
+
 /**
  * Send a single SendGrid dynamic template email.
  * Returns true on 2xx, false otherwise.
+ * Emits a structured log line after each attempt.
  */
-async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData) {
+async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData, logCtx = {}) {
+  const templateKey = TEMPLATE_KEYS[templateId] || templateId;
   const payload = {
     from: { email: fromEmail },
     personalizations: [{
-      to: [{ email: toEmail }],
+      to:  [{ email: toEmail }],
       bcc: [{ email: BCC_EMAIL }],
       dynamic_template_data: dynamicData
     }],
     template_id: templateId
   };
 
-  const response = await fetch(SENDGRID_API_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
+  const t0 = Date.now();
+  let sgStatus;
+  try {
+    const response = await fetch(SENDGRID_API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
 
-  if (response.ok || response.status === 202) {
-    console.log(`[sendgrid-integration] Template ${templateId} sent to ${toEmail} — status ${response.status}`);
-    return true;
+    sgStatus = response.status;
+    const ok = response.ok || response.status === 202;
+    const elapsed_ms = Date.now() - t0;
+
+    sgLog({
+      ...logCtx,
+      template_key:         templateKey,
+      sendgrid_template_id: templateId,
+      status:               sgStatus,
+      elapsed_ms,
+      ok,
+      attempt:              1
+    });
+
+    if (ok) {
+      console.log(`[sendgrid-integration] Template ${templateKey} sent to ${toEmail} — status ${sgStatus}`);
+      return true;
+    }
+
+    const errorText = await response.text();
+    console.error(`[sendgrid-integration] Template ${templateKey} failed for ${toEmail} — status ${sgStatus}:`, errorText);
+    return false;
+
+  } catch (err) {
+    const elapsed_ms = Date.now() - t0;
+    sgLog({
+      ...logCtx,
+      template_key:         templateKey,
+      sendgrid_template_id: templateId,
+      ok:                   false,
+      elapsed_ms,
+      error_name:           err?.name,
+      error_message:        err?.message,
+      status:               err?.code || err?.response?.statusCode
+    });
+    console.error(`[sendgrid-integration] Template ${templateKey} unexpected error for ${toEmail}:`, err);
+    return false;
   }
-
-  const errorText = await response.text();
-  console.error(`[sendgrid-integration] Template ${templateId} failed for ${toEmail} — status ${response.status}:`, errorText);
-  return false;
 }
 
 /**
@@ -88,14 +158,17 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
  * the stamp if boarding_confirmation_sent_at is already set.
  *
  * @param {object} seat - Seat entity record from Base44
- * @param {string} seat.id - Seat record ID
- * @param {string} seat.user_email - Passenger email
- * @param {string} seat.first_name - Passenger first name
- * @param {string} seat.last_name - Passenger last name
- * @param {string|null} seat.boarding_confirmation_sent_at - Existing timestamp (idempotency check)
+ * @param {string} seat.id                          - Seat record ID
+ * @param {string} seat.user_email                  - Passenger email
+ * @param {string} seat.first_name                  - Passenger first name
+ * @param {string} seat.last_name                   - Passenger last name
+ * @param {string} [seat.flight_id]                 - Flight ID (for correlation)
+ * @param {string} [seat.passenger_id]              - Passenger ID (for correlation)
+ * @param {string} [seat.request_id]                - Request ID (for correlation)
+ * @param {string|null} seat.boarding_confirmation_sent_at - Idempotency check
  */
 async function sendSeatConfirmation(seat) {
-  const apiKey = process.env.SENDGRID_API_KEY;
+  const apiKey    = process.env.SENDGRID_API_KEY;
   const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
   const base44SeatUrl = process.env.BASE44_SEAT_URL;
 
@@ -104,7 +177,16 @@ async function sendSeatConfirmation(seat) {
     return { success: false, error: 'SENDGRID_API_KEY not configured' };
   }
 
-  const { id: seatId, user_email, first_name, last_name, boarding_confirmation_sent_at } = seat;
+  const {
+    id: seatId,
+    user_email,
+    first_name,
+    last_name,
+    flight_id,
+    passenger_id,
+    request_id,
+    boarding_confirmation_sent_at
+  } = seat;
 
   // Validate required fields
   if (!user_email || !first_name || !last_name) {
@@ -118,20 +200,18 @@ async function sendSeatConfirmation(seat) {
     return { success: true, skipped: true };
   }
 
-  const dynamicData = {
-    first_name,
-    last_name,
-    user_email
+  const correlation_id = buildCorrelationId({ flightId: flight_id, passengerId: passenger_id, requestId: request_id });
+  const logCtx = {
+    correlation_id,
+    flight_id:    flight_id    || undefined,
+    passenger_id: passenger_id || undefined,
+    request_id:   request_id   || undefined
   };
 
+  const dynamicData = { first_name, last_name, user_email };
+
   // ── Send 1: alphaflightannouncement_v1 ─────────────────────────────────────
-  const announcementSent = await sendTemplate(
-    apiKey,
-    fromEmail,
-    user_email,
-    TEMPLATE_ALPHA_ANNOUNCEMENT,
-    dynamicData
-  );
+  const announcementSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_ALPHA_ANNOUNCEMENT, dynamicData, logCtx);
 
   if (!announcementSent) {
     console.error(`[sendgrid-integration] alphaflightannouncement_v1 failed for seat ${seatId} — aborting sequence`);
@@ -139,13 +219,7 @@ async function sendSeatConfirmation(seat) {
   }
 
   // ── Send 2: boarding_confirmation_v1 ───────────────────────────────────────
-  const confirmationSent = await sendTemplate(
-    apiKey,
-    fromEmail,
-    user_email,
-    TEMPLATE_BOARDING_CONFIRMATION,
-    dynamicData
-  );
+  const confirmationSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_BOARDING_CONFIRMATION, dynamicData, logCtx);
 
   if (!confirmationSent) {
     console.error(`[sendgrid-integration] boarding_confirmation_v1 failed for seat ${seatId} — announcement already sent, stamp withheld`);
@@ -172,10 +246,10 @@ async function sendSeatConfirmation(seat) {
  */
 exports.handler = async (event) => {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin':  '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
+    'Content-Type':                 'application/json'
   };
 
   if (event.httpMethod === 'OPTIONS') {
@@ -200,23 +274,16 @@ exports.handler = async (event) => {
   const result = await sendSeatConfirmation(seat);
 
   if (!result.success) {
-    return {
-      statusCode: 502,
-      headers,
-      body: JSON.stringify({ ok: false, error: result.error })
-    };
+    return { statusCode: 502, headers, body: JSON.stringify({ ok: false, error: result.error }) };
   }
 
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify({ ok: true, skipped: result.skipped || false })
-  };
+  return { statusCode: 200, headers, body: JSON.stringify({ ok: true, skipped: result.skipped || false }) };
 };
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
   module.exports.sendSeatConfirmation = sendSeatConfirmation;
-  module.exports.sendTemplate = sendTemplate;
-  module.exports.updateSeatRecord = updateSeatRecord;
+  module.exports.sendTemplate         = sendTemplate;
+  module.exports.updateSeatRecord     = updateSeatRecord;
+  module.exports.buildCorrelationId   = buildCorrelationId;
 }
