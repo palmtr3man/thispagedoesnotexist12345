@@ -734,7 +734,7 @@
     }
 
     /* In dashboard state: landing content slides up + fades out */
-    body[data-state='dashboard'] .container > :not(#age-gate-overlay):not(#dashboard-view) {
+    body[data-state='dashboard'] .container > :not(#age-gate-overlay):not(#dashboard-view):not(.carousel-wrap) {
       opacity: 0;
       transform: translateY(-18px);
       filter: blur(4px);
@@ -1740,7 +1740,7 @@
           }
         }
 
-        // ── 1. Flight label badge (#flight-number) ───────────────────────��
+        // ── 1. Flight label badge (#flight-number) ──────────���────────────��
         // Driven by Admin → NextFlightConfig → next_flight_number
         if (flightEl) {
           var label = status.flight_label && status.flight_label.trim()
