@@ -4,8 +4,8 @@
  *
  * Triggered when a Seat entity is activated (admin approves a SeatRequest).
  * Dispatches the two-email Phase 2 boarding sequence in order:
- *   1. alphaflightannouncement_v1  (d-a33174bd2e4f4682b5b1546f106fb43c)
- *   2. boarding_confirmation_v1    (d-678824bc506c432dae9eadab36c07904)
+ *   1. alphaflightannouncement_v1  (canonical fallback defined in sendgrid-templates.js)
+ *   2. boarding_confirmation_v1    (canonical fallback defined in sendgrid-templates.js)
  *
  * After both sends confirm 2xx, stamps boarding_confirmation_sent_at on the
  * Seat record via the Base44 API. Idempotency guard: will not overwrite if
@@ -24,20 +24,17 @@
  *   - Manus Handoff — boarding_confirmation_sent_at Stamp (Mar 23, 2026)
  */
 
+const { TEMPLATES, assertTemplates, templateKeyForId } = require('./sendgrid-templates');
+
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
 const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'sendgrid-integration';
 const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
 
-// Template IDs — Phase 2 boarding sequence (Section 2.1)
-const TEMPLATE_ALPHA_ANNOUNCEMENT = 'd-a33174bd2e4f4682b5b1546f106fb43c';
-const TEMPLATE_BOARDING_CONFIRMATION = 'd-678824bc506c432dae9eadab36c07904';
-
-// Template key map for readable log labels
-const TEMPLATE_KEYS = {
-  [TEMPLATE_ALPHA_ANNOUNCEMENT]:   'alphaflightannouncement_v1',
-  [TEMPLATE_BOARDING_CONFIRMATION]: 'boarding_confirmation_v1'
-};
+// Template IDs — Phase 2 boarding sequence (sourced from sendgrid-templates.js — do not hardcode d-... here)
+assertTemplates(['alphaflightannouncement_v1', 'boarding_confirmation_v1']);
+const TEMPLATE_ALPHA_ANNOUNCEMENT    = TEMPLATES.alphaflightannouncement_v1;
+const TEMPLATE_BOARDING_CONFIRMATION = TEMPLATES.boarding_confirmation_v1;
 
 /**
  * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
@@ -66,7 +63,7 @@ function buildCorrelationId({ flightId, passengerId, requestId } = {}) {
  * Emits a structured log line after each attempt.
  */
 async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData, logCtx = {}) {
-  const templateKey = TEMPLATE_KEYS[templateId] || templateId;
+  const templateKey = templateKeyForId(templateId);
   const payload = {
     from: { email: fromEmail },
     personalizations: [{

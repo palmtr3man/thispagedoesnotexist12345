@@ -11,7 +11,7 @@
  * Required Netlify env vars:
  *   SENDGRID_API_KEY              — SendGrid API key
  *   SENDGRID_FROM_EMAIL         — Sender address (default: noreply@thispagedoesnotexist12345.com)
- *   SENDGRID_TEMPLATE_SEAT_REQUEST — seat_request_acknowledgement_v1 template ID (default: d-740595dc07be40129569bc731f1bc454)
+ *   SENDGRID_TEMPLATE_SEAT_REQUEST — seat_request_acknowledgement_v1 template ID (canonical fallback defined in sendgrid-templates.js)
  *   PLATFORM_URL             — Platform URL injected into email (default: https://www.thispagedoesnotexist12345.com)
  *   SIGNAL_URL               — Signal newsletter URL injected into email
  *   BASE44_SEAT_REQUEST_URL  — Base44 endpoint for seat-request writes (optional; skipped if unset)
@@ -30,6 +30,8 @@
  * Gate Contract v2 — seat_id bridge + beehiiv auto-subscribe
  */
 
+const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
+
 const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'seat-request';
 const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
 
@@ -42,10 +44,10 @@ function sgLog(fields) {
   console.log(JSON.stringify({ event: 'tuj_sendgrid_send', function: FUNCTION_NAME, stage: STAGE, ...fields }));
 }
 
-// --- SendGrid template IDs ---
-const FIXED_SENDGRID_TEMPLATE_ID = 'd-740595dc07be40129569bc731f1bc454'; // seat_request_acknowledgement_v1
-const TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_SEAT_REQUEST || process.env.SENDGRID_TEMPLATE_ID || FIXED_SENDGRID_TEMPLATE_ID;
-const INTERNAL_TEMPLATE_ID = 'd-073dc68a683348f18133d78c9879ced8'; // internalsignupnotification_v1
+// --- SendGrid template IDs (sourced from sendgrid-templates.js — do not hardcode d-... here) ---
+assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_v1']);
+const TEMPLATE_ID = TEMPLATES.seat_request_acknowledgement_v1;
+const INTERNAL_TEMPLATE_ID = TEMPLATES.internalsignupnotification_v1;
 const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
 const ASM_GROUP_ID = parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10); // "The Ultimate Journey — Transactional" unsubscribe group
 const NOTION_API_VERSION = '2022-06-28';
