@@ -718,10 +718,15 @@
       .mc-seat-badge { align-items: flex-start; }
     }
     /* ── Smooth state transitions ─────────────────────────────────────────── */
-    /* All direct children of .container (except overlays) slide+fade on state change */
-    .container > :not(#age-gate-overlay):not(#dashboard-view) {
+    /* All direct children of .container (except overlays + carousel) slide+fade on state change */
+    .container > :not(#age-gate-overlay):not(#dashboard-view):not(.carousel-wrap) {
       will-change: transform, opacity, filter;
       transition: opacity 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms ease;
+    }
+    /* Carousel-wrap fades with state but never translates — keeps slide math clean */
+    .container > .carousel-wrap {
+      transition: opacity 420ms ease;
+      will-change: opacity;
     }
 
     /* Dashboard starts invisible and shifted down — CSS drives the animation */
