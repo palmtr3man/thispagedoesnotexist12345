@@ -1,1 +1,222 @@
-LyoqCiAqICMxMTYg4oCUIGhhbmRsZVNlYXRPcGVuZWQgLyBzZW5kU2VhdENvbmZpcm1hdGlvbgogKiBOZXRsaWZ5IEZ1bmN0aW9uOiBzZW5kZ3JpZC1pbnRlZ3JhdGlvbgogKgogKiBUcmlnZ2VyZWQgd2hlbiBhIFNlYXQgZW50aXR5IGlzIGFjdGl2YXRlZCAoYWRtaW4gYXBwcm92ZXMgYSBTZWF0UmVxdWVzdCkuCiAqIERpc3BhdGNoZXMgdGhlIHR3by1lbWFpbCBQaGFzZSAyIGJvYXJkaW5nIHNlcXVlbmNlIGluIG9yZGVyOgogKiAgIDEuIGFscGhhZmxpZ2h0YW5ub3VuY2VtZW50X3YxICAoZC1hMzMxNzRiZDJlNGY0NjgyYjViMTU0NmYxMDZmYjQzYykKICogICAyLiBib2FyZGluZ19jb25maXJtYXRpb25fdjEgICAgKGQtNjc4ODI0YmM1MDZjNDMyZGFlOWVhZGFiMzZjMDc5MDQpCiAqCiAqIEFmdGVyIGJvdGggc2VuZHMgY29uZmlybSAyeHgsIHN0YW1wcyBib2FyZGluZ19jb25maXJtYXRpb25fc2VudF9hdCBvbiB0aGUKICogU2VhdCByZWNvcmQgdmlhIHRoZSBCYXNlNDQgQVBJLiBJZGVtcG90ZW5jeSBndWFyZDogd2lsbCBub3Qgb3ZlcndyaXRlIGlmCiAqIHRoZSBmaWVsZCBpcyBhbHJlYWR5IHNldCAoZ3VhcmRzIGFnYWluc3QgcmV0cnkgZG91YmxlLXN0YW1wcykuCiAqCiAqIEFsbCBzZW5kcyBCQ0Mgc3VwcG9ydEB0aGlzcGFnZWRvZXNub3RleGlzdDEyMzQ1LmNvbSBwZXIgdW5pdmVyc2FsIEJDQyBydWxlLgogKgogKiBTcGVjIHJlZmVyZW5jZXM6CiAqICAgLSBUVUogQWxwaGEgTGF1bmNoIE9wZXJhdGlvbmFsIFNwZWMgKEZMIDAzMjEyNikg4oCUIFNlY3Rpb24gMi4xCiAqICAgLSBNYW51cyBIYW5kb2ZmIOKAlCBib2FyZGluZ19jb25maXJtYXRpb25fc2VudF9hdCBTdGFtcCAoTWFyIDIzLCAyMDI2KQogKi8KCmNvbnN0IFNFTkRHUklEX0FQSV9VUkwgPSAnaHR0cHM6Ly9hcGkuc2VuZGdyaWQuY29tL3YzL21haWwvc2VuZCc7CmNvbnN0IEJDQ19FTUFJTCA9ICdzdXBwb3J0QHRoaXNwYWdlZG9lc25vdGV4aXN0MTIzNDUuY29tJzsKCi8vIFRlbXBsYXRlIElEcyDigJQgUGhhc2UgMiBib2FyZGluZyBzZXF1ZW5jZSAoU2VjdGlvbiAyLjEpCmNvbnN0IFRFTVBMQVRFX0FMUEhBX0FOTk9VTkNFTUVOVCA9ICdkLWEzMzE3NGJkMmU0ZjQ2ODJiNWIxNTQ2ZjEwNmZiNDNjJzsKY29uc3QgVEVNUExBVEVfQk9BUkRJTkdfQ09ORklSTUFUSU9OID0gJ2QtNjc4ODI0YmM1MDZjNDMyZGFlOWVhZGFiMzZjMDc5MDQnOwoKLyoqCiAqIFNlbmQgYSBzaW5nbGUgU2VuZEdyaWQgZHluYW1pYyB0ZW1wbGF0ZSBlbWFpbC4KICogUmV0dXJucyB0cnVlIG9uIDJ4eCwgZmFsc2Ugb3RoZXJ3aXNlLgogKi8KYXN5bmMgZnVuY3Rpb24gc2VuZFRlbXBsYXRlKGFwaUtleSwgZnJvbUVtYWlsLCB0b0VtYWlsLCB0ZW1wbGF0ZUlkLCBkeW5hbWljRGF0YSkgewogIGNvbnN0IHBheWxvYWQgPSB7CiAgICBmcm9tOiB7IGVtYWlsOiBmcm9tRW1haWwgfSwKICAgIHBlcnNvbmFsaXphdGlvbnM6IFt7CiAgICAgIHRvOiBbeyBlbWFpbDogdG9FbWFpbCB9XSwKICAgICAgYmNjOiBbeyBlbWFpbDogQkNDX0VNQUlMIH1dLAogICAgICBkeW5hbWljX3RlbXBsYXRlX2RhdGE6IGR5bmFtaWNEYXRhCiAgICB9XSwKICAgIHRlbXBsYXRlX2lkOiB0ZW1wbGF0ZUlkCiAgfTsKCiAgY29uc3QgcmVzcG9uc2UgPSBhd2FpdCBmZXRjaChTRU5ER1JJRF9BUElfVVJMLCB7CiAgICBtZXRob2Q6ICdQT1NUJywKICAgIGhlYWRlcnM6IHsKICAgICAgQXV0aG9yaXphdGlvbjogYEJlYXJlciAke2FwaUtleX1gLAogICAgICAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nCiAgICB9LAogICAgYm9keTogSlNPTi5zdHJpbmdpZnkocGF5bG9hZCkKICB9KTsKCiAgaWYgKHJlc3BvbnNlLm9rIHx8IHJlc3BvbnNlLnN0YXR1cyA9PT0gMjAyKSB7CiAgICBjb25zb2xlLmxvZyhgW3NlbmRncmlkLWludGVncmF0aW9uXSBUZW1wbGF0ZSAke3RlbXBsYXRlSWR9IHNlbnQgdG8gJHt0b0VtYWlsfSDigJQgc3RhdHVzICR7cmVzcG9uc2Uuc3RhdHVzfWApOwogICAgcmV0dXJuIHRydWU7CiAgfQoKICBjb25zdCBlcnJvclRleHQgPSBhd2FpdCByZXNwb25zZS50ZXh0KCk7CiAgY29uc29sZS5lcnJvcihgW3NlbmRncmlkLWludGVncmF0aW9uXSBUZW1wbGF0ZSAke3RlbXBsYXRlSWR9IGZhaWxlZCBmb3IgJHt0b0VtYWlsfSDigJQgc3RhdHVzICR7cmVzcG9uc2Uuc3RhdHVzfTpgLCBlcnJvclRleHQpOwogIHJldHVybiBmYWxzZTsKfQoKLyoqCiAqIFdyaXRlIGEgZmllbGQgdXBkYXRlIGJhY2sgdG8gYSBTZWF0IHJlY29yZCB2aWEgdGhlIEJhc2U0NCBBUEkuCiAqLwphc3luYyBmdW5jdGlvbiB1cGRhdGVTZWF0UmVjb3JkKGJhc2U0NFNlYXRVcmwsIHNlYXRJZCwgZmllbGRzKSB7CiAgY29uc3QgdXJsID0gYCR7YmFzZTQ0U2VhdFVybH0vJHtzZWF0SWR9YDsKICBjb25zdCByZXNwb25zZSA9IGF3YWl0IGZldGNoKHVybCwgewogICAgbWV0aG9kOiAnUEFUQ0gnLAogICAgaGVhZGVyczogeyAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nIH0sCiAgICBib2R5OiBKU09OLnN0cmluZ2lmeShmaWVsZHMpCiAgfSk7CgogIGlmICghcmVzcG9uc2Uub2spIHsKICAgIGNvbnN0IGVycm9yVGV4dCA9IGF3YWl0IHJlc3BvbnNlLnRleHQoKTsKICAgIGNvbnNvbGUuZXJyb3IoYFtzZW5kZ3JpZC1pbnRlZ3JhdGlvbl0gQmFzZTQ0IFNlYXQgdXBkYXRlIGZhaWxlZCBmb3Igc2VhdCAke3NlYXRJZH0g4oCUIHN0YXR1cyAke3Jlc3BvbnNlLnN0YXR1c306YCwgZXJyb3JUZXh0KTsKICAgIHJldHVybiBmYWxzZTsKICB9CgogIGNvbnNvbGUubG9nKGBbc2VuZGdyaWQtaW50ZWdyYXRpb25dIFNlYXQgcmVjb3JkICR7c2VhdElkfSB1cGRhdGVkOmAsIE9iamVjdC5rZXlzKGZpZWxkcykuam9pbignLCAnKSk7CiAgcmV0dXJuIHRydWU7Cn0KCi8qKgogKiBzZW5kU2VhdENvbmZpcm1hdGlvbiDigJQgY29yZSBib2FyZGluZyBzZXF1ZW5jZSBkaXNwYXRjaGVyLgogKgogKiBGaXJlcyBib3RoIFBoYXNlIDIgdGVtcGxhdGVzIGluIG9yZGVyLiBJZiBib3RoIHJldHVybiAyeHgsIHN0YW1wcwogKiBib2FyZGluZ19jb25maXJtYXRpb25fc2VudF9hdCBvbiB0aGUgU2VhdCByZWNvcmQuIElkZW1wb3RlbnQ6IHNraXBzCiAqIHRoZSBzdGFtcCBpZiBib2FyZGluZ19jb25maXJtYXRpb25fc2VudF9hdCBpcyBhbHJlYWR5IHNldC4KICoKICogQHBhcmFtIHtvYmplY3R9IHNlYXQgLSBTZWF0IGVudGl0eSByZWNvcmQgZnJvbSBCYXNlNDQKICogQHBhcmFtIHtzdHJpbmd9IHNlYXQuaWQgLSBTZWF0IHJlY29yZCBJRAogKiBAcGFyYW0ge3N0cmluZ30gc2VhdC51c2VyX2VtYWlsIC0gUGFzc2VuZ2VyIGVtYWlsCiAqIEBwYXJhbSB7c3RyaW5nfSBzZWF0LmZpcnN0X25hbWUgLSBQYXNzZW5nZXIgZmlyc3QgbmFtZQogKiBAcGFyYW0ge3N0cmluZ30gc2VhdC5sYXN0X25hbWUgLSBQYXNzZW5nZXIgbGFzdCBuYW1lCiAqIEBwYXJhbSB7c3RyaW5nfG51bGx9IHNlYXQuYm9hcmRpbmdfY29uZmlybWF0aW9uX3NlbnRfYXQgLSBFeGlzdGluZyB0aW1lc3RhbXAgKGlkZW1wb3RlbmN5IGNoZWNrKQogKi8KYXN5bmMgZnVuY3Rpb24gc2VuZFNlYXRDb25maXJtYXRpb24oc2VhdCkgewogIGNvbnN0IGFwaUtleSA9IHByb2Nlc3MuZW52LlNFTkRHUklEX0FQSV9LRVk7CiAgY29uc3QgZnJvbUVtYWlsID0gcHJvY2Vzcy5lbnYuU0VOREdSSURfRlJPTV9FTUFJTCB8fCAnbm9yZXBseUB0aGlzcGFnZWRvZXNub3RleGlzdDEyMzQ1LmNvbSc7CiAgY29uc3QgYmFzZTQ0U2VhdFVybCA9IHByb2Nlc3MuZW52LkJBU0U0NF9TRUFUX1VSTDsKCiAgaWYgKCFhcGlLZXkpIHsKICAgIGNvbnNvbGUuZXJyb3IoJ1tzZW5kZ3JpZC1pbnRlZ3JhdGlvbl0gU0VOREdSSURfQVBJX0tFWSBpcyBub3Qgc2V0IOKAlCBhYm9ydGluZycpOwogICAgcmV0dXJuIHsgc3VjY2VzczogZmFsc2UsIGVycm9yOiAnU0VOREdSSURfQVBJX0tFWSBub3QgY29uZmlndXJlZCcgfTsKICB9CgogIGNvbnN0IHsgaWQ6IHNlYXRJZCwgdXNlcl9lbWFpbCwgZmlyc3RfbmFtZSwgbGFzdF9uYW1lLCBib2FyZGluZ19jb25maXJtYXRpb25fc2VudF9hdCB9ID0gc2VhdDsKCiAgLy8gVmFsaWRhdGUgcmVxdWlyZWQgZmllbGRzCiAgaWYgKCF1c2VyX2VtYWlsIHx8ICFmaXJzdF9uYW1lIHx8ICFsYXN0X25hbWUpIHsKICAgIGNvbnNvbGUuZXJyb3IoYFtzZW5kZ3JpZC1pbnRlZ3JhdGlvbl0gU2VhdCAke3NlYXRJZH0gbWlzc2luZyByZXF1aXJlZCBmaWVsZHMgKHVzZXJfZW1haWwsIGZpcnN0X25hbWUsIGxhc3RfbmFtZSkg4oCUIGFib3J0aW5nYCk7CiAgICByZXR1cm4geyBzdWNjZXNzOiBmYWxzZSwgZXJyb3I6ICdNaXNzaW5nIHJlcXVpcmVkIHNlYXQgZmllbGRzJyB9OwogIH0KCiAgLy8gSWRlbXBvdGVuY3kgZ3VhcmQg4oCUIGRvIG5vdCByZS1zZW5kIGlmIGFscmVhZHkgc3RhbXBlZAogIGlmIChib2FyZGluZ19jb25maXJtYXRpb25fc2VudF9hdCkgewogICAgY29uc29sZS5sb2coYFtzZW5kZ3JpZC1pbnRlZ3JhdGlvbl0gU2VhdCAke3NlYXRJZH0gYWxyZWFkeSBoYXMgYm9hcmRpbmdfY29uZmlybWF0aW9uX3NlbnRfYXQgKCR7Ym9hcmRpbmdfY29uZmlybWF0aW9uX3NlbnRfYXR9KSDigJQgc2tpcHBpbmcgc2VuZGApOwogICAgcmV0dXJuIHsgc3VjY2VzczogdHJ1ZSwgc2tpcHBlZDogdHJ1ZSB9OwogIH0KCiAgY29uc3QgZHluYW1pY0RhdGEgPSB7CiAgICBmaXJzdF9uYW1lLAogICAgbGFzdF9uYW1lLAogICAgdXNlcl9lbWFpbAogIH07CgogIC8vIOKUgOKUgCBTZW5kIDE6IGFscGhhZmxpZ2h0YW5ub3VuY2VtZW50X3YxIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAogIGNvbnN0IGFubm91bmNlbWVudFNlbnQgPSBhd2FpdCBzZW5kVGVtcGxhdGUoCiAgICBhcGlLZXksCiAgICBmcm9tRW1haWwsCiAgICB1c2VyX2VtYWlsLAogICAgVEVNUExBVEVfQUxQSEFfQU5OT1VOQ0VNRU5ULAogICAgZHluYW1pY0RhdGEKICApOwoKICBpZiAoIWFubm91bmNlbWVudFNlbnQpIHsKICAgIGNvbnNvbGUuZXJyb3IoYFtzZW5kZ3JpZC1pbnRlZ3JhdGlvbl0gYWxwaGFmbGlnaHRhbm5vdW5jZW1lbnRfdjEgZmFpbGVkIGZvciBzZWF0ICR7c2VhdElkfSDigJQgYWJvcnRpbmcgc2VxdWVuY2VgKTsKICAgIHJldHVybiB7IHN1Y2Nlc3M6IGZhbHNlLCBlcnJvcjogJ2FscGhhZmxpZ2h0YW5ub3VuY2VtZW50X3YxIHNlbmQgZmFpbGVkJyB9OwogIH0KCiAgLy8g4pSA4pSAIFNlbmQgMjogYm9hcmRpbmdfY29uZmlybWF0aW9uX3YxIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAogIGNvbnN0IGNvbmZpcm1hdGlvblNlbnQgPSBhd2FpdCBzZW5kVGVtcGxhdGUoCiAgICBhcGlLZXksCiAgICBmcm9tRW1haWwsCiAgICB1c2VyX2VtYWlsLAogICAgVEVNUExBVEVfQk9BUkRJTkdfQ09ORklSTUFUSU9OLAogICAgZHluYW1pY0RhdGEKICApOwoKICBpZiAoIWNvbmZpcm1hdGlvblNlbnQpIHsKICAgIGNvbnNvbGUuZXJyb3IoYFtzZW5kZ3JpZC1pbnRlZ3JhdGlvbl0gYm9hcmRpbmdfY29uZmlybWF0aW9uX3YxIGZhaWxlZCBmb3Igc2VhdCAke3NlYXRJZH0g4oCUIGFubm91bmNlbWVudCBhbHJlYWR5IHNlbnQsIHN0YW1wIHdpdGhoZWxkYCk7CiAgICByZXR1cm4geyBzdWNjZXNzOiBmYWxzZSwgZXJyb3I6ICdib2FyZGluZ19jb25maXJtYXRpb25fdjEgc2VuZCBmYWlsZWQnIH07CiAgfQoKICAvLyDilIDilIAgQm90aCBzZW5kcyBjb25maXJtZWQgMnh4IOKAlCBzdGFtcCBib2FyZGluZ19jb25maXJtYXRpb25fc2VudF9hdCDilIDilIDilIDilIDilIDilIDilIDilIDilIAKICBpZiAoYmFzZTQ0U2VhdFVybCAmJiBzZWF0SWQpIHsKICAgIGF3YWl0IHVwZGF0ZVNlYXRSZWNvcmQoYmFzZTQ0U2VhdFVybCwgc2VhdElkLCB7CiAgICAgIGJvYXJkaW5nX2NvbmZpcm1hdGlvbl9zZW50X2F0OiBuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCkKICAgIH0pOwogIH0gZWxzZSB7CiAgICBjb25zb2xlLndhcm4oJ1tzZW5kZ3JpZC1pbnRlZ3JhdGlvbl0gQkFTRTQ0X1NFQVRfVVJMIG5vdCBzZXQg4oCUIGJvYXJkaW5nX2NvbmZpcm1hdGlvbl9zZW50X2F0IHN0YW1wIHNraXBwZWQnKTsKICB9CgogIHJldHVybiB7IHN1Y2Nlc3M6IHRydWUgfTsKfQoKLyoqCiAqIGhhbmRsZVNlYXRPcGVuZWQg4oCUIE5ldGxpZnkgRnVuY3Rpb24gaGFuZGxlci4KICoKICogQWNjZXB0cyBhIFBPU1Qgd2l0aCB0aGUgZnVsbCBTZWF0IGVudGl0eSByZWNvcmQgaW4gdGhlIHJlcXVlc3QgYm9keS4KICogRGVsZWdhdGVzIHRvIHNlbmRTZWF0Q29uZmlybWF0aW9uIGZvciB0aGUgZW1haWwgc2VxdWVuY2UgYW5kIHN0YW1wLgogKi8KZXhwb3J0cy5oYW5kbGVyID0gYXN5bmMgKGV2ZW50KSA9PiB7CiAgY29uc3QgaGVhZGVycyA9IHsKICAgICdBY2Nlc3MtQ29udHJvbC1BbGxvdy1PcmlnaW4nOiAnKicsCiAgICAnQWNjZXNzLUNvbnRyb2wtQWxsb3ctTWV0aG9kcyc6ICdQT1NULCBPUFRJT05TJywKICAgICdBY2Nlc3MtQ29udHJvbC1BbGxvdy1IZWFkZXJzJzogJ0NvbnRlbnQtVHlwZScsCiAgICAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nCiAgfTsKCiAgaWYgKGV2ZW50Lmh0dHBNZXRob2QgPT09ICdPUFRJT05TJykgewogICAgcmV0dXJuIHsgc3RhdHVzQ29kZTogMjA0LCBoZWFkZXJzLCBib2R5OiAnJyB9OwogIH0KCiAgaWYgKGV2ZW50Lmh0dHBNZXRob2QgIT09ICdQT1NUJykgewogICAgcmV0dXJuIHsgc3RhdHVzQ29kZTogNDA1LCBoZWFkZXJzLCBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiBmYWxzZSwgZXJyb3I6ICdNZXRob2QgTm90IEFsbG93ZWQnIH0pIH07CiAgfQoKICBsZXQgc2VhdDsKICB0cnkgewogICAgc2VhdCA9IEpTT04ucGFyc2UoZXZlbnQuYm9keSk7CiAgfSBjYXRjaCAoZXJyKSB7CiAgICByZXR1cm4geyBzdGF0dXNDb2RlOiA0MDAsIGhlYWRlcnMsIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ0ludmFsaWQgSlNPTiBib2R5JyB9KSB9OwogIH0KCiAgaWYgKCFzZWF0IHx8ICFzZWF0LmlkKSB7CiAgICByZXR1cm4geyBzdGF0dXNDb2RlOiA0MDAsIGhlYWRlcnMsIGJvZHk6IEpTT04uc3RyaW5naWZ5KHsgb2s6IGZhbHNlLCBlcnJvcjogJ01pc3Npbmcgc2VhdC5pZCBpbiByZXF1ZXN0IGJvZHknIH0pIH07CiAgfQoKICBjb25zdCByZXN1bHQgPSBhd2FpdCBzZW5kU2VhdENvbmZpcm1hdGlvbihzZWF0KTsKCiAgaWYgKCFyZXN1bHQuc3VjY2VzcykgewogICAgcmV0dXJuIHsKICAgICAgc3RhdHVzQ29kZTogNTAyLAogICAgICBoZWFkZXJzLAogICAgICBib2R5OiBKU09OLnN0cmluZ2lmeSh7IG9rOiBmYWxzZSwgZXJyb3I6IHJlc3VsdC5lcnJvciB9KQogICAgfTsKICB9CgogIHJldHVybiB7CiAgICBzdGF0dXNDb2RlOiAyMDAsCiAgICBoZWFkZXJzLAogICAgYm9keTogSlNPTi5zdHJpbmdpZnkoeyBvazogdHJ1ZSwgc2tpcHBlZDogcmVzdWx0LnNraXBwZWQgfHwgZmFsc2UgfSkKICB9Owp9OwoKLy8gRXhwb3J0IGZvciB0ZXN0aW5nCmlmICh0eXBlb2YgbW9kdWxlICE9PSAndW5kZWZpbmVkJyAmJiBtb2R1bGUuZXhwb3J0cykgewogIG1vZHVsZS5leHBvcnRzLnNlbmRTZWF0Q29uZmlybWF0aW9uID0gc2VuZFNlYXRDb25maXJtYXRpb247CiAgbW9kdWxlLmV4cG9ydHMuc2VuZFRlbXBsYXRlID0gc2VuZFRlbXBsYXRlOwogIG1vZHVsZS5leHBvcnRzLnVwZGF0ZVNlYXRSZWNvcmQgPSB1cGRhdGVTZWF0UmVjb3JkOwp9Cg==
+/**
+ * #116 — handleSeatOpened / sendSeatConfirmation
+ * Netlify Function: sendgrid-integration
+ *
+ * Triggered when a Seat entity is activated (admin approves a SeatRequest).
+ * Dispatches the two-email Phase 2 boarding sequence in order:
+ *   1. alphaflightannouncement_v1  (d-a33174bd2e4f4682b5b1546f106fb43c)
+ *   2. boarding_confirmation_v1    (d-678824bc506c432dae9eadab36c07904)
+ *
+ * After both sends confirm 2xx, stamps boarding_confirmation_sent_at on the
+ * Seat record via the Base44 API. Idempotency guard: will not overwrite if
+ * the field is already set (guards against retry double-stamps).
+ *
+ * All sends BCC support@thispagedoesnotexist12345.com per universal BCC rule.
+ *
+ * Spec references:
+ *   - TUJ Alpha Launch Operational Spec (FL 032126) — Section 2.1
+ *   - Manus Handoff — boarding_confirmation_sent_at Stamp (Mar 23, 2026)
+ */
+
+const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
+const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
+
+// Template IDs — Phase 2 boarding sequence (Section 2.1)
+const TEMPLATE_ALPHA_ANNOUNCEMENT = 'd-a33174bd2e4f4682b5b1546f106fb43c';
+const TEMPLATE_BOARDING_CONFIRMATION = 'd-678824bc506c432dae9eadab36c07904';
+
+/**
+ * Send a single SendGrid dynamic template email.
+ * Returns true on 2xx, false otherwise.
+ */
+async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData) {
+  const payload = {
+    from: { email: fromEmail },
+    personalizations: [{
+      to: [{ email: toEmail }],
+      bcc: [{ email: BCC_EMAIL }],
+      dynamic_template_data: dynamicData
+    }],
+    template_id: templateId
+  };
+
+  const response = await fetch(SENDGRID_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok || response.status === 202) {
+    console.log(`[sendgrid-integration] Template ${templateId} sent to ${toEmail} — status ${response.status}`);
+    return true;
+  }
+
+  const errorText = await response.text();
+  console.error(`[sendgrid-integration] Template ${templateId} failed for ${toEmail} — status ${response.status}:`, errorText);
+  return false;
+}
+
+/**
+ * Write a field update back to a Seat record via the Base44 API.
+ */
+async function updateSeatRecord(base44SeatUrl, seatId, fields) {
+  const url = `${base44SeatUrl}/${seatId}`;
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(fields)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[sendgrid-integration] Base44 Seat update failed for seat ${seatId} — status ${response.status}:`, errorText);
+    return false;
+  }
+
+  console.log(`[sendgrid-integration] Seat record ${seatId} updated:`, Object.keys(fields).join(', '));
+  return true;
+}
+
+/**
+ * sendSeatConfirmation — core boarding sequence dispatcher.
+ *
+ * Fires both Phase 2 templates in order. If both return 2xx, stamps
+ * boarding_confirmation_sent_at on the Seat record. Idempotent: skips
+ * the stamp if boarding_confirmation_sent_at is already set.
+ *
+ * @param {object} seat - Seat entity record from Base44
+ * @param {string} seat.id - Seat record ID
+ * @param {string} seat.user_email - Passenger email
+ * @param {string} seat.first_name - Passenger first name
+ * @param {string} seat.last_name - Passenger last name
+ * @param {string|null} seat.boarding_confirmation_sent_at - Existing timestamp (idempotency check)
+ */
+async function sendSeatConfirmation(seat) {
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const base44SeatUrl = process.env.BASE44_SEAT_URL;
+
+  if (!apiKey) {
+    console.error('[sendgrid-integration] SENDGRID_API_KEY is not set — aborting');
+    return { success: false, error: 'SENDGRID_API_KEY not configured' };
+  }
+
+  const { id: seatId, user_email, first_name, last_name, boarding_confirmation_sent_at } = seat;
+
+  // Validate required fields
+  if (!user_email || !first_name || !last_name) {
+    console.error(`[sendgrid-integration] Seat ${seatId} missing required fields (user_email, first_name, last_name) — aborting`);
+    return { success: false, error: 'Missing required seat fields' };
+  }
+
+  // Idempotency guard — do not re-send if already stamped
+  if (boarding_confirmation_sent_at) {
+    console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boarding_confirmation_sent_at}) — skipping send`);
+    return { success: true, skipped: true };
+  }
+
+  const dynamicData = {
+    first_name,
+    last_name,
+    user_email
+  };
+
+  // ── Send 1: alphaflightannouncement_v1 ─────────────────────────────────────
+  const announcementSent = await sendTemplate(
+    apiKey,
+    fromEmail,
+    user_email,
+    TEMPLATE_ALPHA_ANNOUNCEMENT,
+    dynamicData
+  );
+
+  if (!announcementSent) {
+    console.error(`[sendgrid-integration] alphaflightannouncement_v1 failed for seat ${seatId} — aborting sequence`);
+    return { success: false, error: 'alphaflightannouncement_v1 send failed' };
+  }
+
+  // ── Send 2: boarding_confirmation_v1 ───────────────────────────────────────
+  const confirmationSent = await sendTemplate(
+    apiKey,
+    fromEmail,
+    user_email,
+    TEMPLATE_BOARDING_CONFIRMATION,
+    dynamicData
+  );
+
+  if (!confirmationSent) {
+    console.error(`[sendgrid-integration] boarding_confirmation_v1 failed for seat ${seatId} — announcement already sent, stamp withheld`);
+    return { success: false, error: 'boarding_confirmation_v1 send failed' };
+  }
+
+  // ── Both sends confirmed 2xx — stamp boarding_confirmation_sent_at ─────────
+  if (base44SeatUrl && seatId) {
+    await updateSeatRecord(base44SeatUrl, seatId, {
+      boarding_confirmation_sent_at: new Date().toISOString()
+    });
+  } else {
+    console.warn('[sendgrid-integration] BASE44_SEAT_URL not set — boarding_confirmation_sent_at stamp skipped');
+  }
+
+  return { success: true };
+}
+
+/**
+ * handleSeatOpened — Netlify Function handler.
+ *
+ * Accepts a POST with the full Seat entity record in the request body.
+ * Delegates to sendSeatConfirmation for the email sequence and stamp.
+ */
+exports.handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers, body: JSON.stringify({ ok: false, error: 'Method Not Allowed' }) };
+  }
+
+  let seat;
+  try {
+    seat = JSON.parse(event.body);
+  } catch (err) {
+    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Invalid JSON body' }) };
+  }
+
+  if (!seat || !seat.id) {
+    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Missing seat.id in request body' }) };
+  }
+
+  const result = await sendSeatConfirmation(seat);
+
+  if (!result.success) {
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ ok: false, error: result.error })
+    };
+  }
+
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({ ok: true, skipped: result.skipped || false })
+  };
+};
+
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports.sendSeatConfirmation = sendSeatConfirmation;
+  module.exports.sendTemplate = sendTemplate;
+  module.exports.updateSeatRecord = updateSeatRecord;
+}
