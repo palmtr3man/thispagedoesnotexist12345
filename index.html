@@ -58,8 +58,9 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding: 1.5rem 0 2rem;
     }
 
     /* Black Glass Theme */
@@ -1049,6 +1050,36 @@
     <h1>🚀 The Ultimate Journey</h1>
     <p class="subtitle">Career Optimization Platform</p>
 
+    <!-- CAROUSEL -->
+    <div class="carousel-wrap">
+      <div class="carousel" id="mainCarousel">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide">
+            <h3>Your career has a flight plan.</h3>
+            <p>The Ultimate Journey runs one focused cohort through the full system — mapping your experience to what the market is actually hiring for.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>Built for the overlooked operator.</h3>
+            <p>This first cohort is for operators who've been out of the market, restarting, or stuck. No experience floor. No gatekeeping — just clear checkpoints.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>One flight. Five seats.</h3>
+            <p>PageForward Airways is carrying 5 passengers on this flight through the TUJ system. Every outcome is logged to the manifest and shared in the newsletter.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>Gate open. Then wheels up.</h3>
+            <p>Every bug, fix, and passenger milestone is recorded. When this flight departs, the gate closes until the next cohort is scheduled.</p>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots">
+        <div class="carousel-dot active" data-index="0"></div>
+        <div class="carousel-dot" data-index="1"></div>
+        <div class="carousel-dot" data-index="2"></div>
+        <div class="carousel-dot" data-index="3"></div>
+      </div>
+    </div>
+
     <!-- ── Age Gate Overlay (controlled by window.__TUJ.showAgeGate) ─────── -->
     <div id="age-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
       <div class="age-gate-card">
@@ -1467,35 +1498,6 @@
       </div>
     </div>
 
-    <!-- CAROUSEL -->
-    <div class="carousel-wrap">
-      <div class="carousel" id="mainCarousel">
-        <div class="carousel-track" id="carouselTrack">
-          <div class="carousel-slide">
-            <h3>Your career has a flight plan.</h3>
-            <p>The Ultimate Journey runs one focused cohort through the full system — mapping your experience to what the market is actually hiring for.</p>
-          </div>
-          <div class="carousel-slide">
-            <h3>Built for the overlooked operator.</h3>
-            <p>This first cohort is for operators who've been out of the market, restarting, or stuck. No experience floor. No gatekeeping — just clear checkpoints.</p>
-          </div>
-          <div class="carousel-slide">
-            <h3>One flight. Five seats.</h3>
-            <p>PageForward Airways is carrying 5 passengers on this flight through the TUJ system. Every outcome is logged to the manifest and shared in the newsletter.</p>
-          </div>
-          <div class="carousel-slide">
-            <h3>Gate open. Then wheels up.</h3>
-            <p>Every bug, fix, and passenger milestone is recorded. When this flight departs, the gate closes until the next cohort is scheduled.</p>
-          </div>
-        </div>
-      </div>
-      <div class="carousel-dots" id="carouselDots">
-        <div class="carousel-dot active" data-index="0"></div>
-        <div class="carousel-dot" data-index="1"></div>
-        <div class="carousel-dot" data-index="2"></div>
-        <div class="carousel-dot" data-index="3"></div>
-      </div>
-    </div>
 
     <!-- BLACK GLASS BUTTONS -->
     <div class="btn-row">
@@ -1745,7 +1747,7 @@
           }
         }
 
-        // ── 1. Flight label badge (#flight-number) ──────────���────────────��
+        // ── 1. Flight label badge (#flight-number) ───────────────────────��
         // Driven by Admin → NextFlightConfig → next_flight_number
         if (flightEl) {
           var label = status.flight_label && status.flight_label.trim()
@@ -2355,7 +2357,6 @@
       }
     })();
 
-    })();
   </script>
 
 
