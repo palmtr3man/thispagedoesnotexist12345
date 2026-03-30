@@ -530,6 +530,52 @@
       font-family: monospace;
     }
 
+    /* ── Mission Control: Gate Status / Seat Counter (4-P3) ───────────────── */
+    #mc-gate-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(168,196,0,0.18);
+      border-radius: 6px;
+      background: rgba(168,196,0,0.04);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+    #mc-gate-status .mc-gs-label {
+      color: rgba(168,196,0,0.5);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    #mc-gate-status .mc-gs-value {
+      color: #A8C400;
+      font-weight: 600;
+    }
+    #mc-gate-status .mc-gs-cta {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid rgba(168,196,0,0.35);
+      border-radius: 4px;
+      color: #A8C400;
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    #mc-gate-status .mc-gs-cta:hover {
+      background: rgba(168,196,0,0.1);
+      border-color: rgba(168,196,0,0.6);
+    }
+    #mc-gate-status .mc-gs-cta[data-action='none'] {
+      display: none;
+    }
+
     /* ── Mission Control: Sections ───────────────────────────────────────── */
     .mc-section {
       margin-bottom: 1.75rem;
@@ -1182,10 +1228,20 @@
         </div>
       </div>
 
-      <!-- ── Section 1: 8-Step Boarding Sequence ──────────────────────────── -->
+      <!-- ── Gate Status / Seat Counter (4-P3) ─────────────────────────────────────────── -->
+      <!-- Driven by resolveGateState() in the TUJ State Machine (below).
+           JS populates #mc-gs-count-value and #mc-gs-cta on every rerender(). -->
+      <div id="mc-gate-status">
+        <div>
+          <span class="mc-gs-label">Gate Status</span>
+          <span id="mc-gs-count-value" class="mc-gs-value">Loading…</span>
+        </div>
+        <a id="mc-gs-cta" class="mc-gs-cta" href="#seat-request-form" data-action="none">Request seat</a>
+      </div>
+
+      <!-- ── Section 1: 8-Step Boarding Sequence ─────────────────────────────────────────── -->
       <div class="mc-section">
-        <h3 class="mc-section-title">📍 Boarding Sequence</h3>
-        <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
+        <h3 class="mc-section-title">📍 Boarding Sequence</h3>  <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
         <ol class="boarding-steps">
           <li class="boarding-step" id="bstep-1">
             <span class="bstep-num">01</span>
@@ -2110,6 +2166,55 @@
         dashboardView.style.display = visible ? 'block' : 'none';
       }
 
+      // ── Gate Status / Seat Counter helpers (4-P3) ───────────────────────────────
+      // resolveGateState(status) — maps raw /api/seat-status payload to
+      // a display descriptor consumed by updateGateStatusWidget().
+      // Returns: { label: string, cta: { text: string, action: string, href: string } }
+      function resolveGateState(status) {
+        var MAX = 5;
+        if (!status) {
+          return { label: 'Status unavailable', cta: { text: '', action: 'none', href: '#' } };
+        }
+        var gateStatus = (status.gate_status || '').toLowerCase();
+        var departed   = (status.nextflightstatus || status.next_flight_status) === 'DEPARTED'
+                      || gateStatus === 'departed';
+        if (departed) {
+          return { label: 'Flight departed', cta: { text: '', action: 'none', href: '#' } };
+        }
+        if (gateStatus === 'closed') {
+          return { label: 'Flight full — all seats filled', cta: { text: '', action: 'none', href: '#' } };
+        }
+        // open or unknown — show live count
+        var openCount = typeof status.open_count === 'number' ? status.open_count
+                      : typeof status.seats_remaining === 'number' ? status.seats_remaining
+                      : null;
+        if (openCount === null) {
+          return { label: 'Seats coming soon', cta: { text: '', action: 'none', href: '#' } };
+        }
+        if (openCount <= 0) {
+          return { label: 'Flight full — all seats filled', cta: { text: '', action: 'none', href: '#' } };
+        }
+        var label = openCount + ' of ' + MAX + ' seat' + (MAX !== 1 ? 's' : '') + ' open';
+        return {
+          label: label,
+          cta: { text: 'Invite a crew member', action: 'invite', href: '#seat-request-form' }
+        };
+      }
+
+      // updateGateStatusWidget(status) — writes resolveGateState() output
+      // into #mc-gs-count-value and #mc-gs-cta.
+      function updateGateStatusWidget(status) {
+        var countEl = document.getElementById('mc-gs-count-value');
+        var ctaEl   = document.getElementById('mc-gs-cta');
+        var gs = resolveGateState(status);
+        if (countEl) countEl.textContent = gs.label;
+        if (ctaEl) {
+          ctaEl.textContent       = gs.cta.text;
+          ctaEl.setAttribute('data-action', gs.cta.action);
+          ctaEl.setAttribute('href', gs.cta.href);
+        }
+      }
+
       // ── Apply state to DOM ────────────────────────────────────────────────
       function applyState(state, status, seatId) {
         var previousState = _state;
@@ -2153,6 +2258,12 @@
         } else {
           // Reset welcome banner when leaving dashboard state
           if (waBanner) waBanner.style.display = 'none';
+        }
+
+        // ── Gate Status / Seat Counter widget (4-P3) ─────────────────────────────────
+        // Driven entirely by resolveGateState() output — no raw API shapes in UI layer.
+        if (state === 'dashboard') {
+          updateGateStatusWidget(status);
         }
 
         // ── Hand off to window.__applySeatGate() for all badge/CTA logic ──────
