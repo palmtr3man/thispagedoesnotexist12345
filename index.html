@@ -395,8 +395,53 @@
     .age-gate-card p {
       font-size: 0.9rem;
       color: rgba(255,255,255,0.7);
-      margin-bottom: 1.75rem;
+      margin-bottom: 1.25rem;
       line-height: 1.6;
+    }
+    /* DOB input grid (4-P2) */
+    .age-gate-dob {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.4fr;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .age-gate-dob-field { display: flex; flex-direction: column; }
+    .age-gate-dob label {
+      display: block;
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+    }
+    .age-gate-dob select,
+    .age-gate-dob input[type=number] {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(168,196,0,0.25);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.55rem 0.4rem;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .age-gate-dob select:focus,
+    .age-gate-dob input[type=number]:focus {
+      outline: none;
+      border-color: rgba(168,196,0,0.6);
+    }
+    /* hide number spinners */
+    .age-gate-dob input[type=number]::-webkit-inner-spin-button,
+    .age-gate-dob input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .age-gate-dob input[type=number] { -moz-appearance: textfield; }
+    #age-gate-error {
+      font-size: 0.8rem;
+      color: #ff6b6b;
+      min-height: 1.2em;
+      margin-bottom: 0.5rem;
     }
     .age-gate-actions {
       display: flex;
@@ -415,10 +460,11 @@
       color: #A8C400;
       transition: background 0.2s, box-shadow 0.2s;
     }
-    .age-gate-confirm:hover {
+    .age-gate-confirm:hover:not(:disabled) {
       background: rgba(168, 196, 0, 0.2);
       box-shadow: 0 0 14px rgba(168, 196, 0, 0.25);
     }
+    .age-gate-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
     .age-gate-deny {
       font-size: 0.8rem;
       color: rgba(255,255,255,0.35);
@@ -1081,13 +1127,36 @@
       </div>
     </div>
 
-    <!-- ── Age Gate Overlay (controlled by window.__TUJ.showAgeGate) ─────── -->
+    <!-- ── Age Gate Overlay (4-P2: Option C — DOB collection + age_token) ── -->
     <div id="age-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
       <div class="age-gate-card">
-        <h2 id="age-gate-title">✈️ Age Verification</h2>
-        <p>The Ultimate Journey platform is intended for passengers <strong>21 years of age or older</strong>. Please confirm your age to continue.</p>
+        <h2 id="age-gate-title">✈️ Passenger Verification</h2>
+        <p>The Ultimate Journey is designed for career-focused adults. Please confirm your date of birth to continue boarding.</p>
+        <div class="age-gate-dob">
+          <div class="age-gate-dob-field">
+            <label for="ag-month">Month</label>
+            <select id="ag-month" aria-label="Birth month">
+              <option value="">MM</option>
+              <option value="1">01</option><option value="2">02</option>
+              <option value="3">03</option><option value="4">04</option>
+              <option value="5">05</option><option value="6">06</option>
+              <option value="7">07</option><option value="8">08</option>
+              <option value="9">09</option><option value="10">10</option>
+              <option value="11">11</option><option value="12">12</option>
+            </select>
+          </div>
+          <div class="age-gate-dob-field">
+            <label for="ag-day">Day</label>
+            <select id="ag-day" aria-label="Birth day"><option value="">DD</option></select>
+          </div>
+          <div class="age-gate-dob-field">
+            <label for="ag-year">Year</label>
+            <input id="ag-year" type="number" placeholder="YYYY" min="1900" max="2099" aria-label="Birth year" />
+          </div>
+        </div>
+        <div id="age-gate-error" role="alert"></div>
         <div class="age-gate-actions">
-          <button class="age-gate-confirm" id="age-gate-confirm-btn">I confirm I am 21 or older — Let me board</button>
+          <button class="age-gate-confirm" id="age-gate-confirm-btn" disabled>Verify Age &amp; Continue</button>
           <button class="age-gate-deny" id="age-gate-deny-btn">I cannot confirm — take me back</button>
         </div>
       </div>
@@ -2128,18 +2197,88 @@
         if (overlay) overlay.classList.remove('active');
       }
 
-      // ── Age gate button wiring ────────────────────────────────────────────
+      // ── Age gate DOB wiring (4-P2: Option C) ─────────────────────────────
+      // Populates day dropdown, enables confirm when DOB is complete.
+      // On confirm: POSTs to /api/verify-age, stores signed age_token in sessionStorage.
       document.addEventListener('DOMContentLoaded', function () {
-        var confirmBtn = document.getElementById('age-gate-confirm-btn');
-        var denyBtn    = document.getElementById('age-gate-deny-btn');
+        var monthSel    = document.getElementById('ag-month');
+        var daySel      = document.getElementById('ag-day');
+        var yearInput   = document.getElementById('ag-year');
+        var confirmBtn  = document.getElementById('age-gate-confirm-btn');
+        var denyBtn     = document.getElementById('age-gate-deny-btn');
+        var errorEl     = document.getElementById('age-gate-error');
+        var AGE_TOKEN_KEY = 'tuj_age_token'; // sessionStorage — signed token
+
+        function populateDays() {
+          var m = parseInt(monthSel ? monthSel.value : '', 10);
+          var y = parseInt(yearInput ? yearInput.value : '', 10);
+          var maxDay = (m && y && !isNaN(y)) ? new Date(y, m, 0).getDate()
+                     : m ? new Date(2000, m, 0).getDate() : 31;
+          var prev = daySel ? daySel.value : '';
+          if (daySel) {
+            daySel.innerHTML = '<option value="">DD</option>';
+            for (var d = 1; d <= maxDay; d++) {
+              var opt = document.createElement('option');
+              opt.value = d;
+              opt.textContent = String(d).padStart(2, '0');
+              daySel.appendChild(opt);
+            }
+            if (prev && parseInt(prev, 10) <= maxDay) daySel.value = prev;
+          }
+        }
+
+        function isComplete() {
+          return monthSel && monthSel.value &&
+                 daySel   && daySel.value &&
+                 yearInput && yearInput.value && yearInput.value.length === 4 &&
+                 !isNaN(parseInt(yearInput.value, 10));
+        }
+
+        function updateBtn() {
+          if (confirmBtn) confirmBtn.disabled = !isComplete();
+        }
+
+        if (monthSel)  monthSel.addEventListener('change', function () { populateDays(); updateBtn(); });
+        if (daySel)    daySel.addEventListener('change', updateBtn);
+        if (yearInput) {
+          yearInput.addEventListener('input', function () { populateDays(); updateBtn(); });
+        }
 
         if (confirmBtn) {
-          confirmBtn.addEventListener('click', function () {
-            localStorage.setItem(AGE_KEY, '1');
-            hideAgeGate();
-            if (typeof _ageGateCb === 'function') {
-              _ageGateCb();
-              _ageGateCb = null;
+          confirmBtn.addEventListener('click', async function () {
+            if (!isComplete()) return;
+            if (errorEl) errorEl.textContent = '';
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = '⏳ Verifying…';
+            var m   = String(parseInt(monthSel.value, 10)).padStart(2, '0');
+            var d   = String(parseInt(daySel.value, 10)).padStart(2, '0');
+            var y   = yearInput.value.trim();
+            var dob = y + '-' + m + '-' + d;
+            try {
+              var res  = await fetch('/api/verify-age', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date_of_birth: dob })
+              });
+              var data = await res.json();
+              if (data.ok && data.age_token) {
+                sessionStorage.setItem(AGE_TOKEN_KEY, data.age_token);
+                localStorage.setItem(AGE_KEY, '1'); // backward compat
+                hideAgeGate();
+                if (typeof _ageGateCb === 'function') {
+                  _ageGateCb();
+                  _ageGateCb = null;
+                }
+              } else {
+                if (errorEl) errorEl.textContent = data.reason || 'Age verification failed. Please check your date of birth.';
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Verify Age & Continue';
+              }
+            } catch (err) {
+              console.error('[age-gate] verify-age error:', err);
+              if (errorEl) errorEl.textContent = 'Verification failed. Please check your connection and try again.';
+              confirmBtn.disabled = false;
+              confirmBtn.textContent = 'Verify Age & Continue';
             }
           });
         }
