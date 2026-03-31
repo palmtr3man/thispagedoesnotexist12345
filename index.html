@@ -2189,7 +2189,11 @@
       // a display descriptor consumed by updateGateStatusWidget().
       // Returns: { label: string, cta: { text: string, action: string, href: string } }
       function resolveGateState(status) {
-        var MAX = 5;
+        // QA #2 fix: read capacity from live API response; fall back to 5 if absent.
+        // After Apr 16 Base44 patch, status.max_seats will reflect activeFlight.capacity.
+        var MAX = (status && typeof status.max_seats === 'number' && status.max_seats > 0)
+                  ? status.max_seats
+                  : 5;
         if (!status) {
           return { label: 'Status unavailable', cta: { text: '', action: 'none', href: '#' } };
         }
