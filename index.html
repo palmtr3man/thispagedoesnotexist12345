@@ -1924,8 +1924,30 @@
 
         // ── 3. Loading dock label (#dock-status) ──────────────────────────
         // Driven by gate_status field (derived from PUBLIC_GATE_STATE override in seat-status.js)
-        // 'hold' = gate is operator-paused; treat as closed for public display (QA #6 fix).
+        // 'hold'     = gate is operator-paused; treat as closed for public display (QA #6 fix).
+        // 'conflict' = multiple active flights detected (QA #5 Layer 3); show safe fallback.
         var gateStatusNorm = (status.gate_status || '').toLowerCase();
+
+        // QA #5 — Layer 3: UI fallback for flight invariant conflict.
+        // If the Netlify function returned gate_status: 'conflict' (HTTP 409 body),
+        // surface a neutral holding state rather than showing potentially wrong seat data.
+        if (gateStatusNorm === 'conflict') {
+          if (dockEl) dockEl.textContent = 'GATE CLOSED';
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          // Log to console so operators can diagnose without exposing to users
+          console.warn('[TUJ] Gate conflict: multiple active flights detected. Check Supabase flights table.');
+          return;
+        }
+
         var gateOpen = gateStatusNorm !== 'departed' && gateStatusNorm !== 'closed' && gateStatusNorm !== 'hold';
         if (dockEl) {
           dockEl.textContent = gateOpen ? 'GATE OPEN' : 'GATE CLOSED';

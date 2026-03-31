@@ -8,7 +8,7 @@
  *   BASE44_COHORT_STATUS_URL — the public URL of the Base44 getCohortStatus function
  *                              (Base44 Dashboard → Code → Functions → getCohortStatus)
  *
- * Optional env var:
+ * Optional env vars:
  *   PUBLIC_GATE_STATE — operator override for the public gate state.
  *                       When set, overrides the gate_status field in the
  *                       upstream Base44 response before returning to the client.
@@ -18,6 +18,14 @@
  *
  * CORS headers are already set on the Base44 side; this proxy passes the
  * response through cleanly. Falls back to gate_status: 'closed' on any error.
+ *
+ * QA #5 — Single active flight invariant (Layer 2 of 3):
+ *   If the upstream response signals more than one active flight
+ *   (active_flight_count > 1), this function returns HTTP 409 with
+ *   gate_status: 'conflict' so the UI can surface a safe fallback
+ *   instead of silently showing ambiguous seat data.
+ *   Layer 1: Supabase partial unique index (supabase/migrations/20260331_single_active_flight_invariant.sql)
+ *   Layer 3: UI fallback in index.html applySeatGate()
  */
 
 export default async function handler(req, context) {
@@ -25,6 +33,25 @@ export default async function handler(req, context) {
     const res = await fetch(process.env.BASE44_COHORT_STATUS_URL);
     if (!res.ok) throw new Error(`Upstream error: ${res.status}`);
     const data = await res.json();
+
+    // QA #5 — Layer 2: 409 guard for multiple active flights.
+    // If Base44 returns active_flight_count > 1, the single-active-flight
+    // invariant has been violated at the DB level (or the Supabase index
+    // has not yet been applied). Return 409 so the UI shows a safe fallback
+    // rather than ambiguous seat data.
+    if (typeof data.active_flight_count === 'number' && data.active_flight_count > 1) {
+      return new Response(
+        JSON.stringify({
+          gate_status: 'conflict',
+          active_flight_count: data.active_flight_count,
+          error: 'Multiple active flights detected — single-active-flight invariant violated.',
+        }),
+        {
+          status: 409,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
     // PUBLIC_GATE_STATE override — operator-controlled gate switch.
     // When set, this value takes precedence over whatever Base44 returns
