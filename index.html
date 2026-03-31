@@ -1923,8 +1923,10 @@
         }
 
         // ── 3. Loading dock label (#dock-status) ──────────────────────────
-        // Driven by gate_status field (derived from next_flight_status in Base44)
-        var gateOpen = status.gate_status !== 'departed' && status.gate_status !== 'closed';
+        // Driven by gate_status field (derived from PUBLIC_GATE_STATE override in seat-status.js)
+        // 'hold' = gate is operator-paused; treat as closed for public display (QA #6 fix).
+        var gateStatusNorm = (status.gate_status || '').toLowerCase();
+        var gateOpen = gateStatusNorm !== 'departed' && gateStatusNorm !== 'closed' && gateStatusNorm !== 'hold';
         if (dockEl) {
           dockEl.textContent = gateOpen ? 'GATE OPEN' : 'GATE CLOSED';
         }
@@ -2019,6 +2021,22 @@
 
         // Gate is open from here down
         if (lockedMsg) lockedMsg.style.display = 'none';
+
+        // ── HOLD / CLOSED gate → suppress all seat CTAs (QA #6 fix) ──────
+        // When PUBLIC_GATE_STATE=hold or closed, hide seat request + waitlist CTAs.
+        if (gateStatusNorm === 'hold' || gateStatusNorm === 'closed') {
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          return;
+        }
 
         // Alpha mode off → hide the seat request button entirely
         if (!status.alpha_mode) {
