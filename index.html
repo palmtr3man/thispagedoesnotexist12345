@@ -1928,6 +1928,25 @@
         // 'conflict' = multiple active flights detected (QA #5 Layer 3); show safe fallback.
         var gateStatusNorm = (status.gate_status || '').toLowerCase();
 
+        // QA #7 — UI guard: QA flight isolation violation.
+        // If the Netlify function returned gate_status: 'qa_isolation_violation' (HTTP 422),
+        // a QA flight is active on the public page. Surface a neutral holding state.
+        if (gateStatusNorm === 'qa_isolation_violation') {
+          if (dockEl) dockEl.textContent = 'GATE CLOSED';
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          console.warn('[TUJ] QA isolation violation: active flight is a QA flight. Check Supabase flights table and apply no_active_qa_flight index.');
+          return;
+        }
+
         // QA #5 — Layer 3: UI fallback for flight invariant conflict.
         // If the Netlify function returned gate_status: 'conflict' (HTTP 409 body),
         // surface a neutral holding state rather than showing potentially wrong seat data.

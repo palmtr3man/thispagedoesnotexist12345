@@ -26,6 +26,13 @@
  *   instead of silently showing ambiguous seat data.
  *   Layer 1: Supabase partial unique index (supabase/migrations/20260331_single_active_flight_invariant.sql)
  *   Layer 3: UI fallback in index.html applySeatGate()
+ *
+ * QA #7 — QA flight isolation (API layer):
+ *   If the upstream response indicates the active flight is a QA flight
+ *   (flight_mode === 'qa'), this function returns HTTP 422 with
+ *   gate_status: 'qa_isolation_violation' so the UI can surface a safe
+ *   fallback. QA flights must never drive the public .com page.
+ *   DB layer: Supabase partial unique index (supabase/migrations/20260331_qa_flight_isolation.sql)
  */
 
 export default async function handler(req, context) {
@@ -33,6 +40,26 @@ export default async function handler(req, context) {
     const res = await fetch(process.env.BASE44_COHORT_STATUS_URL);
     if (!res.ok) throw new Error(`Upstream error: ${res.status}`);
     const data = await res.json();
+
+    // QA #7 — API guard: QA flight isolation.
+    // If the active flight has flight_mode === 'qa', it must never drive
+    // the public .com page. Return 422 with gate_status: 'qa_isolation_violation'
+    // so the UI can surface a safe fallback. This catches the case where the
+    // Supabase DB constraint (no_active_qa_flight index) has not yet been applied
+    // or is bypassed via a direct DB write.
+    if (data.flight_mode === 'qa') {
+      return new Response(
+        JSON.stringify({
+          gate_status: 'qa_isolation_violation',
+          flight_mode: 'qa',
+          error: 'Active flight is a QA flight — QA flights must never drive the public .com page.',
+        }),
+        {
+          status: 422,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
     // QA #5 — Layer 2: 409 guard for multiple active flights.
     // If Base44 returns active_flight_count > 1, the single-active-flight
