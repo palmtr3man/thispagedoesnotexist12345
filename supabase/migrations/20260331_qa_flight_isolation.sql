@@ -1,31 +1,43 @@
 -- Migration: qa_flight_isolation
--- Decision: QA #7 — QA flight isolation not enforced
+-- Decision: QA #7 — QA flight isolation not enforced (QA flights must never drive .com)
 -- Applied: 2026-03-31
--- Owner: Manus
+-- Revised: 2026-03-31 (DEFERRED — schema does not support DB-layer enforcement)
+-- Owner: Kevin / Manus
 --
--- Enforces that flights with flight_mode = 'qa' can never be set active = true.
--- This prevents a QA flight from accidentally becoming the public activeFlight
--- and driving .com seat counts, copy, or gate state.
+-- DEFERRED — DB layer not applicable with current schema.
 --
--- Works in concert with the one_active_non_qa_flight index from
--- 20260331_single_active_flight_invariant.sql (QA #5), which prevents
--- multiple active non-QA flights. Together these two constraints fully
--- isolate QA flights from production.
+-- The original design assumed a `flight_mode` column on the `flights` table
+-- (values: 'qa' | null/'production') to distinguish QA flights from production
+-- flights at the DB level. The actual `flights` table schema (as of Mar 31, 2026)
+-- has no such column:
+--
+--   id, flight_code, flight_name, notion_page_id, status, start_date, end_date,
+--   departure_at, arrival_at, year, all_landed, retro_notes, created_at, updated_at
+--
+-- Without a discriminator column, a DB-level constraint cannot distinguish QA
+-- flights from production flights. A `flight_code` prefix convention (e.g., QA-*)
+-- was considered but rejected — no naming convention is established in the schema
+-- or codebase, and prefix-based enforcement is fragile.
+--
+-- CURRENT PROTECTION (API layer — already deployed):
+--   netlify/functions/seat-status.js — QA isolation guard (commit 4f711e8).
+--   If Base44 getCohortStatus returns flight_mode === 'qa' in the response,
+--   the proxy returns HTTP 422 with gate_status: 'qa_isolation_violation'.
+--   The UI then shows GATE CLOSED and suppresses all CTAs.
+--   This guard protects the public .com boundary even without a DB constraint.
+--
+-- UNBLOCK PATH:
+--   Add a `flight_mode` column to the `flights` table in Base44 (credits-dependent,
+--   estimated Apr 16 deploy window). Once the column exists, this migration should
+--   be replaced with:
+--
+--   ALTER TABLE flights ADD COLUMN IF NOT EXISTS flight_mode text
+--     CHECK (flight_mode IS NULL OR flight_mode IN ('production', 'qa'));
+--
+--   Then extend the enforce_single_active_flight trigger (QA #5) to also block
+--   qa-mode flights from entering live states ('Boarding' or 'In Flight').
+--
+-- This file is intentionally a no-op. It exists to document the deferral
+-- decision and the unblock path for future reference.
 
--- Drop if re-running (idempotent)
-DROP INDEX IF EXISTS no_active_qa_flight;
-
--- Partial unique index: a QA flight (flight_mode = 'qa') can never have
--- active = true. The index covers only rows where flight_mode = 'qa',
--- and within that set enforces that active is always false.
--- Attempting to set active = true on a QA flight raises a unique violation.
-CREATE UNIQUE INDEX no_active_qa_flight
-  ON flights (active)
-  WHERE flight_mode = 'qa'
-    AND active = true;
-
--- Verify (run manually after applying):
--- SELECT indexname, indexdef
--- FROM pg_indexes
--- WHERE tablename = 'flights'
---   AND indexname = 'no_active_qa_flight';
+-- No SQL to execute. See comments above.
