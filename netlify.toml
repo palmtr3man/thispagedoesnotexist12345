@@ -49,3 +49,8 @@
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
   status = 200
+
+[[redirects]]
+  from = "/api/verify-age"
+  to = "/.netlify/functions/verify-age"
+  status = 200
