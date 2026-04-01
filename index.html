@@ -612,7 +612,7 @@
     }
     .mc-section-link:hover { color: #A8C400; }
 
-    /* ── Mission Control: Boarding Steps ─────────���───────────────────────── */
+    /* ── Mission Control: Boarding Steps ─────────────────────────────────── */
     .boarding-steps {
       list-style: none;
       margin: 0;
@@ -629,7 +629,11 @@
       border-radius: 8px;
       border: 1px solid rgba(168,196,0,0.12);
       background: rgba(0,0,0,0.3);
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .boarding-step:hover {
+      border-color: rgba(168,196,0,0.28);
+      background: rgba(168,196,0,0.03);
     }
     .boarding-step.done {
       border-color: rgba(168,196,0,0.4);
@@ -662,6 +666,33 @@
       color: rgba(255,255,255,0.4);
       line-height: 1.4;
     }
+    .bstep-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.45rem;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #A8C400;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(168,196,0,0.3);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      background: rgba(168,196,0,0.06);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      width: fit-content;
+    }
+    .bstep-cta:hover {
+      background: rgba(168,196,0,0.14);
+      border-color: rgba(168,196,0,0.65);
+      color: #fff;
+    }
+    .bstep-cta-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.15s;
+    }
+    .bstep-cta:hover .bstep-cta-arrow { transform: translateX(3px); }
     .bstep-status {
       font-size: 0.9rem;
       flex-shrink: 0;
@@ -1241,72 +1272,114 @@
 
       <!-- ── Section 1: 8-Step Boarding Sequence ─────────────────────────────────────────── -->
       <div class="mc-section">
-        <h3 class="mc-section-title">📍 Boarding Sequence</h3>  <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
+        <h3 class="mc-section-title">📍 Boarding Sequence</h3>
+        <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
         <ol class="boarding-steps">
-          <li class="boarding-step" id="bstep-1">
+
+          <!-- Step 1: Subscribe to Signal — already done on boarding -->
+          <li class="boarding-step done" id="bstep-1">
             <span class="bstep-num">01</span>
             <div class="bstep-body">
               <span class="bstep-name">Subscribe to Signal</span>
               <span class="bstep-desc">Your mission brief arrives via newsletter. Issue #001 is your first brief.</span>
+              <a class="bstep-cta" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">
+                Open Signal <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="1">✔</span>
           </li>
+
+          <!-- Step 2: Complete Your Profile — opens Systems / OnboardingPassport -->
           <li class="boarding-step" id="bstep-2">
             <span class="bstep-num">02</span>
             <div class="bstep-body">
               <span class="bstep-name">Complete Your Profile</span>
               <span class="bstep-desc">Set your headline, target titles, and location in your passenger record.</span>
+              <a class="bstep-cta" id="bstep-2-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open Systems — Passenger Record <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="2">○</span>
           </li>
+
+          <!-- Step 3: Link Resume to Studio -->
           <li class="boarding-step" id="bstep-3">
             <span class="bstep-num">03</span>
             <div class="bstep-body">
               <span class="bstep-name">Link Your Resume to Studio</span>
               <span class="bstep-desc">Upload or build your one-page resume in the AI Resume Builder.</span>
+              <a class="bstep-cta" href="/Studio" target="_blank" rel="noopener noreferrer">
+                Open Studio <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="3">○</span>
           </li>
+
+          <!-- Step 4: Optimize LinkedIn -->
           <li class="boarding-step" id="bstep-4">
             <span class="bstep-num">04</span>
             <div class="bstep-body">
               <span class="bstep-name">Optimize LinkedIn</span>
               <span class="bstep-desc">Headline, About, and Skills aligned with your target titles.</span>
+              <a class="bstep-cta" href="https://www.linkedin.com/in/me" target="_blank" rel="noopener noreferrer">
+                Open LinkedIn Profile <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="4">○</span>
           </li>
+
+          <!-- Step 5: Book a Consultation -->
           <li class="boarding-step" id="bstep-5">
             <span class="bstep-num">05</span>
             <div class="bstep-body">
               <span class="bstep-name">Book a Consultation</span>
-              <span class="bstep-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
+              <span class="bstep-desc">30-minute strategy session. Reply to your Welcome email to schedule, or use the link below.</span>
+              <a class="bstep-cta" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer">
+                Book 30-Min Session <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="5">○</span>
           </li>
+
+          <!-- Step 6: Add 5 Target Companies -->
           <li class="boarding-step" id="bstep-6">
             <span class="bstep-num">06</span>
             <div class="bstep-body">
               <span class="bstep-name">Add 5 Target Companies</span>
               <span class="bstep-desc">Research and log your first five target companies in The Build.</span>
+              <a class="bstep-cta" id="bstep-6-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open The Build <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="6">○</span>
           </li>
+
+          <!-- Step 7: Submit 3 Applications -->
           <li class="boarding-step" id="bstep-7">
             <span class="bstep-num">07</span>
             <div class="bstep-body">
               <span class="bstep-name">Submit 3 Applications</span>
               <span class="bstep-desc">Apply to three roles. Log each one in The Build pipeline.</span>
+              <a class="bstep-cta" id="bstep-7-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Log Applications in The Build <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="7">○</span>
           </li>
+
+          <!-- Step 8: Set Follow-Up Reminders -->
           <li class="boarding-step" id="bstep-8">
             <span class="bstep-num">08</span>
             <div class="bstep-body">
               <span class="bstep-name">Set Follow-Up Reminders</span>
-              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission.</span>
+              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission in The Build.</span>
+              <a class="bstep-cta" id="bstep-8-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open The Build — Set Reminders <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="8">○</span>
           </li>
+
         </ol>
       </div>
 
@@ -2309,6 +2382,15 @@
                 a.href = u.toString();
               } catch (e) { /* skip malformed hrefs */ }
             });
+            // Wire seat_id into CalendarJet consultation link in boarding steps
+            var calBoardingLink = document.querySelector('#bstep-5 .bstep-cta');
+            if (calBoardingLink) {
+              try {
+                var cu = new URL(calBoardingLink.href);
+                cu.searchParams.set('seat_id', seatId);
+                calBoardingLink.href = cu.toString();
+              } catch (e) { /* skip */ }
+            }
           }
           // Welcome Aboard banner: show once if ?status=boarded in URL
           if (waBanner) {
@@ -2575,6 +2657,20 @@
               form.style.display = 'none';
               var conf = document.getElementById('seat-request-confirm');
               if (conf) conf.style.display = 'block';
+            } else if (d.duplicate) {
+              // One seat per email — surface a clear, friendly message
+              // If the API returned the existing seat_id, redirect directly to dashboard
+              if (d.seat_id) {
+                sessionStorage.setItem(SEAT_KEY, d.seat_id);
+                form.style.display = 'none';
+                var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
+                history.replaceState({}, '', newUrl);
+                window.__TUJ.rerender();
+              } else {
+                errEl.textContent  = d.error || 'A seat request has already been submitted for this email. Check your inbox for your original confirmation.';
+                subBtn.disabled    = false;
+                subBtn.textContent = '✈️ Submit Request';
+              }
             } else {
               errEl.textContent  = d.error || 'Something went wrong — please try again.';
               subBtn.disabled    = false;

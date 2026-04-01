@@ -81,6 +81,51 @@ function notionRichText(content) {
   return [{ type: 'text', text: { content: String(content) } }];
 }
 
+/**
+ * Check whether an email already has a seat request in the Notion registry.
+ * Returns the existing seat_id string if found, or null if not found / API unavailable.
+ * Fails gracefully — a Notion outage must not block new seat requests.
+ */
+async function checkExistingRequest({ email, notionApiKey, databaseId }) {
+  if (!notionApiKey) return null;
+  try {
+    const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + notionApiKey,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_API_VERSION
+      },
+      body: JSON.stringify({
+        filter: {
+          property: 'Email',
+          email: { equals: email }
+        },
+        page_size: 1
+      })
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      console.warn('[seat-request] Notion dedupe query failed ' + response.status + ': ' + errText);
+      return null; // fail open
+    }
+    const data = await response.json();
+    if (data.results && data.results.length > 0) {
+      const page = data.results[0];
+      const seatIdProp = page.properties && page.properties['Seat ID'];
+      const existingSeatId = seatIdProp && seatIdProp.rich_text && seatIdProp.rich_text[0]
+        ? seatIdProp.rich_text[0].plain_text
+        : null;
+      console.log(`[seat-request] Duplicate request detected for ${email} — existing seat_id: ${existingSeatId || 'unknown'}`);
+      return existingSeatId || '__duplicate__';
+    }
+    return null;
+  } catch (err) {
+    console.warn('[seat-request] Notion dedupe check unexpected error:', err.message);
+    return null; // fail open
+  }
+}
+
 async function logSeatRequestToNotion({ seatId, name, email, requestDate, source, notionApiKey, databaseId }) {
   if (!notionApiKey) {
     console.warn('[seat-request] NOTION_API_KEY not set — skipping Notion log write');
@@ -252,6 +297,30 @@ exports.handler = async function (event, context) {
   const resolvedTier  = (tier && typeof tier === 'string' ? tier.trim() : 'Alpha (Founding)');
   const resolvedCabinTier = (cabin_tier && typeof cabin_tier === 'string' ? cabin_tier.trim() : 'Alpha (Founding)');
   const formattedAmountPaid = (amount_paid !== undefined && amount_paid !== null ? amount_paid : '$0.00');
+
+  // --- Deduplicate: one seat request per email (Gate Contract §2e) ---
+  // Query the Notion Seat Request Registry before generating a new seat_id.
+  // If the email already has a record, return 409 with the existing seat_id.
+  // Fails gracefully: if Notion is unavailable, proceed normally.
+  const existingSeatId = await checkExistingRequest({
+    email: emailTrimmed,
+    notionApiKey,
+    databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
+  });
+  if (existingSeatId) {
+    console.log(`[seat-request] Rejecting duplicate request for ${emailTrimmed}`);
+    const resolvedExisting = existingSeatId === '__duplicate__' ? null : existingSeatId;
+    return {
+      statusCode: 409,
+      headers,
+      body: JSON.stringify({
+        ok: false,
+        duplicate: true,
+        error: 'A seat request has already been submitted for this email address. Check your inbox for your original confirmation.',
+        ...(resolvedExisting ? { seat_id: resolvedExisting } : {})
+      })
+    };
+  }
 
   // --- Generate seat_id (Gate Contract §3) ---
   const seatId = generateSeatId();
