@@ -3,25 +3,29 @@
  * Netlify Function: sendgrid-integration
  *
  * Triggered when a Seat entity is activated (admin approves a SeatRequest).
- * Dispatches the two-email Phase 2 boarding sequence in order:
- *   1. alphaflightannouncement_v1  (canonical fallback defined in sendgrid-templates.js)
- *   2. boarding_confirmation_v1    (canonical fallback defined in sendgrid-templates.js)
+ * Dispatches the correct email sequence based on boarding_type:
  *
- * After both sends confirm 2xx, stamps boarding_confirmation_sent_at on the
- * Seat record via the Base44 API. Idempotency guard: will not overwrite if
- * the field is already set (guards against retry double-stamps).
+ *   boarding_type = "executive_pre"
+ *     → exec_preboard_opentowork_v1  (single send; no boarding_confirmation stamp)
  *
+ *   boarding_type = anything else (default Phase 2 sequence)
+ *     1. alphaflightannouncement_v1
+ *     2. boarding_confirmation_v1
+ *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
+ *
+ * Idempotency guard: will not overwrite boarding_confirmation_sent_at if already set.
  * All sends BCC support@thispagedoesnotexist12345.com per universal BCC rule.
  *
  * Required env vars:
- *   SENDGRID_API_KEY    — SendGrid API key
- *   SENDGRID_FROM_EMAIL — Sender address (default: noreply@thispagedoesnotexist12345.com)
- *   BASE44_SEAT_URL     — Base44 Seat record read/update endpoint
- *   SENDGRID_DEBUG      — Set to "true" to emit structured JSON observability logs
+ *   SENDGRID_API_KEY              — SendGrid API key
+ *   SENDGRID_FROM_EMAIL           — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   BASE44_SEAT_URL               — Base44 Seat record read/update endpoint
+ *   SENDGRID_DEBUG                — Set to "true" to emit structured JSON observability logs
  *
  * Spec references:
  *   - TUJ Alpha Launch Operational Spec (FL 032126) — Section 2.1
  *   - Manus Handoff — boarding_confirmation_sent_at Stamp (Mar 23, 2026)
+ *   - exec_preboard_opentowork_v1 wiring fix (Apr 1, 2026)
  */
 
 const { TEMPLATES, assertTemplates, templateKeyForId } = require('./sendgrid-templates');
@@ -31,10 +35,11 @@ const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
 const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'sendgrid-integration';
 const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
 
-// Template IDs — Phase 2 boarding sequence (sourced from sendgrid-templates.js — do not hardcode d-... here)
-assertTemplates(['alphaflightannouncement_v1', 'boarding_confirmation_v1']);
+// Template IDs — sourced from sendgrid-templates.js (do not hardcode d-... here)
+assertTemplates(['alphaflightannouncement_v1', 'boarding_confirmation_v1', 'exec_preboard_opentowork_v1']);
 const TEMPLATE_ALPHA_ANNOUNCEMENT    = TEMPLATES.alphaflightannouncement_v1;
 const TEMPLATE_BOARDING_CONFIRMATION = TEMPLATES.boarding_confirmation_v1;
+const TEMPLATE_EXEC_PREBOARD         = TEMPLATES.exec_preboard_opentowork_v1;
 
 /**
  * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
@@ -150,7 +155,11 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
 /**
  * sendSeatConfirmation — core boarding sequence dispatcher.
  *
- * Fires both Phase 2 templates in order. If both return 2xx, stamps
+ * Routes to the correct email sequence based on seat.boarding_type:
+ *   - "executive_pre" → exec_preboard_opentowork_v1 (single send)
+ *   - default         → alphaflightannouncement_v1 + boarding_confirmation_v1
+ *
+ * For the default sequence: if both sends return 2xx, stamps
  * boarding_confirmation_sent_at on the Seat record. Idempotent: skips
  * the stamp if boarding_confirmation_sent_at is already set.
  *
@@ -159,6 +168,9 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
  * @param {string} seat.user_email                  - Passenger email
  * @param {string} seat.first_name                  - Passenger first name
  * @param {string} seat.last_name                   - Passenger last name
+ * @param {string} [seat.boarding_type]             - "executive_pre" routes to exec_preboard template
+ * @param {string} [seat.pid]                       - Passenger ID string (used in exec_preboard template)
+ * @param {string} [seat.tuj_code]                  - TUJ code (used in exec_preboard template)
  * @param {string} [seat.flight_id]                 - Flight ID (for correlation)
  * @param {string} [seat.passenger_id]              - Passenger ID (for correlation)
  * @param {string} [seat.request_id]                - Request ID (for correlation)
@@ -179,6 +191,9 @@ async function sendSeatConfirmation(seat) {
     user_email,
     first_name,
     last_name,
+    boarding_type,
+    pid,
+    tuj_code,
     flight_id,
     passenger_id,
     request_id,
@@ -191,8 +206,8 @@ async function sendSeatConfirmation(seat) {
     return { success: false, error: 'Missing required seat fields' };
   }
 
-  // Idempotency guard — do not re-send if already stamped
-  if (boarding_confirmation_sent_at) {
+  // Idempotency guard — do not re-send if already stamped (applies to default sequence only)
+  if (boarding_confirmation_sent_at && boarding_type !== 'executive_pre') {
     console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boarding_confirmation_sent_at}) — skipping send`);
     return { success: true, skipped: true };
   }
@@ -200,14 +215,31 @@ async function sendSeatConfirmation(seat) {
   const correlation_id = buildCorrelationId({ flightId: flight_id, passengerId: passenger_id, requestId: request_id });
   const logCtx = {
     correlation_id,
+    boarding_type: boarding_type || 'default',
     flight_id:    flight_id    || undefined,
     passenger_id: passenger_id || undefined,
     request_id:   request_id   || undefined
   };
 
+  // ── Executive Pre-Board path ───────────────────────────────────────────────
+  if (boarding_type === 'executive_pre') {
+    console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=executive_pre, routing to exec_preboard_opentowork_v1`);
+
+    const execDynamicData = { first_name, last_name, user_email, pid: pid || '', tuj_code: tuj_code || '' };
+    const execSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_EXEC_PREBOARD, execDynamicData, logCtx);
+
+    if (!execSent) {
+      console.error(`[sendgrid-integration] exec_preboard_opentowork_v1 failed for seat ${seatId}`);
+      return { success: false, error: 'exec_preboard_opentowork_v1 send failed' };
+    }
+
+    return { success: true };
+  }
+
+  // ── Default Phase 2 boarding sequence ─────────────────────────────────────
   const dynamicData = { first_name, last_name, user_email };
 
-  // ── Send 1: alphaflightannouncement_v1 ─────────────────────────────────────
+  // Send 1: alphaflightannouncement_v1
   const announcementSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_ALPHA_ANNOUNCEMENT, dynamicData, logCtx);
 
   if (!announcementSent) {
@@ -215,7 +247,7 @@ async function sendSeatConfirmation(seat) {
     return { success: false, error: 'alphaflightannouncement_v1 send failed' };
   }
 
-  // ── Send 2: boarding_confirmation_v1 ───────────────────────────────────────
+  // Send 2: boarding_confirmation_v1
   const confirmationSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_BOARDING_CONFIRMATION, dynamicData, logCtx);
 
   if (!confirmationSent) {
@@ -223,7 +255,7 @@ async function sendSeatConfirmation(seat) {
     return { success: false, error: 'boarding_confirmation_v1 send failed' };
   }
 
-  // ── Both sends confirmed 2xx — stamp boarding_confirmation_sent_at ─────────
+  // Both sends confirmed 2xx — stamp boarding_confirmation_sent_at
   if (base44SeatUrl && seatId) {
     await updateSeatRecord(base44SeatUrl, seatId, {
       boarding_confirmation_sent_at: new Date().toISOString()
