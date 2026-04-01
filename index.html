@@ -1329,12 +1329,13 @@
           </li>
 
           <!-- Step 5: Book a Consultation -->
+          <!-- CalendarJet CTA is hidden by default; shown only when intake_mode=CALENDARJET -->
           <li class="boarding-step" id="bstep-5">
             <span class="bstep-num">05</span>
             <div class="bstep-body">
               <span class="bstep-name">Book a Consultation</span>
-              <span class="bstep-desc">30-minute strategy session. Reply to your Welcome email to schedule, or use the link below.</span>
-              <a class="bstep-cta" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer">
+              <span class="bstep-desc" id="bstep-5-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
+              <a class="bstep-cta" id="bstep-5-cta" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer" style="display:none;">
                 Book 30-Min Session <span class="bstep-cta-arrow">→</span>
               </a>
             </div>
@@ -2171,6 +2172,19 @@
         var intakeMode = status.intake_mode || 'SENDGRID';
         var calUrl = 'https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345';
 
+        // ── Step 05 boarding CTA: CalendarJet link only in CALENDARJET mode ──────
+        var bstep5Cta  = document.getElementById('bstep-5-cta');
+        var bstep5Desc = document.getElementById('bstep-5-desc');
+        if (intakeMode === 'CALENDARJET') {
+          // Show the booking link and update description
+          if (bstep5Cta)  bstep5Cta.style.display = '';
+          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Use the link below to schedule.';
+        } else {
+          // SENDGRID / CONSTANTCONTACT: no outbound link — reply to Welcome email
+          if (bstep5Cta)  bstep5Cta.style.display = 'none';
+          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Reply to your Welcome email to schedule.';
+        }
+
         if (intakeMode === 'CALENDARJET') {
           // Hide the SendGrid seat request CTA; show the CalendarJet booking link
           if (waitlistBtn) waitlistBtn.style.display = 'none';
@@ -2383,7 +2397,7 @@
               } catch (e) { /* skip malformed hrefs */ }
             });
             // Wire seat_id into CalendarJet consultation link in boarding steps
-            var calBoardingLink = document.querySelector('#bstep-5 .bstep-cta');
+            var calBoardingLink = document.getElementById('bstep-5-cta');
             if (calBoardingLink) {
               try {
                 var cu = new URL(calBoardingLink.href);
