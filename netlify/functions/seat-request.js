@@ -331,17 +331,20 @@ exports.handler = async function (event, context) {
   // but encodeURIComponent is used defensively in case the format ever changes.
   const passportUrl = `${passportBase}?seat_id=${encodeURIComponent(seatId)}`;
 
-  const padInternalAlertValue = (value) => ` ${value}`;
+  // Bug-003 fix: pass values without the leading-space pad so the SendGrid template
+  // can render "Name: Kevin" style rows without label/value collision.
+  // first_name uses the full nameTrimmed so {{first_name}} resolves as "Jo Ann", not "Jo".
   const internalDynamicTemplateData = {
-    name:         padInternalAlertValue(nameTrimmed),
-    email:        padInternalAlertValue(emailTrimmed),
-    seat_id:      padInternalAlertValue(seatId),
-    tier:         padInternalAlertValue(resolvedTier),
-    cabin_tier:   padInternalAlertValue(resolvedCabinTier),
-    signup_date:  padInternalAlertValue(requestDate),
+    name:         nameTrimmed,
+    first_name:   nameTrimmed,
+    email:        emailTrimmed,
+    seat_id:      seatId,
+    tier:         resolvedTier,
+    cabin_tier:   resolvedCabinTier,
+    signup_date:  requestDate,
     passport_url: passportUrl,
-    source:       padInternalAlertValue(sourceValue),
-    amount_paid:  padInternalAlertValue(formattedAmountPaid)
+    source:       sourceValue,
+    amount_paid:  formattedAmountPaid
   };
 
   // --- Send user acknowledgement via SendGrid ---
