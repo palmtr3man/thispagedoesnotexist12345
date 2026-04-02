@@ -1171,11 +1171,11 @@
 </head>
 <body class="black-glass" data-state="loading">
   <div class="container">
-    <h1>🚀 The Ultimate Journey</h1>
-    <p class="subtitle">Career Optimization Platform</p>
+    <h1 data-show-state="landing departed">🚀 The Ultimate Journey</h1>
+    <p class="subtitle" data-show-state="landing departed">Career Optimization Platform</p>
 
     <!-- CAROUSEL -->
-    <div class="carousel-wrap">
+    <div class="carousel-wrap" data-show-state="landing departed">
       <div class="carousel" id="mainCarousel">
         <div class="carousel-track" id="carouselTrack">
           <div class="carousel-slide">
@@ -1235,6 +1235,31 @@
         <div class="age-gate-actions">
           <button class="age-gate-confirm" id="age-gate-confirm-btn" disabled>Verify Age &amp; Continue</button>
           <button class="age-gate-deny" id="age-gate-deny-btn">I cannot confirm — take me back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Seat ID Entry Modal (shown when ?mission-control without valid seat_id) ── -->
+    <div id="seat-id-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="sig-title" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+      <div class="age-gate-card" style="max-width:380px;">
+        <h2 id="sig-title" style="color:#A8C400;font-size:1.25rem;margin-bottom:0.5rem;">❖ Mission Control</h2>
+        <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:1.25rem;line-height:1.6;">Enter your Seat ID to access your dashboard.<br><span style="font-size:0.78rem;opacity:0.6;">Your ID was included in your boarding confirmation email.</span></p>
+        <input
+          id="sig-input"
+          type="text"
+          placeholder="TUJ-XXXXXX"
+          maxlength="10"
+          autocomplete="off"
+          spellcheck="false"
+          style="width:100%;padding:0.65rem 0.9rem;border-radius:8px;border:1px solid rgba(168,196,0,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:1rem;font-family:monospace;letter-spacing:0.1em;text-transform:uppercase;outline:none;box-sizing:border-box;margin-bottom:0.5rem;"
+          oninput="this.value=this.value.toUpperCase();"
+          onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
+          onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
+        />
+        <div id="sig-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1.2em;margin-bottom:0.5rem;"></div>
+        <div class="age-gate-actions">
+          <button class="age-gate-confirm" id="sig-confirm-btn">Access Mission Control</button>
+          <button class="age-gate-deny" id="sig-cancel-btn">Cancel</button>
         </div>
       </div>
     </div>
@@ -1474,10 +1499,21 @@
         </div>
       </div>
 
+      <!-- ── Dashboard footer nav ──────────────────────────────────────────── -->
+      <div class="mc-section" style="border-bottom:none;margin-bottom:0;padding-bottom:0;padding-top:0.5rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;">
+          <a class="mc-action-btn" href="/Studio" target="_blank" rel="noopener noreferrer">📄 Studio</a>
+          <a class="mc-action-btn" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">📡 Signal</a>
+          <a class="mc-action-btn" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">⚙️ Systems</a>
+          <a class="mc-action-btn" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">📚 Resources</a>
+        </div>
+        <p style="font-size:0.7rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:0.75rem;letter-spacing:0.04em;">&copy; 2026 The Ultimate Journey</p>
+      </div>
+
     </div><!-- /#dashboard-view -->
 
     <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
-    <div class="status-section" id="loading-dock">
+    <div class="status-section" id="loading-dock" data-show-state="landing departed">
       <div class="status-scanlines"></div>
 
       <div class="status-title">
@@ -1700,15 +1736,16 @@
 
 
     <!-- BLACK GLASS BUTTONS -->
-    <div class="btn-row">
+    <div class="btn-row" data-show-state="landing departed">
       <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
+      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
       <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
       <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
       <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
     </div>
 
     <!-- PUZZLE PATH TRACKER -->
-    <div class="puzzle-tracker" id="puzzleTracker">
+    <div class="puzzle-tracker" id="puzzleTracker" data-show-state="landing departed">
       <span class="puzzle-label">Paths Activated</span>
       <div class="puzzle-diamonds">
         <span class="puzzle-diamond" id="diamond-signal" title="Signal">✦</span>
@@ -1718,22 +1755,22 @@
     </div>
 
     <!-- Divider -->
-    <div class="btn-row-divider">
+    <div class="btn-row-divider" data-show-state="landing departed">
       <span>next step</span>
     </div>
 
     <!-- NEXT STEP GUIDANCE -->
-    <div class="btn-row-waitlist" style="display: block; text-align: center; margin-bottom: 2rem;">
+    <div class="btn-row-waitlist" data-show-state="landing departed" style="display: block; text-align: center; margin-bottom: 2rem;">
       <p style="font-size: 0.85rem; color: rgba(168, 196, 0, 0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
     </div>
 
     <!-- Option B: About / Footer Links -->
-    <section style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(168,196,0,0.1); font-size:0.8rem;">
+    <section data-show-state="landing departed" style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(168,196,0,0.1); font-size:0.8rem;">
       <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">About / Resources</a>
       <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
       <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
     </section>
-    <footer>
+    <footer data-show-state="landing departed">
       &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
     </footer>
   </div>
@@ -2389,6 +2426,13 @@
           if (seatIdEl) seatIdEl.textContent = seatId || '';
           // Wire seat_id into all .tech links so OnboardingPassport receives it
           if (seatId) {
+            // Update Mission Control nav button href with seat_id
+            var mcNavBtn = document.getElementById('mc-nav-btn');
+            if (mcNavBtn) {
+              mcNavBtn.href = '/?seat_id=' + encodeURIComponent(seatId);
+            }
+          }
+          if (seatId) {
             document.querySelectorAll('a[href*="thispagedoesnotexist12345.tech"]').forEach(function (a) {
               try {
                 var u = new URL(a.href);
@@ -2778,6 +2822,99 @@
         tick();
         timer = setInterval(tick, 1000);
       }, 100);
+    })();
+
+    // ── Seat ID Gate Modal — wires the ❖ Mission Control nav button and entry prompt ──
+    (function () {
+      var SEAT_KEY  = 'seat_id';
+      var SEAT_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+
+      var overlay   = document.getElementById('seat-id-gate-overlay');
+      var sigInput  = document.getElementById('sig-input');
+      var sigError  = document.getElementById('sig-error');
+      var sigConfirm = document.getElementById('sig-confirm-btn');
+      var sigCancel  = document.getElementById('sig-cancel-btn');
+      var mcNavBtn   = document.getElementById('mc-nav-btn');
+
+      // Show the Mission Control nav button only when a valid seat_id is in session
+      function refreshMcNavBtn() {
+        var stored = sessionStorage.getItem(SEAT_KEY);
+        if (mcNavBtn) {
+          if (stored && SEAT_REGEX.test(stored)) {
+            mcNavBtn.href = '/?seat_id=' + encodeURIComponent(stored);
+            mcNavBtn.style.display = '';
+          } else {
+            // No valid seat in session — show button but it opens the entry modal
+            mcNavBtn.href = '#';
+            mcNavBtn.style.display = '';
+          }
+        }
+      }
+
+      function openGate() {
+        if (overlay) {
+          overlay.style.display = 'flex';
+          if (sigInput) { sigInput.value = ''; sigInput.focus(); }
+          if (sigError) sigError.textContent = '';
+        }
+      }
+
+      function closeGate() {
+        if (overlay) overlay.style.display = 'none';
+      }
+
+      // Mission Control nav button click: if seat in session go direct, else open modal
+      if (mcNavBtn) {
+        mcNavBtn.addEventListener('click', function (e) {
+          var stored = sessionStorage.getItem(SEAT_KEY);
+          if (stored && SEAT_REGEX.test(stored)) {
+            // Valid seat in session — let the href navigate normally
+            return;
+          }
+          e.preventDefault();
+          openGate();
+        });
+      }
+
+      // Confirm: validate input, store in session, navigate to dashboard
+      if (sigConfirm) {
+        sigConfirm.addEventListener('click', function () {
+          var val = (sigInput ? sigInput.value.trim().toUpperCase() : '');
+          if (!SEAT_REGEX.test(val)) {
+            if (sigError) sigError.textContent = 'Invalid Seat ID. Format: TUJ-XXXXXX (e.g. TUJ-C2DED6)';
+            if (sigInput) sigInput.focus();
+            return;
+          }
+          sessionStorage.setItem(SEAT_KEY, val);
+          closeGate();
+          // Navigate to dashboard with the entered seat_id
+          window.location.href = '/?seat_id=' + encodeURIComponent(val);
+        });
+      }
+
+      // Allow Enter key in input to confirm
+      if (sigInput) {
+        sigInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && sigConfirm) sigConfirm.click();
+        });
+      }
+
+      // Cancel button
+      if (sigCancel) {
+        sigCancel.addEventListener('click', closeGate);
+      }
+
+      // Close on overlay background click
+      if (overlay) {
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeGate();
+        });
+      }
+
+      // Initial state: show/configure Mission Control nav button
+      document.addEventListener('DOMContentLoaded', refreshMcNavBtn);
+      // Also refresh after TUJ state machine may have stored a seat_id
+      setTimeout(refreshMcNavBtn, 1200);
     })();
 
     // Black Glass always active
