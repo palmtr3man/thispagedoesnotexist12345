@@ -237,7 +237,9 @@ async function sendSeatConfirmation(seat) {
   }
 
   // ── Default Phase 2 boarding sequence ─────────────────────────────────────
-  const dynamicData = { first_name, last_name, user_email };
+  // seatreference is an alias for seatId so templates that use {{seatreference}}
+  // resolve correctly. seat_id is also included for templates using {{seat_id}}.
+  const dynamicData = { first_name, last_name, user_email, seat_id: seatId || '', seatreference: seatId || '' };
 
   // Send 1: alphaflightannouncement_v1
   const announcementSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_ALPHA_ANNOUNCEMENT, dynamicData, logCtx);
