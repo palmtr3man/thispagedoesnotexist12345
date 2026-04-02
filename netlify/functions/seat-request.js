@@ -283,7 +283,7 @@ exports.handler = async function (event, context) {
   const fromEmail   = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
   const platformUrl = process.env.PLATFORM_URL        || 'https://www.thispagedoesnotexist12345.com';
   const signalUrl   = process.env.SIGNAL_URL          || 'https://newsletter.thispagedoesnotexist12345.us';
-  const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.tech';
+  const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.com';
   const beehiivKey  = process.env.BEEHIIV_API_KEY;
   const beehiivPub  = process.env.BEEHIIV_PUB_ID || BEEHIIV_PUB_ID_DEFAULT;
 
@@ -354,7 +354,7 @@ exports.handler = async function (event, context) {
     source:       sourceValue,
     platform_url: platformUrl,
     signal_url:   signalUrl,
-    passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.tech?seat_id=TUJ-XXXXXX
+    passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.com?seat_id=TUJ-XXXXXX
     request_date: requestDate
   };
 
