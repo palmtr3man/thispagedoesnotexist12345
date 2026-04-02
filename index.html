@@ -1256,7 +1256,7 @@
           onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
           onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
         />
-        <div id="sig-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1.2em;margin-bottom:0.5rem;"></div>
+        <div id="sig-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1.2em;margin-bottom:0.5rem;line-height:1.5;"></div>
         <div class="age-gate-actions">
           <button class="age-gate-confirm" id="sig-confirm-btn">Access Mission Control</button>
           <button class="age-gate-deny" id="sig-cancel-btn">Cancel</button>
@@ -1738,10 +1738,13 @@
     <!-- BLACK GLASS BUTTONS -->
     <div class="btn-row" data-show-state="landing departed">
       <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
-      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
       <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
       <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
       <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
+    </div>
+    <!-- MISSION CONTROL BUTTON — separate row, below Studio/Signal/Systems/Support -->
+    <div class="btn-row" data-show-state="landing departed" style="margin-top:-0.25rem;">
+      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
     </div>
 
     <!-- PUZZLE PATH TRACKER -->
@@ -2489,13 +2492,19 @@
         console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
       }
 
-      // ── Public: rerender() ────���───────────────────────────────────────────
+       // ── Public: rerender() ─────────────────────────────────────────────────
       async function rerender() {
+        // Preserve scroll position so the loading-state flash never resets the page
+        var savedScrollY = window.scrollY || window.pageYOffset || 0;
         document.body.setAttribute('data-state', 'loading');
         _status = await fetchStatus();
         _seatId = getSeatId();
         var state = computeState(_status, _seatId);
         applyState(state, _status, _seatId);
+        // Restore scroll after the state transition fires (next rAF)
+        requestAnimationFrame(function () {
+          window.scrollTo(0, savedScrollY);
+        });
       }
 
       // ── Public: showAgeGate(onConfirm) ───────────────────────────────────
@@ -2881,7 +2890,9 @@
         sigConfirm.addEventListener('click', function () {
           var val = (sigInput ? sigInput.value.trim().toUpperCase() : '');
           if (!SEAT_REGEX.test(val)) {
-            if (sigError) sigError.textContent = 'Invalid Seat ID. Format: TUJ-XXXXXX (e.g. TUJ-C2DED6)';
+            if (sigError) {
+              sigError.innerHTML = 'That code doesn\'t match a seat on this flight. If you haven\'t boarded yet, <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#A8C400;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+            }
             if (sigInput) sigInput.focus();
             return;
           }
