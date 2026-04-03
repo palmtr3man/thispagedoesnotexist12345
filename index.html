@@ -2073,6 +2073,20 @@
           return;
         }
 
+        // F-VIP-01 — UI guard: VIP flight suppression (Layer 3 of 3).
+        // If the Netlify function returned HTTP 451 with _vip_suppressed: true,
+        // a VIP flight was active but has been withheld from public display.
+        // gate_status is already 'closed' in the payload; this guard ensures
+        // no VIP flight label leaks into the UI and logs a discreet console note.
+        if (status._vip_suppressed === true) {
+          // gate_status is already 'closed' — fall through to normal closed rendering
+          // but clear any flight_label that might have been set before the guard ran.
+          status.flight_label = null;
+          console.info('[TUJ] VIP flight active — public gate showing closed state (F-VIP-01).');
+          // Do NOT return early: let the normal 'closed' rendering path run so
+          // the "Next Departure" badge (nextflightdeparturedate) still displays.
+        }
+
         // QA #5 — Layer 3: UI fallback for flight invariant conflict.
         // If the Netlify function returned gate_status: 'conflict' (HTTP 409 body),
         // surface a neutral holding state rather than showing potentially wrong seat data.
