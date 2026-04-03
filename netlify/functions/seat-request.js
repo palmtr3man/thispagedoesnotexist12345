@@ -45,7 +45,7 @@ function sgLog(fields) {
 }
 
 // --- SendGrid template IDs (sourced from sendgrid-templates.js — do not hardcode d-... here) ---
-assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_v1']);
+assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_v1', 'next_flight_waitlist_v1']);
 const TEMPLATE_ID = TEMPLATES.seat_request_acknowledgement_v1;
 const INTERNAL_TEMPLATE_ID = TEMPLATES.internalsignupnotification_v1;
 const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
@@ -297,6 +297,50 @@ exports.handler = async function (event, context) {
   const resolvedTier  = (tier && typeof tier === 'string' ? tier.trim() : 'Alpha (Founding)');
   const resolvedCabinTier = (cabin_tier && typeof cabin_tier === 'string' ? cabin_tier.trim() : 'Alpha (Founding)');
   const formattedAmountPaid = (amount_paid !== undefined && amount_paid !== null ? amount_paid : '$0.00');
+
+  // --- F143: Cohort capacity check — divert to waitlist if seats_available === false ---
+  // Fires next_flight_waitlist_v1 email + applies Beehiiv 'waitlist' tag.
+  // Non-fatal: if /api/seat-status is unavailable, falls through to normal flow.
+  try {
+    const seatStatusUrl = (process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com') + '/api/seat-status';
+    const statusRes = await fetch(seatStatusUrl);
+    if (statusRes.ok) {
+      const statusData = await statusRes.json();
+      if (statusData.seats_available === false) {
+        console.log(`[seat-request] Cohort full — diverting ${emailTrimmed} to waitlist (F143)`);
+        const wlFirstName = nameTrimmed.split(/\s+/)[0] || nameTrimmed;
+        const wlPlatformUrl = (process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com') + '/ResumeFitCheck';
+        const waitlistTemplateId = TEMPLATES.next_flight_waitlist_v1;
+        // Send next_flight_waitlist_v1 email
+        try {
+          const wlRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: { email: fromEmail },
+              personalizations: [{ to: [{ email: emailTrimmed }], dynamic_template_data: { first_name: wlFirstName, platform_url: wlPlatformUrl } }],
+              template_id: waitlistTemplateId,
+              asm: { group_id: ASM_GROUP_ID }
+            })
+          });
+          console.log(`[seat-request] next_flight_waitlist_v1 ${wlRes.ok || wlRes.status === 202 ? 'sent' : 'failed (' + wlRes.status + ')'} to ${emailTrimmed}`);
+        } catch (wlErr) {
+          console.error('[seat-request] Waitlist email error:', wlErr.message);
+        }
+        // Apply Beehiiv 'waitlist' tag via subscription (reactivate_existing: false keeps existing subs intact)
+        if (beehiivKey) {
+          await subscribeToBeehiiv(emailTrimmed, wlFirstName, beehiivKey, beehiivPub);
+        }
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ ok: true, waitlisted: true, status: 'waitlisted', message: "You're on the next flight. Check your inbox for details." })
+        };
+      }
+    }
+  } catch (capacityErr) {
+    console.warn('[seat-request] Capacity check unavailable (F143 — fail open):', capacityErr.message);
+  }
 
   // --- Deduplicate: one seat request per email (Gate Contract §2e) ---
   // Query the Notion Seat Request Registry before generating a new seat_id.

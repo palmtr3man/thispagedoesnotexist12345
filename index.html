@@ -1631,7 +1631,12 @@
             })
             .then(function(r){ return r.json(); })
             .then(function(d){
-              if (d.ok) {
+              if (d.waitlisted) {
+                // F143: Cohort full — show "You're on the next flight" state
+                form.style.display = 'none';
+                var wlConf = document.getElementById('seat-request-waitlisted');
+                if (wlConf) wlConf.style.display = 'block';
+              } else if (d.ok) {
                 form.style.display = 'none';
                 var conf = document.getElementById('seat-request-confirm');
                 conf.style.display = 'block';
@@ -1695,12 +1700,19 @@
           </div>
         </form>
 
-        <!-- Step 3: Confirmation (hidden until successful submit) -->
+        <!-- Step 3a: Confirmation — seat reserved (hidden until successful submit) -->
         <div
           id="seat-request-confirm"
           style="display:none;font-size:0.9rem;color:#A8C400;letter-spacing:0.03em;padding:0.5rem 0;"
         >
           ✅ Your seat request has been received. Check your inbox for the next steps.
+        </div>
+
+        <!-- Step 3b: Waitlist confirmation — cohort full (F143) -->
+        <div id="seat-request-waitlisted" style="display:none;padding:1rem 0;">
+          <p style="font-size:1rem;color:#A8C400;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">You're on the next flight.</p>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:1rem;">All 5 seats on this flight are full.<br>We'll notify you the moment a seat opens — passengers graduate when they land an offer.</p>
+          <a href="/ResumeFitCheck" class="btn-waitlist unlocked" style="display:inline-block;">▶ While you wait, run an ATS check</a>
         </div>
 
         <!-- seat-count span appended here by applySeatGate() -->
@@ -2719,6 +2731,11 @@
               var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
               history.replaceState({}, '', newUrl);
               window.__TUJ.rerender();
+            } else if (d.waitlisted) {
+              // F143: Cohort full — show "You're on the next flight" state
+              form.style.display = 'none';
+              var wlConf = document.getElementById('seat-request-waitlisted');
+              if (wlConf) wlConf.style.display = 'block';
             } else if (d.ok) {
               // Legacy ok:true without seat_id (Base44 stub path)
               form.style.display = 'none';
