@@ -240,3 +240,49 @@ export async function requestSeat(payload) {
 
   return data;
 }
+
+/**
+ * resolveSeatId() — Session Seat ID Reader
+ *
+ * Returns the seat_id stored in sessionStorage by a prior requestSeat() call,
+ * or null if no seat is active in the current session.
+ *
+ * Use this to read the passenger's seat identifier without triggering a full
+ * resolveState() round-trip (e.g., for deep-link construction or API calls
+ * that require seat_id as a query parameter).
+ *
+ * @since   v1b (2026-03-29)
+ * @returns {string|null} The seat_id string, or null if not present.
+ *
+ * @example
+ * import { resolveSeatId } from '/gate-contract.js';
+ * const id = resolveSeatId();
+ * if (id) window.location.href = `/Tower?seat_id=${id}`;
+ */
+export function resolveSeatId() {
+  return sessionStorage.getItem(GATE.SESSION_KEY) || null;
+}
+
+/**
+ * verifyAgeToken() — Age Confirmation Token Validator
+ *
+ * Checks whether the passenger has confirmed they are 18+ by reading the
+ * age_confirmed flag stored in sessionStorage during the intake flow.
+ *
+ * Returns true only if the flag is explicitly set to the string 'true'.
+ * Any other value (missing, 'false', malformed) returns false.
+ *
+ * This is a client-side convenience check only. The authoritative age
+ * confirmation is validated server-side in seat-request.js before any
+ * seat is reserved.
+ *
+ * @since   v1b (2026-03-29)
+ * @returns {boolean} True if age has been confirmed in this session.
+ *
+ * @example
+ * import { verifyAgeToken } from '/gate-contract.js';
+ * if (!verifyAgeToken()) showAgeGate();
+ */
+export function verifyAgeToken() {
+  return sessionStorage.getItem('age_confirmed') === 'true';
+}
