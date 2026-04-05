@@ -7,6 +7,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2026-04-05] — Fix: resolveState() seat_id Server-Side Validation (Mission Control State 2)
+
+### Added
+- `netlify/functions/seat.js` — New `/api/seat?id=TUJ-XXXXXX` Netlify function. Validates a seat ID against Base44 (`BASE44_SEAT_URL/{id}`). Returns `{ valid: true, seat_id, status }` on success; `{ valid: false, reason: 'not_found' | 'inactive' }` on rejection; `{ valid: true, _unchecked: true }` as fail-open when `BASE44_SEAT_URL` is unset or Base44 is unreachable. Accepts `opened` and `approved` Base44 statuses as valid; rejects `pending` and all others.
+- `netlify.toml` — `/api/seat` redirect wired to `/.netlify/functions/seat`.
+- `#seat-invalid-notice` HTML element — inline recovery notice shown in landing state when a seat_id is rejected. Links to Signal newsletter for re-entry.
+
+### Changed
+- `index.html` — `getSeatId()` split into `getSeatIdRaw()` (sync, format-only) and `validateSeatId(id)` (async, calls `/api/seat`). `rerender()` now runs `fetchStatus()` and `validateSeatId()` in parallel via `Promise.all()`. On explicit rejection (`valid: false`), strips `seat_id` from URL via `history.replaceState` and surfaces `#seat-invalid-notice`. Fail-open on network error or timeout preserves existing behaviour when Base44 is unconfigured.
+- `index.html` — Seat ID Entry Modal confirm handler upgraded to call `/api/seat` before navigating. Shows server-side error message on `valid: false`; fails open on network error.
+- `gate-contract.js` — `resolveState()` upgraded to v1c. Now calls `GATE.VALIDATE_SEAT` after regex validation. Same fail-open contract as inline state machine. Accepts `{ skipSeatValidation: true }` opt for test environments.
+
+---
+
 ## [2026-04-02] — Sprint 2 Completion
 
 ### Added

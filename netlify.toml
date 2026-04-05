@@ -54,3 +54,8 @@
   from = "/api/verify-age"
   to = "/.netlify/functions/verify-age"
   status = 200
+
+[[redirects]]
+  from = "/api/seat"
+  to = "/.netlify/functions/seat"
+  status = 200
