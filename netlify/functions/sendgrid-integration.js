@@ -394,7 +394,8 @@ async function sendSeatConfirmation(seat) {
     cabin_class:    cabin_class || 'Economy',
     passport_url:   passportUrl,
     first_task_url: firstTaskUrl,
-    secondary_url:  secondaryUrl
+    secondary_url:  secondaryUrl,
+    platform_url:   process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com'
   };
 
   // Template pairs: { autosend: '<autosend-id>', sendgrid: '<d-...>' }
