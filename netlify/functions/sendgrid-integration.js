@@ -384,9 +384,12 @@ async function sendSeatConfirmation(seat) {
   // Fix 4 (Apr 5, 2026): platform_url added — resolves {{platform_url}} Main Site footer link in
   //   boarding_pass_free_v1, boarding_pass_paid_v1, boarding_instructions_free_v1,
   //   boarding_instructions_paid_v1. Was previously unmapped -> rendered as base44.app URL.
-  const passportUrl   = `${siteUrl}/Studio?seat_id=${encodeURIComponent(seatId || '')}`;
-  const firstTaskUrl  = `${siteUrl}/Studio?seat_id=${encodeURIComponent(seatId || '')}`;
-  const secondaryUrl  = `${siteUrl}?seat_id=${encodeURIComponent(seatId || '')}`;
+  // Fix 3b (Apr 5, 2026): passport_url corrected to /?seat_id= (was /Studio?seat_id=).
+  //   seat_id chars (A-Z, 2-9, hyphen) are URL-safe — encodeURIComponent removed per canonical spec.
+  //   firstTaskUrl retains /Studio path (boarding instructions CTA — ResumeFitCheck deep-link).
+  const passportUrl   = `${siteUrl}/?seat_id=${seatId || ''}`;
+  const firstTaskUrl  = `${siteUrl}/Studio?seat_id=${seatId || ''}`;
+  const secondaryUrl  = `${siteUrl}?seat_id=${seatId || ''}`;
   const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
 
   const dynamicData = {

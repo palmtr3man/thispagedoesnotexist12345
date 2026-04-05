@@ -17,7 +17,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - `index.html` — `getSeatId()` split into `getSeatIdRaw()` (sync, format-only) and `validateSeatId(id)` (async, calls `/api/seat`). `rerender()` now runs `fetchStatus()` and `validateSeatId()` in parallel via `Promise.all()`. On explicit rejection (`valid: false`), strips `seat_id` from URL via `history.replaceState` and surfaces `#seat-invalid-notice`. Fail-open on network error or timeout preserves existing behaviour when Base44 is unconfigured.
 - `index.html` — Seat ID Entry Modal confirm handler upgraded to call `/api/seat` before navigating. Shows server-side error message on `valid: false`; fails open on network error.
-- `gate-contract.js` — `resolveState()` upgraded to v1c. Now calls `GATE.VALIDATE_SEAT` after regex validation. Same fail-open contract as inline state machine. Accepts `{ skipSeatValidation: true }` opt for test environments.
+- `gate-contract.js` — `resolveState()` upgraded to v1c. Now calls `GATE.VALIDATE_SEAT` after regex validation. Same fail-open contract. Accepts `{ skipSeatValidation: true }` opt for test environments.
+
+## [2026-04-05] — Fix 3a + 3b: Mission Control CTA URL Canonicalization
+
+### Fixed
+- `netlify/functions/sendgrid-integration.js` — Fix 3b: `passport_url` corrected from `${siteUrl}/Studio?seat_id=...` to `${siteUrl}/?seat_id=...` (was landing on `/Studio` instead of Mission Control root). `encodeURIComponent` removed from `passportUrl`, `firstTaskUrl`, and `secondaryUrl` construction — seat_id chars (A–Z, 2–9, hyphen) are URL-safe; encoding was a no-op but violated the canonical spec.
+- `netlify/functions/seat-request.js` — Fix 3b: `encodeURIComponent` removed from `passportUrl` construction. Canonical form locked: `https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX`.
+- Fix 3a: `?status=boarded` param confirmed absent from all templates and server-side URL construction. No changes required.
+
+### Changed
+- `sendgrid-templates/boarding_pass_free_v1.html` — Fix log updated; last-updated date bumped to 2026-04-05.
+- `sendgrid-templates/boarding_pass_paid_v1.html` — Fix log updated; last-updated date bumped to 2026-04-05.
+- `sendgrid-templates/boarding_instructions_free_v1.html` — Fix log updated; last-updated date bumped to 2026-04-05.
+- `sendgrid-templates/boarding_instructions_paid_v1.html` — Fix log updated; last-updated date bumped to 2026-04-05.
 
 ---
 
