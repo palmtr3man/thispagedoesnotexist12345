@@ -7,6 +7,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2026-04-05] — Fix: Alpha Cohort Seat ID Reassignment (Regex Compliance)
+
+### Changed
+- Alpha cohort seat IDs reassigned to comply with `SEAT_ID_REGEX` (`^TUJ-[A-Z2-9]{6}$` — excludes `0`, `1`, `O`, `I` for visual clarity). Previous IDs used `0` and `1` which failed the format check and would have caused all cohort passengers to land on the invalid-seat recovery screen instead of Mission Control.
+  - Seat 1 Kevin Clark: `TUJ-KC0001` → `TUJ-KC2222`
+  - Seat 2 Clarence Clark: `TUJ-CC0001` → `TUJ-CC2222`
+  - Seat 3 Jo Ann Clark: `TUJ-JC0001` → `TUJ-JC2222`
+  - Seat 4 Janelle Asumang: `TUJ-JA0001` → `TUJ-JA2222`
+  - Seat 5 Monica Nadute: `TUJ-MN0001` → `TUJ-MN2222`
+- Notion Alpha Launch cohort manifest updated with new IDs.
+- Base44 Seat records require manual update (seat_id field on each of the 5 records).
+
+---
+
 ## [2026-04-05] — Fix: resolveState() seat_id Server-Side Validation (Mission Control State 2)
 
 ### Added
