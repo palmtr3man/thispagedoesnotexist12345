@@ -1576,6 +1576,18 @@
         <div class="countdown-departed" id="countdown-departed" style="display:none;">✈️ Wheels Up — Flight Departed</div>
       </div>
 
+      <!-- Seat ID invalid recovery notice (shown by rerender() when seat_id is rejected) -->
+      <div
+        id="seat-invalid-notice"
+        data-show-state="landing"
+        style="display:none;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.35);border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.55;text-align:center;margin-bottom:0.75rem;"
+      >
+        That Seat ID wasn’t found on this flight.
+        Check your boarding confirmation email, or
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#A8C400;text-decoration:underline;">join Signal</a>
+        to stay on the manifest.
+      </div>
+
       <!-- F148: Primary CTA → POST /api/seat-request -->
       <!-- #cta-wrapper: stacked + centered so seat-count note renders below the button, not inline -->
       <div id="cta-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:1.25rem auto;text-align:center;">
@@ -2318,15 +2330,58 @@
       var _ageGateCb  = null;   // pending callback after age confirm
 
       // ── Helpers ──────────────────────────────────────────────────────────
-      function getSeatId() {
+
+      // getSeatIdRaw() — reads seat_id from URL or sessionStorage without validation.
+      // Returns the raw string if it matches the format regex, else null.
+      function getSeatIdRaw() {
         var fromSession = sessionStorage.getItem(SEAT_KEY);
         var fromUrl     = new URLSearchParams(location.search).get('seat_id');
-        var id = fromSession || fromUrl || null;
-        if (id && SEAT_REGEX.test(id)) {
-          sessionStorage.setItem(SEAT_KEY, id); // persist URL param to session
+        var id = fromUrl || fromSession || null;
+        if (id && SEAT_REGEX.test(id)) return id;
+        return null;
+      }
+
+      // validateSeatId(id) — async; calls /api/seat to confirm the seat is active.
+      // Resolution contract:
+      //   valid: true  → seat confirmed; persists to sessionStorage; returns id.
+      //   valid: false → seat invalid/inactive; clears sessionStorage; returns null.
+      //   fetch error  → fail-open; persists to sessionStorage; returns id.
+      //                  (preserves existing behaviour when Base44 is unreachable)
+      async function validateSeatId(id) {
+        if (!id) return null;
+        // Persist immediately so the session survives a hard refresh mid-flight.
+        sessionStorage.setItem(SEAT_KEY, id);
+        try {
+          var res = await fetch('/api/seat?id=' + encodeURIComponent(id));
+          if (!res.ok) {
+            // Non-2xx from our own function (e.g. 400 bad format) — treat as invalid.
+            if (res.status === 400) {
+              console.warn('[TUJ] seat validation: 400 bad format for', id);
+              sessionStorage.removeItem(SEAT_KEY);
+              return null;
+            }
+            // Any other non-2xx (5xx etc.) — fail open.
+            console.warn('[TUJ] seat validation: non-2xx (' + res.status + ') — failing open for', id);
+            return id;
+          }
+          var data = await res.json();
+          if (data.valid === false) {
+            console.warn('[TUJ] seat validation: invalid seat', id, '— reason:', data.reason || 'unknown');
+            sessionStorage.removeItem(SEAT_KEY);
+            return null;
+          }
+          // valid: true (or _unchecked: true fail-open from function)
+          return id;
+        } catch (e) {
+          // Network error / timeout — fail open.
+          console.warn('[TUJ] seat validation: fetch error — failing open for', id, e);
           return id;
         }
-        return null;
+      }
+
+      // getSeatId() — kept for legacy callers; synchronous read only (no API call).
+      function getSeatId() {
+        return getSeatIdRaw();
       }
 
       function isAgeVerified() {
@@ -2518,13 +2573,37 @@
         console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
       }
 
-       // ── Public: rerender() ─────────────────────────────────────────────────
+      // ── Public: rerender() ───────────────────────────────────────────────────────────────
       async function rerender() {
         // Preserve scroll position so the loading-state flash never resets the page
         var savedScrollY = window.scrollY || window.pageYOffset || 0;
         document.body.setAttribute('data-state', 'loading');
-        _status = await fetchStatus();
-        _seatId = getSeatId();
+
+        // Fetch gate status and validate seat_id in parallel for speed.
+        var rawId = getSeatIdRaw();
+        var results = await Promise.all([
+          fetchStatus(),
+          validateSeatId(rawId)   // null if rawId is null; fail-open on error
+        ]);
+        _status = results[0];
+        _seatId = results[1];  // null means invalid/missing; non-null means confirmed
+
+        // If rawId was present but validateSeatId returned null, the seat was
+        // explicitly rejected. Strip it from the URL so a refresh doesn't re-trigger
+        // the validation loop, and surface a recovery notice.
+        if (rawId && !_seatId) {
+          var params = new URLSearchParams(location.search);
+          params.delete('seat_id');
+          var newSearch = params.toString();
+          history.replaceState({}, '', newSearch ? '?' + newSearch : location.pathname);
+          // Surface inline recovery notice (shown in landing state)
+          var noticeEl = document.getElementById('seat-invalid-notice');
+          if (noticeEl) noticeEl.style.display = 'block';
+        } else {
+          var noticeEl = document.getElementById('seat-invalid-notice');
+          if (noticeEl) noticeEl.style.display = 'none';
+        }
+
         var state = computeState(_status, _seatId);
         applyState(state, _status, _seatId);
         // Restore scroll after the state transition fires (next rAF)
@@ -2916,7 +2995,7 @@
         });
       }
 
-      // Confirm: validate input, store in session, navigate to dashboard
+      // Confirm: validate input, call /api/seat, then navigate to dashboard
       if (sigConfirm) {
         sigConfirm.addEventListener('click', function () {
           var val = (sigInput ? sigInput.value.trim().toUpperCase() : '');
@@ -2927,10 +3006,40 @@
             if (sigInput) sigInput.focus();
             return;
           }
-          sessionStorage.setItem(SEAT_KEY, val);
-          closeGate();
-          // Navigate to dashboard with the entered seat_id
-          window.location.href = '/?seat_id=' + encodeURIComponent(val);
+
+          // Disable button + show loading state while we validate against Base44
+          sigConfirm.disabled = true;
+          sigConfirm.textContent = 'Verifying…';
+          if (sigError) sigError.textContent = '';
+
+          fetch('/api/seat?id=' + encodeURIComponent(val))
+            .then(function (r) {
+              // Non-2xx other than 400: fail open and navigate
+              if (!r.ok && r.status !== 400) return { valid: true, _unchecked: true };
+              return r.json();
+            })
+            .then(function (data) {
+              if (data.valid === false) {
+                // Seat not found or inactive — show error, do not navigate
+                sigConfirm.disabled = false;
+                sigConfirm.textContent = 'Access Mission Control';
+                if (sigError) {
+                  sigError.innerHTML = 'That Seat ID wasn\'t found on this flight. Double-check your boarding email, or <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#A8C400;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+                }
+                if (sigInput) sigInput.focus();
+                return;
+              }
+              // Valid (or fail-open) — persist and navigate
+              sessionStorage.setItem(SEAT_KEY, val);
+              closeGate();
+              window.location.href = '/?seat_id=' + encodeURIComponent(val);
+            })
+            .catch(function () {
+              // Network error — fail open and navigate
+              sessionStorage.setItem(SEAT_KEY, val);
+              closeGate();
+              window.location.href = '/?seat_id=' + encodeURIComponent(val);
+            });
         });
       }
 

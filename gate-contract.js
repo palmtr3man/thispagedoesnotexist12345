@@ -6,9 +6,9 @@
  * Both the .com landing/dashboard repo and the .tech boarding app must
  * import from this module — neither repo should hardcode these values.
  *
- * @version 1b
+ * @version 1c
  * @since   2026-03-27
- * @updated 2026-04-02
+ * @updated 2026-04-05
  */
 
 /**
@@ -163,12 +163,23 @@ export const GATE = {
  *
  * Resolution logic:
  * 1. If the flight has departed → 'departed'
- * 2. If a valid seat ID is present in sessionStorage or URL → 'dashboard'
+ * 2. If a valid seat ID is present in sessionStorage or URL AND is confirmed
+ *    active by /api/seat → 'dashboard'
  * 3. Otherwise → 'landing'
  *
- * On any fetch error, defaults to 'landing' and logs the error.
+ * Seat validation contract (GATE.VALIDATE_SEAT):
+ * - valid: true  → seat confirmed; persists to sessionStorage; returns 'dashboard'.
+ * - valid: false → seat invalid/inactive; clears sessionStorage; returns 'landing'.
+ * - fetch error  → fail-open; persists to sessionStorage; returns 'dashboard'.
+ *   Rationale: a transient upstream outage must not lock out confirmed passengers.
+ * - GATE.VALIDATE_SEAT not configured → skips API call; falls back to regex-only.
+ *
+ * On any gate-status fetch error, defaults to 'landing' and logs the error.
  *
  * @async
+ * @param {{ skipSeatValidation?: boolean }} [opts]
+ *   Pass `{ skipSeatValidation: true }` to bypass the /api/seat call (e.g. for
+ *   unit tests or environments where the function is not deployed).
  * @returns {Promise<ViewState>} The view to render.
  *
  * @example
@@ -178,7 +189,7 @@ export const GATE = {
  * else if (view === 'departed') renderDeparted();
  * else                          renderLanding();
  */
-export async function resolveState() {
+export async function resolveState(opts = {}) {
   try {
     const res    = await fetch(GATE.SEAT_STATUS);
     const status = await res.json();
@@ -188,17 +199,60 @@ export async function resolveState() {
 
     if (departed) return 'departed';
 
-    // Check sessionStorage first, then URL param
-    const seatId = sessionStorage.getItem(GATE.SESSION_KEY)
-                || new URLSearchParams(location.search).get('seat_id');
+    // Prefer URL param over sessionStorage so a fresh deep-link always wins.
+    const rawId = new URLSearchParams(location.search).get('seat_id')
+               || sessionStorage.getItem(GATE.SESSION_KEY);
 
-    if (seatId && GATE.SEAT_ID_REGEX.test(seatId)) {
-      // Persist to sessionStorage if it came from URL
-      sessionStorage.setItem(GATE.SESSION_KEY, seatId);
-      return 'dashboard';
+    if (!rawId || !GATE.SEAT_ID_REGEX.test(rawId)) {
+      return 'landing';
     }
 
-    return 'landing';
+    // Persist immediately so the session survives a hard refresh mid-flight.
+    sessionStorage.setItem(GATE.SESSION_KEY, rawId);
+
+    // ── Server-side seat validation ─────────────────────────────────────────
+    // Skip if caller opts out (tests / non-Netlify environments).
+    if (!opts.skipSeatValidation) {
+      try {
+        const SEAT_VALIDATION_TIMEOUT_MS = 4000;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), SEAT_VALIDATION_TIMEOUT_MS);
+        const seatRes = await fetch(
+          `${GATE.VALIDATE_SEAT}?id=${encodeURIComponent(rawId)}`,
+          { signal: controller.signal }
+        );
+        clearTimeout(timer);
+
+        if (seatRes.status === 400) {
+          // Malformed id (shouldn't happen after regex check, but be safe)
+          console.warn('[gate-contract] resolveState: 400 from /api/seat for', rawId);
+          sessionStorage.removeItem(GATE.SESSION_KEY);
+          return 'landing';
+        }
+
+        if (seatRes.ok) {
+          const seatData = await seatRes.json();
+          if (seatData.valid === false) {
+            console.warn('[gate-contract] resolveState: seat invalid —', rawId, 'reason:', seatData.reason || 'unknown');
+            sessionStorage.removeItem(GATE.SESSION_KEY);
+            return 'landing';
+          }
+          // valid: true (or _unchecked fail-open) — fall through to 'dashboard'
+        }
+        // Non-2xx other than 400 → fail open (fall through to 'dashboard')
+      } catch (seatErr) {
+        // Network error or AbortError (timeout) → fail open
+        const isTimeout = seatErr.name === 'AbortError';
+        console.warn(
+          '[gate-contract] resolveState: seat validation',
+          isTimeout ? 'timed out' : 'errored',
+          '— failing open for', rawId
+        );
+        // Fall through to 'dashboard'
+      }
+    }
+
+    return 'dashboard';
   } catch (err) {
     console.error('[gate-contract] resolveState error — defaulting to landing:', err);
     return 'landing';

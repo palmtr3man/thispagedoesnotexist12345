@@ -371,9 +371,10 @@ exports.handler = async function (event, context) {
   console.log(`[seat-request] Generated seat_id ${seatId} for ${emailTrimmed}`);
 
   // --- Build passport URL with seat_id pre-filled (Gate Contract §4 — email handoff) ---
-  // seat_id chars are URL-safe (A-Z, 2-9, hyphen) — no additional encoding needed,
-  // but encodeURIComponent is used defensively in case the format ever changes.
-  const passportUrl = `${passportBase}?seat_id=${encodeURIComponent(seatId)}`;
+  // Fix 3b (Apr 5, 2026): encodeURIComponent removed per canonical spec.
+  // seat_id chars (A-Z, 2-9, hyphen) are URL-safe — no encoding needed or wanted.
+  // Canonical form: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
+  const passportUrl = `${passportBase}?seat_id=${seatId}`;
 
   // Bug-003 fix: pass values without the leading-space pad so the SendGrid template
   // can render "Name: Kevin" style rows without label/value collision.

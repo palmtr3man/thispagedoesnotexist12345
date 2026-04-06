@@ -3,14 +3,16 @@
   Template: boarding_instructions_paid_v1
   SendGrid ID: d-d8ec12e940944c5596af1fa740cf7f07
   Purpose: Boarding instructions for paid-tier passengers (First Class / Sponsored)
-  Last updated: 2026-04-02
+  Last updated: 2026-04-05
 
-  Fix log (Fix 2 — Apr 2, 2026):
-  Fix 2: CTA href updated to {{first_task_url}} so the "Start Your First Task"
+  Fix log:
+  Fix 2 (Apr 2, 2026): CTA href updated to {{first_task_url}} so the "Start Your First Task"
          button deep-links directly to ResumeFitCheck with seat_id pre-loaded.
-         first_task_url is constructed server-side in handleSeatOpened:
-           ${PLATFORM_URL}/ResumeFitCheck?seat_id=${encodeURIComponent(seat_id)}
+         first_task_url is constructed server-side in handleSeatOpened.
          No Base44 deploy needed — payload already includes first_task_url.
+  Fix 3b (Apr 5, 2026): encodeURIComponent removed from server-side first_task_url construction.
+         seat_id chars (A-Z, 2-9, hyphen) are URL-safe — no encoding needed.
+         No template HTML changes required (CTA uses {{first_task_url}} indirection).
 
   Dynamic variables used:
     {{first_name}}      — Passenger first name

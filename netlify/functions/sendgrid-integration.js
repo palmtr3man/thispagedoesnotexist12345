@@ -381,9 +381,16 @@ async function sendSeatConfirmation(seat) {
   console.log(`[sendgrid-integration] Seat ${seatId} — cabin_class=${cabin_class || 'undefined'} → ${isPaid ? 'PAID' : 'FREE'} boarding sequence`);
 
   // Construct full payload (Fix 1 + Fix 2: all CTAs include ?seat_id=)
-  const passportUrl   = `${siteUrl}/Studio?seat_id=${encodeURIComponent(seatId || '')}`;
-  const firstTaskUrl  = `${siteUrl}/Studio?seat_id=${encodeURIComponent(seatId || '')}`;
-  const secondaryUrl  = `${siteUrl}?seat_id=${encodeURIComponent(seatId || '')}`;
+  // Fix 4 (Apr 5, 2026): platform_url added — resolves {{platform_url}} Main Site footer link in
+  //   boarding_pass_free_v1, boarding_pass_paid_v1, boarding_instructions_free_v1,
+  //   boarding_instructions_paid_v1. Was previously unmapped -> rendered as base44.app URL.
+  // Fix 3b (Apr 5, 2026): passport_url corrected to /?seat_id= (was /Studio?seat_id=).
+  //   seat_id chars (A-Z, 2-9, hyphen) are URL-safe — encodeURIComponent removed per canonical spec.
+  //   firstTaskUrl retains /Studio path (boarding instructions CTA — ResumeFitCheck deep-link).
+  const passportUrl   = `${siteUrl}/?seat_id=${seatId || ''}`;
+  const firstTaskUrl  = `${siteUrl}/Studio?seat_id=${seatId || ''}`;
+  const secondaryUrl  = `${siteUrl}?seat_id=${seatId || ''}`;
+  const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
 
   const dynamicData = {
     first_name,
@@ -395,7 +402,7 @@ async function sendSeatConfirmation(seat) {
     passport_url:   passportUrl,
     first_task_url: firstTaskUrl,
     secondary_url:  secondaryUrl,
-    platform_url:   process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com'
+    platform_url:   mainSiteUrl        // Fix 4: resolves {{platform_url}} Main Site footer link
   };
 
   // Template pairs: { autosend: '<autosend-id>', sendgrid: '<d-...>' }
