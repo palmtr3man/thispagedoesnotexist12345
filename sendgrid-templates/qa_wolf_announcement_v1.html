@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .wrapper { background-color: #f4f4f4; padding: 32px 16px; }
+  .container { background-color: #ffffff; max-width: 560px; margin: 0 auto; border-radius: 4px; overflow: hidden; }
+  .header { background-color: #0a0a0a; padding: 28px 40px; text-align: center; }
+  .header h1 { color: #ffffff; font-size: 20px; font-weight: bold; margin: 0 0 4px 0; letter-spacing: 0.04em; }
+  .header p { color: #888888; font-size: 13px; margin: 0; letter-spacing: 0.06em; text-transform: uppercase; }
+  .internal-badge { background-color: #1a1a2e; border: 1px solid #00D9FF; border-radius: 3px; padding: 8px 16px; text-align: center; margin: 0; }
+  .internal-badge span { color: #00D9FF; font-size: 11px; font-weight: bold; letter-spacing: 0.12em; text-transform: uppercase; }
+  .body { padding: 36px 40px; color: #1a1a1a; font-size: 15px; line-height: 1.7; }
+  .body p { margin: 0 0 18px 0; }
+  .flight-card { background-color: #f8f8f8; border-left: 4px solid #0a0a0a; border-radius: 2px; padding: 20px 24px; margin: 28px 0; }
+  .flight-card table { width: 100%; border-collapse: collapse; }
+  .flight-card td { padding: 5px 0; font-size: 14px; color: #1a1a1a; }
+  .flight-card td:first-child { color: #888888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; width: 140px; }
+  .flight-card .status-rescheduled { color: #b45309; font-weight: bold; }
+  .cta-wrap { text-align: center; margin: 32px 0; }
+  .cta-btn { background-color: #0a0a0a; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 3px; font-size: 15px; font-weight: bold; display: inline-block; letter-spacing: 0.02em; }
+  .sign-off { margin-top: 32px; padding-top: 24px; border-top: 1px solid #eeeeee; font-size: 14px; color: #444444; }
+  .footer { background-color: #f4f4f4; text-align: center; padding: 20px 40px; font-size: 12px; color: #999999; }
+  .footer a { color: #999999; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="container">
+    <div class="header">
+      <h1>PageForward Airways ✈</h1>
+      <p>The Ultimate Journey</p>
+    </div>
+    <div class="internal-badge">
+      <span>&#9646; Internal QA — Not Passenger-Facing</span>
+    </div>
+    <div class="body">
+      <p>{{first_name}},</p>
+      <p>The <strong>Corporate Games Flight 0</strong> has been rescheduled. This is an internal QA-only notice — this flight is not passenger-facing and is not part of the public boarding sequence.</p>
+      <p>QA Wolf is cleared for pre-flight systems check. All E2E gate verifications should proceed against the updated schedule below.</p>
+      <div class="flight-card">
+        <table>
+          <tr>
+            <td>Flight</td>
+            <td><strong>Corporate Games Flight 0 🎮</strong></td>
+          </tr>
+          <tr>
+            <td>Flight Code</td>
+            <td><strong>{{flight_code}}</strong></td>
+          </tr>
+          <tr>
+            <td>Rescheduled From</td>
+            <td><strong>Apr 20, 2026</strong></td>
+          </tr>
+          <tr>
+            <td>New Date</td>
+            <td><strong>{{departure_date}}</strong></td>
+          </tr>
+          <tr>
+            <td>Audience</td>
+            <td><strong>Internal QA Only</strong></td>
+          </tr>
+          <tr>
+            <td>Status</td>
+            <td class="status-rescheduled">&#9646; Rescheduled — Pending Confirmation</td>
+          </tr>
+        </table>
+      </div>
+      <p>Do not forward this notice to passengers. All QA gate checks should reference the updated departure date above.</p>
+      <div class="cta-wrap">
+        <a href="https://www.thispagedoesnotexist12345.com/Studio" class="cta-btn">Open Mission Control &rarr;</a>
+      </div>
+      <div class="sign-off">
+        <strong>Co-Pilot Kevin</strong><br>
+        PageForward Airways — Internal Ops
+      </div>
+    </div>
+    <div class="footer">
+      <p>PageForward Airways &nbsp;&middot;&nbsp; The Ultimate Journey</p>
+      <p>Internal QA distribution only &nbsp;&middot;&nbsp; <a href="{{unsubscribe_url}}">Unsubscribe</a></p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
