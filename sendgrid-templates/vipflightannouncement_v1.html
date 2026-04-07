@@ -40,7 +40,7 @@
                 VIP
               </h1>
               <h2 style="margin:0 0 32px 0;font-size:28px;font-weight:300;letter-spacing:0.12em;color:#7c9fff;">
-                FLIGHT {{flight_number}} ✈️
+                FLIGHT {{flight_code}} ✈️
               </h2>
 
               <!-- Divider -->
@@ -54,7 +54,7 @@
                 The VIP Flight has pushed back from the gate — and now the next chapter is ready for boarding.
               </p>
               <p style="margin:0 0 28px 0;font-size:15px;color:#8899aa;line-height:1.7;">
-                <strong style="color:#e8eaf6;">FL 042426, the VIP Flight, is now boarding.</strong> This is your priority cleared-for-boarding notice — secure your seat before general boarding begins.
+                <strong style="color:#e8eaf6;">{{flight_code}}, the VIP Flight, is now boarding.</strong> This is your priority cleared-for-boarding notice — secure your seat before general boarding begins.
               </p>
 
               <!-- Flight manifest box -->
@@ -67,7 +67,7 @@
                           <span style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#556677;">Flight</span>
                         </td>
                         <td style="padding:8px 0;border-bottom:1px solid #1a1a28;text-align:right;">
-                          <span style="font-size:13px;font-weight:600;color:#e8eaf6;font-family:monospace;">FL 042426 — VIP Flight</span>
+                          <span style="font-size:13px;font-weight:600;color:#e8eaf6;font-family:monospace;">{{flight_code}}</span>
                         </td>
                       </tr>
                       <tr>
@@ -83,7 +83,7 @@
                           <span style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#556677;">Departure</span>
                         </td>
                         <td style="padding:8px 0;border-bottom:1px solid #1a1a28;text-align:right;">
-                          <span style="font-size:13px;font-weight:600;color:#e8eaf6;">Apr 24, 2026</span>
+                          <span style="font-size:13px;font-weight:600;color:#e8eaf6;">{{departure_date}}</span>
                         </td>
                       </tr>
                       <tr>
