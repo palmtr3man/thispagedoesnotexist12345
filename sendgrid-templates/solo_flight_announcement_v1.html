@@ -1,90 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-  .wrapper { background-color: #f4f4f4; padding: 32px 16px; }
-  .container { background-color: #ffffff; max-width: 560px; margin: 0 auto; border-radius: 4px; overflow: hidden; }
-  .header { background-color: #0a0a0a; padding: 28px 40px; text-align: center; }
-  .header h1 { color: #ffffff; font-size: 20px; font-weight: bold; margin: 0 0 4px 0; letter-spacing: 0.04em; }
-  .header p { color: #888888; font-size: 13px; margin: 0; letter-spacing: 0.06em; text-transform: uppercase; }
-  .body { padding: 36px 40px; color: #1a1a1a; font-size: 15px; line-height: 1.7; }
-  .body p { margin: 0 0 18px 0; }
-  .flight-card { background-color: #f8f8f8; border-left: 4px solid #0a0a0a; border-radius: 2px; padding: 20px 24px; margin: 28px 0; }
-  .flight-card table { width: 100%; border-collapse: collapse; }
-  .flight-card td { padding: 5px 0; font-size: 14px; color: #1a1a1a; }
-  .flight-card td:first-child { color: #888888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; width: 140px; }
-  .flight-card .status-staged { color: #1a7a1a; font-weight: bold; }
-  .cta-wrap { text-align: center; margin: 32px 0; }
-  .cta-btn { background-color: #0a0a0a; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 3px; font-size: 15px; font-weight: bold; display: inline-block; letter-spacing: 0.02em; }
-  .sign-off { margin-top: 32px; padding-top: 24px; border-top: 1px solid #eeeeee; font-size: 14px; color: #444444; }
-  .footer { background-color: #f4f4f4; text-align: center; padding: 20px 40px; font-size: 12px; color: #999999; }
-  .footer a { color: #999999; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solo Flight 1 — Your Seat Is Ready</title>
 </head>
-<body>
-<div class="wrapper">
-  <div class="container">
-    <div class="header">
-      <h1>PageForward Airways ✈</h1>
-      <p>The Ultimate Journey</p>
-    </div>
-    <div class="body">
-      <p>Dear Passenger {{first_name}},</p>
-      <p>The next chapter of the journey is staged and ready. <strong>Solo Flight 1</strong> is your next boarding window — a staged release for passengers cleared through the full E2E sequence.</p>
-      <p>This is your advance notice. Boarding opens when the final E2E gate check clears. Your seat is held — no action required until the gate opens.</p>
-      <div class="flight-card">
-        <table>
-          <tr>
-            <td>Flight</td>
-            <td><strong>Solo Flight 1 ✈️</strong></td>
-          </tr>
-          <tr>
-            <td>Flight Code</td>
-            <td><strong>{{flight_code}}</strong></td>
-          </tr>
-          <tr>
-            <td>Departure</td>
-            <td><strong>{{departure_date}}</strong></td>
-          </tr>
-          <tr>
-            <td>Seats Available</td>
-            <td><strong>{{seats_available}}</strong></td>
-          </tr>
-          <tr>
-            <td>Track</td>
-            <td><strong>Staged — Next in Sequence</strong></td>
-          </tr>
-          <tr>
-            <td>Status</td>
-            <td class="status-staged">&#9646; Staged — E2E Gate Pending</td>
-          </tr>
-        </table>
-      </div>
-      <p>When the gate opens, you'll receive your boarding pass directly. Until then, your position in the sequence is confirmed.</p>
-      <div class="cta-wrap">
-        <a href="https://www.thispagedoesnotexist12345.com/Studio" class="cta-btn">Proceed to Boarding Gate &rarr;</a>
-      </div>
-      <p>We'll see you aboard. Clear skies ahead, Passenger.</p>
-      <div class="sign-off">
-        <strong>Co-Pilot Kevin</strong><br>
-        PageForward Airways
-      </div>
-    </div>
-    <div class="footer">
-      <p>PageForward Airways &nbsp;&middot;&nbsp; The Ultimate Journey</p>
-      <p>
-        <a href="https://www.thispagedoesnotexist12345.com/" style="color: #999999;">Request a Seat</a>
-        &nbsp;&middot;&nbsp;
-        <a href="https://view-link.cx/d7sGLORJ0DF" style="color: #999999;">View Master Requirements</a>
-        &nbsp;&middot;&nbsp;
-        <a href="https://www.thispagedoesnotexist12345.tech/" style="color: #999999;">Reject &amp; Return</a>
-      </p>
-      <p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>
-    </div>
+<body style="margin:0;padding:0;background-color:#0a0a0f;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+
+  <!-- ALPHA TEST BANNER — REMOVE BEFORE LIVE SEND -->
+  <div style="background:#1a2a1a;color:#4caf50;text-align:center;padding:10px 20px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid #2a3a2a;">
+    ⚠ Alpha Test Send — Remove Banner Before Live Send
   </div>
-</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0a0a0f;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="padding:0 0 32px 0;text-align:center;">
+              <div style="display:inline-block;border:1px solid #2a2a3a;border-radius:4px;padding:10px 20px;background:#0f0f1a;">
+                <span style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#8899aa;">PageForward Airways</span>
+              </div>
+            </td>
+          </tr>
+
+          <!-- HERO CARD -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f0f1a 0%,#12121f 60%,#0f1420 100%);border:1px solid #1e1e30;border-radius:8px;padding:48px 40px;text-align:center;">
+
+              <!-- Eyebrow -->
+              <p style="margin:0 0 16px 0;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#7c9fff;font-weight:700;">
+                ✈️ Now Boarding
+              </p>
+
+              <!-- Flight name -->
+              <h1 style="margin:0 0 8px 0;font-size:36px;font-weight:800;letter-spacing:0.04em;color:#e8eaf6;line-height:1.1;">
+                SOLO
+              </h1>
+              <h2 style="margin:0 0 32px 0;font-size:28px;font-weight:300;letter-spacing:0.12em;color:#7c9fff;">
+                FLIGHT 1 ✈️
+              </h2>
+
+              <!-- Divider -->
+              <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#7c9fff,transparent);margin:0 auto 32px auto;"></div>
+
+              <!-- Greeting -->
+              <p style="margin:0 0 12px 0;font-size:16px;color:#b0b8cc;line-height:1.6;">
+                Hey {{first_name}},
+              </p>
+              <p style="margin:0 0 8px 0;font-size:15px;color:#8899aa;line-height:1.7;">
+                Your seat on <strong style="color:#e8eaf6;">Solo Flight 1</strong> is confirmed. This is your personal runway — no cohort, no waiting. Just you, your journey, and a direct line to what's next.
+              </p>
+              <p style="margin:0 0 28px 0;font-size:15px;color:#8899aa;line-height:1.7;">
+                We've reserved your place. Here's everything you need before wheels up.
+              </p>
+
+              <!-- Flight manifest box -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0a0a14;border:1px solid #1e1e30;border-radius:6px;margin:0 0 28px 0;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding:8px 0;border-bottom:1px solid #1a1a28;">
+                          <span style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#556677;">Flight</span>
+                        </td>
+                        <td style="padding:8px 0;border-bottom:1px solid #1a1a28;text-align:right;">
+                          <span style="font-size:13px;font-weight:600;color:#e8eaf6;font-family:monospace;">{{flight_code}}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-bottom:1px solid #1a1a28;">
+                          <span style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#556677;">Departure</span>
+                        </td>
+                        <td style="padding:8px 0;border-bottom:1px solid #1a1a28;text-align:right;">
+                          <span style="font-size:13px;font-weight:600;color:#e8eaf6;">{{departure_date}}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;">
+                          <span style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#556677;">Seats Available</span>
+                        </td>
+                        <td style="padding:8px 0;text-align:right;">
+                          <span style="font-size:13px;font-weight:700;color:#7c9fff;">{{seats_available}}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Value prop -->
+              <div style="background:#0a0a14;border:1px solid #1e1e30;border-radius:6px;padding:20px 24px;margin:0 0 32px 0;text-align:left;">
+                <p style="margin:0 0 12px 0;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#7c9fff;font-weight:700;">What's On This Flight</p>
+                <p style="margin:0;font-size:13px;color:#8899aa;line-height:1.8;">
+                  ✦ Your personalized career journey, built around you<br/>
+                  ✦ Direct access to Studio — your mission control<br/>
+                  ✦ Resume, fit check, and positioning — all in one place<br/>
+                  ✦ A staged release, so you're among the first on board
+                </p>
+              </div>
+
+              <!-- Primary CTA -->
+              <a href="https://www.thispagedoesnotexist12345.com/Studio?seat_id={{seat_id}}"
+                 style="display:inline-block;background:linear-gradient(135deg,#4a6fff,#2a4fdf);color:#fff;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:16px 36px;border-radius:4px;margin:0 0 12px 0;">
+                ❖ Board Your Flight — Open Studio
+              </a>
+
+              <br/>
+
+              <!-- Secondary CTA -->
+              <a href="https://www.thispagedoesnotexist12345.com/Studio?seat_id={{seat_id}}"
+                 style="display:inline-block;color:#7c9fff;text-decoration:none;font-size:12px;font-weight:600;letter-spacing:0.06em;padding:10px 0;">
+                Proceed to Boarding Gate →
+              </a>
+
+              <p style="margin:20px 0 0 0;font-size:12px;color:#445566;line-height:1.6;">
+                Questions? Reply to this email or visit <a href="https://www.thispagedoesnotexist12345.com" style="color:#556677;">theultimatejourney.com</a>
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="padding:32px 0 0 0;text-align:center;">
+              <p style="margin:0 0 12px 0;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#334455;">
+                PageForward Airways · The Ultimate Journey
+              </p>
+              <p style="margin:0;font-size:11px;color:#334455;line-height:1.8;">
+                <a href="https://www.thispagedoesnotexist12345.com/Studio" style="color:#556677;text-decoration:none;">Studio</a>
+                &nbsp;·&nbsp;
+                <a href="https://www.thispagedoesnotexist12345.com" style="color:#556677;text-decoration:none;">TUJ</a>
+                &nbsp;·&nbsp;
+                <a href="{{unsubscribe_url}}" style="color:#556677;text-decoration:none;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
 </body>
 </html>
