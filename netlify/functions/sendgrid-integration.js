@@ -6,14 +6,18 @@
  * Dispatches the correct email sequence based on boarding_type:
  *
  *   boarding_type = "executive_pre"
- *     → exec_preboard_opentowork_v1  (single send; no boarding_confirmation stamp)
+ *     → exec_preboard_opentowork_v1  (single send)
+ *     Requires non-empty pid and tuj_code; aborts with error if either is missing.
+ *     On success, stamps exec_preboard_sent_at on the Seat record.
+ *     Idempotency guard: skips send if exec_preboard_sent_at is already set.
  *
  *   boarding_type = anything else (default Phase 2 sequence)
  *     1. alphaflightannouncement_v1
  *     2. boarding_confirmation_v1
  *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
  *
- * Idempotency guard: will not overwrite boarding_confirmation_sent_at if already set.
+ * Idempotency guards: will not overwrite boarding_confirmation_sent_at (default path)
+ * or exec_preboard_sent_at (executive_pre path) if already set.
  * All sends BCC support@thispagedoesnotexist12345.com per universal BCC rule.
  *
  * Required env vars:
@@ -174,7 +178,8 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
  * @param {string} [seat.flight_id]                 - Flight ID (for correlation)
  * @param {string} [seat.passenger_id]              - Passenger ID (for correlation)
  * @param {string} [seat.request_id]                - Request ID (for correlation)
- * @param {string|null} seat.boarding_confirmation_sent_at - Idempotency check
+ * @param {string|null} seat.boarding_confirmation_sent_at - Idempotency check (default path)
+ * @param {string|null} seat.exec_preboard_sent_at           - Idempotency check (executive_pre path)
  */
 async function sendSeatConfirmation(seat) {
   const apiKey    = process.env.SENDGRID_API_KEY;
@@ -197,7 +202,8 @@ async function sendSeatConfirmation(seat) {
     flight_id,
     passenger_id,
     request_id,
-    boarding_confirmation_sent_at
+    boarding_confirmation_sent_at,
+    exec_preboard_sent_at
   } = seat;
 
   // Validate required fields
@@ -206,7 +212,13 @@ async function sendSeatConfirmation(seat) {
     return { success: false, error: 'Missing required seat fields' };
   }
 
-  // Idempotency guard — do not re-send if already stamped (applies to default sequence only)
+  // Idempotency guard — executive_pre path: skip if already stamped
+  if (boarding_type === 'executive_pre' && exec_preboard_sent_at) {
+    console.log(`[sendgrid-integration] Seat ${seatId} already has exec_preboard_sent_at (${exec_preboard_sent_at}) — skipping send`);
+    return { success: true, skipped: true };
+  }
+
+  // Idempotency guard — default path: skip if already stamped
   if (boarding_confirmation_sent_at && boarding_type !== 'executive_pre') {
     console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boarding_confirmation_sent_at}) — skipping send`);
     return { success: true, skipped: true };
@@ -225,12 +237,29 @@ async function sendSeatConfirmation(seat) {
   if (boarding_type === 'executive_pre') {
     console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=executive_pre, routing to exec_preboard_opentowork_v1`);
 
-    const execDynamicData = { first_name, last_name, user_email, pid: pid || '', tuj_code: tuj_code || '' };
+    // Validate pid and tuj_code — both are required template variables.
+    // Sending with empty values would render blank placeholders in the email.
+    if (!pid || !tuj_code) {
+      const missing = [!pid && 'pid', !tuj_code && 'tuj_code'].filter(Boolean).join(', ');
+      console.error(`[sendgrid-integration] Seat ${seatId} — exec_preboard_opentowork_v1 aborted: missing required fields: ${missing}`);
+      return { success: false, error: `exec_preboard_opentowork_v1 requires non-empty: ${missing}` };
+    }
+
+    const execDynamicData = { first_name, last_name, user_email, pid, tuj_code };
     const execSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_EXEC_PREBOARD, execDynamicData, logCtx);
 
     if (!execSent) {
       console.error(`[sendgrid-integration] exec_preboard_opentowork_v1 failed for seat ${seatId}`);
       return { success: false, error: 'exec_preboard_opentowork_v1 send failed' };
+    }
+
+    // Send confirmed 2xx — stamp exec_preboard_sent_at for idempotency
+    if (base44SeatUrl && seatId) {
+      await updateSeatRecord(base44SeatUrl, seatId, {
+        exec_preboard_sent_at: new Date().toISOString()
+      });
+    } else {
+      console.warn('[sendgrid-integration] BASE44_SEAT_URL not set — exec_preboard_sent_at stamp skipped');
     }
 
     return { success: true };
