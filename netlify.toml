@@ -32,6 +32,12 @@
   to = "/.netlify/functions/seat-request"
   status = 200
 
+# Canonical entry point — /request-seat → homepage
+[[redirects]]
+  from = "/request-seat"
+  to = "/"
+  status = 301
+
 # One Page Studio — serve /Studio from the Studio subfolder
 [[redirects]]
   from = "/ResumeOnePageStudio"
