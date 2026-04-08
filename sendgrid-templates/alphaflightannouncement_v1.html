@@ -34,13 +34,13 @@
     <div class="body">
       <p>Dear Passenger {{first_name}},</p>
       <p>The time has come. The hangar doors are opening and the first flight is ready for pushback.</p>
-      <p><strong>FL 041726, the Alpha Flight, is now boarding.</strong></p>
-      <p>We have seats available for departure. This is your cleared-for-boarding notice — seats on the Alpha Flight are strictly limited, and once they're filled, the gate closes.</p>
+      <p><strong>Flight {{flight_code}} is now boarding.</strong></p>
+      <p>We have seats available for departure. This is your cleared-for-boarding notice — seats on Flight {{flight_code}} are strictly limited, and once they're filled, the gate closes.</p>
       <div class="flight-card">
         <table>
           <tr>
             <td>Flight</td>
-            <td><strong>FL 041726 — Alpha Flight</strong></td>
+            <td><strong>{{flight_code}}</strong></td>
           </tr>
           <tr>
             <td>Seats Available</td>
@@ -48,7 +48,7 @@
           </tr>
           <tr>
             <td>Departure</td>
-            <td><strong>Apr 17, 2026</strong></td>
+            <td><strong>{{departure_date}}</strong></td>
           </tr>
           <tr>
             <td>Status</td>
