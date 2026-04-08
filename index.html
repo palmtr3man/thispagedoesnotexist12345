@@ -612,7 +612,7 @@
     }
     .mc-section-link:hover { color: #A8C400; }
 
-    /* ── Mission Control: Boarding Steps ─────────���───────────────────────── */
+    /* ── Mission Control: Boarding Steps ─────────────────────────────────── */
     .boarding-steps {
       list-style: none;
       margin: 0;
@@ -629,7 +629,11 @@
       border-radius: 8px;
       border: 1px solid rgba(168,196,0,0.12);
       background: rgba(0,0,0,0.3);
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .boarding-step:hover {
+      border-color: rgba(168,196,0,0.28);
+      background: rgba(168,196,0,0.03);
     }
     .boarding-step.done {
       border-color: rgba(168,196,0,0.4);
@@ -662,6 +666,33 @@
       color: rgba(255,255,255,0.4);
       line-height: 1.4;
     }
+    .bstep-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.45rem;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #A8C400;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(168,196,0,0.3);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      background: rgba(168,196,0,0.06);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      width: fit-content;
+    }
+    .bstep-cta:hover {
+      background: rgba(168,196,0,0.14);
+      border-color: rgba(168,196,0,0.65);
+      color: #fff;
+    }
+    .bstep-cta-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.15s;
+    }
+    .bstep-cta:hover .bstep-cta-arrow { transform: translateX(3px); }
     .bstep-status {
       font-size: 0.9rem;
       flex-shrink: 0;
@@ -1140,11 +1171,11 @@
 </head>
 <body class="black-glass" data-state="loading">
   <div class="container">
-    <h1>🚀 The Ultimate Journey</h1>
-    <p class="subtitle">Career Optimization Platform</p>
+    <h1 data-show-state="landing departed">🚀 The Ultimate Journey</h1>
+    <p class="subtitle" data-show-state="landing departed">Career Optimization Platform</p>
 
     <!-- CAROUSEL -->
-    <div class="carousel-wrap">
+    <div class="carousel-wrap" data-show-state="landing departed">
       <div class="carousel" id="mainCarousel">
         <div class="carousel-track" id="carouselTrack">
           <div class="carousel-slide">
@@ -1208,6 +1239,31 @@
       </div>
     </div>
 
+    <!-- ── Seat ID Entry Modal (shown when ?mission-control without valid seat_id) ── -->
+    <div id="seat-id-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="sig-title" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+      <div class="age-gate-card" style="max-width:380px;">
+        <h2 id="sig-title" style="color:#A8C400;font-size:1.25rem;margin-bottom:0.5rem;">❖ Mission Control</h2>
+        <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:1.25rem;line-height:1.6;">Enter your Seat ID to access your dashboard.<br><span style="font-size:0.78rem;opacity:0.6;">Your ID was included in your boarding confirmation email.</span></p>
+        <input
+          id="sig-input"
+          type="text"
+          placeholder="TUJ-XXXXXX"
+          maxlength="10"
+          autocomplete="off"
+          spellcheck="false"
+          style="width:100%;padding:0.65rem 0.9rem;border-radius:8px;border:1px solid rgba(168,196,0,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:1rem;font-family:monospace;letter-spacing:0.1em;text-transform:uppercase;outline:none;box-sizing:border-box;margin-bottom:0.5rem;"
+          oninput="this.value=this.value.toUpperCase();"
+          onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
+          onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
+        />
+        <div id="sig-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1.2em;margin-bottom:0.5rem;line-height:1.5;"></div>
+        <div class="age-gate-actions">
+          <button class="age-gate-confirm" id="sig-confirm-btn">Access Mission Control</button>
+          <button class="age-gate-deny" id="sig-cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ── Mission Control Dashboard (state: dashboard) ───────────────── -->
     <div id="dashboard-view">
 
@@ -1241,72 +1297,115 @@
 
       <!-- ── Section 1: 8-Step Boarding Sequence ─────────────────────────────────────────── -->
       <div class="mc-section">
-        <h3 class="mc-section-title">📍 Boarding Sequence</h3>  <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
+        <h3 class="mc-section-title">📍 Boarding Sequence</h3>
+        <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
         <ol class="boarding-steps">
-          <li class="boarding-step" id="bstep-1">
+
+          <!-- Step 1: Subscribe to Signal — already done on boarding -->
+          <li class="boarding-step done" id="bstep-1">
             <span class="bstep-num">01</span>
             <div class="bstep-body">
               <span class="bstep-name">Subscribe to Signal</span>
               <span class="bstep-desc">Your mission brief arrives via newsletter. Issue #001 is your first brief.</span>
+              <a class="bstep-cta" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">
+                Open Signal <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="1">✔</span>
           </li>
+
+          <!-- Step 2: Complete Your Profile — opens Systems / OnboardingPassport -->
           <li class="boarding-step" id="bstep-2">
             <span class="bstep-num">02</span>
             <div class="bstep-body">
               <span class="bstep-name">Complete Your Profile</span>
               <span class="bstep-desc">Set your headline, target titles, and location in your passenger record.</span>
+              <a class="bstep-cta" id="bstep-2-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open Systems — Passenger Record <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="2">○</span>
           </li>
+
+          <!-- Step 3: Link Resume to Studio -->
           <li class="boarding-step" id="bstep-3">
             <span class="bstep-num">03</span>
             <div class="bstep-body">
               <span class="bstep-name">Link Your Resume to Studio</span>
               <span class="bstep-desc">Upload or build your one-page resume in the AI Resume Builder.</span>
+              <a class="bstep-cta" href="/Studio" target="_blank" rel="noopener noreferrer">
+                Open Studio <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="3">○</span>
           </li>
+
+          <!-- Step 4: Optimize LinkedIn -->
           <li class="boarding-step" id="bstep-4">
             <span class="bstep-num">04</span>
             <div class="bstep-body">
               <span class="bstep-name">Optimize LinkedIn</span>
               <span class="bstep-desc">Headline, About, and Skills aligned with your target titles.</span>
+              <a class="bstep-cta" href="https://www.linkedin.com/in/me" target="_blank" rel="noopener noreferrer">
+                Open LinkedIn Profile <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="4">○</span>
           </li>
+
+          <!-- Step 5: Book a Consultation -->
+          <!-- CalendarJet CTA is hidden by default; shown only when intake_mode=CALENDARJET -->
           <li class="boarding-step" id="bstep-5">
             <span class="bstep-num">05</span>
             <div class="bstep-body">
               <span class="bstep-name">Book a Consultation</span>
-              <span class="bstep-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
+              <span class="bstep-desc" id="bstep-5-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
+              <a class="bstep-cta" id="bstep-5-cta" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer" style="display:none;">
+                Book 30-Min Session <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="5">○</span>
           </li>
+
+          <!-- Step 6: Add 5 Target Companies -->
           <li class="boarding-step" id="bstep-6">
             <span class="bstep-num">06</span>
             <div class="bstep-body">
               <span class="bstep-name">Add 5 Target Companies</span>
               <span class="bstep-desc">Research and log your first five target companies in The Build.</span>
+              <a class="bstep-cta" id="bstep-6-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open The Build <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="6">○</span>
           </li>
+
+          <!-- Step 7: Submit 3 Applications -->
           <li class="boarding-step" id="bstep-7">
             <span class="bstep-num">07</span>
             <div class="bstep-body">
               <span class="bstep-name">Submit 3 Applications</span>
               <span class="bstep-desc">Apply to three roles. Log each one in The Build pipeline.</span>
+              <a class="bstep-cta" id="bstep-7-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Log Applications in The Build <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="7">○</span>
           </li>
+
+          <!-- Step 8: Set Follow-Up Reminders -->
           <li class="boarding-step" id="bstep-8">
             <span class="bstep-num">08</span>
             <div class="bstep-body">
               <span class="bstep-name">Set Follow-Up Reminders</span>
-              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission.</span>
+              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission in The Build.</span>
+              <a class="bstep-cta" id="bstep-8-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open The Build — Set Reminders <span class="bstep-cta-arrow">→</span>
+              </a>
             </div>
             <span class="bstep-status" data-step="8">○</span>
           </li>
+
         </ol>
       </div>
 
@@ -1337,9 +1436,9 @@
           </a>
 
           <a class="mc-tile" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">
-            <span class="mc-tile-icon">📚</span>
-            <span class="mc-tile-name">Resources</span>
-            <span class="mc-tile-desc">Career resource library — subscriber access only</span>
+            <span class="mc-tile-icon">🗺️</span>
+            <span class="mc-tile-name">Field Guide</span>
+            <span class="mc-tile-desc">Career field guide — subscriber access only</span>
             <span class="mc-tile-arrow">→</span>
           </a>
 
@@ -1400,15 +1499,26 @@
         </div>
       </div>
 
+      <!-- ── Dashboard footer nav ──────────────────────────────────────────── -->
+      <div class="mc-section" style="border-bottom:none;margin-bottom:0;padding-bottom:0;padding-top:0.5rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;">
+          <a class="mc-action-btn" href="/Studio" target="_blank" rel="noopener noreferrer">📄 Studio</a>
+          <a class="mc-action-btn" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">📡 Signal</a>
+          <a class="mc-action-btn" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">⚙️ Systems</a>
+          <a class="mc-action-btn" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">📚 Resources</a>
+        </div>
+        <p style="font-size:0.7rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:0.75rem;letter-spacing:0.04em;">&copy; 2026 The Ultimate Journey</p>
+      </div>
+
     </div><!-- /#dashboard-view -->
 
     <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
-    <div class="status-section" id="loading-dock">
+    <div class="status-section" id="loading-dock" data-show-state="landing departed">
       <div class="status-scanlines"></div>
 
       <div class="status-title">
         <span class="status-title-label">Flight:</span>
-        <span class="badge badge--flight" id="flight-number">Next Departure ✈️</span>
+        <span class="badge badge--flight" id="flight-number">Solo Flight 1 ✈️</span>
       </div>
 
       <div class="status-title">
@@ -1421,14 +1531,14 @@
 
       <div class="status-title">
         <span class="status-title-label">Departure Time:</span>
-        <span class="badge badge--highlight" id="departure-time-badge">2:22 PM ET</span>
+        <span class="badge badge--highlight" id="departure-time-badge">2:01 AM ET</span>
 
       </div>
 
       <div class="status-title">
         <span class="status-title-label">Departure Date:</span>
         <span class="badge badge--arriving" id="departure-date">
-          <span class="arriving-dot"></span>Next Departure
+          <span class="arriving-dot"></span>April 3
         </span>
       </div>
 
@@ -1464,6 +1574,18 @@
           </div>
         </div>
         <div class="countdown-departed" id="countdown-departed" style="display:none;">✈️ Wheels Up — Flight Departed</div>
+      </div>
+
+      <!-- Seat ID invalid recovery notice (shown by rerender() when seat_id is rejected) -->
+      <div
+        id="seat-invalid-notice"
+        data-show-state="landing"
+        style="display:none;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.35);border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.55;text-align:center;margin-bottom:0.75rem;"
+      >
+        That Seat ID wasn’t found on this flight.
+        Check your boarding confirmation email, or
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#A8C400;text-decoration:underline;">join Signal</a>
+        to stay on the manifest.
       </div>
 
       <!-- F148: Primary CTA → POST /api/seat-request -->
@@ -1521,7 +1643,12 @@
             })
             .then(function(r){ return r.json(); })
             .then(function(d){
-              if (d.ok) {
+              if (d.waitlisted) {
+                // F143: Cohort full — show "You're on the next flight" state
+                form.style.display = 'none';
+                var wlConf = document.getElementById('seat-request-waitlisted');
+                if (wlConf) wlConf.style.display = 'block';
+              } else if (d.ok) {
                 form.style.display = 'none';
                 var conf = document.getElementById('seat-request-confirm');
                 conf.style.display = 'block';
@@ -1585,12 +1712,19 @@
           </div>
         </form>
 
-        <!-- Step 3: Confirmation (hidden until successful submit) -->
+        <!-- Step 3a: Confirmation — seat reserved (hidden until successful submit) -->
         <div
           id="seat-request-confirm"
           style="display:none;font-size:0.9rem;color:#A8C400;letter-spacing:0.03em;padding:0.5rem 0;"
         >
           ✅ Your seat request has been received. Check your inbox for the next steps.
+        </div>
+
+        <!-- Step 3b: Waitlist confirmation — cohort full (F143) -->
+        <div id="seat-request-waitlisted" style="display:none;padding:1rem 0;">
+          <p style="font-size:1rem;color:#A8C400;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">You're on the next flight.</p>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:1rem;">All 5 seats on this flight are full.<br>We'll notify you the moment a seat opens — passengers graduate when they land an offer.</p>
+          <a href="/ResumeFitCheck" class="btn-waitlist unlocked" style="display:inline-block;">▶ While you wait, run an ATS check</a>
         </div>
 
         <!-- seat-count span appended here by applySeatGate() -->
@@ -1626,15 +1760,19 @@
 
 
     <!-- BLACK GLASS BUTTONS -->
-    <div class="btn-row">
+    <div class="btn-row" data-show-state="landing departed">
       <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
       <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
       <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
       <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
     </div>
+    <!-- MISSION CONTROL BUTTON — separate row, below Studio/Signal/Systems/Support -->
+    <div class="btn-row" data-show-state="landing departed" style="margin-top:-0.25rem;">
+      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
+    </div>
 
     <!-- PUZZLE PATH TRACKER -->
-    <div class="puzzle-tracker" id="puzzleTracker">
+    <div class="puzzle-tracker" id="puzzleTracker" data-show-state="landing departed">
       <span class="puzzle-label">Paths Activated</span>
       <div class="puzzle-diamonds">
         <span class="puzzle-diamond" id="diamond-signal" title="Signal">✦</span>
@@ -1644,22 +1782,22 @@
     </div>
 
     <!-- Divider -->
-    <div class="btn-row-divider">
+    <div class="btn-row-divider" data-show-state="landing departed">
       <span>next step</span>
     </div>
 
     <!-- NEXT STEP GUIDANCE -->
-    <div class="btn-row-waitlist" style="display: block; text-align: center; margin-bottom: 2rem;">
+    <div class="btn-row-waitlist" data-show-state="landing departed" style="display: block; text-align: center; margin-bottom: 2rem;">
       <p style="font-size: 0.85rem; color: rgba(168, 196, 0, 0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
     </div>
 
     <!-- Option B: About / Footer Links -->
-    <section style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(168,196,0,0.1); font-size:0.8rem;">
-      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">About / Resources</a>
+    <section data-show-state="landing departed" style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(168,196,0,0.1); font-size:0.8rem;">
+      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">About / Field Guide</a>
       <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
       <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
     </section>
-    <footer>
+    <footer data-show-state="landing departed">
       &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
     </footer>
   </div>
@@ -1947,6 +2085,20 @@
           return;
         }
 
+        // F-VIP-01 — UI guard: VIP flight suppression (Layer 3 of 3).
+        // If the Netlify function returned HTTP 451 with _vip_suppressed: true,
+        // a VIP flight was active but has been withheld from public display.
+        // gate_status is already 'closed' in the payload; this guard ensures
+        // no VIP flight label leaks into the UI and logs a discreet console note.
+        if (status._vip_suppressed === true) {
+          // gate_status is already 'closed' — fall through to normal closed rendering
+          // but clear any flight_label that might have been set before the guard ran.
+          status.flight_label = null;
+          console.info('[TUJ] VIP flight active — public gate showing closed state (F-VIP-01).');
+          // Do NOT return early: let the normal 'closed' rendering path run so
+          // the "Next Departure" badge (nextflightdeparturedate) still displays.
+        }
+
         // QA #5 — Layer 3: UI fallback for flight invariant conflict.
         // If the Netlify function returned gate_status: 'conflict' (HTTP 409 body),
         // surface a neutral holding state rather than showing potentially wrong seat data.
@@ -2098,6 +2250,19 @@
         var intakeMode = status.intake_mode || 'SENDGRID';
         var calUrl = 'https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345';
 
+        // ── Step 05 boarding CTA: CalendarJet link only in CALENDARJET mode ──────
+        var bstep5Cta  = document.getElementById('bstep-5-cta');
+        var bstep5Desc = document.getElementById('bstep-5-desc');
+        if (intakeMode === 'CALENDARJET') {
+          // Show the booking link and update description
+          if (bstep5Cta)  bstep5Cta.style.display = '';
+          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Use the link below to schedule.';
+        } else {
+          // SENDGRID / CONSTANTCONTACT: no outbound link — reply to Welcome email
+          if (bstep5Cta)  bstep5Cta.style.display = 'none';
+          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Reply to your Welcome email to schedule.';
+        }
+
         if (intakeMode === 'CALENDARJET') {
           // Hide the SendGrid seat request CTA; show the CalendarJet booking link
           if (waitlistBtn) waitlistBtn.style.display = 'none';
@@ -2165,15 +2330,58 @@
       var _ageGateCb  = null;   // pending callback after age confirm
 
       // ── Helpers ──────────────────────────────────────────────────────────
-      function getSeatId() {
+
+      // getSeatIdRaw() — reads seat_id from URL or sessionStorage without validation.
+      // Returns the raw string if it matches the format regex, else null.
+      function getSeatIdRaw() {
         var fromSession = sessionStorage.getItem(SEAT_KEY);
         var fromUrl     = new URLSearchParams(location.search).get('seat_id');
-        var id = fromSession || fromUrl || null;
-        if (id && SEAT_REGEX.test(id)) {
-          sessionStorage.setItem(SEAT_KEY, id); // persist URL param to session
+        var id = fromUrl || fromSession || null;
+        if (id && SEAT_REGEX.test(id)) return id;
+        return null;
+      }
+
+      // validateSeatId(id) — async; calls /api/seat to confirm the seat is active.
+      // Resolution contract:
+      //   valid: true  → seat confirmed; persists to sessionStorage; returns id.
+      //   valid: false → seat invalid/inactive; clears sessionStorage; returns null.
+      //   fetch error  → fail-open; persists to sessionStorage; returns id.
+      //                  (preserves existing behaviour when Base44 is unreachable)
+      async function validateSeatId(id) {
+        if (!id) return null;
+        // Persist immediately so the session survives a hard refresh mid-flight.
+        sessionStorage.setItem(SEAT_KEY, id);
+        try {
+          var res = await fetch('/api/seat?id=' + encodeURIComponent(id));
+          if (!res.ok) {
+            // Non-2xx from our own function (e.g. 400 bad format) — treat as invalid.
+            if (res.status === 400) {
+              console.warn('[TUJ] seat validation: 400 bad format for', id);
+              sessionStorage.removeItem(SEAT_KEY);
+              return null;
+            }
+            // Any other non-2xx (5xx etc.) — fail open.
+            console.warn('[TUJ] seat validation: non-2xx (' + res.status + ') — failing open for', id);
+            return id;
+          }
+          var data = await res.json();
+          if (data.valid === false) {
+            console.warn('[TUJ] seat validation: invalid seat', id, '— reason:', data.reason || 'unknown');
+            sessionStorage.removeItem(SEAT_KEY);
+            return null;
+          }
+          // valid: true (or _unchecked: true fail-open from function)
+          return id;
+        } catch (e) {
+          // Network error / timeout — fail open.
+          console.warn('[TUJ] seat validation: fetch error — failing open for', id, e);
           return id;
         }
-        return null;
+      }
+
+      // getSeatId() — kept for legacy callers; synchronous read only (no API call).
+      function getSeatId() {
+        return getSeatIdRaw();
       }
 
       function isAgeVerified() {
@@ -2302,6 +2510,13 @@
           if (seatIdEl) seatIdEl.textContent = seatId || '';
           // Wire seat_id into all .tech links so OnboardingPassport receives it
           if (seatId) {
+            // Update Mission Control nav button href with seat_id
+            var mcNavBtn = document.getElementById('mc-nav-btn');
+            if (mcNavBtn) {
+              mcNavBtn.href = '/?seat_id=' + encodeURIComponent(seatId);
+            }
+          }
+          if (seatId) {
             document.querySelectorAll('a[href*="thispagedoesnotexist12345.tech"]').forEach(function (a) {
               try {
                 var u = new URL(a.href);
@@ -2309,6 +2524,15 @@
                 a.href = u.toString();
               } catch (e) { /* skip malformed hrefs */ }
             });
+            // Wire seat_id into CalendarJet consultation link in boarding steps
+            var calBoardingLink = document.getElementById('bstep-5-cta');
+            if (calBoardingLink) {
+              try {
+                var cu = new URL(calBoardingLink.href);
+                cu.searchParams.set('seat_id', seatId);
+                calBoardingLink.href = cu.toString();
+              } catch (e) { /* skip */ }
+            }
           }
           // Welcome Aboard banner: show once if ?status=boarded in URL
           if (waBanner) {
@@ -2349,13 +2573,43 @@
         console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
       }
 
-      // ── Public: rerender() ────���───────────────────────────────────────────
+      // ── Public: rerender() ───────────────────────────────────────────────────────────────
       async function rerender() {
+        // Preserve scroll position so the loading-state flash never resets the page
+        var savedScrollY = window.scrollY || window.pageYOffset || 0;
         document.body.setAttribute('data-state', 'loading');
-        _status = await fetchStatus();
-        _seatId = getSeatId();
+
+        // Fetch gate status and validate seat_id in parallel for speed.
+        var rawId = getSeatIdRaw();
+        var results = await Promise.all([
+          fetchStatus(),
+          validateSeatId(rawId)   // null if rawId is null; fail-open on error
+        ]);
+        _status = results[0];
+        _seatId = results[1];  // null means invalid/missing; non-null means confirmed
+
+        // If rawId was present but validateSeatId returned null, the seat was
+        // explicitly rejected. Strip it from the URL so a refresh doesn't re-trigger
+        // the validation loop, and surface a recovery notice.
+        if (rawId && !_seatId) {
+          var params = new URLSearchParams(location.search);
+          params.delete('seat_id');
+          var newSearch = params.toString();
+          history.replaceState({}, '', newSearch ? '?' + newSearch : location.pathname);
+          // Surface inline recovery notice (shown in landing state)
+          var noticeEl = document.getElementById('seat-invalid-notice');
+          if (noticeEl) noticeEl.style.display = 'block';
+        } else {
+          var noticeEl = document.getElementById('seat-invalid-notice');
+          if (noticeEl) noticeEl.style.display = 'none';
+        }
+
         var state = computeState(_status, _seatId);
         applyState(state, _status, _seatId);
+        // Restore scroll after the state transition fires (next rAF)
+        requestAnimationFrame(function () {
+          window.scrollTo(0, savedScrollY);
+        });
       }
 
       // ── Public: showAgeGate(onConfirm) ───────────────────────────────────
@@ -2570,11 +2824,30 @@
               var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
               history.replaceState({}, '', newUrl);
               window.__TUJ.rerender();
+            } else if (d.waitlisted) {
+              // F143: Cohort full — show "You're on the next flight" state
+              form.style.display = 'none';
+              var wlConf = document.getElementById('seat-request-waitlisted');
+              if (wlConf) wlConf.style.display = 'block';
             } else if (d.ok) {
               // Legacy ok:true without seat_id (Base44 stub path)
               form.style.display = 'none';
               var conf = document.getElementById('seat-request-confirm');
               if (conf) conf.style.display = 'block';
+            } else if (d.duplicate) {
+              // One seat per email — surface a clear, friendly message
+              // If the API returned the existing seat_id, redirect directly to dashboard
+              if (d.seat_id) {
+                sessionStorage.setItem(SEAT_KEY, d.seat_id);
+                form.style.display = 'none';
+                var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
+                history.replaceState({}, '', newUrl);
+                window.__TUJ.rerender();
+              } else {
+                errEl.textContent  = d.error || 'A seat request has already been submitted for this email. Check your inbox for your original confirmation.';
+                subBtn.disabled    = false;
+                subBtn.textContent = '✈️ Submit Request';
+              }
             } else {
               errEl.textContent  = d.error || 'Something went wrong — please try again.';
               subBtn.disabled    = false;
@@ -2668,6 +2941,131 @@
         tick();
         timer = setInterval(tick, 1000);
       }, 100);
+    })();
+
+    // ── Seat ID Gate Modal — wires the ❖ Mission Control nav button and entry prompt ──
+    (function () {
+      var SEAT_KEY  = 'seat_id';
+      var SEAT_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+
+      var overlay   = document.getElementById('seat-id-gate-overlay');
+      var sigInput  = document.getElementById('sig-input');
+      var sigError  = document.getElementById('sig-error');
+      var sigConfirm = document.getElementById('sig-confirm-btn');
+      var sigCancel  = document.getElementById('sig-cancel-btn');
+      var mcNavBtn   = document.getElementById('mc-nav-btn');
+
+      // Show the Mission Control nav button only when a valid seat_id is in session
+      function refreshMcNavBtn() {
+        var stored = sessionStorage.getItem(SEAT_KEY);
+        if (mcNavBtn) {
+          if (stored && SEAT_REGEX.test(stored)) {
+            mcNavBtn.href = '/?seat_id=' + encodeURIComponent(stored);
+            mcNavBtn.style.display = '';
+          } else {
+            // No valid seat in session — show button but it opens the entry modal
+            mcNavBtn.href = '#';
+            mcNavBtn.style.display = '';
+          }
+        }
+      }
+
+      function openGate() {
+        if (overlay) {
+          overlay.style.display = 'flex';
+          if (sigInput) { sigInput.value = ''; sigInput.focus(); }
+          if (sigError) sigError.textContent = '';
+        }
+      }
+
+      function closeGate() {
+        if (overlay) overlay.style.display = 'none';
+      }
+
+      // Mission Control nav button click: if seat in session go direct, else open modal
+      if (mcNavBtn) {
+        mcNavBtn.addEventListener('click', function (e) {
+          var stored = sessionStorage.getItem(SEAT_KEY);
+          if (stored && SEAT_REGEX.test(stored)) {
+            // Valid seat in session — let the href navigate normally
+            return;
+          }
+          e.preventDefault();
+          openGate();
+        });
+      }
+
+      // Confirm: validate input, call /api/seat, then navigate to dashboard
+      if (sigConfirm) {
+        sigConfirm.addEventListener('click', function () {
+          var val = (sigInput ? sigInput.value.trim().toUpperCase() : '');
+          if (!SEAT_REGEX.test(val)) {
+            if (sigError) {
+              sigError.innerHTML = 'That code doesn\'t match a seat on this flight. If you haven\'t boarded yet, <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#A8C400;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+            }
+            if (sigInput) sigInput.focus();
+            return;
+          }
+
+          // Disable button + show loading state while we validate against Base44
+          sigConfirm.disabled = true;
+          sigConfirm.textContent = 'Verifying…';
+          if (sigError) sigError.textContent = '';
+
+          fetch('/api/seat?id=' + encodeURIComponent(val))
+            .then(function (r) {
+              // Non-2xx other than 400: fail open and navigate
+              if (!r.ok && r.status !== 400) return { valid: true, _unchecked: true };
+              return r.json();
+            })
+            .then(function (data) {
+              if (data.valid === false) {
+                // Seat not found or inactive — show error, do not navigate
+                sigConfirm.disabled = false;
+                sigConfirm.textContent = 'Access Mission Control';
+                if (sigError) {
+                  sigError.innerHTML = 'That Seat ID wasn\'t found on this flight. Double-check your boarding email, or <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#A8C400;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+                }
+                if (sigInput) sigInput.focus();
+                return;
+              }
+              // Valid (or fail-open) — persist and navigate
+              sessionStorage.setItem(SEAT_KEY, val);
+              closeGate();
+              window.location.href = '/?seat_id=' + encodeURIComponent(val);
+            })
+            .catch(function () {
+              // Network error — fail open and navigate
+              sessionStorage.setItem(SEAT_KEY, val);
+              closeGate();
+              window.location.href = '/?seat_id=' + encodeURIComponent(val);
+            });
+        });
+      }
+
+      // Allow Enter key in input to confirm
+      if (sigInput) {
+        sigInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && sigConfirm) sigConfirm.click();
+        });
+      }
+
+      // Cancel button
+      if (sigCancel) {
+        sigCancel.addEventListener('click', closeGate);
+      }
+
+      // Close on overlay background click
+      if (overlay) {
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeGate();
+        });
+      }
+
+      // Initial state: show/configure Mission Control nav button
+      document.addEventListener('DOMContentLoaded', refreshMcNavBtn);
+      // Also refresh after TUJ state machine may have stored a seat_id
+      setTimeout(refreshMcNavBtn, 1200);
     })();
 
     // Black Glass always active

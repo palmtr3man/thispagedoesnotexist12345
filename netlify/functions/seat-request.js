@@ -45,7 +45,7 @@ function sgLog(fields) {
 }
 
 // --- SendGrid template IDs (sourced from sendgrid-templates.js — do not hardcode d-... here) ---
-assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_v1']);
+assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_v1', 'next_flight_waitlist_v1']);
 const TEMPLATE_ID = TEMPLATES.seat_request_acknowledgement_v1;
 const INTERNAL_TEMPLATE_ID = TEMPLATES.internalsignupnotification_v1;
 const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
@@ -79,6 +79,51 @@ function generateSeatId() {
 
 function notionRichText(content) {
   return [{ type: 'text', text: { content: String(content) } }];
+}
+
+/**
+ * Check whether an email already has a seat request in the Notion registry.
+ * Returns the existing seat_id string if found, or null if not found / API unavailable.
+ * Fails gracefully — a Notion outage must not block new seat requests.
+ */
+async function checkExistingRequest({ email, notionApiKey, databaseId }) {
+  if (!notionApiKey) return null;
+  try {
+    const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + notionApiKey,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_API_VERSION
+      },
+      body: JSON.stringify({
+        filter: {
+          property: 'Email',
+          email: { equals: email }
+        },
+        page_size: 1
+      })
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      console.warn('[seat-request] Notion dedupe query failed ' + response.status + ': ' + errText);
+      return null; // fail open
+    }
+    const data = await response.json();
+    if (data.results && data.results.length > 0) {
+      const page = data.results[0];
+      const seatIdProp = page.properties && page.properties['Seat ID'];
+      const existingSeatId = seatIdProp && seatIdProp.rich_text && seatIdProp.rich_text[0]
+        ? seatIdProp.rich_text[0].plain_text
+        : null;
+      console.log(`[seat-request] Duplicate request detected for ${email} — existing seat_id: ${existingSeatId || 'unknown'}`);
+      return existingSeatId || '__duplicate__';
+    }
+    return null;
+  } catch (err) {
+    console.warn('[seat-request] Notion dedupe check unexpected error:', err.message);
+    return null; // fail open
+  }
 }
 
 async function logSeatRequestToNotion({ seatId, name, email, requestDate, source, notionApiKey, databaseId }) {
@@ -238,7 +283,7 @@ exports.handler = async function (event, context) {
   const fromEmail   = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
   const platformUrl = process.env.PLATFORM_URL        || 'https://www.thispagedoesnotexist12345.com';
   const signalUrl   = process.env.SIGNAL_URL          || 'https://newsletter.thispagedoesnotexist12345.us';
-  const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.tech';
+  const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.com';
   const beehiivKey  = process.env.BEEHIIV_API_KEY;
   const beehiivPub  = process.env.BEEHIIV_PUB_ID || BEEHIIV_PUB_ID_DEFAULT;
 
@@ -253,26 +298,98 @@ exports.handler = async function (event, context) {
   const resolvedCabinTier = (cabin_tier && typeof cabin_tier === 'string' ? cabin_tier.trim() : 'Alpha (Founding)');
   const formattedAmountPaid = (amount_paid !== undefined && amount_paid !== null ? amount_paid : '$0.00');
 
+  // --- F143: Cohort capacity check — divert to waitlist if seats_available === false ---
+  // Fires next_flight_waitlist_v1 email + applies Beehiiv 'waitlist' tag.
+  // Non-fatal: if /api/seat-status is unavailable, falls through to normal flow.
+  try {
+    const seatStatusUrl = (process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com') + '/api/seat-status';
+    const statusRes = await fetch(seatStatusUrl);
+    if (statusRes.ok) {
+      const statusData = await statusRes.json();
+      if (statusData.seats_available === false) {
+        console.log(`[seat-request] Cohort full — diverting ${emailTrimmed} to waitlist (F143)`);
+        const wlFirstName = nameTrimmed.split(/\s+/)[0] || nameTrimmed;
+        const wlPlatformUrl = (process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com') + '/ResumeFitCheck';
+        const waitlistTemplateId = TEMPLATES.next_flight_waitlist_v1;
+        // Send next_flight_waitlist_v1 email
+        try {
+          const wlRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: { email: fromEmail },
+              personalizations: [{ to: [{ email: emailTrimmed }], dynamic_template_data: { first_name: wlFirstName, platform_url: wlPlatformUrl } }],
+              template_id: waitlistTemplateId,
+              asm: { group_id: ASM_GROUP_ID }
+            })
+          });
+          console.log(`[seat-request] next_flight_waitlist_v1 ${wlRes.ok || wlRes.status === 202 ? 'sent' : 'failed (' + wlRes.status + ')'} to ${emailTrimmed}`);
+        } catch (wlErr) {
+          console.error('[seat-request] Waitlist email error:', wlErr.message);
+        }
+        // Apply Beehiiv 'waitlist' tag via subscription (reactivate_existing: false keeps existing subs intact)
+        if (beehiivKey) {
+          await subscribeToBeehiiv(emailTrimmed, wlFirstName, beehiivKey, beehiivPub);
+        }
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ ok: true, waitlisted: true, status: 'waitlisted', message: "You're on the next flight. Check your inbox for details." })
+        };
+      }
+    }
+  } catch (capacityErr) {
+    console.warn('[seat-request] Capacity check unavailable (F143 — fail open):', capacityErr.message);
+  }
+
+  // --- Deduplicate: one seat request per email (Gate Contract §2e) ---
+  // Query the Notion Seat Request Registry before generating a new seat_id.
+  // If the email already has a record, return 409 with the existing seat_id.
+  // Fails gracefully: if Notion is unavailable, proceed normally.
+  const existingSeatId = await checkExistingRequest({
+    email: emailTrimmed,
+    notionApiKey,
+    databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
+  });
+  if (existingSeatId) {
+    console.log(`[seat-request] Rejecting duplicate request for ${emailTrimmed}`);
+    const resolvedExisting = existingSeatId === '__duplicate__' ? null : existingSeatId;
+    return {
+      statusCode: 409,
+      headers,
+      body: JSON.stringify({
+        ok: false,
+        duplicate: true,
+        error: 'A seat request has already been submitted for this email address. Check your inbox for your original confirmation.',
+        ...(resolvedExisting ? { seat_id: resolvedExisting } : {})
+      })
+    };
+  }
+
   // --- Generate seat_id (Gate Contract §3) ---
   const seatId = generateSeatId();
   console.log(`[seat-request] Generated seat_id ${seatId} for ${emailTrimmed}`);
 
   // --- Build passport URL with seat_id pre-filled (Gate Contract §4 — email handoff) ---
-  // seat_id chars are URL-safe (A-Z, 2-9, hyphen) — no additional encoding needed,
-  // but encodeURIComponent is used defensively in case the format ever changes.
-  const passportUrl = `${passportBase}?seat_id=${encodeURIComponent(seatId)}`;
+  // Fix 3b (Apr 5, 2026): encodeURIComponent removed per canonical spec.
+  // seat_id chars (A-Z, 2-9, hyphen) are URL-safe — no encoding needed or wanted.
+  // Canonical form: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
+  const passportUrl = `${passportBase}?seat_id=${seatId}`;
 
-  const padInternalAlertValue = (value) => ` ${value}`;
+  // Bug-003 fix: pass values without the leading-space pad so the SendGrid template
+  // can render "Name: Kevin" style rows without label/value collision.
+  // first_name uses the full nameTrimmed so {{first_name}} resolves as "Jo Ann", not "Jo".
   const internalDynamicTemplateData = {
-    name:         padInternalAlertValue(nameTrimmed),
-    email:        padInternalAlertValue(emailTrimmed),
-    seat_id:      padInternalAlertValue(seatId),
-    tier:         padInternalAlertValue(resolvedTier),
-    cabin_tier:   padInternalAlertValue(resolvedCabinTier),
-    signup_date:  padInternalAlertValue(requestDate),
+    name:         nameTrimmed,
+    first_name:   nameTrimmed,
+    email:        emailTrimmed,
+    seat_id:      seatId,
+    tier:         resolvedTier,
+    cabin_tier:   resolvedCabinTier,
+    signup_date:  requestDate,
     passport_url: passportUrl,
-    source:       padInternalAlertValue(sourceValue),
-    amount_paid:  padInternalAlertValue(formattedAmountPaid)
+    source:       sourceValue,
+    amount_paid:  formattedAmountPaid
   };
 
   // --- Send user acknowledgement via SendGrid ---
@@ -285,7 +402,7 @@ exports.handler = async function (event, context) {
     source:       sourceValue,
     platform_url: platformUrl,
     signal_url:   signalUrl,
-    passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.tech?seat_id=TUJ-XXXXXX
+    passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.com?seat_id=TUJ-XXXXXX
     request_date: requestDate
   };
 

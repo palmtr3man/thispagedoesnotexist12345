@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<!--
+  Template: boarding_instructions_free_v1
+  SendGrid ID: d-747dac53dd2c4b47b33400376aad1672
+  Purpose: Boarding instructions for free-tier passengers — directs to first task
+  Last updated: 2026-04-05
+
+  Fix log:
+  Fix 2 (Apr 2, 2026): CTA href updated to {{first_task_url}} so the "Start Your First Task"
+         button deep-links directly to ResumeFitCheck with seat_id pre-loaded.
+         first_task_url is constructed server-side in handleSeatOpened.
+         No Base44 deploy needed — payload already includes first_task_url.
+  Fix 3b (Apr 5, 2026): encodeURIComponent removed from server-side first_task_url construction.
+         seat_id chars (A-Z, 2-9, hyphen) are URL-safe — no encoding needed.
+         No template HTML changes required (CTA uses {{first_task_url}} indirection).
+
+  Dynamic variables used:
+    {{first_name}}      — Passenger first name
+    {{seat_id}}         — Seat label (e.g. TUJ-XXXXXX)
+    {{first_task_url}}  — Deep-link to ResumeFitCheck (?seat_id=...)
+    {{secondary_url}}   — Secondary link (Jobs page)
+    {{platform_url}}    — Base platform URL
+    {{unsubscribe_url}} — Unsubscribe link
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Boarding Instructions — The Ultimate Journey</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Arial', Helvetica, sans-serif;">
+  <!-- [Alpha Test — FL 032126] Banner — remove before production send -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#1a0a00;">
+    <tr>
+      <td align="center" style="padding:8px 16px;">
+        <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;color:#FF8C00;letter-spacing:1px;text-transform:uppercase;">
+          ⚠️ Alpha Test — FL 032126 &nbsp;|&nbsp; Internal Only — Do Not Forward
+        </p>
+      </td>
+    </tr>
+  </table>
+
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #0a0a0a;">
+    <tr>
+      <td align="center" style="padding: 20px 0;">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%;">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background-color: #1a1a2e; padding: 28px 40px 24px 40px; border-top: 4px solid #00D9FF; text-align: center;">
+              <p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #00D9FF; letter-spacing: 1px;">
+                The Ultimate Journey &middot; PageForward Airways
+              </p>
+              <p style="margin: 0; font-size: 11px; color: #888888; letter-spacing: 1px;">
+                Economy Class &middot; Boarding Instructions
+              </p>
+            </td>
+          </tr>
+
+          <!-- GREETING -->
+          <tr>
+            <td style="background-color: #16213e; padding: 28px 40px 20px 40px; border-left: 4px solid #00D9FF;">
+              <p style="margin: 0 0 4px 0; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #00D9FF;">
+                🗺️ Your Flight Plan
+              </p>
+              <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #ffffff;">
+                Here's how to fly, {{first_name}}.
+              </h1>
+              <p style="margin: 0; font-size: 14px; color: #aaaaaa; line-height: 1.6;">
+                Your seat is active. The system is ready. Your first task is waiting.
+                Follow the steps below to get airborne.
+              </p>
+            </td>
+          </tr>
+
+          <!-- STEPS -->
+          <tr>
+            <td style="background-color: #0f1a2e; padding: 24px 40px;">
+              <p style="margin: 0 0 20px 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #00D9FF;">
+                Your Boarding Sequence
+              </p>
+
+              <!-- Step 1 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;">
+                <tr>
+                  <td width="36" style="vertical-align: top; padding-right: 12px;">
+                    <div style="width: 28px; height: 28px; background-color: #00D9FF; border-radius: 50%; text-align: center; line-height: 28px; font-size: 13px; font-weight: 700; color: #0a0a0a;">1</div>
+                  </td>
+                  <td style="vertical-align: top;">
+                    <p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #ffffff;">Complete your Resume Fit Check</p>
+                    <p style="margin: 0; font-size: 12px; color: #888888; line-height: 1.5;">
+                      This is your first task. It maps your experience to what the market is hiring for right now.
+                      Your seat ID is pre-loaded — just click the button below.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Step 2 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;">
+                <tr>
+                  <td width="36" style="vertical-align: top; padding-right: 12px;">
+                    <div style="width: 28px; height: 28px; background-color: #2a2a4e; border-radius: 50%; text-align: center; line-height: 28px; font-size: 13px; font-weight: 700; color: #00D9FF; border: 1px solid #00D9FF;">2</div>
+                  </td>
+                  <td style="vertical-align: top;">
+                    <p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #ffffff;">Review your active job targets</p>
+                    <p style="margin: 0; font-size: 12px; color: #888888; line-height: 1.5;">
+                      After your Fit Check, head to the Jobs board to review the roles the system has queued for you.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Step 3 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
+                <tr>
+                  <td width="36" style="vertical-align: top; padding-right: 12px;">
+                    <div style="width: 28px; height: 28px; background-color: #2a2a4e; border-radius: 50%; text-align: center; line-height: 28px; font-size: 13px; font-weight: 700; color: #00D9FF; border: 1px solid #00D9FF;">3</div>
+                  </td>
+                  <td style="vertical-align: top;">
+                    <p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #ffffff;">Keep your seat ID handy</p>
+                    <p style="margin: 0; font-size: 12px; color: #888888; line-height: 1.5;">
+                      Your seat ID <strong style="color: #00D9FF;">{{seat_id}}</strong> is your permanent identifier throughout the flight.
+                      Every checkpoint, every milestone — it's tied to this ID.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA — Fix 2: href uses {{first_task_url}} -->
+          <tr>
+            <td style="background-color: #0f1a2e; padding: 0 40px 32px 40px; text-align: center;">
+              <a href="{{first_task_url}}"
+                 style="display: inline-block; background-color: #00D9FF; color: #0a0a0a; font-size: 14px; font-weight: bold; padding: 14px 32px; border-radius: 4px; text-decoration: none; letter-spacing: 0.5px;">
+                🗺️ Start Your First Task
+              </a>
+              <p style="margin: 12px 0 0 0; font-size: 12px; color: #555555;">
+                Also explore:
+                <a href="{{secondary_url}}" style="color: #00D9FF; text-decoration: none;">Browse Active Jobs</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- DIVIDER -->
+          <tr>
+            <td style="background-color: #00D9FF; height: 1px; font-size: 0; line-height: 0;">&nbsp;</td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="background-color: #0a0a0a; padding: 20px 40px; text-align: center;">
+              <p style="margin: 0 0 6px 0; font-size: 12px; color: #ffffff; font-weight: bold;">
+                The Ultimate Journey &middot; PageForward Airways
+              </p>
+              <p style="margin: 0 0 12px 0; font-size: 11px; color: #555555;">
+                You're receiving this as part of your Alpha Flight 1 boarding sequence.
+              </p>
+              <p style="margin: 0; font-size: 11px;">
+                <a href="https://www.thispagedoesnotexist12345.com/" style="color: #00D9FF; text-decoration: none;">Request a Seat</a>
+                &nbsp;&middot;&nbsp;
+                <a href="https://view-link.cx/d7sGLORJ0DF" style="color: #00D9FF; text-decoration: none;">View Master Requirements</a>
+                &nbsp;&middot;&nbsp;
+                <a href="https://www.thispagedoesnotexist12345.tech/" style="color: #555555; text-decoration: none;">Reject &amp; Return</a>
+              </p>
+              <p style="margin: 8px 0 0 0; font-size: 11px;">
+                <a href="{{unsubscribe_url}}" style="color: #555555; text-decoration: none;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

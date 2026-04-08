@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Boarding Pass is Ready</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0A0A0A; font-family: 'Inter', Arial, sans-serif; color: #E0E0E0; padding: 40px 20px; }
+    .wrapper { max-width: 600px; margin: 0 auto; }
+
+    .header { text-align: center; margin-bottom: 32px; }
+    .header .tuj { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+    .header .logo { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; margin-bottom: 4px; }
+    .header .powered { font-size: 10px; letter-spacing: 1px; color: #555; margin-bottom: 16px; }
+    .header h1 { font-size: 26px; font-weight: 700; color: #FFFFFF; }
+
+    .boarding-pass { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,217,255,0.08); overflow: hidden; margin-bottom: 24px; }
+
+    .pass-header { background: rgba(0,217,255,0.08); border-bottom: 1px solid rgba(0,217,255,0.2); padding: 20px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .pass-header .airline-block .airline { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; margin-bottom: 2px; }
+    .pass-header .airline-block .sub { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #444; margin-bottom: 6px; }
+    .pass-header .flight { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+    .class-badge { background: rgba(0,217,255,0.15); border: 1px solid rgba(0,217,255,0.4); border-radius: 20px; padding: 6px 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 600; white-space: nowrap; }
+
+    .pass-body { padding: 28px; }
+    .pass-row { display: flex; gap: 24px; margin-bottom: 24px; }
+    .pass-field { flex: 1; }
+    .pass-field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; display: block; margin-bottom: 4px; }
+    .pass-field .value { font-size: 16px; font-weight: 600; color: #FFFFFF; }
+    .divider { border: none; border-top: 1px dashed rgba(255,255,255,0.12); margin: 20px 0; }
+
+    .perks h3 { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+    .perk-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #CCCCCC; }
+    .perk-item .dot { width: 6px; height: 6px; background: #00D9FF; border-radius: 50%; flex-shrink: 0; }
+
+    .barcode-strip { background: rgba(0,0,0,0.3); border-top: 1px dashed rgba(255,255,255,0.1); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .barcode-strip .gate-info { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #444; }
+    .barcode-strip .seat { font-size: 13px; font-weight: 700; color: #00D9FF; letter-spacing: 2px; }
+
+    .cta-block { text-align: center; margin: 32px 0; }
+    .cta-btn { display: inline-block; background: #00D9FF; color: #0A0A0A; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-decoration: none; padding: 14px 36px; border-radius: 8px; text-transform: uppercase; }
+
+    .footer { text-align: center; font-size: 11px; color: #333; margin-top: 32px; line-height: 1.8; }
+    .footer a { color: #00D9FF; text-decoration: none; }
+    .footer .tuj-footer { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+
+    @media (max-width: 480px) {
+      .pass-row { flex-direction: column; gap: 16px; }
+      .pass-header { flex-direction: column; gap: 12px; }
+      body { padding: 20px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <div class="header">
+      <div class="tuj">The Ultimate Journey</div>
+      <div class="logo">PageForward Airways</div>
+      <div class="powered">Powered by The Ultimate Journey</div>
+      <h1>✈️ Your Boarding Pass is Ready</h1>
+    </div>
+
+    <div class="boarding-pass">
+      <div class="pass-header">
+        <div class="airline-block">
+          <div class="airline">PageForward Airways</div>
+          <div class="sub">Powered by The Ultimate Journey</div>
+          <div class="flight">PF-001</div>
+        </div>
+        <div class="class-badge">Economy</div>
+      </div>
+
+      <div class="pass-body">
+        <div class="pass-row">
+          <div class="pass-field">
+            <label>Passenger</label>
+            <div class="value">{{first_name}}</div>
+          </div>
+          <div class="pass-field">
+            <label>Destination</label>
+            <div class="value">Your Next Role</div>
+          </div>
+        </div>
+        <div class="pass-row">
+          <div class="pass-field">
+            <label>Departure</label>
+            <div class="value">{{signup_date}}</div>
+          </div>
+          <div class="pass-field">
+            <label>Cabin Class</label>
+            <div class="value">Free</div>
+          </div>
+          <div class="pass-field">
+            <label>Boarding</label>
+            <div class="value">Now Open</div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="perks">
+          <h3>What's Included</h3>
+          <div class="perk-item"><span class="dot"></span> ATS Resume Scanner (PageRouter)</div>
+          <div class="perk-item"><span class="dot"></span> JD Library &amp; Job Pipeline Tracker</div>
+          <div class="perk-item"><span class="dot"></span> Application Hub &amp; Status Tracking</div>
+          <div class="perk-item"><span class="dot"></span> Cover Letter Studio (3/month)</div>
+          <div class="perk-item"><span class="dot"></span> Notion Sync (read-only)</div>
+        </div>
+      </div>
+
+      <div class="barcode-strip">
+        <span class="gate-info">Gate: Dashboard &nbsp;|&nbsp; Boards: Now &nbsp;|&nbsp; The Ultimate Journey</span>
+        <span class="seat">{{seat_id}}</span>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <a href="{{passport_url}}" class="cta-btn">❖ Mission Control</a>
+    </div>
+
+    <div class="footer">
+      <div class="tuj-footer">The Ultimate Journey · PageForward Airways</div>
+      You're receiving this because you signed up at PageForward.<br />
+      <a href="https://www.thispagedoesnotexist12345.com/request-seat" style="color: #00D9FF; text-decoration: none;">Request a Seat</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/mission-control/requirements" style="color: #00D9FF; text-decoration: none;">View Master Requirements</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/reject-return" style="color: #555555; text-decoration: none;">Reject &amp; Return</a><br />
+      <a href="{{unsubscribe_url}}" style="color: #555555; text-decoration: none;">Unsubscribe</a><br /><br />
+      © 2026 The Ultimate Journey. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>

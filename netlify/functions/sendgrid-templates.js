@@ -18,21 +18,30 @@
  *   SENDGRID_TEMPLATE_ALPHA_ANNOUNCEMENT    → alphaflightannouncement_v1
  *   SENDGRID_TEMPLATE_BOARDING_CONFIRMATION → boarding_confirmation_v1
  *   SENDGRID_TEMPLATE_OFFER_CONGRATS        → offer_congrats_v1
- *   SENDGRID_TEMPLATE_EXEC_PREBOARD         → exec_preboard_opentowork_v1
+ *   SENDGRID_TEMPLATE_EXEC_PREBOARD                  → exec_preboard_opentowork_v1
+ *   SENDGRID_TEMPLATE_BOARDING_PASS_FREE         → boarding_pass_free_v1
+ *   SENDGRID_TEMPLATE_BOARDING_PASS_PAID         → boarding_pass_paid_v1
+ *   SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_FREE → boarding_instructions_free_v1
+ *   SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_PAID → boarding_instructions_paid_v1
  *
  * Fallback IDs are the confirmed canonical values from the SendGrid Template
  * Registry (Notion). They exist so local dev without a .env file still resolves
  * correctly, and so a missing Netlify var produces a clear startup error rather
  * than a silent wrong-template send.
  *
- * Last verified: 2026-04-01
+ * Last verified: 2026-04-02
  * Source of truth: Notion — 📧 SendGrid Template Registry — All Templates
+ *
+ * Fix 1 + Fix 2 (Apr 2, 2026): boarding_pass_free/paid_v1 and
+ * boarding_instructions_free/paid_v1 registered here so handleSeatOpened
+ * in Base44 can reference canonical IDs. Template HTML files committed to
+ * sendgrid-templates/ directory for upload to SendGrid dashboard.
  */
 
 'use strict';
 
 // ---------------------------------------------------------------------------
-// Canonical fallback IDs (confirmed live in SendGrid as of 2026-04-01)
+// Canonical fallback IDs (confirmed live in SendGrid as of 2026-04-02)
 // ---------------------------------------------------------------------------
 const FALLBACKS = {
   seat_request_acknowledgement_v1: 'd-740595dc07be40129569bc731f1bc454',
@@ -43,6 +52,13 @@ const FALLBACKS = {
   boarding_confirmation_v1:        'd-678824bc506c432dae9eadab36c07904',
   offer_congrats_v1:               'd-11d5610e48b34eedb77dc2bc7bdf4eaa',
   exec_preboard_opentowork_v1:     'd-d8cef7e7bfbc449fa318219bda70d397',
+  // ── Boarding sequence templates (handleSeatOpened fan-out) ────────────────
+  // Fix 1: boarding_pass CTAs now use {{passport_url}} (deep-link with seat_id)
+  // Fix 2: boarding_instructions CTAs now use {{first_task_url}} (seat_id appended)
+  boarding_pass_free_v1:           'd-91ca65ce16634f299a46af4f0645d540',
+  boarding_pass_paid_v1:           'd-9290e951724f4b028d94945d4f06b69f',
+  boarding_instructions_free_v1:   'd-747dac53dd2c4b47b33400376aad1672',
+  boarding_instructions_paid_v1:   'd-d8ec12e940944c5596af1fa740cf7f07',
 };
 
 // ---------------------------------------------------------------------------
@@ -64,7 +80,16 @@ const TEMPLATES = {
   offer_congrats_v1:
     process.env.SENDGRID_TEMPLATE_OFFER_CONGRATS        || FALLBACKS.offer_congrats_v1,
   exec_preboard_opentowork_v1:
-    process.env.SENDGRID_TEMPLATE_EXEC_PREBOARD         || FALLBACKS.exec_preboard_opentowork_v1,
+    process.env.SENDGRID_TEMPLATE_EXEC_PREBOARD              || FALLBACKS.exec_preboard_opentowork_v1,
+  // ── Boarding sequence templates (handleSeatOpened fan-out) ────────────────
+  boarding_pass_free_v1:
+    process.env.SENDGRID_TEMPLATE_BOARDING_PASS_FREE         || FALLBACKS.boarding_pass_free_v1,
+  boarding_pass_paid_v1:
+    process.env.SENDGRID_TEMPLATE_BOARDING_PASS_PAID         || FALLBACKS.boarding_pass_paid_v1,
+  boarding_instructions_free_v1:
+    process.env.SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_FREE || FALLBACKS.boarding_instructions_free_v1,
+  boarding_instructions_paid_v1:
+    process.env.SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_PAID || FALLBACKS.boarding_instructions_paid_v1,
 };
 
 // ---------------------------------------------------------------------------

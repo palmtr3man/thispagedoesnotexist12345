@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--
+  Template: boarding_pass_paid_v1
+  SendGrid ID: d-9290e951724f4b028d94945d4f06b69f
+  Version: v1-dark-neon (ACTIVE)
+  Last updated: Apr 7, 2026
+
+  Dynamic variables:
+    {{first_name}}    — Passenger first name
+    {{last_name}}     — Passenger last name
+    {{seat_id}}       — Seat label (e.g. TUJ-KC2222)
+    {{passport_url}}  — server-side: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
+    {{signup_date}}   — Optional boarding date string (e.g. "Apr 7, 2026"); falls back to "Confirmed"
+    {{unsubscribe_url}} — SendGrid unsubscribe token
+
+  Test data:
+    {
+      "first_name": "Kevin",
+      "last_name": "Clark",
+      "seat_id": "TUJ-KC2222",
+      "passport_url": "https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-KC2222",
+      "signup_date": "Apr 7, 2026"
+    }
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First Class Boarding Pass</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0A0A0A; font-family: 'Inter', Arial, sans-serif; color: #E0E0E0; padding: 40px 20px; }
+    .wrapper { max-width: 600px; margin: 0 auto; }
+
+    .header { text-align: center; margin-bottom: 32px; }
+    .header .tuj { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+    .header .logo { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; margin-bottom: 4px; }
+    .header .powered { font-size: 10px; letter-spacing: 1px; color: #555; margin-bottom: 16px; }
+    .header h1 { font-size: 26px; font-weight: 700; color: #FFFFFF; }
+    .header .subtitle { font-size: 13px; color: #888; margin-top: 6px; }
+
+    .boarding-pass { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,217,255,0.25); border-radius: 16px; box-shadow: 0 8px 48px rgba(0,217,255,0.15); overflow: hidden; margin-bottom: 24px; }
+    .premium-bar { height: 3px; background: linear-gradient(90deg, #00D9FF 0%, #0099BB 50%, #00D9FF 100%); }
+
+    .pass-header { background: rgba(0,217,255,0.1); border-bottom: 1px solid rgba(0,217,255,0.2); padding: 20px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .pass-header .airline-block .airline { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; margin-bottom: 2px; }
+    .pass-header .airline-block .sub { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #444; margin-bottom: 6px; }
+    .pass-header .flight { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+    .class-badge { background: rgba(0,217,255,0.2); border: 1px solid #00D9FF; border-radius: 20px; padding: 6px 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; white-space: nowrap; }
+
+    .pass-body { padding: 28px; }
+    .pass-row { display: flex; gap: 24px; margin-bottom: 24px; }
+    .pass-field { flex: 1; }
+    .pass-field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; display: block; margin-bottom: 4px; }
+    .pass-field .value { font-size: 16px; font-weight: 600; color: #FFFFFF; }
+    .divider { border: none; border-top: 1px dashed rgba(255,255,255,0.12); margin: 20px 0; }
+
+    .seat-id-block { background: rgba(0,217,255,0.06); border: 1px solid rgba(0,217,255,0.2); border-radius: 10px; padding: 14px 20px; margin-bottom: 24px; }
+    .seat-id-block .label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+    .seat-id-block .code { font-size: 22px; font-weight: 700; color: #00D9FF; letter-spacing: 3px; }
+    .seat-id-block .note { font-size: 11px; color: #555; margin-top: 4px; }
+
+    .perks h3 { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+    .perk-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #CCCCCC; }
+    .perk-item .dot { width: 6px; height: 6px; background: #00D9FF; border-radius: 50%; flex-shrink: 0; }
+    .perk-item.premium { color: #FFFFFF; font-weight: 600; }
+
+    .barcode-strip { background: rgba(0,0,0,0.3); border-top: 1px dashed rgba(255,255,255,0.1); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .barcode-strip .gate-info { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #444; }
+    .barcode-strip .seat { font-size: 13px; font-weight: 700; color: #00D9FF; letter-spacing: 2px; }
+
+    .cta-block { text-align: center; margin: 32px 0 16px; }
+    .cta-btn-primary { display: inline-block; background: #00D9FF; color: #0A0A0A; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-decoration: none; padding: 14px 36px; border-radius: 8px; text-transform: uppercase; margin-bottom: 12px; }
+    .cta-btn-secondary { display: inline-block; background: transparent; color: #00D9FF; font-weight: 600; font-size: 13px; letter-spacing: 1px; text-decoration: none; padding: 10px 28px; border-radius: 8px; border: 1px solid rgba(0,217,255,0.4); text-transform: uppercase; }
+
+    .footer { text-align: center; font-size: 11px; color: #333; margin-top: 32px; line-height: 1.8; }
+    .footer a { color: #00D9FF; text-decoration: none; }
+    .footer .tuj-footer { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+
+    @media (max-width: 480px) {
+      .pass-row { flex-direction: column; gap: 16px; }
+      .pass-header { flex-direction: column; gap: 12px; }
+      body { padding: 20px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Preview text (hidden) -->
+  <span style="display:none;max-height:0;overflow:hidden;">Your First Class seat on Alpha Flight 1 is confirmed. Your Seat ID is inside.</span>
+
+  <!-- Alpha test banner — REMOVE BEFORE PRODUCTION SEND -->
+  <div style="background-color:#1a0a00;padding:8px 16px;text-align:center;margin-bottom:0;">
+    <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#FF8C00;letter-spacing:1px;text-transform:uppercase;">⚠️ Alpha Test — FL 032126 &nbsp;|&nbsp; Internal Only — Do Not Forward</p>
+  </div>
+
+  <div class="wrapper">
+
+    <div class="header">
+      <div class="tuj">The Ultimate Journey</div>
+      <div class="logo">PageForward Airways</div>
+      <div class="powered">Powered by The Ultimate Journey</div>
+      <h1>✈️ First Class Boarding Pass</h1>
+      <div class="subtitle">Welcome aboard, {{first_name}}. Your seat is confirmed.</div>
+    </div>
+
+    <div class="boarding-pass">
+      <div class="premium-bar"></div>
+      <div class="pass-header">
+        <div class="airline-block">
+          <div class="airline">PageForward Airways</div>
+          <div class="sub">Powered by The Ultimate Journey</div>
+          <div class="flight">Alpha Flight 1</div>
+        </div>
+        <div class="class-badge">First Class</div>
+      </div>
+
+      <div class="pass-body">
+        <div class="pass-row">
+          <div class="pass-field">
+            <label>Passenger</label>
+            <div class="value">{{first_name}} {{last_name}}</div>
+          </div>
+          <div class="pass-field">
+            <label>Destination</label>
+            <div class="value">Your Next Role</div>
+          </div>
+        </div>
+
+        <div class="pass-row">
+          <div class="pass-field">
+            <label>Boarding Date</label>
+            <!-- signup_date fallback: if missing renders "Confirmed" -->
+            <div class="value">{{signup_date}}</div>
+          </div>
+          <div class="pass-field">
+            <label>Cabin Class</label>
+            <div class="value">First Class</div>
+          </div>
+          <div class="pass-field">
+            <label>Boarding</label>
+            <div class="value">Now Open</div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="seat-id-block">
+          <div class="label">Your Seat ID</div>
+          <div class="code">{{seat_id}}</div>
+          <div class="note">Keep this handy — you will need it at every checkpoint.</div>
+        </div>
+
+        <div class="perks">
+          <h3>First Class Includes</h3>
+          <div class="perk-item premium"><span class="dot"></span> Everything in Free tier</div>
+          <div class="perk-item"><span class="dot"></span> Unlimited Cover Letters</div>
+          <div class="perk-item"><span class="dot"></span> TailorForJob — Full Resume Tailoring</div>
+          <div class="perk-item"><span class="dot"></span> ATS Score Engine (deterministic scoring)</div>
+          <div class="perk-item"><span class="dot"></span> Notion Sync (read + write)</div>
+          <div class="perk-item"><span class="dot"></span> Priority Support</div>
+        </div>
+      </div>
+
+      <div class="barcode-strip">
+        <span class="gate-info">Gate: Mission Control &nbsp;|&nbsp; Boards: Now &nbsp;|&nbsp; The Ultimate Journey</span>
+        <span class="seat">{{seat_id}}</span>
+      </div>
+    </div>
+
+    <!-- PRIMARY CTA: Mission Control via passport_url -->
+    <div class="cta-block">
+      <a href="{{passport_url}}" class="cta-btn-primary">❖ Mission Control — First Class</a>
+      <br />
+      <!-- SECONDARY CTA: Boarding Gate -->
+      <a href="https://www.thispagedoesnotexist12345.com/Studio?seat_id={{seat_id}}" class="cta-btn-secondary">Proceed to Boarding Gate →</a>
+    </div>
+
+    <div class="footer">
+      <div class="tuj-footer">The Ultimate Journey · PageForward Airways</div>
+      You're receiving this because you've been invited to Alpha Flight 1 — First Class.<br />
+      <a href="https://www.thispagedoesnotexist12345.com/">Request a Seat</a> &nbsp;·&nbsp;
+      <a href="https://view-link.cx/d7sGLORJ0DF">View Master Requirements</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/" style="color:#555555;">Reject &amp; Return</a><br />
+      <a href="{{unsubscribe_url}}" style="color:#555555;">Unsubscribe</a><br /><br />
+      © 2026 The Ultimate Journey. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>
