@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<!--
+  Template: exec_preboard_opentowork_v1
+  SendGrid ID: d-d8cef7e7bfbc449fa318219bda70d397
+  Version: v1-dark-neon (ACTIVE)
+  Last updated: Apr 8, 2026
+  Dynamic variables:
+    {{first_name}}      — Passenger first name
+    {{last_name}}       — Passenger last name
+    {{user_email}}      — Passenger email address
+    {{pid}}             — Passenger ID string (required — aborts if empty)
+    {{tuj_code}}        — TUJ access code (required — aborts if empty)
+    {{dashboard_url}}   — Smart Front Door dashboard URL (retained per Smart Front Door decision)
+    {{unsubscribe_url}} — SendGrid unsubscribe token
+  Test data:
+    {
+      "first_name": "Kevin",
+      "last_name": "Clark",
+      "user_email": "k.clark7@gmail.com",
+      "pid": "PID-KC001",
+      "tuj_code": "TUJ-ALPHA-001",
+      "dashboard_url": "https://www.thispagedoesnotexist12345.com/dashboard"
+    }
+  Notes:
+    - boarding_type = "executive_pre" routes to this template via sendSeatConfirmation()
+    - Single send (no dual-tier boarding sequence)
+    - SendGrid-only path (no AutoSend template for this flow)
+    - {{dashboard_url}} retained per Smart Front Door decision (not replaced by passport_url)
+    - Idempotency: exec_preboard_sent_at stamped on Seat record after confirmed 2xx
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Pre-Board — Open to Work</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0A0A0A; font-family: 'Inter', Arial, sans-serif; color: #E0E0E0; padding: 40px 20px; }
+    .wrapper { max-width: 600px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 32px; }
+    .header .tuj { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+    .header .logo { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; margin-bottom: 4px; }
+    .header .powered { font-size: 10px; letter-spacing: 1px; color: #555; margin-bottom: 16px; }
+    .header h1 { font-size: 26px; font-weight: 700; color: #FFFFFF; }
+    .header .subtitle { font-size: 13px; color: #888; margin-top: 6px; }
+
+    .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(0,217,255,0.25); border-radius: 16px; box-shadow: 0 8px 48px rgba(0,217,255,0.15); overflow: hidden; margin-bottom: 24px; }
+    .premium-bar { height: 3px; background: linear-gradient(90deg, #00D9FF 0%, #0099BB 50%, #00D9FF 100%); }
+    .card-header { background: rgba(0,217,255,0.1); border-bottom: 1px solid rgba(0,217,255,0.2); padding: 20px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-header .airline-block .airline { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; margin-bottom: 2px; }
+    .card-header .airline-block .sub { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #444; margin-bottom: 6px; }
+    .card-header .flight { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+    .status-badge { background: rgba(0,217,255,0.2); border: 1px solid #00D9FF; border-radius: 20px; padding: 6px 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; white-space: nowrap; }
+
+    .card-body { padding: 28px; }
+    .field-row { display: flex; gap: 24px; margin-bottom: 24px; }
+    .field { flex: 1; }
+    .field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; display: block; margin-bottom: 4px; }
+    .field .value { font-size: 16px; font-weight: 600; color: #FFFFFF; }
+    .divider { border: none; border-top: 1px dashed rgba(255,255,255,0.12); margin: 20px 0; }
+
+    .code-block { background: rgba(0,217,255,0.06); border: 1px solid rgba(0,217,255,0.2); border-radius: 10px; padding: 14px 20px; margin-bottom: 16px; }
+    .code-block .label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+    .code-block .code { font-size: 22px; font-weight: 700; color: #00D9FF; letter-spacing: 3px; }
+    .code-block .note { font-size: 11px; color: #555; margin-top: 4px; }
+
+    .access-section h3 { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+    .access-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #CCCCCC; }
+    .access-item .dot { width: 6px; height: 6px; background: #00D9FF; border-radius: 50%; flex-shrink: 0; }
+    .access-item.highlight { color: #FFFFFF; font-weight: 600; }
+
+    .barcode-strip { background: rgba(0,0,0,0.3); border-top: 1px dashed rgba(255,255,255,0.1); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .barcode-strip .gate-info { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #444; }
+    .barcode-strip .pid-display { font-size: 13px; font-weight: 700; color: #00D9FF; letter-spacing: 2px; }
+
+    .cta-block { text-align: center; margin: 32px 0 16px; }
+    .cta-btn-primary { display: inline-block; background: #00D9FF; color: #0A0A0A; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-decoration: none; padding: 14px 36px; border-radius: 8px; text-transform: uppercase; margin-bottom: 12px; }
+    .cta-btn-secondary { display: inline-block; background: transparent; color: #00D9FF; font-weight: 600; font-size: 13px; letter-spacing: 1px; text-decoration: none; padding: 10px 28px; border-radius: 8px; border: 1px solid rgba(0,217,255,0.4); text-transform: uppercase; }
+
+    .footer { text-align: center; font-size: 11px; color: #333; margin-top: 32px; line-height: 1.8; }
+    .footer a { color: #00D9FF; text-decoration: none; }
+    .footer .tuj-footer { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+
+    @media (max-width: 480px) {
+      .field-row { flex-direction: column; gap: 16px; }
+      .card-header { flex-direction: column; gap: 12px; }
+      body { padding: 20px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Preview text (hidden) -->
+  <span style="display:none;max-height:0;overflow:hidden;">Your Executive Pre-Board access is confirmed. Your TUJ Code and Passenger ID are inside.</span>
+
+  <!-- Alpha test banner — REMOVE BEFORE PRODUCTION SEND -->
+  <div style="background-color:#1a0a00;padding:8px 16px;text-align:center;margin-bottom:0;">
+    <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#FF8C00;letter-spacing:1px;text-transform:uppercase;">⚠️ Alpha Test — Executive Pre-Board &nbsp;|&nbsp; Internal Only — Do Not Forward</p>
+  </div>
+
+  <div class="wrapper">
+
+    <div class="header">
+      <div class="tuj">The Ultimate Journey</div>
+      <div class="logo">PageForward Airways</div>
+      <div class="powered">Powered by The Ultimate Journey</div>
+      <h1>🚀 Executive Pre-Board</h1>
+      <div class="subtitle">Welcome, {{first_name}}. Your access credentials are confirmed.</div>
+    </div>
+
+    <div class="card">
+      <div class="premium-bar"></div>
+      <div class="card-header">
+        <div class="airline-block">
+          <div class="airline">PageForward Airways</div>
+          <div class="sub">Powered by The Ultimate Journey</div>
+          <div class="flight">Executive Pre-Board</div>
+        </div>
+        <div class="status-badge">Open to Work</div>
+      </div>
+
+      <div class="card-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Passenger</label>
+            <div class="value">{{first_name}} {{last_name}}</div>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <div class="value">{{user_email}}</div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="code-block">
+          <div class="label">Your TUJ Code</div>
+          <div class="code">{{tuj_code}}</div>
+          <div class="note">Use this code to activate your Executive Pre-Board access.</div>
+        </div>
+
+        <div class="code-block">
+          <div class="label">Your Passenger ID</div>
+          <div class="code">{{pid}}</div>
+          <div class="note">Your unique identifier across The Ultimate Journey platform.</div>
+        </div>
+
+        <div class="access-section">
+          <h3>Executive Pre-Board Access Includes</h3>
+          <div class="access-item highlight"><span class="dot"></span> Smart Front Door — Career Intelligence Hub</div>
+          <div class="access-item"><span class="dot"></span> Open to Work signal activation</div>
+          <div class="access-item"><span class="dot"></span> Executive dashboard access</div>
+          <div class="access-item"><span class="dot"></span> Priority career intelligence briefings</div>
+          <div class="access-item"><span class="dot"></span> Direct support channel</div>
+        </div>
+      </div>
+
+      <div class="barcode-strip">
+        <span class="gate-info">Gate: Smart Front Door &nbsp;|&nbsp; Status: Open to Work &nbsp;|&nbsp; The Ultimate Journey</span>
+        <span class="pid-display">{{pid}}</span>
+      </div>
+    </div>
+
+    <!-- PRIMARY CTA: Smart Front Door dashboard ({{dashboard_url}} retained per Smart Front Door decision) -->
+    <div class="cta-block">
+      <a href="{{dashboard_url}}" class="cta-btn-primary">❖ Enter Smart Front Door</a>
+      <br />
+      <!-- SECONDARY CTA: Main site -->
+      <a href="https://www.thispagedoesnotexist12345.com/" class="cta-btn-secondary">Visit The Ultimate Journey →</a>
+    </div>
+
+    <div class="footer">
+      <div class="tuj-footer">The Ultimate Journey · PageForward Airways</div>
+      You're receiving this because you've been granted Executive Pre-Board access.<br />
+      <a href="https://www.thispagedoesnotexist12345.com/">Request a Seat</a> &nbsp;·&nbsp;
+      <a href="https://view-link.cx/d7sGLORJ0DF">View Master Requirements</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/" style="color:#555555;">Reject &amp; Return</a><br />
+      <a href="{{unsubscribe_url}}" style="color:#555555;">Unsubscribe</a><br /><br />
+      © 2026 The Ultimate Journey. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>
