@@ -1,49 +1,80 @@
 /**
- * #116 — handleSeatOpened / sendSeatConfirmation
+ * F-190 — handleSeatOpened / sendSeatConfirmation
  * Netlify Function: sendgrid-integration
  *
- * Triggered when a Seat entity is activated (admin approves a SeatRequest).
- * Dispatches the correct email sequence based on boarding_type:
+ * Triggered when a Seat entity is activated (admin opens a Seat record in Base44).
+ * Dispatches the correct email sequence based on boarding_type and cabin_class:
  *
  *   boarding_type = "executive_pre"
- *     → exec_preboard_opentowork_v1  (single send)
- *     Requires non-empty pid and tuj_code; aborts with error if either is missing.
- *     On success, stamps exec_preboard_sent_at on the Seat record.
- *     Idempotency guard: skips send if exec_preboard_sent_at is already set.
+ *     → exec_preboard_opentowork_v1  (single send; SendGrid only; no boarding_confirmation stamp)
  *
- *   boarding_type = anything else (default Phase 2 sequence)
- *     1. alphaflightannouncement_v1
- *     2. boarding_confirmation_v1
+ *   boarding_type = anything else (F-190 dual-tier boarding sequence)
+ *     1. boarding_pass_paid_v1   (if cabin_class === 'First')
+ *        boarding_pass_free_v1   (all other cabin_class values)
+ *     2. boarding_instructions_paid_v1   (if cabin_class === 'First')
+ *        boarding_instructions_free_v1   (all other cabin_class values)
  *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
  *
- * Idempotency guards: will not overwrite boarding_confirmation_sent_at (default path)
- * or exec_preboard_sent_at (executive_pre path) if already set.
+ * Provider routing (F-190):
+ *   Primary:  AutoSend  (AUTOSEND_API_KEY + AUTOSEND_TEMPLATE_* env vars)
+ *   Fallback: SendGrid  (SENDGRID_API_KEY + SENDGRID_TEMPLATE_* env vars)
+ *   Override: Set EMAIL_PRIMARY_PROVIDER=sendgrid to bypass AutoSend entirely.
+ *
+ * Idempotency guard: will not overwrite boarding_confirmation_sent_at if already set.
  * All sends BCC support@thispagedoesnotexist12345.com per universal BCC rule.
  *
  * Required env vars:
- *   SENDGRID_API_KEY              — SendGrid API key
+ *   SENDGRID_API_KEY              — SendGrid API key (fallback path)
+ *   AUTOSEND_API_KEY              — AutoSend Bearer token (primary path)
  *   SENDGRID_FROM_EMAIL           — Sender address (default: noreply@thispagedoesnotexist12345.com)
  *   BASE44_SEAT_URL               — Base44 Seat record read/update endpoint
+ *   SITE_URL                      — Base URL for CTA deep-links (default: https://thispagedoesnotexist12345.com)
+ *   EMAIL_PRIMARY_PROVIDER        — Set to "sendgrid" to force SendGrid; default is AutoSend
  *   SENDGRID_DEBUG                — Set to "true" to emit structured JSON observability logs
  *
+ * AutoSend template env vars (deployed to Netlify Apr 4, 2026):
+ *   AUTOSEND_TEMPLATE_BOARDING_PASS_FREE
+ *   AUTOSEND_TEMPLATE_BOARDING_PASS_PAID
+ *   AUTOSEND_TEMPLATE_BOARDING_INSTRUCTIONS_FREE
+ *   AUTOSEND_TEMPLATE_BOARDING_INSTRUCTIONS_PAID
+ *
  * Spec references:
- *   - TUJ Alpha Launch Operational Spec (FL 032126) — Section 2.1
- *   - Manus Handoff — boarding_confirmation_sent_at Stamp (Mar 23, 2026)
- *   - exec_preboard_opentowork_v1 wiring fix (Apr 1, 2026)
+ *   - F-190 — AutoSend / SendGrid Parallel Alignment
+ *   - Feature 101 — Fix 1: passport_url with ?seat_id= appended
+ *   - Feature 144 — Fix 2: first_task_url / secondary_url with ?seat_id= appended
+ *   - Base44 Seat entity: cabin_class enum ('First' | 'Sponsored' | 'Economy')
  */
 
 const { TEMPLATES, assertTemplates, templateKeyForId } = require('./sendgrid-templates');
 
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
-const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
-const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'sendgrid-integration';
-const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
+const AUTOSEND_API_URL = 'https://api.autosend.io/v1/transactional/send';
+const BCC_EMAIL        = 'support@thispagedoesnotexist12345.com';
+const FUNCTION_NAME    = process.env.AWS_LAMBDA_FUNCTION_NAME || 'sendgrid-integration';
+const STAGE            = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
 
-// Template IDs — sourced from sendgrid-templates.js (do not hardcode d-... here)
-assertTemplates(['alphaflightannouncement_v1', 'boarding_confirmation_v1', 'exec_preboard_opentowork_v1']);
-const TEMPLATE_ALPHA_ANNOUNCEMENT    = TEMPLATES.alphaflightannouncement_v1;
-const TEMPLATE_BOARDING_CONFIRMATION = TEMPLATES.boarding_confirmation_v1;
-const TEMPLATE_EXEC_PREBOARD         = TEMPLATES.exec_preboard_opentowork_v1;
+// AutoSend template IDs — canonical values from Template Registry (Apr 4, 2026)
+const AUTOSEND_TEMPLATES = {
+  boarding_pass_free_v1:           process.env.AUTOSEND_TEMPLATE_BOARDING_PASS_FREE         || '69d1d387f27358a37673e394',
+  boarding_pass_paid_v1:           process.env.AUTOSEND_TEMPLATE_BOARDING_PASS_PAID         || '69d1d388f27358a37673e399',
+  boarding_instructions_free_v1:   process.env.AUTOSEND_TEMPLATE_BOARDING_INSTRUCTIONS_FREE || '69d1d38af27358a37673e39e',
+  boarding_instructions_paid_v1:   process.env.AUTOSEND_TEMPLATE_BOARDING_INSTRUCTIONS_PAID || '69d1d38cf27358a37673e3a3',
+};
+
+// SendGrid template IDs — sourced from sendgrid-templates.js (do not hardcode d-... here)
+assertTemplates([
+  'boarding_pass_free_v1',
+  'boarding_pass_paid_v1',
+  'boarding_instructions_free_v1',
+  'boarding_instructions_paid_v1',
+  'exec_preboard_opentowork_v1'
+]);
+
+const TEMPLATE_BOARDING_PASS_FREE           = TEMPLATES.boarding_pass_free_v1;
+const TEMPLATE_BOARDING_PASS_PAID           = TEMPLATES.boarding_pass_paid_v1;
+const TEMPLATE_BOARDING_INSTRUCTIONS_FREE   = TEMPLATES.boarding_instructions_free_v1;
+const TEMPLATE_BOARDING_INSTRUCTIONS_PAID   = TEMPLATES.boarding_instructions_paid_v1;
+const TEMPLATE_EXEC_PREBOARD                = TEMPLATES.exec_preboard_opentowork_v1;
 
 /**
  * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
@@ -51,7 +82,7 @@ const TEMPLATE_EXEC_PREBOARD         = TEMPLATES.exec_preboard_opentowork_v1;
  */
 function sgLog(fields) {
   if (process.env.SENDGRID_DEBUG !== 'true') return;
-  console.log(JSON.stringify({ event: 'tuj_sendgrid_send', function: FUNCTION_NAME, stage: STAGE, ...fields }));
+  console.log(JSON.stringify({ event: 'tuj_email_send', function: FUNCTION_NAME, stage: STAGE, ...fields }));
 }
 
 /**
@@ -69,9 +100,8 @@ function buildCorrelationId({ flightId, passengerId, requestId } = {}) {
 /**
  * Send a single SendGrid dynamic template email.
  * Returns true on 2xx, false otherwise.
- * Emits a structured log line after each attempt.
  */
-async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData, logCtx = {}) {
+async function sendViaSendGrid(apiKey, fromEmail, toEmail, templateId, dynamicData, logCtx = {}) {
   const templateKey = templateKeyForId(templateId);
   const payload = {
     from: { email: fromEmail },
@@ -82,7 +112,6 @@ async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData,
     }],
     template_id: templateId
   };
-
   const t0 = Date.now();
   let sgStatus;
   try {
@@ -94,45 +123,136 @@ async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData,
       },
       body: JSON.stringify(payload)
     });
-
     sgStatus = response.status;
     const ok = response.ok || response.status === 202;
     const elapsed_ms = Date.now() - t0;
-
     sgLog({
       ...logCtx,
+      provider:             'sendgrid',
       template_key:         templateKey,
       sendgrid_template_id: templateId,
       status:               sgStatus,
       elapsed_ms,
       ok,
-      attempt:              1
     });
-
     if (ok) {
-      console.log(`[sendgrid-integration] Template ${templateKey} sent to ${toEmail} — status ${sgStatus}`);
+      console.log(`[sendgrid-integration] SendGrid: ${templateKey} sent to ${toEmail} — status ${sgStatus}`);
       return true;
     }
-
     const errorText = await response.text();
-    console.error(`[sendgrid-integration] Template ${templateKey} failed for ${toEmail} — status ${sgStatus}:`, errorText);
+    console.error(`[sendgrid-integration] SendGrid: ${templateKey} failed for ${toEmail} — status ${sgStatus}:`, errorText);
     return false;
-
   } catch (err) {
     const elapsed_ms = Date.now() - t0;
     sgLog({
       ...logCtx,
-      template_key:         templateKey,
-      sendgrid_template_id: templateId,
-      ok:                   false,
+      provider:      'sendgrid',
+      template_key:  templateKey,
+      ok:            false,
       elapsed_ms,
-      error_name:           err?.name,
-      error_message:        err?.message,
-      status:               err?.code || err?.response?.statusCode
+      error_name:    err?.name,
+      error_message: err?.message,
     });
-    console.error(`[sendgrid-integration] Template ${templateKey} unexpected error for ${toEmail}:`, err);
+    console.error(`[sendgrid-integration] SendGrid: ${templateKey} unexpected error for ${toEmail}:`, err);
     return false;
   }
+}
+
+/**
+ * Send a single AutoSend transactional template email.
+ * Returns true on 2xx, false otherwise.
+ */
+async function sendViaAutoSend(autosendKey, fromEmail, toEmail, templateId, dynamicData, logCtx = {}) {
+  const payload = {
+    template_id: templateId,
+    to:          toEmail,
+    from:        fromEmail,
+    bcc:         BCC_EMAIL,
+    variables:   dynamicData
+  };
+  const t0 = Date.now();
+  let asStatus;
+  try {
+    const response = await fetch(AUTOSEND_API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${autosendKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    asStatus = response.status;
+    const ok = response.ok;
+    const elapsed_ms = Date.now() - t0;
+    sgLog({
+      ...logCtx,
+      provider:             'autosend',
+      autosend_template_id: templateId,
+      status:               asStatus,
+      elapsed_ms,
+      ok,
+    });
+    if (ok) {
+      console.log(`[sendgrid-integration] AutoSend: template ${templateId} sent to ${toEmail} — status ${asStatus}`);
+      return true;
+    }
+    const errorText = await response.text();
+    console.error(`[sendgrid-integration] AutoSend: template ${templateId} failed for ${toEmail} — status ${asStatus}:`, errorText);
+    return false;
+  } catch (err) {
+    const elapsed_ms = Date.now() - t0;
+    sgLog({
+      ...logCtx,
+      provider:      'autosend',
+      ok:            false,
+      elapsed_ms,
+      error_name:    err?.name,
+      error_message: err?.message,
+    });
+    console.error(`[sendgrid-integration] AutoSend: template ${templateId} unexpected error for ${toEmail}:`, err);
+    return false;
+  }
+}
+
+/**
+ * sendTemplate — provider-aware dispatcher.
+ *
+ * Tries AutoSend first (unless EMAIL_PRIMARY_PROVIDER=sendgrid).
+ * Falls back to SendGrid on AutoSend failure.
+ * Logs provider_attempted, provider_result, and fallback_triggered on every send.
+ *
+ * @param {object} keys         - { sendgridKey, autosendKey }
+ * @param {string} fromEmail    - Sender address
+ * @param {string} toEmail      - Recipient address
+ * @param {object} templatePair - { autosend: '<autosend-id>', sendgrid: '<d-...>' }
+ * @param {object} dynamicData  - Template variables
+ * @param {object} logCtx       - Correlation context
+ * @returns {Promise<{ ok: boolean, provider: string, fallback: boolean }>}
+ */
+async function sendTemplate(keys, fromEmail, toEmail, templatePair, dynamicData, logCtx = {}) {
+  const { sendgridKey, autosendKey } = keys;
+  const forcesSendGrid = process.env.EMAIL_PRIMARY_PROVIDER === 'sendgrid';
+
+  // ── AutoSend primary path ──────────────────────────────────────────────────
+  if (!forcesSendGrid && autosendKey && templatePair.autosend) {
+    const ok = await sendViaAutoSend(autosendKey, fromEmail, toEmail, templatePair.autosend, dynamicData, logCtx);
+    if (ok) {
+      console.log(`[sendgrid-integration] provider_attempted=autosend provider_result=success fallback_triggered=false`);
+      return { ok: true, provider: 'autosend', fallback: false };
+    }
+    console.warn(`[sendgrid-integration] AutoSend failed — falling back to SendGrid`);
+  }
+
+  // ── SendGrid fallback (or primary if forced) ───────────────────────────────
+  if (sendgridKey && templatePair.sendgrid) {
+    const ok = await sendViaSendGrid(sendgridKey, fromEmail, toEmail, templatePair.sendgrid, dynamicData, logCtx);
+    const fallback = !forcesSendGrid;
+    console.log(`[sendgrid-integration] provider_attempted=sendgrid provider_result=${ok ? 'success' : 'failure'} fallback_triggered=${fallback}`);
+    return { ok, provider: 'sendgrid', fallback };
+  }
+
+  console.error(`[sendgrid-integration] No valid provider available for ${toEmail} — both AutoSend and SendGrid unconfigured`);
+  return { ok: false, provider: 'none', fallback: false };
 }
 
 /**
@@ -159,9 +279,13 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
 /**
  * sendSeatConfirmation — core boarding sequence dispatcher.
  *
- * Routes to the correct email sequence based on seat.boarding_type:
- *   - "executive_pre" → exec_preboard_opentowork_v1 (single send)
- *   - default         → alphaflightannouncement_v1 + boarding_confirmation_v1
+ * Routes to the correct email sequence based on seat.boarding_type and seat.cabin_class:
+ *   - "executive_pre" → exec_preboard_opentowork_v1 (single send, SendGrid only)
+ *   - default         → boarding_pass + boarding_instructions (dual-tier, AutoSend primary)
+ *
+ * Tier determination uses seat.cabin_class (Base44 canonical field):
+ *   cabin_class === 'First' → paid templates
+ *   all other values        → free templates
  *
  * For the default sequence: if both sends return 2xx, stamps
  * boarding_confirmation_sent_at on the Seat record. Idempotent: skips
@@ -172,30 +296,35 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
  * @param {string} seat.user_email                  - Passenger email
  * @param {string} seat.first_name                  - Passenger first name
  * @param {string} seat.last_name                   - Passenger last name
+ * @param {string} [seat.cabin_class]               - 'First' | 'Sponsored' | 'Economy' (tier field)
  * @param {string} [seat.boarding_type]             - "executive_pre" routes to exec_preboard template
- * @param {string} [seat.pid]                       - Passenger ID string (used in exec_preboard template)
- * @param {string} [seat.tuj_code]                  - TUJ code (used in exec_preboard template)
+ * @param {string} [seat.pid]                       - Passenger ID string (exec_preboard template)
+ * @param {string} [seat.tuj_code]                  - TUJ code (exec_preboard template)
  * @param {string} [seat.flight_id]                 - Flight ID (for correlation)
  * @param {string} [seat.passenger_id]              - Passenger ID (for correlation)
  * @param {string} [seat.request_id]                - Request ID (for correlation)
- * @param {string|null} seat.boarding_confirmation_sent_at - Idempotency check (default path)
- * @param {string|null} seat.exec_preboard_sent_at           - Idempotency check (executive_pre path)
+ * @param {string|null} seat.boarding_confirmation_sent_at - Idempotency check
  */
 async function sendSeatConfirmation(seat) {
-  const apiKey    = process.env.SENDGRID_API_KEY;
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const sendgridKey   = process.env.SENDGRID_API_KEY;
+  const autosendKey   = process.env.AUTOSEND_API_KEY;
+  const fromEmail     = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
   const base44SeatUrl = process.env.BASE44_SEAT_URL;
+  const siteUrl       = (process.env.SITE_URL || 'https://thispagedoesnotexist12345.com').replace(/\/$/, '');
 
-  if (!apiKey) {
-    console.error('[sendgrid-integration] SENDGRID_API_KEY is not set — aborting');
-    return { success: false, error: 'SENDGRID_API_KEY not configured' };
+  if (!sendgridKey && !autosendKey) {
+    console.error('[sendgrid-integration] Neither SENDGRID_API_KEY nor AUTOSEND_API_KEY is set — aborting');
+    return { success: false, error: 'No email provider API key configured' };
   }
+
+  const keys = { sendgridKey, autosendKey };
 
   const {
     id: seatId,
     user_email,
     first_name,
     last_name,
+    cabin_class,
     boarding_type,
     pid,
     tuj_code,
@@ -227,34 +356,37 @@ async function sendSeatConfirmation(seat) {
   const correlation_id = buildCorrelationId({ flightId: flight_id, passengerId: passenger_id, requestId: request_id });
   const logCtx = {
     correlation_id,
+    seat_id:       seatId,
+    cabin_class:   cabin_class || 'unknown',
     boarding_type: boarding_type || 'default',
-    flight_id:    flight_id    || undefined,
-    passenger_id: passenger_id || undefined,
-    request_id:   request_id   || undefined
+    flight_id:     flight_id    || undefined,
+    passenger_id:  passenger_id || undefined,
+    request_id:    request_id   || undefined
   };
 
   // ── Executive Pre-Board path ───────────────────────────────────────────────
+  // exec_preboard uses SendGrid only (no AutoSend template for this path)
   if (boarding_type === 'executive_pre') {
     console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=executive_pre, routing to exec_preboard_opentowork_v1`);
-
+    if (!sendgridKey) {
+      console.error(`[sendgrid-integration] exec_preboard path requires SENDGRID_API_KEY — not set`);
+      return { success: false, error: 'SENDGRID_API_KEY not configured for exec_preboard path' };
+    }
     // Validate pid and tuj_code — both are required template variables.
     // Whitespace-only values are treated as missing to prevent blank placeholder renders.
-    const pidTrim    = pid      && pid.trim();
-    const tujTrim    = tuj_code && tuj_code.trim();
+    const pidTrim  = pid      && pid.trim();
+    const tujTrim  = tuj_code && tuj_code.trim();
     if (!pidTrim || !tujTrim) {
       const missing = [!pidTrim && 'pid', !tujTrim && 'tuj_code'].filter(Boolean).join(', ');
       console.error(`[sendgrid-integration] Seat ${seatId} — exec_preboard_opentowork_v1 aborted: missing required fields: ${missing}`);
       return { success: false, error: `exec_preboard_opentowork_v1 requires non-empty: ${missing}` };
     }
-
     const execDynamicData = { first_name, last_name, user_email, pid: pidTrim, tuj_code: tujTrim };
-    const execSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_EXEC_PREBOARD, execDynamicData, logCtx);
-
+    const execSent = await sendViaSendGrid(sendgridKey, fromEmail, user_email, TEMPLATE_EXEC_PREBOARD, execDynamicData, logCtx);
     if (!execSent) {
       console.error(`[sendgrid-integration] exec_preboard_opentowork_v1 failed for seat ${seatId}`);
       return { success: false, error: 'exec_preboard_opentowork_v1 send failed' };
     }
-
     // Send confirmed 2xx — stamp exec_preboard_sent_at for idempotency.
     // A failed stamp write is treated as a hard failure: returning success here
     // would allow a duplicate trigger to re-send the template (no guard to stop it).
@@ -269,27 +401,61 @@ async function sendSeatConfirmation(seat) {
     } else {
       console.warn('[sendgrid-integration] BASE44_SEAT_URL not set — exec_preboard_sent_at stamp skipped');
     }
-
     return { success: true };
   }
 
-  // ── Default Phase 2 boarding sequence ─────────────────────────────────────
-  const dynamicData = { first_name, last_name, user_email };
+  // ── F-190 Dual-Tier Boarding Sequence ─────────────────────────────────────
+  // Tier determination: cabin_class === 'First' → paid; all other values → free
+  // (Base44 canonical field is cabin_class, NOT tier or cabin_tier)
+  const isPaid = cabin_class === 'First';
+  console.log(`[sendgrid-integration] Seat ${seatId} — cabin_class=${cabin_class || 'undefined'} → ${isPaid ? 'PAID' : 'FREE'} boarding sequence`);
 
-  // Send 1: alphaflightannouncement_v1
-  const announcementSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_ALPHA_ANNOUNCEMENT, dynamicData, logCtx);
+  // Construct full payload (Fix 1 + Fix 2: all CTAs include ?seat_id=)
+  // Fix 4 (Apr 5, 2026): platform_url added — resolves {{platform_url}} Main Site footer link in
+  //   boarding_pass_free_v1, boarding_pass_paid_v1, boarding_instructions_free_v1,
+  //   boarding_instructions_paid_v1. Was previously unmapped -> rendered as base44.app URL.
+  // Fix 3b (Apr 5, 2026): passport_url corrected to /?seat_id= (was /Studio?seat_id=).
+  //   seat_id chars (A-Z, 2-9, hyphen) are URL-safe — encodeURIComponent removed per canonical spec.
+  //   firstTaskUrl retains /Studio path (boarding instructions CTA — ResumeFitCheck deep-link).
+  const passportUrl   = `${siteUrl}/?seat_id=${seatId || ''}`;
+  const firstTaskUrl  = `${siteUrl}/Studio?seat_id=${seatId || ''}`;
+  const secondaryUrl  = `${siteUrl}?seat_id=${seatId || ''}`;
+  const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
 
-  if (!announcementSent) {
-    console.error(`[sendgrid-integration] alphaflightannouncement_v1 failed for seat ${seatId} — aborting sequence`);
-    return { success: false, error: 'alphaflightannouncement_v1 send failed' };
+  const dynamicData = {
+    first_name,
+    last_name,
+    user_email,
+    seat_id:        seatId || '',
+    seatreference:  seatId || '',
+    cabin_class:    cabin_class || 'Economy',
+    passport_url:   passportUrl,
+    first_task_url: firstTaskUrl,
+    secondary_url:  secondaryUrl,
+    platform_url:   mainSiteUrl        // Fix 4: resolves {{platform_url}} Main Site footer link
+  };
+
+  // Template pairs: { autosend: '<autosend-id>', sendgrid: '<d-...>' }
+  const boardingPassTemplate = isPaid
+    ? { autosend: AUTOSEND_TEMPLATES.boarding_pass_paid_v1,         sendgrid: TEMPLATE_BOARDING_PASS_PAID }
+    : { autosend: AUTOSEND_TEMPLATES.boarding_pass_free_v1,         sendgrid: TEMPLATE_BOARDING_PASS_FREE };
+
+  const boardingInstructionsTemplate = isPaid
+    ? { autosend: AUTOSEND_TEMPLATES.boarding_instructions_paid_v1, sendgrid: TEMPLATE_BOARDING_INSTRUCTIONS_PAID }
+    : { autosend: AUTOSEND_TEMPLATES.boarding_instructions_free_v1, sendgrid: TEMPLATE_BOARDING_INSTRUCTIONS_FREE };
+
+  // Send 1: boarding_pass (paid or free)
+  const passResult = await sendTemplate(keys, fromEmail, user_email, boardingPassTemplate, dynamicData, { ...logCtx, template_key: `boarding_pass_${isPaid ? 'paid' : 'free'}_v1` });
+  if (!passResult.ok) {
+    console.error(`[sendgrid-integration] boarding_pass send failed for seat ${seatId} — aborting sequence`);
+    return { success: false, error: `boarding_pass_${isPaid ? 'paid' : 'free'}_v1 send failed` };
   }
 
-  // Send 2: boarding_confirmation_v1
-  const confirmationSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_BOARDING_CONFIRMATION, dynamicData, logCtx);
-
-  if (!confirmationSent) {
-    console.error(`[sendgrid-integration] boarding_confirmation_v1 failed for seat ${seatId} — announcement already sent, stamp withheld`);
-    return { success: false, error: 'boarding_confirmation_v1 send failed' };
+  // Send 2: boarding_instructions (paid or free)
+  const instructionsResult = await sendTemplate(keys, fromEmail, user_email, boardingInstructionsTemplate, dynamicData, { ...logCtx, template_key: `boarding_instructions_${isPaid ? 'paid' : 'free'}_v1` });
+  if (!instructionsResult.ok) {
+    console.error(`[sendgrid-integration] boarding_instructions send failed for seat ${seatId} — boarding_pass already sent, stamp withheld`);
+    return { success: false, error: `boarding_instructions_${isPaid ? 'paid' : 'free'}_v1 send failed` };
   }
 
   // Both sends confirmed 2xx — stamp boarding_confirmation_sent_at
@@ -350,6 +516,8 @@ exports.handler = async (event) => {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports.sendSeatConfirmation = sendSeatConfirmation;
   module.exports.sendTemplate         = sendTemplate;
+  module.exports.sendViaSendGrid      = sendViaSendGrid;
+  module.exports.sendViaAutoSend      = sendViaAutoSend;
   module.exports.updateSeatRecord     = updateSeatRecord;
   module.exports.buildCorrelationId   = buildCorrelationId;
 }
