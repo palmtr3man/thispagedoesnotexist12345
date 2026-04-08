@@ -238,14 +238,16 @@ async function sendSeatConfirmation(seat) {
     console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=executive_pre, routing to exec_preboard_opentowork_v1`);
 
     // Validate pid and tuj_code — both are required template variables.
-    // Sending with empty values would render blank placeholders in the email.
-    if (!pid || !tuj_code) {
-      const missing = [!pid && 'pid', !tuj_code && 'tuj_code'].filter(Boolean).join(', ');
+    // Whitespace-only values are treated as missing to prevent blank placeholder renders.
+    const pidTrim    = pid      && pid.trim();
+    const tujTrim    = tuj_code && tuj_code.trim();
+    if (!pidTrim || !tujTrim) {
+      const missing = [!pidTrim && 'pid', !tujTrim && 'tuj_code'].filter(Boolean).join(', ');
       console.error(`[sendgrid-integration] Seat ${seatId} — exec_preboard_opentowork_v1 aborted: missing required fields: ${missing}`);
       return { success: false, error: `exec_preboard_opentowork_v1 requires non-empty: ${missing}` };
     }
 
-    const execDynamicData = { first_name, last_name, user_email, pid, tuj_code };
+    const execDynamicData = { first_name, last_name, user_email, pid: pidTrim, tuj_code: tujTrim };
     const execSent = await sendTemplate(apiKey, fromEmail, user_email, TEMPLATE_EXEC_PREBOARD, execDynamicData, logCtx);
 
     if (!execSent) {
@@ -253,11 +255,17 @@ async function sendSeatConfirmation(seat) {
       return { success: false, error: 'exec_preboard_opentowork_v1 send failed' };
     }
 
-    // Send confirmed 2xx — stamp exec_preboard_sent_at for idempotency
+    // Send confirmed 2xx — stamp exec_preboard_sent_at for idempotency.
+    // A failed stamp write is treated as a hard failure: returning success here
+    // would allow a duplicate trigger to re-send the template (no guard to stop it).
     if (base44SeatUrl && seatId) {
-      await updateSeatRecord(base44SeatUrl, seatId, {
+      const stamped = await updateSeatRecord(base44SeatUrl, seatId, {
         exec_preboard_sent_at: new Date().toISOString()
       });
+      if (!stamped) {
+        console.error(`[sendgrid-integration] Seat ${seatId} — exec_preboard_sent_at stamp failed; returning error to prevent duplicate sends`);
+        return { success: false, error: 'exec_preboard_sent_at stamp write failed' };
+      }
     } else {
       console.warn('[sendgrid-integration] BASE44_SEAT_URL not set — exec_preboard_sent_at stamp skipped');
     }
