@@ -7,6 +7,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2026-04-08] — Feat: Studio Mission Control Gateway Wiring (tuj_code passthrough)
+
+### Added
+- `Studio/index.html` — Mission Control Gateway wiring script (Addendum Apr 7, 2026). Injects a self-contained IIFE before `</body>` that reads `seat_id` and `tuj_code` from the incoming URL query string and dynamically sets three CTA hrefs via `data-cta` attribute selectors (`boarding-signal`, `operator-trace`, `studio-entry`). Implements the CTA destination contract from the Wiring Addendum spec: with `seat_id` present, all three CTAs carry both `seat_id` and `tuj_code` params; without `seat_id`, CTAs fall back to bare URLs. Existing `seat_id` parsing in `initDepartureSelector()` is preserved and unmodified.
+
+---
+
 ## [2026-04-05] — Fix: Alpha Cohort Seat ID Reassignment (Regex Compliance)
 
 ### Changed

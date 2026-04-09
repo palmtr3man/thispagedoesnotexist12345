@@ -909,5 +909,42 @@ window.addEventListener('load', async () => {
     }
 });
 </script>
+
+<!-- Mission Control Gateway Wiring — Addendum Apr 7, 2026
+     Reads seat_id + tuj_code from URL and sets all three CTA hrefs dynamically.
+     Spec: Mission Control Gateway — Wiring Addendum for Manus
+     Constraint: seat_id parsing already handled above; this block adds tuj_code
+     passthrough and mission-control CTA routing. -->
+<script>
+(function () {
+  var params  = new URLSearchParams(window.location.search);
+  var seatId  = params.get('seat_id')  || '';
+  var tujCode = params.get('tuj_code') || '';
+
+  // Boarding signal review
+  var boardingEl = document.querySelector('[data-cta="boarding-signal"]');
+  if (boardingEl) {
+    boardingEl.href = seatId
+      ? 'https://www.thispagedoesnotexist12345.com/?seat_id=' + seatId + '&tuj_code=' + tujCode + '&view=boarding-signal'
+      : 'https://www.thispagedoesnotexist12345.com/';
+  }
+
+  // Operator trace → mission-control
+  var traceEl = document.querySelector('[data-cta="operator-trace"]');
+  if (traceEl) {
+    traceEl.href = seatId
+      ? 'https://www.thispagedoesnotexist12345.com/mission-control?tuj_code=' + tujCode + '&seat_id=' + seatId + '&origin=gateway'
+      : 'https://www.thispagedoesnotexist12345.com/mission-control';
+  }
+
+  // Studio entry (self-referential with params preserved)
+  var studioEl = document.querySelector('[data-cta="studio-entry"]');
+  if (studioEl) {
+    studioEl.href = seatId
+      ? 'https://www.thispagedoesnotexist12345.com/Studio?seat_id=' + seatId + '&tuj_code=' + tujCode
+      : 'https://www.thispagedoesnotexist12345.com/Studio';
+  }
+})();
+</script>
 </body>
 </html>
