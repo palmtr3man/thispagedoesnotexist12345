@@ -15,8 +15,8 @@
  *   SENDGRID_TEMPLATE_INTERNAL_SIGNUP       → internalsignupnotification_v1
  *   SENDGRID_TEMPLATE_NEXT_FLIGHT_WAITLIST  → next_flight_waitlist_v1
  *   SENDGRID_TEMPLATE_OPT_OUT_ACK           → optout_acknowledgement_v1
- *   SENDGRID_TEMPLATE_ALPHA_ANNOUNCEMENT    → alphaflightannouncement_v1
- *   SENDGRID_TEMPLATE_BOARDING_CONFIRMATION → boarding_confirmation_v1
+ *   SENDGRID_TEMPLATE_ALPHA_ANNOUNCEMENT    → alphaflightannouncement_v1   [DEPRECATED — F-190 Apr 12, 2026]
+ *   SENDGRID_TEMPLATE_BOARDING_CONFIRMATION → boarding_confirmation_v1      [DEPRECATED — F-190 Apr 12, 2026]
  *   SENDGRID_TEMPLATE_OFFER_CONGRATS        → offer_congrats_v1
  *   SENDGRID_TEMPLATE_EXEC_PREBOARD                  → exec_preboard_opentowork_v1
  *   SENDGRID_TEMPLATE_BOARDING_PASS_FREE         → boarding_pass_free_v1
@@ -48,8 +48,10 @@ const FALLBACKS = {
   internalsignupnotification_v1:   'd-073dc68a683348f18133d78c9879ced8',
   next_flight_waitlist_v1:         'd-52c178a809f94a82a3bf8cd6ebd435e9',
   optout_acknowledgement_v1:       'd-e74bbc76586845f98febdd724cc69429',
-  alphaflightannouncement_v1:      'd-a33174bd2e4f4682b5b1546f106fb43c',
-  boarding_confirmation_v1:        'd-678824bc506c432dae9eadab36c07904',
+  // DEPRECATED (F-190 Apr 12, 2026) — replaced by dual-tier boarding sequence.
+  // No longer called by any active send path. Retained for registry parity only.
+  alphaflightannouncement_v1:      'd-a33174bd2e4f4682b5b1546f106fb43c',  // DEPRECATED — was Phase 2 boarding send 1
+  boarding_confirmation_v1:        'd-678824bc506c432dae9eadab36c07904',  // DEPRECATED — was Phase 2 boarding send 2
   offer_congrats_v1:               'd-11d5610e48b34eedb77dc2bc7bdf4eaa',
   exec_preboard_opentowork_v1:     'd-d8cef7e7bfbc449fa318219bda70d397',
   // ── Boarding sequence templates (handleSeatOpened fan-out) ────────────────
@@ -73,6 +75,7 @@ const TEMPLATES = {
     process.env.SENDGRID_TEMPLATE_NEXT_FLIGHT_WAITLIST  || FALLBACKS.next_flight_waitlist_v1,
   optout_acknowledgement_v1:
     process.env.SENDGRID_TEMPLATE_OPT_OUT_ACK           || FALLBACKS.optout_acknowledgement_v1,
+  // DEPRECATED (F-190 Apr 12, 2026) — no longer called by any active send path
   alphaflightannouncement_v1:
     process.env.SENDGRID_TEMPLATE_ALPHA_ANNOUNCEMENT    || FALLBACKS.alphaflightannouncement_v1,
   boarding_confirmation_v1:

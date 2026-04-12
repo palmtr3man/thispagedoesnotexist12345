@@ -196,7 +196,7 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
  * @param {string} [seat.cabin_class]               - 'First' | 'Sponsored' | 'Economy' (tier field)
  * @param {string} [seat.boarding_type]             - "executive_pre" routes to exec_preboard template
  * @param {string} [seat.pid]                       - Passenger ID string (exec_preboard template)
- * @param {string} [seat.tuj_code]                  - TUJ code (exec_preboard template)
+ * @param {string} [seat.tuj_code]                  - TUJ code — canonical seat ID for CTA URLs (e.g. TUJ-KC2222)
  * @param {string} [seat.flight_id]                 - Flight ID (for correlation)
  * @param {string} [seat.passenger_id]              - Passenger ID (for correlation)
  * @param {string} [seat.request_id]                - Request ID (for correlation)
@@ -226,7 +226,8 @@ async function sendSeatConfirmation(seat) {
     passenger_id,
     request_id,
     boarding_confirmation_sent_at,
-    exec_preboard_sent_at
+    exec_preboard_sent_at,
+    flight_display_name
   } = seat;
 
   // Validate required fields
@@ -305,23 +306,28 @@ async function sendSeatConfirmation(seat) {
   //   boarding_instructions_paid_v1. Was previously unmapped -> rendered as base44.app URL.
   // Fix 3b (Apr 5, 2026): passport_url corrected to /?seat_id= (was /Studio?seat_id=).
   //   seat_id chars (A-Z, 2-9, hyphen) are URL-safe — encodeURIComponent removed per canonical spec.
-  //   firstTaskUrl retains /Studio path (boarding instructions CTA — ResumeFitCheck deep-link).
-  const passportUrl   = `${siteUrl}/?seat_id=${seatId || ''}`;
-  const firstTaskUrl  = `${siteUrl}/Studio?seat_id=${seatId || ''}`;
-  const secondaryUrl  = `${siteUrl}?seat_id=${seatId || ''}`;
+  // F-190 Apr 12: CTA URLs use tuj_code (canonical TUJ seat ID e.g. TUJ-KC2222), not seat.id (UUID).
+  //   first_task_url corrected to /ResumeFitCheck (was /Studio — wrong path).
+  //   secondary_url corrected to /OnboardingPassport (was bare siteUrl — missing path).
+  const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
+  const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
+  const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}`;
+  const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}`;
   const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
+  const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
 
   const dynamicData = {
     first_name,
     last_name,
     user_email,
-    seat_id:        seatId || '',
-    seatreference:  seatId || '',
-    cabin_class:    cabin_class || 'Economy',
-    passport_url:   passportUrl,
-    first_task_url: firstTaskUrl,
-    secondary_url:  secondaryUrl,
-    platform_url:   mainSiteUrl        // Fix 4: resolves {{platform_url}} Main Site footer link
+    seat_id:             canonicalSeatId,
+    seatreference:       canonicalSeatId,
+    cabin_class:         cabin_class || 'Economy',
+    passport_url:        passportUrl,
+    first_task_url:      firstTaskUrl,
+    secondary_url:       secondaryUrl,
+    platform_url:        mainSiteUrl,           // Fix 4: resolves {{platform_url}} Main Site footer link
+    flight_display_name: flightLabel            // F-190 Apr 12: required by boarding pass + instructions templates
   };
 
   // Select templates based on tier
