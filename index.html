@@ -1175,6 +1175,154 @@
       position: relative;
       z-index: 1;
     }
+
+    /* ── BLOCKER-01: Info Modal — What is TUJ Explainer + Alpha Disclaimer ── */
+    #info-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      background: rgba(168, 196, 0, 0.08);
+      border: 1px solid rgba(168, 196, 0, 0.3);
+      color: rgba(168, 196, 0, 0.85);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+      margin-top: 0.75rem;
+    }
+    #info-btn:hover {
+      background: rgba(168, 196, 0, 0.15);
+      border-color: rgba(168, 196, 0, 0.6);
+      color: #A8C400;
+    }
+    #info-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    #info-modal-overlay.active { display: flex; }
+    .info-modal-card {
+      max-width: 480px;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.97);
+      border: 1px solid rgba(168, 196, 0, 0.35);
+      border-radius: 16px;
+      padding: 2rem 1.75rem 1.75rem;
+      text-align: left;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .info-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 1.25rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .info-modal-close:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .info-modal-card h2 {
+      color: #A8C400;
+      font-size: 1.25rem;
+      margin-bottom: 0.35rem;
+    }
+    .info-modal-card .info-modal-tagline {
+      font-size: 0.8rem;
+      color: rgba(168,196,0,0.55);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .info-modal-section {
+      margin-bottom: 1.1rem;
+    }
+    .info-modal-section h3 {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(168,196,0,0.7);
+      margin-bottom: 0.4rem;
+    }
+    .info-modal-section p {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .info-modal-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .info-modal-steps li {
+      font-size: 0.87rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.55;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .info-modal-steps li .step-icon { flex-shrink: 0; }
+    .info-modal-disclaimer {
+      background: rgba(255, 180, 0, 0.07);
+      border: 1px solid rgba(255, 180, 0, 0.25);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.1rem;
+    }
+    .info-modal-disclaimer h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 180, 0, 0.8);
+      margin-bottom: 0.35rem;
+    }
+    .info-modal-disclaimer p {
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.6;
+      margin: 0;
+    }
+    .info-modal-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+    .info-modal-links a {
+      font-size: 0.82rem;
+      color: #A8C400;
+      text-decoration: none;
+      border: 1px solid rgba(168,196,0,0.3);
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .info-modal-links a:hover {
+      background: rgba(168,196,0,0.1);
+      border-color: rgba(168,196,0,0.6);
+    }
 </style>
 </head>
 <body class="black-glass" data-state="loading">
@@ -1185,6 +1333,13 @@
     <!-- Static lede — 10-second clarity fix (Apr 12, 2026) -->
     <!-- Answers "what is this and why should I care?" without relying on the carousel. -->
     <p class="lede" data-show-state="landing departed">A focused career program that maps your experience to what the market is actually hiring for — one cohort, five seats, full-system support from resume to offer.</p>
+
+    <!-- BLOCKER-01: Info button — triggers What is TUJ modal -->
+    <div data-show-state="landing departed" style="text-align:center;margin-bottom:0.5rem;">
+      <button id="info-btn" aria-haspopup="dialog" aria-controls="info-modal-overlay" data-umami-event="Info Modal Open">
+        ℹ️ What is TUJ?
+      </button>
+    </div>
 
     <!-- CAROUSEL -->
     <div class="carousel-wrap" data-show-state="landing departed">
@@ -1213,6 +1368,46 @@
         <div class="carousel-dot" data-index="1"></div>
         <div class="carousel-dot" data-index="2"></div>
         <div class="carousel-dot" data-index="3"></div>
+      </div>
+    </div>
+
+    <!-- ── BLOCKER-01: Info Modal — What is TUJ Explainer + Alpha Disclaimer ── -->
+    <div id="info-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="info-modal-title">
+      <div class="info-modal-card">
+        <button class="info-modal-close" id="info-modal-close" aria-label="Close">&times;</button>
+        <h2 id="info-modal-title">✈️ What is The Ultimate Journey?</h2>
+        <p class="info-modal-tagline">PageForward Airways &mdash; FL 032126 &mdash; Alpha Flight 1</p>
+
+        <div class="info-modal-section">
+          <h3>The Mission</h3>
+          <p>The Ultimate Journey is a focused career optimization program — one cohort, five seats, full-system support from resume to offer. We map your experience to what the market is actually hiring for, then work the system until you land.</p>
+        </div>
+
+        <div class="info-modal-section">
+          <h3>What &ldquo;Request a Seat&rdquo; Means</h3>
+          <p>Requesting a seat puts you on the flight manifest. There are exactly 5 seats on this flight. Once the tower reviews your request and confirms your seat, you receive a boarding pass and access to the full TUJ system.</p>
+        </div>
+
+        <div class="info-modal-section">
+          <h3>What Happens After Boarding</h3>
+          <ul class="info-modal-steps">
+            <li><span class="step-icon">🎫</span> Boarding pass issued &rarr; you land in the Studio</li>
+            <li><span class="step-icon">📄</span> Upload your resume + paste a job description</li>
+            <li><span class="step-icon">🎯</span> Run Resume Fit Check &rarr; ATS score + gap analysis</li>
+            <li><span class="step-icon">✏️</span> Tailor your resume variant in One Page Studio</li>
+            <li><span class="step-icon">🚀</span> Apply, track, and close in the Application Hub</li>
+          </ul>
+        </div>
+
+        <div class="info-modal-disclaimer">
+          <h3>⚠️ Alpha Disclaimer</h3>
+          <p>This is a <strong>family alpha</strong> — a private, invite-only test flight with 5 seats. The system is live but not public. Bugs will happen. Your feedback shapes what gets built next. This is not a course, a subscription, or a product launch. It is a working flight.</p>
+        </div>
+
+        <div class="info-modal-links">
+          <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" data-umami-event="Info Modal — Signal Link">📡 Signal Newsletter</a>
+          <a href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer" data-umami-event="Info Modal — Support Link">📅 Book a Consultation</a>
+        </div>
       </div>
     </div>
 
@@ -3119,6 +3314,38 @@
       document.addEventListener('DOMContentLoaded', refreshMcNavBtn);
       // Also refresh after TUJ state machine may have stored a seat_id
       setTimeout(refreshMcNavBtn, 1200);
+    })();
+
+    // ── BLOCKER-01: Info Modal — open / close wiring ──
+    (function() {
+      var overlay = document.getElementById('info-modal-overlay');
+      var openBtn = document.getElementById('info-btn');
+      var closeBtn = document.getElementById('info-modal-close');
+      if (!overlay || !openBtn) return;
+
+      function openInfoModal() {
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+        if (closeBtn) closeBtn.focus();
+      }
+      function closeInfoModal() {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        openBtn.focus();
+      }
+
+      openBtn.addEventListener('click', openInfoModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeInfoModal);
+
+      // Close on backdrop click
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeInfoModal();
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closeInfoModal();
+      });
     })();
 
     // Black Glass always active
