@@ -1646,12 +1646,17 @@
             errEl.textContent = '';
             if (!name)  { errEl.textContent = 'Name is required.'; return; }
             if (!email) { errEl.textContent = 'Email is required.'; return; }
+            var _ageToken = sessionStorage.getItem('tuj_age_token') || null;
+            if (!_ageToken) {
+              errEl.textContent = 'Age verification required. Please complete the passenger verification step first.';
+              return;
+            }
             subBtn.disabled = true;
             subBtn.textContent = '⏳ Submitting…';
             fetch('/api/seat-request', {
               method: 'POST',
               headers: {'Content-Type':'application/json'},
-              body: JSON.stringify({ name: name, email: email, source: 'landing' })
+              body: JSON.stringify({ name: name, email: email, age_token: _ageToken, source: 'landing' })
             })
             .then(function(r){ return r.json(); })
             .then(function(d){
@@ -2779,34 +2784,33 @@
           });
         }
 
-        // Replace inline onsubmit with a version that reads age_confirmed
-        // from the checkbox and handles the seat_id response.
+        // BLOCKER-04: Replace age_confirmed boolean with age_token (HMAC-signed from /api/verify-age).
+        // The age gate overlay stores the token in sessionStorage under 'tuj_age_token'.
         form.removeAttribute('onsubmit');
         form.addEventListener('submit', function (e) {
           e.preventDefault();
-          var nameVal      = form.querySelector('input[name=name]').value.trim();
-          var emailVal     = form.querySelector('input[name=email]').value.trim();
-          var ageConfirmed = ageCheckbox ? ageCheckbox.checked : false;
-          var errEl        = document.getElementById('seat-form-error');
+          var nameVal  = form.querySelector('input[name=name]').value.trim();
+          var emailVal = form.querySelector('input[name=email]').value.trim();
+          var errEl    = document.getElementById('seat-form-error');
           errEl.textContent = '';
-          if (!nameVal)      { errEl.textContent = 'Name is required.';  return; }
-          if (!emailVal)     { errEl.textContent = 'Email is required.'; return; }
-          if (!ageConfirmed) { errEl.textContent = 'Please confirm your age to continue.'; return; }
+          if (!nameVal)  { errEl.textContent = 'Name is required.';  return; }
+          if (!emailVal) { errEl.textContent = 'Email is required.'; return; }
+          var _ageToken2 = sessionStorage.getItem('tuj_age_token') || null;
+          if (!_ageToken2) {
+            errEl.textContent = 'Age verification required. Please complete the passenger verification step first.';
+            return;
+          }
           subBtn.disabled    = true;
           subBtn.textContent = '⏳ Submitting…';
-
-          // Also store age verification in localStorage now that they've
-          // explicitly checked the box — dismisses the overlay gate too.
-          localStorage.setItem(AGE_KEY, '1');
 
           fetch('/api/seat-request', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify({
-              name:          nameVal,
-              email:         emailVal,
-              age_confirmed: true,   // checkbox verified above
-              source:        'landing'
+              name:      nameVal,
+              email:     emailVal,
+              age_token: _ageToken2,
+              source:    'landing'
             })
           })
           .then(function (r) { return r.json(); })

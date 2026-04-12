@@ -2,7 +2,7 @@
  * /api/seat-request — Netlify Function (Gate Contract v2)
  *
  * Upgrades over v1:
- *   1. Validates age_confirmed field (rejects if false or missing)
+ *   1. Validates age_token (HMAC-signed token from /api/verify-age — rejects if missing/invalid/expired)
  *   2. Generates seat_id in TUJ-XXXXXX format
  *   3. Calls beehiiv API to auto-subscribe email to Signal newsletter
  *   4. Returns { ok: true, seat_id, status } in response body
@@ -19,7 +19,11 @@
  *   BEEHIIV_PUB_ID           — beehiiv Publication ID (default: pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf)
  *
  * Request body (JSON):
- *   { name: string, email: string, age_confirmed: boolean, source?: string, tier?: string, cabin_tier?: string, amount_paid?: number }
+ *   { name: string, email: string, age_token: string, source?: string, tier?: string, cabin_tier?: string, amount_paid?: number, referral_code?: string }
+ *
+ * BLOCKER-04 (2026-04-12): age_confirmed boolean replaced with age_token (HMAC-signed).
+ * Supabase waitlist_submissions upsert added after SendGrid ack.
+ * SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY env vars required for Supabase write.
  *
  * Success response:
  *   { ok: true, seat_id: 'TUJ-XXXXXX', status: 'confirmed' }
@@ -36,6 +40,7 @@
  */
 
 const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
+const { verifyAgeToken } = require('./verify-age');
 
 const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'seat-request';
 const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
@@ -286,16 +291,19 @@ exports.handler = async function (event, context) {
     };
   }
 
-  const { name, email, age_confirmed, source, tier, cabin_tier, amount_paid } = body;
-
-  // --- Validate: age_confirmed (Gate Contract §2a / §5) ---
-  if (age_confirmed !== true) {
+   const { name, email, age_token, source, tier, cabin_tier, amount_paid, referral_code: inboundReferralCode } = body;
+  // --- Validate: age_token (Gate Contract §2a / §5 — BLOCKER-04) ---
+  // Must be a valid HMAC-signed token issued by /api/verify-age within the last 24h.
+  // age_confirmed: boolean is no longer accepted — token required.
+  const ageSecret = process.env.AGE_TOKEN_SECRET;
+  const agePayload = ageSecret && age_token ? verifyAgeToken(age_token, ageSecret) : null;
+  if (!agePayload || !agePayload.verified) {
     return {
       statusCode: 400,
       headers,
       body: JSON.stringify({
         ok: false,
-        error: `Age verification required. You must confirm you are ${MIN_AGE} or older to request a seat.`
+        error: `Age verification required. Please confirm you are ${MIN_AGE} or older before requesting a seat.`
       })
     };
   }
@@ -512,6 +520,68 @@ exports.handler = async function (event, context) {
       headers,
       body: JSON.stringify({ ok: false, error: 'Internal server error' })
     };
+  }
+
+  // --- Supabase upsert: waitlist_submissions (BLOCKER-04) ---
+  // Persists the seat request to Supabase as the canonical waitlist store.
+  // Fails gracefully — a Supabase outage must not block the SendGrid ack.
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (supabaseUrl && supabaseKey) {
+    try {
+      // Generate a stable referral_code for this record (8 chars, same charset as seat_id)
+      const refCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const refCodeArr = new Uint8Array(8);
+      crypto.getRandomValues(refCodeArr);
+      const newReferralCode = Array.from(refCodeArr).map(b => refCodeChars[b % refCodeChars.length]).join('');
+      const upsertPayload = {
+        email:         emailTrimmed.toLowerCase(),
+        first_name:    firstName || null,
+        seat_id:       seatId,
+        source:        sourceValue || 'landing',
+        referral_code: newReferralCode,
+        status:        'pending',
+        age_verified:  true
+      };
+      // If passenger arrived via a referral link, resolve the referring record's id
+      if (inboundReferralCode && typeof inboundReferralCode === 'string') {
+        try {
+          const refLookup = await fetch(
+            `${supabaseUrl}/rest/v1/waitlist_submissions?referral_code=eq.${encodeURIComponent(inboundReferralCode.trim())}&select=id&limit=1`,
+            { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+          );
+          const refRows = await refLookup.json();
+          if (Array.isArray(refRows) && refRows[0]?.id) {
+            upsertPayload.referred_by = refRows[0].id;
+          }
+        } catch (refErr) {
+          console.warn('[seat-request] Referral lookup failed (non-blocking):', refErr.message);
+        }
+      }
+      const sbRes = await fetch(
+        `${supabaseUrl}/rest/v1/waitlist_submissions`,
+        {
+          method: 'POST',
+          headers: {
+            apikey:         supabaseKey,
+            Authorization:  `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+            Prefer:         'resolution=merge-duplicates,return=minimal'
+          },
+          body: JSON.stringify(upsertPayload)
+        }
+      );
+      if (sbRes.ok || sbRes.status === 201) {
+        console.log(`[seat-request] Supabase waitlist upsert succeeded for ${emailTrimmed}`);
+      } else {
+        const sbErr = await sbRes.text();
+        console.error(`[seat-request] Supabase waitlist upsert failed ${sbRes.status}: ${sbErr}`);
+      }
+    } catch (sbErr) {
+      console.error('[seat-request] Supabase upsert unexpected error (non-blocking):', sbErr.message);
+    }
+  } else {
+    console.warn('[seat-request] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set — skipping Supabase waitlist upsert');
   }
 
   // --- Notion log: Seat Request Registry ---
