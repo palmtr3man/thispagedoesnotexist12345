@@ -9,6 +9,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-04-12] — F-190 Phase 2: AutoSend Retired — SendGrid-Only Boarding Sequence
+
+### Changed
+- `netlify/functions/sendgrid-integration.js` — AutoSend fully retired. Removed `sendViaAutoSend()`, `sendTemplate()` dispatcher, `AUTOSEND_TEMPLATES` constants, and `AUTOSEND_API_URL`. `sendViaSendGrid()` is now the sole send path for all boarding emails (boarding pass, boarding instructions, exec_preboard). Added `AbortSignal.timeout(10000)` (10s) to prevent indefinite hangs. `sendSeatConfirmation()` calls `sendViaSendGrid()` directly — no provider dispatcher needed. All idempotency guards, BCC rule, ASM wiring (F152), and dynamic template data construction unchanged.
+- `.env.example` — removed `AUTOSEND_*` vars and `EMAIL_PRIMARY_PROVIDER`. Added retirement notice. `SITE_URL` moved out of the now-removed F-190 provider routing block.
+
+### Notes
+- Remove `AUTOSEND_API_KEY`, `AUTOSEND_TEMPLATE_*`, and `EMAIL_PRIMARY_PROVIDER` from Netlify env vars dashboard — they are no longer read.
+- Smoke test checklist: see F-190 Execution Plan (Notion) — Apr 15 window.
+
+---
+
 ## [2026-04-12] — F152: SendGrid ASM Unsubscribe Group Wiring + Preference Center
 
 ### Changed
