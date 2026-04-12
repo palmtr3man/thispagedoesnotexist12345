@@ -103,6 +103,14 @@ function buildCorrelationId({ flightId, passengerId, requestId } = {}) {
  */
 async function sendViaSendGrid(apiKey, fromEmail, toEmail, templateId, dynamicData, logCtx = {}) {
   const templateKey = templateKeyForId(templateId);
+  // F152 — ASM unsubscribe group wiring
+  const asmGroupId          = parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10);
+  const asmMarketingGroupId = process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING
+    ? parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING, 10)
+    : null;
+  const asmGroupsToDisplay  = asmMarketingGroupId
+    ? [asmGroupId, asmMarketingGroupId]
+    : [asmGroupId];
   const payload = {
     from: { email: fromEmail },
     personalizations: [{
@@ -110,7 +118,8 @@ async function sendViaSendGrid(apiKey, fromEmail, toEmail, templateId, dynamicDa
       bcc: [{ email: BCC_EMAIL }],
       dynamic_template_data: dynamicData
     }],
-    template_id: templateId
+    template_id: templateId,
+    asm: { group_id: asmGroupId, groups_to_display: asmGroupsToDisplay }
   };
   const t0 = Date.now();
   let sgStatus;

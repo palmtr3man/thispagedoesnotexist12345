@@ -54,7 +54,14 @@ assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_
 const TEMPLATE_ID = TEMPLATES.seat_request_acknowledgement_v1;
 const INTERNAL_TEMPLATE_ID = TEMPLATES.internalsignupnotification_v1;
 const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
-const ASM_GROUP_ID = parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10); // "The Ultimate Journey — Transactional" unsubscribe group
+const ASM_GROUP_ID          = parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10); // "The Ultimate Journey — Transactional" unsubscribe group
+const ASM_MARKETING_GROUP_ID = process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING
+  ? parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING, 10)
+  : null;
+// groupsToDisplay shows both groups in the preference center when Marketing group is configured (F152).
+const ASM_GROUPS_TO_DISPLAY  = ASM_MARKETING_GROUP_ID
+  ? [ASM_GROUP_ID, ASM_MARKETING_GROUP_ID]
+  : [ASM_GROUP_ID];
 const NOTION_API_VERSION = '2022-06-28';
 const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '5e6440af0ad94c6d89a8442ec2c528f3';
 const SUBJECT      = 'Your seat request is in — FL 032126 ✈️';
@@ -368,7 +375,7 @@ exports.handler = async function (event, context) {
                 dynamic_template_data: { first_name: wlFirstName, platform_url: wlPlatformUrl }
               }],
               template_id: waitlistTemplateId,
-              asm: { group_id: ASM_GROUP_ID }
+              asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
             })
           });
           console.log(`[seat-request] next_flight_waitlist_v1 ${wlRes.ok || wlRes.status === 202 ? 'sent' : 'failed (' + wlRes.status + ')'} to ${emailTrimmed}`);
@@ -475,7 +482,7 @@ exports.handler = async function (event, context) {
           dynamic_template_data: dynamicTemplateData
         }],
         template_id: TEMPLATE_ID,
-        asm: { group_id: ASM_GROUP_ID }
+        asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
       })
     });
 
@@ -575,7 +582,8 @@ exports.handler = async function (event, context) {
           to: [{ email: INTERNAL_NOTIFY_EMAIL }],
           dynamic_template_data: internalDynamicTemplateData
         }],
-        template_id: INTERNAL_TEMPLATE_ID
+        template_id: INTERNAL_TEMPLATE_ID,
+        asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
       })
     });
 

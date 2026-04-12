@@ -9,6 +9,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-04-12] — F152: SendGrid ASM Unsubscribe Group Wiring + Preference Center
+
+### Changed
+- `netlify/functions/seat-request.js` — F152 complete. Added `ASM_MARKETING_GROUP_ID` and `ASM_GROUPS_TO_DISPLAY` constants. All three SendGrid sends (`seat_request_acknowledgement_v1`, `next_flight_waitlist_v1`, `internalsignupnotification_v1`) now include `asm: { group_id, groups_to_display }`. When `SENDGRID_UNSUBSCRIBE_GROUP_MARKETING` is set, both groups appear in the SendGrid preference center.
+- `netlify/functions/sendgrid-integration.js` — `sendViaSendGrid()` now includes `asm: { group_id, groups_to_display }` on all boarding pass, boarding instructions, and exec-preboard sends.
+- `.env.example` — `SENDGRID_UNSUBSCRIBE_GROUP_MARKETING` comment updated to note F152 preference center behaviour.
+
+---
+
 ## [2026-04-12] — F117: Netlify Function /api/seat-status (Carousel + Dock Source of Truth)
 
 ### Changed
