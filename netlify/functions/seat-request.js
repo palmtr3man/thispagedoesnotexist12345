@@ -28,6 +28,11 @@
  *   { ok: false, error: string }
  *
  * Gate Contract v2 — seat_id bridge + beehiiv auto-subscribe
+ *
+ * F143 (2026-04-12): Waitlist path now correctly applies Beehiiv 'waitlist' tag
+ * via Subscription Tags API (POST /v2/publications/:pubId/subscriptions/:subId/tags).
+ * BCC added to next_flight_waitlist_v1 send per universal BCC rule.
+ * subscribeToBeehiiv() now returns the sub_id for downstream tag application.
  */
 
 const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
@@ -62,6 +67,9 @@ const MIN_AGE        = 21;
 
 // --- beehiiv defaults ---
 const BEEHIIV_PUB_ID_DEFAULT = 'pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf';
+
+// --- Universal BCC (mirrors sendgrid-integration.js convention) ---
+const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
 
 /**
  * Generate a seat_id in TUJ-XXXXXX format.
@@ -164,6 +172,7 @@ async function logSeatRequestToNotion({ seatId, name, email, requestDate, source
 /**
  * Subscribe an email to the Signal beehiiv newsletter.
  * Fails gracefully — logs errors but does not block the seat request.
+ * @returns {Promise<string|null>} The beehiiv subscription ID (sub_...) on success, or null on failure.
  */
 async function subscribeToBeehiiv(email, firstName, apiKey, pubId) {
   const url = `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`;
@@ -189,16 +198,51 @@ async function subscribeToBeehiiv(email, firstName, apiKey, pubId) {
 
     if (res.ok || res.status === 201 || res.status === 200) {
       const data = await res.json().catch(() => ({}));
-      console.log(`[seat-request] beehiiv subscribe OK for ${email}`, data?.data?.id || '');
-      return true;
+      const subId = data?.data?.id || null;
+      console.log(`[seat-request] beehiiv subscribe OK for ${email}`, subId || '');
+      return subId;
     } else {
       const errText = await res.text();
       console.error(`[seat-request] beehiiv subscribe error ${res.status}:`, errText);
-      return false;
+      return null;
     }
   } catch (err) {
     console.error('[seat-request] beehiiv subscribe unexpected error:', err);
-    return false;
+    return null;
+  }
+}
+
+/**
+ * Apply the 'waitlist' tag to an existing beehiiv subscriber (F143).
+ * Uses the Subscription Tags API: POST /v2/publications/:pubId/subscriptions/:subId/tags
+ * Fails gracefully — a tag failure must not block the waitlist response.
+ * @param {string} subId   - beehiiv subscription ID (sub_...)
+ * @param {string} apiKey  - beehiiv API key
+ * @param {string} pubId   - beehiiv publication ID
+ */
+async function applyBeehiivWaitlistTag(subId, apiKey, pubId) {
+  if (!subId) {
+    console.warn('[seat-request] applyBeehiivWaitlistTag: no subId — skipping tag apply');
+    return;
+  }
+  const url = `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subId}/tags`;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ tags: ['waitlist'] })
+    });
+    if (res.ok || res.status === 200 || res.status === 201) {
+      console.log(`[seat-request] beehiiv 'waitlist' tag applied to ${subId}`);
+    } else {
+      const errText = await res.text();
+      console.error(`[seat-request] beehiiv tag apply error ${res.status}:`, errText);
+    }
+  } catch (err) {
+    console.error('[seat-request] beehiiv tag apply unexpected error:', err);
   }
 }
 
@@ -311,14 +355,18 @@ exports.handler = async function (event, context) {
         const wlFirstName = nameTrimmed.split(/\s+/)[0] || nameTrimmed;
         const wlPlatformUrl = (process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com') + '/ResumeFitCheck';
         const waitlistTemplateId = TEMPLATES.next_flight_waitlist_v1;
-        // Send next_flight_waitlist_v1 email
+        // Send next_flight_waitlist_v1 email (with BCC per universal BCC rule)
         try {
           const wlRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
             method: 'POST',
             headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
               from: { email: fromEmail },
-              personalizations: [{ to: [{ email: emailTrimmed }], dynamic_template_data: { first_name: wlFirstName, platform_url: wlPlatformUrl } }],
+              personalizations: [{
+                to:  [{ email: emailTrimmed }],
+                bcc: [{ email: BCC_EMAIL }],
+                dynamic_template_data: { first_name: wlFirstName, platform_url: wlPlatformUrl }
+              }],
               template_id: waitlistTemplateId,
               asm: { group_id: ASM_GROUP_ID }
             })
@@ -327,9 +375,11 @@ exports.handler = async function (event, context) {
         } catch (wlErr) {
           console.error('[seat-request] Waitlist email error:', wlErr.message);
         }
-        // Apply Beehiiv 'waitlist' tag via subscription (reactivate_existing: false keeps existing subs intact)
+        // Subscribe to beehiiv + apply 'waitlist' tag (F143 §4)
+        // subscribeToBeehiiv returns the sub_id; applyBeehiivWaitlistTag uses it to call the Tags API.
         if (beehiivKey) {
-          await subscribeToBeehiiv(emailTrimmed, wlFirstName, beehiivKey, beehiivPub);
+          const wlSubId = await subscribeToBeehiiv(emailTrimmed, wlFirstName, beehiivKey, beehiivPub);
+          await applyBeehiivWaitlistTag(wlSubId, beehiivKey, beehiivPub);
         }
         return {
           statusCode: 200,

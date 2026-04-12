@@ -6,9 +6,9 @@
  * Both the .com landing/dashboard repo and the .tech boarding app must
  * import from this module — neither repo should hardcode these values.
  *
- * @version 1c
+ * @version 1d
  * @since   2026-03-27
- * @updated 2026-04-05
+ * @updated 2026-04-12
  */
 
 /**
@@ -42,10 +42,13 @@
 
 /**
  * @typedef {Object} SeatRequestResponse
- * @property {boolean} ok         - True if seat was successfully reserved.
- * @property {string}  [seat_id]  - Assigned seat ID (e.g. "TUJ-AB1234") on success.
- * @property {string}  [status]   - Human-readable status message.
- * @property {string}  [error]    - Error message on failure.
+ * @property {boolean} ok           - True if seat was successfully reserved OR waitlisted.
+ * @property {string}  [seat_id]    - Assigned seat ID (e.g. "TUJ-AB1234") on success (status: 'confirmed').
+ * @property {boolean} [waitlisted] - True when the cohort is full and the passenger is on the next-flight waitlist (F143).
+ * @property {boolean} [duplicate]  - True when a seat request already exists for this email.
+ * @property {string}  [status]     - 'confirmed' | 'waitlisted' — machine-readable status.
+ * @property {string}  [message]    - Human-readable status message.
+ * @property {string}  [error]      - Error message on failure.
  */
 
 /**

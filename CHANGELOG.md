@@ -7,6 +7,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+---
+
+## [2026-04-12] — F143: Non-Selected Passenger Experience — Next Flight Waitlist
+
+### Changed
+- `netlify/functions/seat-request.js` — F143 complete. Three targeted changes to the waitlist path:
+  1. **Beehiiv `waitlist` tag** — `subscribeToBeehiiv()` now returns the beehiiv `sub_id`. New `applyBeehiivWaitlistTag(subId, apiKey, pubId)` function calls `POST /v2/publications/:pubId/subscriptions/:subId/tags` with `{ tags: ['waitlist'] }` immediately after subscribe. Fails gracefully — a tag failure does not block the waitlist response.
+  2. **BCC** — `next_flight_waitlist_v1` SendGrid send now includes `bcc: [{ email: 'support@thispagedoesnotexist12345.com' }]` in `personalizations`, matching the universal BCC rule from `sendgrid-integration.js`.
+  3. **`BCC_EMAIL` constant** — Added module-level `const BCC_EMAIL = 'support@thispagedoesnotexist12345.com'` mirroring the convention in `sendgrid-integration.js`.
+- `gate-contract.js` — `SeatRequestResponse` typedef updated to document `waitlisted`, `duplicate`, `status`, and `message` fields. Version bumped to v1d.
+
+### Notes
+- In-app confirmation state (`#seat-request-waitlisted`) and form submission handler were already correct — no changes to `index.html`.
+- Template ID `d-52c178a809f94a82a3bf8cd6ebd435e9` (set Apr 1, 2026) is the live canonical ID; Notion spec draft shows an earlier ID (`d-54d82aa3007c43e0bd22a5a5ae8c36c4`) from Mar 23, 2026 — codebase value retained.
+
+---
+
 ## [2026-04-08] — Feat: Studio Mission Control Gateway Wiring (tuj_code passthrough)
 
 ### Added
