@@ -35,6 +35,11 @@
  *
  * BLOCKER-03 (2026-04-12): Initial implementation.
  * Path B: Admin Tower → handleSeatOpened → Boarding Pass + Instructions emails.
+ *
+ * BLOCKER-09 (2026-04-12): Added SeatRequest write + cohort open_count increment.
+ * - Creates a seat_requests record after approval (linked to waitlist_submissions)
+ * - Atomically increments cohorts.open_count via increment_cohort_open_count() RPC
+ * - Stamps boarding_emails_sent + boarding_sent_at on seat_requests after email sequence
  */
 
 const { sendSeatConfirmation } = require('./sendgrid-integration');
@@ -183,6 +188,57 @@ exports.handler = async function (event) {
     return { statusCode: 500, headers, body: JSON.stringify({ ok: false, error: 'Failed to update seat request status' }) };
   }
 
+  // --- BLOCKER-09: Create seat_requests record (SeatRequest entity) ---
+  let seatRequestRowId = null;
+  try {
+    const srRes = await fetch(
+      `${supabaseUrl}/rest/v1/seat_requests`,
+      {
+        method:  'POST',
+        headers: { ...sbHeaders, Prefer: 'return=representation' },
+        body:    JSON.stringify({
+          waitlist_submission_id: seat_request_id,
+          seat_id:                seatId,
+          email,
+          first_name:             firstName,
+          last_name:              seatRequest.last_name || null,
+          cabin_class:            cabin_class,
+          flight_id:              flight_id,
+          status:                 'opened',
+          requested_at:           seatRequest.created_at || new Date().toISOString(),
+          approved_at:            new Date().toISOString()
+        })
+      }
+    );
+    const srRows = await srRes.json();
+    seatRequestRowId = Array.isArray(srRows) && srRows[0]?.id ? srRows[0].id : null;
+    console.log(`[admin-approve] seat_requests row created: ${seatRequestRowId} for ${email}`);
+  } catch (err) {
+    // Non-fatal — log for reconciliation, do not block boarding
+    console.error('[admin-approve] seat_requests insert failed (non-fatal):', err.message);
+  }
+
+  // --- BLOCKER-09: Increment cohort open_count (atomic, capped at max_seats) ---
+  try {
+    const cohortRes = await fetch(
+      `${supabaseUrl}/rest/v1/rpc/increment_cohort_open_count`,
+      {
+        method:  'POST',
+        headers: { ...sbHeaders, Prefer: 'return=representation' },
+        body:    JSON.stringify({ p_flight_id: flight_id })
+      }
+    );
+    const newCount = await cohortRes.json();
+    if (newCount === -1) {
+      console.warn(`[admin-approve] Cohort '${flight_id}' not found or not active — open_count not incremented`);
+    } else {
+      console.log(`[admin-approve] Cohort '${flight_id}' open_count → ${newCount}`);
+    }
+  } catch (err) {
+    // Non-fatal — log for reconciliation, do not block boarding
+    console.error('[admin-approve] Cohort open_count increment failed (non-fatal):', err.message);
+  }
+
   // --- Fire boarding email sequence via sendSeatConfirmation ---
   // Construct a seat-like object matching sendgrid-integration.js expectations
   const seatRecord = {
@@ -219,7 +275,7 @@ exports.handler = async function (event) {
     };
   }
 
-  // --- Update Supabase: approved → boarded ---
+  // --- Update Supabase: approved → boarded (waitlist_submissions) ---
   try {
     await fetch(
       `${supabaseUrl}/rest/v1/waitlist_submissions?id=eq.${encodeURIComponent(seat_request_id)}`,
@@ -233,6 +289,27 @@ exports.handler = async function (event) {
   } catch (err) {
     // Non-fatal — emails already sent, log for reconciliation
     console.error('[admin-approve] Supabase boarded stamp failed (non-fatal):', err.message);
+  }
+
+  // --- BLOCKER-09: Stamp seat_requests: boarding_emails_sent + boarding_sent_at ---
+  if (seatRequestRowId) {
+    try {
+      await fetch(
+        `${supabaseUrl}/rest/v1/seat_requests?id=eq.${encodeURIComponent(seatRequestRowId)}`,
+        {
+          method:  'PATCH',
+          headers: { ...sbHeaders, Prefer: 'return=minimal' },
+          body:    JSON.stringify({
+            status:               'boarded',
+            boarding_emails_sent: true,
+            boarding_sent_at:     new Date().toISOString()
+          })
+        }
+      );
+      console.log(`[admin-approve] seat_requests stamped: boarding_emails_sent=true for ${email}`);
+    } catch (err) {
+      console.error('[admin-approve] seat_requests boarding stamp failed (non-fatal):', err.message);
+    }
   }
 
   console.log(`[admin-approve] ✅ Approved and boarded: ${email} seat_id ${seatId}`);
