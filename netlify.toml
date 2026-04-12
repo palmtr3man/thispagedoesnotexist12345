@@ -65,3 +65,15 @@
   from = "/api/seat"
   to = "/.netlify/functions/seat"
   status = 200
+
+# Admin Tower — BLOCKER-03: Approve/Deny Flow
+# Secured by x-admin-secret header (ADMIN_SECRET env var)
+[[redirects]]
+  from = "/api/admin-approve"
+  to = "/.netlify/functions/admin-approve"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-deny"
+  to = "/.netlify/functions/admin-deny"
+  status = 200
