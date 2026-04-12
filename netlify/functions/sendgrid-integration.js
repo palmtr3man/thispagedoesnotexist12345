@@ -236,6 +236,17 @@ async function sendSeatConfirmation(seat) {
     return { success: false, error: 'Missing required seat fields' };
   }
 
+  // F-190 Post-Apr-12 Hardening (86agrt0g5): boarding_type is required.
+  // If absent, abort immediately — do NOT silently fall through to the default boarding sequence.
+  // An exec_pre seat missing boarding_type would otherwise receive the standard boarding emails,
+  // which is a silent misroute with no error logged. Operator must set boarding_type via Tower
+  // before triggering handleSeatOpened.
+  if (!boarding_type) {
+    const msg = `Seat ${seatId} missing boarding_type — aborting to prevent misroute. Set boarding_type via Tower before triggering handleSeatOpened.`;
+    console.error(`[sendgrid-integration] ${msg}`, JSON.stringify({ seat_id: seatId, correlation_id: buildCorrelationId({ flightId: flight_id, passengerId: passenger_id, requestId: request_id }) }));
+    return { success: false, error: 'boarding_type is required — set via Tower before triggering handleSeatOpened' };
+  }
+
   // Idempotency guard — executive_pre path: skip if already stamped
   if (boarding_type === 'executive_pre' && exec_preboard_sent_at) {
     console.log(`[sendgrid-integration] Seat ${seatId} already has exec_preboard_sent_at (${exec_preboard_sent_at}) — skipping send`);
