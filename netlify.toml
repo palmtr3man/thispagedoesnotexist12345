@@ -77,3 +77,12 @@
   from = "/api/admin-deny"
   to = "/.netlify/functions/admin-deny"
   status = 200
+
+# Passenger Door — BLOCKER-07: Newsletter Landing + TUJ Seat Gate + ResumeFitCheck
+# Receives passengers from the .us newsletter boarding_pass deep-link:
+#   https://www.thispagedoesnotexist12345.com/door?seat_id=TUJ-XXXXXX
+# Validates seat_id via /api/seat, then routes to Base44 ResumeFitCheck.
+[[redirects]]
+  from = "/door"
+  to = "/door.html"
+  status = 200
