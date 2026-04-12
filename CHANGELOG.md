@@ -9,6 +9,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-04-12] — F117: Netlify Function /api/seat-status (Carousel + Dock Source of Truth)
+
+### Changed
+- `netlify/functions/seat-status.js` — F117 complete. Three additions to the success response path:
+  1. **`ok: true`** — canonical success flag added to all 200 responses (was absent; guard responses now also carry `ok: false`).
+  2. **`opencount`** — alias for `open_count` added for carousel compatibility (F117 spec requires `opencount` key).
+  3. **`seats[]`** — per-seat array added as the canonical source of truth for the carousel seat slide and dock. Built from `BASE44_SEAT_LIST_URL` when set (live Base44 query, 3 s timeout, graceful fallback). When unset, synthesised from `getCohortStatus` aggregate counts (`open_count` + `approved_count`). Always returns exactly 5 seats in stable order (`seat_1` → `seat_5`). Status values: `pending | approved | opened | denied`.
+  4. **`timestamp`** — already returned by `getCohortStatus`; now guaranteed present in all success responses (falls back to `new Date().toISOString()` if missing).
+- `.env.example` — added `BASE44_SEAT_LIST_URL` (optional) with documentation.
+
+### Notes
+- `BASE44_SEAT_LIST_URL` is optional. When not set, `seats[]` is synthesised — no new required env var for existing deployments.
+- All guard responses (VIP 451, QA isolation 422, conflict 409, catch block) now carry `ok: false` for consistency.
+
+---
+
 ## [2026-04-12] — F143: Non-Selected Passenger Experience — Next Flight Waitlist
 
 ### Changed
