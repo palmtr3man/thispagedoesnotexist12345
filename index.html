@@ -2570,6 +2570,43 @@
           updateGateStatusWidget(status);
         }
 
+        // ── BLOCKER-06: Studio Stateful CTA — Swap Request a Seat / Run Fit Check ──────
+        // When a confirmed passenger enters dashboard state, the primary CTA swaps
+        // from "Request a Seat" to "Run Resume Fit Check" pointing to the Studio.
+        // When leaving dashboard state the Fit Check CTA is hidden and the Request
+        // a Seat button is restored (visibility managed by applySeatGate below).
+        (function () {
+          var waitlistBtnEl  = document.getElementById('waitlistBtn');
+          var ctaWrapperEl   = document.getElementById('cta-wrapper');
+          var fitCheckBtnId  = 'tuj-fitcheck-cta';
+          var existingFitBtn = document.getElementById(fitCheckBtnId);
+          if (state === 'dashboard' && seatId) {
+            // Hide the Request a Seat button — passenger already has a seat
+            if (waitlistBtnEl) waitlistBtnEl.style.display = 'none';
+            var fitUrl = 'https://theultimatejourney.base44.app/ResumeFitCheck?seat_id=' + encodeURIComponent(seatId);
+            if (!existingFitBtn && ctaWrapperEl) {
+              // First time: create and inject the Fit Check CTA
+              var fitBtn = document.createElement('a');
+              fitBtn.id        = fitCheckBtnId;
+              fitBtn.className = 'btn-waitlist unlocked';
+              fitBtn.setAttribute('data-umami-event', 'Run Fit Check Click');
+              fitBtn.setAttribute('target', '_blank');
+              fitBtn.setAttribute('rel', 'noopener noreferrer');
+              fitBtn.href      = fitUrl;
+              fitBtn.textContent = '\u25B6 Run Resume Fit Check';
+              fitBtn.style.textDecoration = 'none';
+              ctaWrapperEl.insertBefore(fitBtn, ctaWrapperEl.firstChild);
+            } else if (existingFitBtn) {
+              existingFitBtn.href         = fitUrl;
+              existingFitBtn.style.display = '';
+            }
+          } else {
+            // Non-dashboard state: hide Fit Check CTA
+            // waitlistBtn visibility is managed by applySeatGate() below
+            if (existingFitBtn) existingFitBtn.style.display = 'none';
+          }
+        })();
+
         // ── Hand off to window.__applySeatGate() for all badge/CTA logic ──────
         // Fire before the transition so badge text is correct when it fades in.
         if (typeof window.__applySeatGate === 'function') {
