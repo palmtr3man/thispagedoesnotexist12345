@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>One Page Studio - AI Resume Builder | The Ultimate Journey</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Control Gateway — One Page Studio | The Ultimate Journey</title>
 
-    <!-- SEO Meta -->
-    <meta name="description" content="One Page Studio — AI-powered resume builder with optimization tools and wordsmith capabilities. Part of The Ultimate Journey career platform.">
-    <meta name="robots" content="index,follow">
+  <!-- SEO Meta -->
+  <meta name="description" content="One Page Studio — AI-powered resume builder with optimization tools and wordsmith capabilities. Part of The Ultimate Journey career platform.">
+  <meta name="robots" content="index,follow">
 
-    <!-- Favicon & PWA -->
-    <link rel="icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
+  <!-- Favicon & PWA -->
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.thispagedoesnotexist12345.com/Studio">
-    <meta property="og:title" content="One Page Studio - AI Resume Builder | The Ultimate Journey">
-    <meta property="og:description" content="AI-powered resume builder with optimization tools and wordsmith capabilities.">
-    <meta property="og:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.thispagedoesnotexist12345.com/Studio">
+  <meta property="og:title" content="Mission Control Gateway — One Page Studio | The Ultimate Journey">
+  <meta property="og:description" content="AI-powered resume builder with optimization tools and wordsmith capabilities.">
+  <meta property="og:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="One Page Studio - AI Resume Builder">
-    <meta name="twitter:description" content="AI-powered resume builder with optimization tools and wordsmith capabilities.">
-    <meta name="twitter:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mission Control Gateway — One Page Studio">
+  <meta name="twitter:description" content="AI-powered resume builder with optimization tools and wordsmith capabilities.">
+  <meta name="twitter:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
 
   <!-- JSON-LD: SoftwareApplication schema -->
   <script type="application/ld+json">
@@ -53,219 +53,571 @@
   }
   </script>
 
-  <!-- Critical CSS: above-fold paint before Tailwind loads -->
+  <!-- Fonts: Mission Control aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Critical CSS: above-fold paint -->
   <style>
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{margin:0;padding:0;min-height:100vh}
-    body{background:linear-gradient(135deg,#0f172a 0%,#1a2332 50%,#0f1419 100%);color:#e0e7ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-    .tap-target{min-height:48px;min-width:48px;display:inline-flex;align-items:center;justify-content:center;padding:.5rem 1rem}
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ── Mission Control design tokens ───────────────────────────────────── */
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;--space-20:5rem;
+      --radius-sm:.375rem;--radius-md:.75rem;--radius-lg:1rem;--radius-xl:1.5rem;--radius-full:9999px;
+      --color-bg:#f3f1eb;--color-surface:#f8f6f2;--color-surface-2:#ffffff;--color-surface-offset:#e8e3da;--color-border:rgba(37,33,28,0.12);
+      --color-text:#25211c;--color-text-muted:#6f6a62;--color-text-faint:#9d978f;--color-text-inverse:#f8f7f3;
+      --color-primary:#0b8ea0;--color-primary-hover:#096d7b;--color-primary-soft:rgba(11,142,160,0.08);--color-gold:#c89b3c;--color-shadow:0 20px 60px rgba(30,25,20,0.08);
+      --font-display:'Instrument Serif',Georgia,serif;--font-body:'Inter',Arial,sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg:#0a0d10;--color-surface:#12171c;--color-surface-2:#182028;--color-surface-offset:#202a33;--color-border:rgba(214,225,235,0.12);
+      --color-text:#edf3f7;--color-text-muted:#a5b4c0;--color-text-faint:#738291;--color-text-inverse:#0c1014;
+      --color-primary:#58c7d7;--color-primary-hover:#86ddea;--color-primary-soft:rgba(88,199,215,0.12);--color-gold:#d9b36a;--color-shadow:0 24px 80px rgba(0,0,0,0.45);
+    }
+
+    html, body { min-height: 100vh; }
+    body {
+      font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6;
+      color: var(--color-text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(88,199,215,0.10), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(217,179,106,0.09), transparent 20%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), transparent 30%),
+        var(--color-bg);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; border: 0; background: none; color: inherit; cursor: pointer; }
+    .tap-target { min-height: 48px; min-width: 48px; display: inline-flex; align-items: center; justify-content: center; padding: .5rem 1rem; }
+
+    /* ── Layout shell ─────────────────────────────────────────────────────── */
+    .mc-shell { max-width: 1360px; margin: 0 auto; padding: var(--space-6); }
+
+    /* ── Topbar ───────────────────────────────────────────────────────────── */
+    .mc-topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+      margin-bottom: var(--space-8); padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--color-border); border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(18px);
+      position: sticky; top: 16px; z-index: 20;
+    }
+    .mc-brand { display: flex; align-items: center; gap: var(--space-3); }
+    .mc-logo { width: 40px; height: 40px; padding: 8px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); }
+    .mc-brand-title { font-size: var(--text-sm); letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-text-muted); }
+    .mc-brand-name { font-size: var(--text-base); font-weight: 600; }
+    .mc-top-actions { display: flex; align-items: center; gap: var(--space-3); }
+    .mc-pill {
+      display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-full);
+      border: 1px solid var(--color-border); background: rgba(255,255,255,0.03); color: var(--color-text-muted); font-size: var(--text-sm);
+    }
+    .mc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); box-shadow: 0 0 0 6px rgba(88,199,215,0.08); }
+    .mc-theme-toggle { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--color-border); background: rgba(255,255,255,0.03); }
+
+    /* ── Hero gateway ─────────────────────────────────────────────────────── */
+    .mc-hero { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: var(--space-6); align-items: stretch; margin-bottom: var(--space-6); }
+    .mc-panel {
+      position: relative; overflow: hidden; border-radius: calc(var(--radius-xl) + 6px); border: 1px solid var(--color-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); box-shadow: var(--color-shadow);
+    }
+    .mc-hero-copy { padding: clamp(1.75rem, 3vw, 3.5rem); min-height: 540px; display: flex; flex-direction: column; justify-content: space-between; }
+    .mc-eyebrow { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.2em; color: var(--color-gold); margin-bottom: var(--space-4); }
+    .mc-h1 { font-family: var(--font-display); font-size: clamp(3rem, 6vw, 6.5rem); line-height: 0.95; letter-spacing: -0.04em; max-width: 11ch; }
+    .mc-lede { margin-top: var(--space-5); max-width: 58ch; color: var(--color-text-muted); }
+    .mc-cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+    .mc-btn {
+      min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 18px; border-radius: var(--radius-full);
+      border: 1px solid transparent; font-size: var(--text-sm); font-weight: 600;
+    }
+    .mc-btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
+    .mc-btn-primary:hover { background: var(--color-primary-hover); }
+    .mc-btn-secondary { border-color: var(--color-border); background: rgba(255,255,255,0.04); }
+    .mc-btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+    /* ── Status strip ─────────────────────────────────────────────────────── */
+    .mc-status-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-3); margin-top: var(--space-8); }
+    .mc-status-card { padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); }
+    .mc-status-label { font-size: var(--text-xs); letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-text-faint); margin-bottom: 8px; }
+    .mc-status-value { font-size: var(--text-lg); font-weight: 600; }
+
+    /* ── Observation window ───────────────────────────────────────────────── */
+    .mc-window-panel { min-height: 540px; display: flex; flex-direction: column; }
+    .mc-window-head { display: flex; justify-content: space-between; align-items: center; padding: var(--space-5); border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); font-size: var(--text-sm); }
+    .mc-window-view {
+      flex: 1; position: relative; overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(103,153,188,0.16) 0%, rgba(74,103,126,0.08) 22%, rgba(24,32,40,0.0) 45%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+    .mc-runway { position: absolute; inset: auto 0 0 0; height: 34%; background: linear-gradient(180deg, rgba(28,34,40,0.1), rgba(7,10,14,0.72)); border-top: 1px solid rgba(255,255,255,0.08); }
+    .mc-taxi-line { position: absolute; left: 8%; right: 8%; bottom: 22%; height: 2px; background: repeating-linear-gradient(90deg, rgba(217,179,106,0.7) 0 42px, transparent 42px 76px); }
+    .mc-plane, .mc-operator-blip, .mc-tower-signal { position: absolute; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px); }
+    .mc-plane { width: 110px; height: 36px; right: 18%; bottom: 26%; border-radius: 999px; background: rgba(255,255,255,0.06); }
+    .mc-plane::before { content: ''; position: absolute; width: 34px; height: 6px; left: 38px; top: -8px; border-radius: 999px; background: rgba(255,255,255,0.22); }
+    .mc-operator-blip { width: 148px; height: 92px; bottom: 18%; background: rgba(18,28,36,0.58); border-radius: 18px; padding: 14px; }
+    .mc-operator-blip.one { left: 10%; } .mc-operator-blip.two { left: 39%; } .mc-operator-blip.three { right: 11%; }
+    .mc-operator-blip small { display:block; color: var(--color-text-faint); text-transform: uppercase; letter-spacing: .14em; font-size: 11px; }
+    .mc-operator-blip strong { display:block; margin-top: 6px; font-size: 15px; }
+    .mc-tower-signal { width: 12px; height: 12px; right: 12%; top: 18%; border-radius: 50%; background: var(--color-primary); box-shadow: 0 0 0 14px rgba(88,199,215,0.08), 0 0 60px rgba(88,199,215,0.3); }
+    .mc-glass-reflection { position: absolute; inset: 0; background: linear-gradient(112deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.04) 18%, transparent 34%, transparent 66%, rgba(255,255,255,0.06) 82%, transparent 100%); pointer-events: none; }
+    .mc-frame-lines { position: absolute; inset: 0; pointer-events: none; }
+    .mc-frame-lines::before, .mc-frame-lines::after { content: ''; position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.08); }
+    .mc-frame-lines::before { left: 33.333%; } .mc-frame-lines::after { left: 66.666%; }
+
+    /* ── Rocket animation ─────────────────────────────────────────────────── */
+    .mc-launchpad { position: absolute; left: 20%; bottom: 24%; width: 82px; height: 26px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+    .mc-rocket-loop { position: absolute; left: 23%; bottom: 22%; width: 26px; height: 72px; animation: mcLaunchLoop 10s linear infinite; transform-origin: center bottom; }
+    .mc-rocket-body { position: absolute; left: 7px; bottom: 12px; width: 12px; height: 34px; border-radius: 999px 999px 5px 5px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(152,212,224,0.72)); box-shadow: 0 0 18px rgba(88,199,215,0.18); }
+    .mc-rocket-body::before { content: ''; position: absolute; inset: -8px 1px auto 1px; height: 12px; border-radius: 50% 50% 0 0; background: rgba(255,255,255,0.95); }
+    .mc-rocket-fin-left, .mc-rocket-fin-right { position: absolute; bottom: 13px; width: 8px; height: 16px; background: rgba(217,179,106,0.85); }
+    .mc-rocket-fin-left { left: 2px; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
+    .mc-rocket-fin-right { right: 2px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+    .mc-rocket-window { position: absolute; top: 11px; left: 9px; width: 8px; height: 8px; border-radius: 50%; background: rgba(11,25,34,0.7); border: 1px solid rgba(255,255,255,0.42); }
+    .mc-rocket-flame { position: absolute; left: 9px; bottom: 0; width: 8px; height: 18px; background: linear-gradient(180deg, rgba(255,214,153,0.95), rgba(255,121,66,0.0)); filter: blur(0.6px); animation: mcFlamePulse 0.35s ease-in-out infinite alternate; }
+    .mc-rocket-trail { position: absolute; left: 12px; bottom: -112px; width: 2px; height: 120px; background: linear-gradient(180deg, rgba(255,255,255,0.0), rgba(174,231,241,0.78), rgba(255,255,255,0.0)); opacity: 0; animation: mcTrailLoop 10s linear infinite; }
+    .mc-smoke { position: absolute; left: 20.5%; bottom: 18.5%; width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.08); filter: blur(1px); animation: mcSmokePulse 10s linear infinite; }
+    .mc-smoke::before, .mc-smoke::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.06); }
+    .mc-smoke::before { width: 18px; height: 18px; left: -10px; bottom: 2px; }
+    .mc-smoke::after { width: 16px; height: 16px; left: 10px; bottom: 0; }
+    @keyframes mcLaunchLoop {
+      0%, 62% { transform: translate3d(0,0,0) scale(0.95); opacity: 0; }
+      66% { transform: translate3d(0,0,0) scale(1); opacity: 1; }
+      76% { transform: translate3d(12px,-88px,0) rotate(-8deg); opacity: 1; }
+      88% { transform: translate3d(58px,-215px,0) rotate(-12deg) scale(0.98); opacity: 1; }
+      100% { transform: translate3d(120px,-360px,0) rotate(-16deg) scale(0.92); opacity: 0; }
+    }
+    @keyframes mcTrailLoop {
+      0%, 64% { opacity: 0; transform: translateY(0); }
+      70% { opacity: 0.82; }
+      90% { opacity: 0.42; transform: translateY(-70px); }
+      100% { opacity: 0; transform: translateY(-120px); }
+    }
+    @keyframes mcFlamePulse { from { transform: scaleY(0.8); opacity: 0.72; } to { transform: scaleY(1.18); opacity: 1; } }
+    @keyframes mcSmokePulse {
+      0%, 62% { opacity: 0; transform: scale(0.5); }
+      68% { opacity: 0.8; transform: scale(1); }
+      78% { opacity: 0.28; transform: translateY(-12px) scale(1.5); }
+      100% { opacity: 0; transform: translateY(-22px) scale(1.8); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mc-rocket-loop, .mc-rocket-trail, .mc-smoke, .mc-rocket-flame { animation: none !important; opacity: 1; transform: none; }
+      .mc-rocket-loop { left: 26%; bottom: 30%; }
+      .mc-rocket-trail { display: none; }
+    }
+
+    /* ── Control surfaces band ────────────────────────────────────────────── */
+    .mc-bands { display: grid; gap: var(--space-6); }
+    .mc-control-band { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: var(--space-6); }
+    .mc-section-card { padding: var(--space-6); }
+    .mc-h2 { font-family: var(--font-display); font-size: clamp(2rem, 3vw, 3rem); letter-spacing: -0.03em; margin-bottom: var(--space-3); }
+    .mc-subcopy { color: var(--color-text-muted); max-width: 62ch; }
+    .mc-timeline { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+    .mc-timeline-item { display: grid; grid-template-columns: auto 1fr; gap: var(--space-4); align-items: start; }
+    .mc-timeline-mark { width: 12px; height: 12px; margin-top: 8px; border-radius: 50%; background: var(--color-gold); box-shadow: 0 0 0 7px rgba(217,179,106,0.08); }
+    .mc-timeline-copy h4 { font-size: var(--text-base); margin-bottom: 6px; }
+    .mc-timeline-copy p { color: var(--color-text-muted); }
+    .mc-control-stack { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+    .mc-control-row {
+      display: grid; grid-template-columns: 1.1fr auto auto; gap: var(--space-3); align-items: center;
+      padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.03); border: 1px solid var(--color-border);
+    }
+    .mc-tag { padding: 7px 11px; border-radius: 999px; font-size: var(--text-xs); letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--color-border); color: var(--color-text-muted); }
+    .mc-footer-note { color: var(--color-text-faint); font-size: var(--text-sm); margin-top: 4px; }
+
+    /* ── Studio tool section ──────────────────────────────────────────────── */
+    .mc-studio-section { margin-top: var(--space-6); }
+    .mc-studio-header {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+      padding: var(--space-5) var(--space-6); border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--color-border); border-bottom: none;
+    }
+    .mc-studio-header-left h2 { font-family: var(--font-display); font-size: clamp(1.5rem, 2.5vw, 2rem); letter-spacing: -0.02em; }
+    .mc-studio-header-left p { color: var(--color-text-muted); font-size: var(--text-sm); margin-top: 4px; }
+    .mc-studio-body {
+      border: 1px solid var(--color-border); border-top: none; border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      background: rgba(255,255,255,0.02); padding: var(--space-6);
+    }
+
+    /* ── Studio tool: legacy utility classes (preserved) ─────────────────── */
+    .glass { background: rgba(15,23,42,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(88,199,215,0.2); border-radius: 0.5rem; }
+    .glass-accent { background: rgba(88,199,215,0.08); border: 1px solid rgba(88,199,215,0.2); border-radius: 0.5rem; }
+    .cyan-glow { color: var(--color-primary); }
+    [data-theme="light"] .cyan-glow { color: var(--color-primary); }
+    .btn-primary-studio { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%); color: var(--color-text-inverse); font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; }
+    .btn-primary-studio:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(88,199,215,0.4); }
+    .btn-secondary-studio { background: rgba(88,199,215,0.08); color: var(--color-primary); border: 1px solid rgba(88,199,215,0.25); padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; }
+    .btn-secondary-studio:hover { background: rgba(88,199,215,0.16); border-color: rgba(88,199,215,0.4); }
+    .btn-success { background: linear-gradient(135deg,#00ff88 0%,#00cc66 100%); color: #000; font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,255,136,0.5); }
+    .btn-danger { background: rgba(255,80,80,0.15); color: #ff5050; border: 1px solid rgba(255,80,80,0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
+    .input-field { background: rgba(88,199,215,0.05); border: 1px solid rgba(88,199,215,0.18); color: var(--color-text); padding: 10px 12px; border-radius: 6px; font-size: 14px; width: 100%; font-family: var(--font-body); }
+    .input-field:focus { outline: none; border-color: rgba(88,199,215,0.45); background: rgba(88,199,215,0.10); box-shadow: 0 0 10px rgba(88,199,215,0.15); }
+    [data-theme="light"] .input-field { background: rgba(11,142,160,0.04); border-color: rgba(11,142,160,0.18); color: var(--color-text); }
+    [data-theme="light"] .input-field:focus { border-color: rgba(11,142,160,0.45); background: rgba(11,142,160,0.08); }
+    .section-header { border-bottom: 2px solid rgba(88,199,215,0.25); padding-bottom: 12px; margin-bottom: 16px; }
+    .resume-preview { background: white; color: #000; padding: 40px; border-radius: 8px; font-family: 'Calibri','Arial',sans-serif; line-height: 1.6; }
+    .resume-preview h1 { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+    .resume-preview .contact-line { font-size: 12px; color: #555; margin-bottom: 12px; border-bottom: 2px solid #00d9ff; padding-bottom: 8px; }
+    .resume-preview .section-title { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #0099cc; border-bottom: 1px solid #ddd; padding-bottom: 3px; margin-top: 14px; margin-bottom: 6px; }
+    .resume-preview .exp-title { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+    .resume-preview .exp-meta { font-size: 11px; color: #555; margin-bottom: 3px; }
+    .resume-preview p { font-size: 11px; margin-bottom: 4px; }
+    .resume-preview .skill-tag { display: inline-block; background: #f0f8ff; border: 1px solid #cce5ff; color: #0066aa; padding: 2px 8px; border-radius: 3px; font-size: 10px; margin: 2px; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .tab-active { border-bottom: 2px solid var(--color-primary); color: var(--color-primary); }
+    .tab-inactive { border-bottom: 2px solid transparent; color: var(--color-text-muted); }
+    .status-bar { background: rgba(88,199,215,0.08); border: 1px solid rgba(88,199,215,0.2); border-radius: 6px; padding: 10px 16px; margin-bottom: 16px; font-size: 13px; }
+    .status-loading { border-color: rgba(255,200,0,0.4); background: rgba(255,200,0,0.05); color: #ffd700; }
+    .status-success { border-color: rgba(0,255,136,0.4); background: rgba(0,255,136,0.05); color: #00ff88; }
+    .status-error { border-color: rgba(255,80,80,0.4); background: rgba(255,80,80,0.05); color: #ff5050; }
+    .status-info { border-color: rgba(88,199,215,0.4); background: rgba(88,199,215,0.05); color: var(--color-primary); }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,215,0,0.3); border-top-color: #ffd700; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ───────────────────────────────────────────────────────── */
+    @media (max-width: 1080px) {
+      .mc-hero, .mc-control-band { grid-template-columns: 1fr; }
+      .mc-window-panel, .mc-hero-copy { min-height: auto; }
+    }
+    @media (max-width: 720px) {
+      .mc-shell { padding: var(--space-4); }
+      .mc-topbar { border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); align-items: flex-start; flex-direction: column; }
+      .mc-top-actions { width: 100%; justify-content: space-between; }
+      .mc-status-strip { grid-template-columns: 1fr; }
+      .mc-control-row { grid-template-columns: 1fr; }
+      .mc-h1 { max-width: 9ch; }
+    }
   </style>
 
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1a2332 50%, #0f1419 100%);
-            color: #e0e7ff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            min-height: 100vh;
-        }
-        .glass { background: rgba(15,23,42,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0,217,255,0.2); }
-        .glass-accent { background: rgba(0,217,255,0.1); border: 1px solid rgba(0,217,255,0.3); }
-        .cyan-glow { color: #00d9ff; text-shadow: 0 0 10px rgba(0,217,255,0.5); }
-        .btn-primary { background: linear-gradient(135deg,#00d9ff 0%,#0099cc 100%); color: #000; font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; border: none; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,217,255,0.5); }
-        .btn-secondary { background: rgba(0,217,255,0.1); color: #00d9ff; border: 1px solid rgba(0,217,255,0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
-        .btn-secondary:hover { background: rgba(0,217,255,0.2); border-color: rgba(0,217,255,0.5); }
-        .btn-success { background: linear-gradient(135deg,#00ff88 0%,#00cc66 100%); color: #000; font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; border: none; }
-        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,255,136,0.5); }
-        .btn-danger { background: rgba(255,80,80,0.15); color: #ff5050; border: 1px solid rgba(255,80,80,0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
-        .input-field { background: rgba(0,217,255,0.05); border: 1px solid rgba(0,217,255,0.2); color: #e0e7ff; padding: 10px 12px; border-radius: 6px; font-size: 14px; width: 100%; }
-        .input-field:focus { outline: none; border-color: rgba(0,217,255,0.5); background: rgba(0,217,255,0.1); box-shadow: 0 0 10px rgba(0,217,255,0.2); }
-        .section-header { border-bottom: 2px solid rgba(0,217,255,0.3); padding-bottom: 12px; margin-bottom: 16px; }
-        .resume-preview { background: white; color: #000; padding: 40px; border-radius: 8px; font-family: 'Calibri','Arial',sans-serif; line-height: 1.6; }
-        .resume-preview h1 { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
-        .resume-preview .contact-line { font-size: 12px; color: #555; margin-bottom: 12px; border-bottom: 2px solid #00d9ff; padding-bottom: 8px; }
-        .resume-preview .section-title { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #0099cc; border-bottom: 1px solid #ddd; padding-bottom: 3px; margin-top: 14px; margin-bottom: 6px; }
-        .resume-preview .exp-title { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
-        .resume-preview .exp-meta { font-size: 11px; color: #555; margin-bottom: 3px; }
-        .resume-preview p { font-size: 11px; margin-bottom: 4px; }
-        .resume-preview .skill-tag { display: inline-block; background: #f0f8ff; border: 1px solid #cce5ff; color: #0066aa; padding: 2px 8px; border-radius: 3px; font-size: 10px; margin: 2px; }
-        .fade-in { animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .tab-active { border-bottom: 2px solid #00d9ff; color: #00d9ff; }
-        .tab-inactive { border-bottom: 2px solid transparent; color: #94a3b8; }
-        .status-bar { background: rgba(0,217,255,0.08); border: 1px solid rgba(0,217,255,0.2); border-radius: 6px; padding: 10px 16px; margin-bottom: 16px; font-size: 13px; }
-        .status-loading { border-color: rgba(255,200,0,0.4); background: rgba(255,200,0,0.05); color: #ffd700; }
-        .status-success { border-color: rgba(0,255,136,0.4); background: rgba(0,255,136,0.05); color: #00ff88; }
-        .status-error { border-color: rgba(255,80,80,0.4); background: rgba(255,80,80,0.05); color: #ff5050; }
-        .status-info { border-color: rgba(0,217,255,0.4); background: rgba(0,217,255,0.05); color: #00d9ff; }
-        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,215,0,0.3); border-top-color: #ffd700; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+
   <!-- Umami Analytics -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="5c935661-0414-4670-8777-a89e47266187"></script>
-
 </head>
 <body>
-<div class="min-h-screen p-6">
-    <header role="banner" class="max-w-7xl mx-auto mb-8">
-        <div class="flex items-center justify-between mb-4">
+<a href="#studio-main" style="position:absolute;left:-9999px;">Skip to content</a>
+
+<div class="mc-shell">
+
+  <!-- ── Topbar ──────────────────────────────────────────────────────────── -->
+  <header role="banner" class="mc-topbar">
+    <div class="mc-brand">
+      <div class="mc-logo" aria-label="TUJ logo">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M6 22c4-8 10-12 20-12" />
+          <path d="M6 26h20" opacity="0.5" />
+          <path d="M16 8l4 4-4 4" />
+        </svg>
+      </div>
+      <div>
+        <div class="mc-brand-title">The Ultimate Journey</div>
+        <div class="mc-brand-name">Mission Control Gateway</div>
+      </div>
+    </div>
+    <div class="mc-top-actions">
+      <div class="mc-pill"><span class="mc-dot"></span> <span id="gatePillText">Gate open · overlooked operators visible</span></div>
+      <button id="saveBackBtn" class="btn-success hidden tap-target" onclick="saveBackToCareerNavigator()" style="font-size:0.875rem;">
+        &#x2713; Save to Career Navigator
+      </button>
+      <a href="https://www.thispagedoesnotexist12345.com/" class="tap-target mc-btn mc-btn-secondary" style="font-size:0.875rem;">
+        &larr; Back to the Dock
+      </a>
+      <button class="mc-theme-toggle" data-theme-toggle aria-label="Switch theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="mc-bands">
+
+    <!-- ── Hero: observation lounge + window panel ─────────────────────── -->
+    <section class="mc-hero" aria-label="Mission Control gateway">
+      <article class="mc-panel mc-hero-copy">
+        <div>
+          <div class="mc-eyebrow">Observation lounge / One-page Studio gateway</div>
+          <h1 class="mc-h1">Look out over the operators moving your journey.</h1>
+          <p class="mc-lede">This is not a dashboard first. It is a glass-front vantage point into the hidden machinery behind your seat: recruiters, referrals, ATS filters, handoffs, follow-ups, and signals that usually stay out of sight.</p>
+          <div class="mc-cta-row">
+            <a class="mc-btn mc-btn-primary" href="#control-surfaces">Enter Mission Control</a>
+            <a class="mc-btn mc-btn-secondary" href="#studio-main">Open One-Page Studio</a>
+          </div>
+        </div>
+
+        <!-- Status strip — tokenized: values update from seat record when seat_id present -->
+        <div class="mc-status-strip" aria-label="Mission control summary" id="mcStatusStrip">
+          <div class="mc-status-card">
+            <div class="mc-status-label">Current lane</div>
+            <div class="mc-status-value" id="mcStatusLane">Boarding</div>
+          </div>
+          <div class="mc-status-card">
+            <div class="mc-status-label">Visible operators</div>
+            <div class="mc-status-value" id="mcStatusOperators">5 active across ramp</div>
+          </div>
+          <div class="mc-status-card">
+            <div class="mc-status-label">Clearest next move</div>
+            <div class="mc-status-value" id="mcStatusNextMove">Review signal path</div>
+          </div>
+        </div>
+
+        <!-- Departure selector panel (preserved — shown when seat has departure window) -->
+        <div id="departureSelectorPanel" class="hidden" style="margin-top:1.5rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.2); border-radius:0.75rem; padding:1.25rem;">
+          <p style="color:var(--color-text-muted); margin-bottom:0.75rem; font-size:14px;">Your flight window is ready. Select your departure date:</p>
+          <div id="departureDateOptions" style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.5rem;"></div>
+          <div id="departureConfirmMsg" class="hidden status-bar status-success" style="margin-top:8px; margin-bottom:0;"></div>
+          <div id="departureErrorMsg" class="hidden status-bar status-error" style="margin-top:8px; margin-bottom:0;"></div>
+        </div>
+
+        <!-- Resume title bar (preserved — shown when editing a specific resume) -->
+        <div id="resumeTitleBar" class="hidden" style="margin-top:1rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.2); border-radius:0.75rem; padding:0.75rem 1rem; display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <span style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">Editing Resume &bull;</span>
+            <span id="resumeTitleDisplay" style="font-weight:600; margin-left:0.25rem;"></span>
+          </div>
+          <span style="color:var(--color-text-faint); font-size:0.75rem;" id="resumeIdDisplay"></span>
+        </div>
+      </article>
+
+      <aside class="mc-panel mc-window-panel" aria-label="Airport window inspired system view">
+        <div class="mc-window-head">
+          <span>Apron view · Hidden activity now visible</span>
+          <span>Mission Control / Studio shell</span>
+        </div>
+        <div class="mc-window-view">
+          <div class="mc-tower-signal"></div>
+          <div class="mc-operator-blip one"><small>Recruiter desk</small><strong>Gate 03 · reviewing profile</strong></div>
+          <div class="mc-operator-blip two"><small>ATS filter</small><strong>Ramp check · parsing resume</strong></div>
+          <div class="mc-operator-blip three"><small>Referral line</small><strong>Pushback queued · waiting handoff</strong></div>
+          <div class="mc-plane" aria-hidden="true"></div>
+          <div class="mc-launchpad" aria-hidden="true"></div>
+          <div class="mc-smoke" aria-hidden="true"></div>
+          <div class="mc-rocket-loop" aria-hidden="true">
+            <div class="mc-rocket-body"><div class="mc-rocket-window"></div></div>
+            <div class="mc-rocket-fin-left"></div>
+            <div class="mc-rocket-fin-right"></div>
+            <div class="mc-rocket-flame"></div>
+            <div class="mc-rocket-trail"></div>
+          </div>
+          <div class="mc-taxi-line"></div>
+          <div class="mc-runway"></div>
+          <div class="mc-frame-lines"></div>
+          <div class="mc-glass-reflection"></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ── Control surfaces ────────────────────────────────────────────── -->
+    <section class="mc-control-band" id="control-surfaces">
+      <article class="mc-panel mc-section-card">
+        <h2 class="mc-h2">Arrival to departure</h2>
+        <p class="mc-subcopy">The one-page Studio tells a story of movement. You enter through the lounge, see the hidden field of action, then step into a clear path forward.</p>
+        <div class="mc-timeline">
+          <div class="mc-timeline-item">
+            <div class="mc-timeline-mark"></div>
+            <div class="mc-timeline-copy"><h4>Arrival</h4><p>Orient with one line of truth, one status, one invitation to look outward.</p></div>
+          </div>
+          <div class="mc-timeline-item">
+            <div class="mc-timeline-mark"></div>
+            <div class="mc-timeline-copy"><h4>Visibility</h4><p>Reveal the overlooked operators as active forces beyond the glass, with signals that read like real movement.</p></div>
+          </div>
+          <div class="mc-timeline-item">
+            <div class="mc-timeline-mark"></div>
+            <div class="mc-timeline-copy"><h4>Control</h4><p>Only after that reveal the practical tools, prompts, and next actions that let you steer.</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="mc-panel mc-section-card">
+        <h2 class="mc-h2">Control surfaces</h2>
+        <p class="mc-subcopy">Polished counters in the lounge — not stacked admin cards. Each surface carries your seat context forward.</p>
+        <div class="mc-control-stack">
+          <div class="mc-control-row">
             <div>
-                <h1 class="text-4xl font-bold cyan-glow mb-1">One Page Studio</h1>
-                <p class="text-slate-400 text-sm">AI-Powered Resume Builder &amp; Optimizer</p>
+              <strong>Boarding signal review</strong>
+              <div class="mc-footer-note">See seat state, route contract, and message history in one place.</div>
             </div>
-            <div class="flex items-center gap-3">
-                <button id="saveBackBtn" class="btn-success hidden" onclick="saveBackToCareerNavigator()">
-                    &#x2713; Save to Career Navigator
-                </button>
-               <a href="https://www.thispagedoesnotexist12345.com/" class="tap-target text-cyan-400 hover:text-cyan-300 text-sm">
-  &larr; Back to the Dock
-</a>
-
-            </div>
-        </div>
-
-        <!-- Status bar -->
-        <div id="statusBar" class="status-bar status-info hidden"></div>
-
-        <div id="departureSelectorPanel" class="hidden glass rounded-lg px-5 py-4 mb-4" style="border: 1px solid rgba(0,217,255,0.25);">
-            <p class="text-slate-300 mb-3" style="font-size:14px;">Your flight window is ready. Select your departure date:</p>
-            <div id="departureDateOptions" class="flex flex-col gap-2 mb-2"></div>
-            <div id="departureConfirmMsg" class="hidden status-bar status-success" style="margin-top:8px; margin-bottom:0;"></div>
-            <div id="departureErrorMsg" class="hidden status-bar status-error" style="margin-top:8px; margin-bottom:0;"></div>
-        </div>
-
-        <div id="resumeTitleBar" class="hidden glass rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
+            <span class="mc-tag">Primary</span>
+            <a class="mc-btn mc-btn-secondary" href="#" data-cta="boarding-signal">Open</a>
+          </div>
+          <div class="mc-control-row">
             <div>
-                <span class="text-slate-400 text-xs uppercase tracking-wider">Editing Resume &bull;</span>
-                <span id="resumeTitleDisplay" class="text-white font-semibold ml-1"></span>
+              <strong>Operator trace</strong>
+              <div class="mc-footer-note">Follow recruiter, ATS, referral, and follow-up handoffs across the journey.</div>
             </div>
-            <span class="text-slate-500 text-xs" id="resumeIdDisplay"></span>
+            <span class="mc-tag">Visibility</span>
+            <a class="mc-btn mc-btn-secondary" href="#" data-cta="operator-trace">Inspect</a>
+          </div>
+          <div class="mc-control-row">
+            <div>
+              <strong>One-page Studio entry</strong>
+              <div class="mc-footer-note">When you are ready, the lounge gives way to the tool without breaking the story.</div>
+            </div>
+            <span class="mc-tag">Gateway</span>
+            <a class="mc-btn mc-btn-primary" href="#studio-main" data-cta="studio-entry">Continue</a>
+          </div>
         </div>
+      </article>
+    </section>
 
+    <!-- ── One-Page Studio tool (preserved in full) ────────────────────── -->
+    <section class="mc-studio-section" id="studio-main">
+      <div class="mc-studio-header">
+        <div class="mc-studio-header-left">
+          <h2>One Page Studio</h2>
+          <p>AI-Powered Resume Builder &amp; Optimizer</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+          <!-- Status bar (inline in header area) -->
+          <div id="statusBar" class="status-bar status-info hidden" style="margin-bottom:0;"></div>
+        </div>
+      </div>
+      <div class="mc-studio-body">
         <!-- Tabs -->
-        <div class="flex gap-8 border-b border-slate-700 mb-8">
-            <button class="tab-active pb-4 font-semibold transition-colors" onclick="switchTab('editor', event)">Resume Editor</button>
-            <button class="tab-inactive pb-4 font-semibold transition-colors" onclick="switchTab('preview', event)">Live Preview</button>
-            <button class="tab-inactive pb-4 font-semibold transition-colors" onclick="switchTab('optimize', event)">AI Optimizer</button>
-            <button class="tab-inactive pb-4 font-semibold transition-colors" onclick="switchTab('export', event)">Export</button>
+        <div style="display:flex; gap:2rem; border-bottom:1px solid var(--color-border); margin-bottom:2rem;">
+          <button class="tab-active" style="padding-bottom:1rem; font-weight:600; transition:color 0.2s;" onclick="switchTab('editor', event)">Resume Editor</button>
+          <button class="tab-inactive" style="padding-bottom:1rem; font-weight:600; transition:color 0.2s;" onclick="switchTab('preview', event)">Live Preview</button>
+          <button class="tab-inactive" style="padding-bottom:1rem; font-weight:600; transition:color 0.2s;" onclick="switchTab('optimize', event)">AI Optimizer</button>
+          <button class="tab-inactive" style="padding-bottom:1rem; font-weight:600; transition:color 0.2s;" onclick="switchTab('export', event)">Export</button>
         </div>
-    </header><!-- /header -->
-    <main id="studio-main" role="main" class="max-w-7xl mx-auto">
+
         <!-- Editor Tab -->
-        <div id="editor-tab" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="glass rounded-lg p-6">
-                <h2 class="text-2xl font-bold cyan-glow mb-6">Edit Resume</h2>
-                <div class="mb-8">
-                    <h3 class="section-header text-lg font-semibold">Personal Information</h3>
-                    <input type="text" id="fullName" placeholder="Full Name" class="input-field mb-3">
-                    <input type="text" id="jobTitle" placeholder="Professional Title (e.g. Software Engineer)" class="input-field mb-3">
-                    <input type="email" id="email" placeholder="Email" class="input-field mb-3">
-                    <input type="tel" id="phone" placeholder="Phone" class="input-field mb-3">
-                    <input type="text" id="location" placeholder="Location (City, State)" class="input-field mb-3">
-                    <input type="url" id="linkedin" placeholder="LinkedIn URL" class="input-field mb-3">
-                    <input type="url" id="website" placeholder="Portfolio / Website URL" class="input-field mb-3">
-                    <textarea id="summary" placeholder="Professional Summary" class="input-field mb-3 resize-none" rows="3"></textarea>
-                </div>
-                <div class="mb-8">
-                    <h3 class="section-header text-lg font-semibold">Experience</h3>
-                    <div class="space-y-4" id="experienceList"></div>
-                    <button class="btn-secondary w-full mt-4" onclick="addExperience()">+ Add Experience</button>
-                </div>
-                <div class="mb-8">
-                    <h3 class="section-header text-lg font-semibold">Education</h3>
-                    <div class="space-y-4" id="educationList"></div>
-                    <button class="btn-secondary w-full mt-4" onclick="addEducation()">+ Add Education</button>
-                </div>
-                <div class="mb-8">
-                    <h3 class="section-header text-lg font-semibold">Skills</h3>
-                    <textarea id="skills" placeholder="Enter skills separated by commas" class="input-field resize-none" rows="3"></textarea>
-                </div>
-                <div class="mb-8">
-                    <h3 class="section-header text-lg font-semibold">Certifications</h3>
-                    <div class="space-y-3" id="certificationsList"></div>
-                    <button class="btn-secondary w-full mt-4" onclick="addCertification()">+ Add Certification</button>
-                </div>
-                <div class="mb-8">
-                    <h3 class="section-header text-lg font-semibold">Projects</h3>
-                    <div class="space-y-3" id="projectsList"></div>
-                    <button class="btn-secondary w-full mt-4" onclick="addProject()">+ Add Project</button>
-                </div>
+        <div id="editor-tab" style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+          <div class="glass" style="padding:1.5rem;">
+            <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">Edit Resume</h3>
+            <div style="margin-bottom:2rem;">
+              <h4 class="section-header" style="font-size:1rem; font-weight:600;">Personal Information</h4>
+              <input type="text" id="fullName" placeholder="Full Name" class="input-field" style="margin-bottom:0.75rem;">
+              <input type="text" id="jobTitle" placeholder="Professional Title (e.g. Software Engineer)" class="input-field" style="margin-bottom:0.75rem;">
+              <input type="email" id="email" placeholder="Email" class="input-field" style="margin-bottom:0.75rem;">
+              <input type="tel" id="phone" placeholder="Phone" class="input-field" style="margin-bottom:0.75rem;">
+              <input type="text" id="location" placeholder="Location (City, State)" class="input-field" style="margin-bottom:0.75rem;">
+              <input type="url" id="linkedin" placeholder="LinkedIn URL" class="input-field" style="margin-bottom:0.75rem;">
+              <input type="url" id="website" placeholder="Portfolio / Website URL" class="input-field" style="margin-bottom:0.75rem;">
+              <textarea id="summary" placeholder="Professional Summary" class="input-field" style="margin-bottom:0.75rem; resize:none;" rows="3"></textarea>
             </div>
-            <div class="glass rounded-lg p-6">
-                <h2 class="text-2xl font-bold cyan-glow mb-6">Live Preview</h2>
-                <div id="preview" class="resume-preview fade-in"></div>
+            <div style="margin-bottom:2rem;">
+              <h4 class="section-header" style="font-size:1rem; font-weight:600;">Experience</h4>
+              <div style="display:flex; flex-direction:column; gap:1rem;" id="experienceList"></div>
+              <button class="btn-secondary-studio" style="width:100%; margin-top:1rem; justify-content:center;" onclick="addExperience()">+ Add Experience</button>
             </div>
+            <div style="margin-bottom:2rem;">
+              <h4 class="section-header" style="font-size:1rem; font-weight:600;">Education</h4>
+              <div style="display:flex; flex-direction:column; gap:1rem;" id="educationList"></div>
+              <button class="btn-secondary-studio" style="width:100%; margin-top:1rem; justify-content:center;" onclick="addEducation()">+ Add Education</button>
+            </div>
+            <div style="margin-bottom:2rem;">
+              <h4 class="section-header" style="font-size:1rem; font-weight:600;">Skills</h4>
+              <textarea id="skills" placeholder="Enter skills separated by commas" class="input-field" style="resize:none;" rows="3"></textarea>
+            </div>
+            <div style="margin-bottom:2rem;">
+              <h4 class="section-header" style="font-size:1rem; font-weight:600;">Certifications</h4>
+              <div style="display:flex; flex-direction:column; gap:0.75rem;" id="certificationsList"></div>
+              <button class="btn-secondary-studio" style="width:100%; margin-top:1rem; justify-content:center;" onclick="addCertification()">+ Add Certification</button>
+            </div>
+            <div style="margin-bottom:2rem;">
+              <h4 class="section-header" style="font-size:1rem; font-weight:600;">Projects</h4>
+              <div style="display:flex; flex-direction:column; gap:0.75rem;" id="projectsList"></div>
+              <button class="btn-secondary-studio" style="width:100%; margin-top:1rem; justify-content:center;" onclick="addProject()">+ Add Project</button>
+            </div>
+          </div>
+          <div class="glass" style="padding:1.5rem;">
+            <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">Live Preview</h3>
+            <div id="preview" class="resume-preview fade-in"></div>
+          </div>
         </div>
 
         <!-- Optimize Tab -->
         <div id="optimize-tab" class="hidden">
-            <div class="glass rounded-lg p-8">
-                <h2 class="text-2xl font-bold cyan-glow mb-6">AI Resume Optimizer</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-accent p-6 rounded">
-                        <h3 class="text-lg font-semibold cyan-glow mb-4">&#x2728; Content Enhancement</h3>
-                        <p class="text-slate-300 mb-4">Improve your resume with AI-powered suggestions for stronger action verbs, better phrasing, and more impactful descriptions.</p>
-                        <button class="btn-primary w-full" onclick="optimizeContent()">Enhance Content</button>
-                    </div>
-                    <div class="glass-accent p-6 rounded">
-                        <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F3AF; ATS Optimization</h3>
-                        <p class="text-slate-300 mb-4">Ensure your resume passes Applicant Tracking Systems with keyword optimization and formatting suggestions.</p>
-                        <button class="btn-primary w-full" onclick="optimizeATS()">Check ATS Score</button>
-                    </div>
-                    <div class="glass-accent p-6 rounded">
-                        <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F4A1; Skill Recommendations</h3>
-                        <p class="text-slate-300 mb-4">Get AI-powered suggestions for skills to add based on your experience and industry trends.</p>
-                        <button class="btn-primary w-full" onclick="recommendSkills()">Get Recommendations</button>
-                    </div>
-                    <div class="glass-accent p-6 rounded">
-                        <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F4CA; Resume Analysis</h3>
-                        <p class="text-slate-300 mb-4">Comprehensive analysis of your resume including length, keyword density, and readability scores.</p>
-                        <button class="btn-primary w-full" onclick="analyzeResume()">Analyze Resume</button>
-                    </div>
-                </div>
-                <div id="optimizeResults" class="mt-8"></div>
+          <div class="glass" style="padding:2rem;">
+            <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">AI Resume Optimizer</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+              <div class="glass-accent" style="padding:1.5rem;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x2728; Content Enhancement</h4>
+                <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Improve your resume with AI-powered suggestions for stronger action verbs, better phrasing, and more impactful descriptions.</p>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="optimizeContent()">Enhance Content</button>
+              </div>
+              <div class="glass-accent" style="padding:1.5rem;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F3AF; ATS Optimization</h4>
+                <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Ensure your resume passes Applicant Tracking Systems with keyword optimization and formatting suggestions.</p>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="optimizeATS()">Check ATS Score</button>
+              </div>
+              <div class="glass-accent" style="padding:1.5rem;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4A1; Skill Recommendations</h4>
+                <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Get AI-powered suggestions for skills to add based on your experience and industry trends.</p>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="recommendSkills()">Get Recommendations</button>
+              </div>
+              <div class="glass-accent" style="padding:1.5rem;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4CA; Resume Analysis</h4>
+                <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Comprehensive analysis of your resume including length, keyword density, and readability scores.</p>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="analyzeResume()">Analyze Resume</button>
+              </div>
             </div>
+            <div id="optimizeResults" style="margin-top:2rem;"></div>
+          </div>
         </div>
 
         <!-- Export Tab -->
         <div id="export-tab" class="hidden">
-            <div class="glass rounded-lg p-8">
-                <h2 class="text-2xl font-bold cyan-glow mb-6">Export &amp; Download</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-accent p-6 rounded text-center">
-                        <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F4C4; PDF</h3>
-                        <p class="text-slate-300 mb-4">Download your resume as a professional PDF document.</p>
-                        <button class="btn-primary w-full" onclick="downloadPDF()">Download PDF</button>
-                    </div>
-                    <div class="glass-accent p-6 rounded text-center">
-                        <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F4CB; JSON</h3>
-                        <p class="text-slate-300 mb-4">Export your resume data as JSON for backup or integration.</p>
-                        <button class="btn-primary w-full" onclick="downloadJSON()">Download JSON</button>
-                    </div>
-                    <div class="glass-accent p-6 rounded text-center">
-                        <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F4BE; Save Draft</h3>
-                        <p class="text-slate-300 mb-4">Save your resume locally in your browser.</p>
-                        <button class="btn-primary w-full" onclick="saveDraft()">Save Draft</button>
-                    </div>
-                </div>
+          <div class="glass" style="padding:2rem;">
+            <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">Export &amp; Download</h3>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;">
+              <div class="glass-accent" style="padding:1.5rem; text-align:center;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4C4; PDF</h4>
+                <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Download your resume as a professional PDF document.</p>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="downloadPDF()">Download PDF</button>
+              </div>
+              <div class="glass-accent" style="padding:1.5rem; text-align:center;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4CB; JSON</h4>
+                <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Export your resume data as JSON for backup or integration.</p>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="downloadJSON()">Download JSON</button>
+              </div>
+              <div class="glass-accent" style="padding:1.5rem; text-align:center;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4BE; Save Draft</h4>
+                <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Save your resume locally in your browser.</p>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="saveDraft()">Save Draft</button>
+              </div>
             </div>
+          </div>
         </div>
-    </main><!-- /main -->
-</div>
+      </div><!-- /mc-studio-body -->
+    </section><!-- /studio-main -->
+
+  </main><!-- /mc-bands -->
+</div><!-- /mc-shell -->
 
 <script>
 // ── TBT reduction: yield between long init tasks ────────────────────────────
 function yieldToMain() {
-    return new Promise(resolve => {
-        if (typeof scheduler !== 'undefined' && scheduler.postTask) {
-            scheduler.postTask(resolve, { priority: 'background' });
-        } else {
-            setTimeout(resolve, 0);
-        }
+  return new Promise(resolve => {
+    if (typeof scheduler !== 'undefined' && scheduler.postTask) {
+      scheduler.postTask(resolve, { priority: 'background' });
+    } else {
+      setTimeout(resolve, 0);
+    }
+  });
+}
+
+// ── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(tab, event) {
+  ['editor','optimize','export'].forEach(t => {
+    const el = document.getElementById(t + '-tab');
+    if (el) el.classList.toggle('hidden', t !== tab);
+  });
+  if (event && event.currentTarget) {
+    document.querySelectorAll('[onclick^="switchTab"]').forEach(btn => {
+      btn.className = btn === event.currentTarget ? 'tab-active' : 'tab-inactive';
+      btn.style.paddingBottom = '1rem';
+      btn.style.fontWeight = '600';
+      btn.style.transition = 'color 0.2s';
     });
+  }
 }
 
 // ============================================================
@@ -276,645 +628,639 @@ let currentResumeData = {};
 let hasUnsavedChanges = false;
 
 // ============================================================
+// STATUS BAR
+// ============================================================
+function showStatus(type, msg) {
+  const bar = document.getElementById('statusBar');
+  if (!bar) return;
+  bar.className = 'status-bar status-' + type;
+  bar.innerHTML = (type === 'loading' ? '<span class="spinner"></span>' : '') + msg;
+  bar.classList.remove('hidden');
+}
+function hideStatus() {
+  const bar = document.getElementById('statusBar');
+  if (bar) bar.classList.add('hidden');
+}
+
+// ============================================================
 // CAREER NAVIGATOR INTEGRATION
 // ============================================================
 const BASE44_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Resume';
 
 function getAuthToken() {
-    const keys = ['base44_token', 'auth_token', 'access_token', 'token'];
-    for (const key of keys) {
-        const val = localStorage.getItem(key);
-        if (val) return val;
-    }
-    for (const key of keys) {
-        const val = sessionStorage.getItem(key);
-        if (val) return val;
-    }
-    return null;
+  const keys = ['base44_token', 'auth_token', 'access_token', 'token'];
+  for (const key of keys) {
+    const val = localStorage.getItem(key);
+    if (val) return val;
+  }
+  for (const key of keys) {
+    const val = sessionStorage.getItem(key);
+    if (val) return val;
+  }
+  return null;
 }
 
 async function loadResumeFromCareerNavigator(resumeId) {
-    showStatus('loading', 'Loading resume from Career Navigator...');
-    try {
-        const token = getAuthToken();
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = 'Bearer ' + token;
-
-        const res = await fetch(BASE44_API + '/' + resumeId, { headers });
-        if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-        const resume = await res.json();
-        currentResumeData = resume;
-        populateFormFromResume(resume);
-        showStatus('success', 'Resume loaded from Career Navigator');
-        document.getElementById('saveBackBtn').classList.remove('hidden');
-        document.getElementById('resumeTitleBar').classList.remove('hidden');
-        document.getElementById('resumeTitleDisplay').textContent = resume.title || 'Untitled Resume';
-        document.getElementById('resumeIdDisplay').textContent = 'ID: ' + resumeId;
-        setTimeout(() => hideStatus(), 3000);
-    } catch (err) {
-        showStatus('error', 'Could not load resume via API — showing local draft. (' + err.message + ')');
-        loadLocalDraft();
-        setTimeout(() => hideStatus(), 5000);
-    }
+  showStatus('loading', 'Loading resume from Career Navigator...');
+  try {
+    const token = getAuthToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const res = await fetch(BASE44_API + '/' + resumeId, { headers });
+    if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+    const resume = await res.json();
+    currentResumeData = resume;
+    populateFormFromResume(resume);
+    showStatus('success', 'Resume loaded from Career Navigator');
+    document.getElementById('saveBackBtn').classList.remove('hidden');
+    document.getElementById('resumeTitleBar').classList.remove('hidden');
+    document.getElementById('resumeTitleDisplay').textContent = resume.title || 'Untitled Resume';
+    document.getElementById('resumeIdDisplay').textContent = 'ID: ' + resumeId;
+    setTimeout(() => hideStatus(), 3000);
+  } catch (err) {
+    showStatus('error', 'Could not load resume via API — showing local draft. (' + err.message + ')');
+    loadLocalDraft();
+    setTimeout(() => hideStatus(), 5000);
+  }
 }
 
 async function saveBackToCareerNavigator() {
-    if (!currentResumeId) return;
-    showStatus('loading', 'Saving resume to Career Navigator...');
-    try {
-        const token = getAuthToken();
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = 'Bearer ' + token;
-
-        const payload = buildResumePayload();
-        const res = await fetch(BASE44_API + '/' + currentResumeId, {
-            method: 'PUT',
-            headers,
-            body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
-        hasUnsavedChanges = false;
-        showStatus('success', 'Resume saved to Career Navigator successfully!');
-        setTimeout(() => hideStatus(), 3000);
-    } catch (err) {
-        showStatus('error', 'Save failed: ' + err.message + '. Your changes are saved locally.');
-        saveDraft();
-    }
+  if (!currentResumeId) return;
+  showStatus('loading', 'Saving resume to Career Navigator...');
+  try {
+    const token = getAuthToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const payload = buildResumePayload();
+    const res = await fetch(BASE44_API + '/' + currentResumeId, {
+      method: 'PUT', headers, body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+    hasUnsavedChanges = false;
+    showStatus('success', 'Resume saved to Career Navigator successfully!');
+    setTimeout(() => hideStatus(), 3000);
+  } catch (err) {
+    showStatus('error', 'Save failed: ' + err.message + '. Your changes are saved locally.');
+    saveDraft();
+  }
 }
 
 function buildResumePayload() {
-    const experience = [];
-    document.querySelectorAll('#experienceList .exp-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input, textarea');
-        experience.push({
-            title: inputs[0]?.value || '',
-            company: inputs[1]?.value || '',
-            start_date: inputs[2]?.value || '',
-            end_date: inputs[3]?.value || '',
-            description: inputs[4]?.value || ''
-        });
+  const experience = [];
+  document.querySelectorAll('#experienceList .exp-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input, textarea');
+    experience.push({
+      title: inputs[0]?.value || '', company: inputs[1]?.value || '',
+      start_date: inputs[2]?.value || '', end_date: inputs[3]?.value || '',
+      description: inputs[4]?.value || ''
     });
-
-    const education = [];
-    document.querySelectorAll('#educationList .edu-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input');
-        education.push({
-            degree: inputs[0]?.value || '',
-            institution: inputs[1]?.value || '',
-            start_date: inputs[2]?.value || '',
-            end_date: inputs[3]?.value || ''
-        });
+  });
+  const education = [];
+  document.querySelectorAll('#educationList .edu-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input');
+    education.push({
+      degree: inputs[0]?.value || '', institution: inputs[1]?.value || '',
+      start_date: inputs[2]?.value || '', end_date: inputs[3]?.value || ''
     });
-
-    const certifications = [];
-    document.querySelectorAll('#certificationsList .cert-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input');
-        certifications.push({
-            name: inputs[0]?.value || '',
-            issuer: inputs[1]?.value || '',
-            date: inputs[2]?.value || ''
-        });
-    });
-
-    const projects = [];
-    document.querySelectorAll('#projectsList .project-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input, textarea');
-        projects.push({
-            name: inputs[0]?.value || '',
-            url: inputs[1]?.value || '',
-            description: inputs[2]?.value || ''
-        });
-    });
-
-    const skillsRaw = document.getElementById('skills')?.value || '';
-    const skills = skillsRaw.split(',').map(s => s.trim()).filter(Boolean).map(s => ({ name: s, level: 'intermediate' }));
-
-    return {
-        ...currentResumeData,
-        title: document.getElementById('resumeTitleDisplay')?.textContent || currentResumeData.title || 'My Resume',
-        personal_info: {
-            full_name: document.getElementById('fullName')?.value || '',
-            professional_title: document.getElementById('jobTitle')?.value || '',
-            email: document.getElementById('email')?.value || '',
-            phone: document.getElementById('phone')?.value || '',
-            location: document.getElementById('location')?.value || '',
-            linkedin_url: document.getElementById('linkedin')?.value || '',
-            website: document.getElementById('website')?.value || '',
-            summary: document.getElementById('summary')?.value || ''
-        },
-        experience,
-        education,
-        skills,
-        certifications,
-        projects
-    };
+  });
+  const certifications = [];
+  document.querySelectorAll('#certificationsList .cert-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input');
+    certifications.push({ name: inputs[0]?.value || '', issuer: inputs[1]?.value || '', date: inputs[2]?.value || '' });
+  });
+  const projects = [];
+  document.querySelectorAll('#projectsList .project-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input, textarea');
+    projects.push({ name: inputs[0]?.value || '', url: inputs[1]?.value || '', description: inputs[2]?.value || '' });
+  });
+  return {
+    title: document.getElementById('fullName')?.value || 'Untitled Resume',
+    personal_info: {
+      full_name: document.getElementById('fullName')?.value || '',
+      professional_title: document.getElementById('jobTitle')?.value || '',
+      email: document.getElementById('email')?.value || '',
+      phone: document.getElementById('phone')?.value || '',
+      location: document.getElementById('location')?.value || '',
+      linkedin: document.getElementById('linkedin')?.value || '',
+      website: document.getElementById('website')?.value || '',
+      summary: document.getElementById('summary')?.value || ''
+    },
+    experience, education,
+    skills: (document.getElementById('skills')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
+    certifications, projects
+  };
 }
 
 function populateFormFromResume(resume) {
-    const pi = resume.personal_info || {};
-    setVal('fullName', pi.full_name || pi.name || '');
-    setVal('jobTitle', pi.professional_title || pi.title || '');
-    setVal('email', pi.email || '');
-    setVal('phone', pi.phone || '');
-    setVal('location', pi.location || pi.city || '');
-    setVal('linkedin', pi.linkedin_url || pi.linkedin || '');
-    setVal('website', pi.website || pi.portfolio_url || '');
-    setVal('summary', pi.summary || pi.professional_summary || '');
-
-    document.getElementById('experienceList').innerHTML = '';
-    (resume.experience || []).forEach(exp => addExperience(exp));
-
-    document.getElementById('educationList').innerHTML = '';
-    (resume.education || []).forEach(edu => addEducation(edu));
-
-    const skillsArr = resume.skills || [];
-    const skillsStr = skillsArr.map(s => (typeof s === 'string' ? s : s.name || '')).filter(Boolean).join(', ');
-    setVal('skills', skillsStr);
-
-    document.getElementById('certificationsList').innerHTML = '';
-    (resume.certifications || []).forEach(cert => addCertification(cert));
-
-    document.getElementById('projectsList').innerHTML = '';
-    (resume.projects || []).forEach(proj => addProject(proj));
-
-    updatePreview();
+  const pi = resume.personal_info || {};
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('fullName', pi.full_name || resume.title);
+  set('jobTitle', pi.professional_title);
+  set('email', pi.email);
+  set('phone', pi.phone);
+  set('location', pi.location);
+  set('linkedin', pi.linkedin);
+  set('website', pi.website);
+  set('summary', pi.summary);
+  document.getElementById('experienceList').innerHTML = '';
+  (resume.experience || []).forEach(exp => addExperience(exp));
+  document.getElementById('educationList').innerHTML = '';
+  (resume.education || []).forEach(edu => addEducation(edu));
+  document.getElementById('skills').value = (resume.skills || []).join(', ');
+  document.getElementById('certificationsList').innerHTML = '';
+  (resume.certifications || []).forEach(cert => addCertification(cert));
+  document.getElementById('projectsList').innerHTML = '';
+  (resume.projects || []).forEach(proj => addProject(proj));
+  updatePreview();
 }
 
-function setVal(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.value = value || '';
-}
-
-function showStatus(type, message) {
-    const bar = document.getElementById('statusBar');
-    bar.classList.remove('hidden', 'status-loading', 'status-success', 'status-error', 'status-info');
-    bar.classList.add('status-' + type);
-    if (type === 'loading') {
-        bar.innerHTML = '<span class="spinner"></span>' + message;
-    } else if (type === 'success') {
-        bar.innerHTML = '&#x2713; ' + message;
-    } else if (type === 'error') {
-        bar.innerHTML = '&#x26A0; ' + message;
-    } else {
-        bar.innerHTML = '&#x2139; ' + message;
-    }
-}
-function hideStatus() {
-    document.getElementById('statusBar').classList.add('hidden');
-}
-
-function switchTab(tabName, event) {
-    ['editor', 'optimize', 'export'].forEach(t => {
-        document.getElementById(t + '-tab').classList.add('hidden');
-    });
-    document.getElementById(tabName + '-tab').classList.remove('hidden');
-    document.querySelectorAll('[onclick*="switchTab"]').forEach(btn => {
-        btn.classList.remove('tab-active');
-        btn.classList.add('tab-inactive');
-    });
-    if (event && event.target) {
-        event.target.classList.remove('tab-inactive');
-        event.target.classList.add('tab-active');
-    }
-    if (tabName === 'preview') updatePreview();
-}
-
+// ============================================================
+// RESUME BUILDER — add/remove entries
+// ============================================================
 function addExperience(data = {}) {
-    const list = document.getElementById('experienceList');
-    const div = document.createElement('div');
-    div.className = 'glass-accent p-4 rounded exp-entry';
-    div.innerHTML = `
-        <input type="text" placeholder="Job Title" class="input-field mb-2" value="${esc(data.title || '')}">
-        <input type="text" placeholder="Company" class="input-field mb-2" value="${esc(data.company || data.company_name || '')}">
-        <div class="grid grid-cols-2 gap-2 mb-2">
-            <input type="text" placeholder="Start Date (e.g. Jan 2022)" class="input-field" value="${esc(data.start_date || '')}">
-            <input type="text" placeholder="End Date (or Present)" class="input-field" value="${esc(data.end_date || data.is_current ? 'Present' : '')}">
-        </div>
-        <textarea placeholder="Description / Accomplishments" class="input-field resize-none mb-2" rows="3">${esc(data.description || data.responsibilities || '')}</textarea>
-        <button class="btn-danger w-full" onclick="this.closest('.exp-entry').remove(); updatePreview()">Remove</button>
-    `;
-    list.appendChild(div);
-    updatePreview();
+  const list = document.getElementById('experienceList');
+  const div = document.createElement('div');
+  div.className = 'glass-accent exp-entry';
+  div.style.cssText = 'padding:1rem; border-radius:0.5rem;';
+  div.innerHTML = `
+    <input type="text" placeholder="Job Title" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.title || '')}">
+    <input type="text" placeholder="Company" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.company || '')}">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+      <input type="text" placeholder="Start Date" class="input-field" value="${esc(data.start_date || '')}">
+      <input type="text" placeholder="End Date (or Present)" class="input-field" value="${esc(data.end_date || '')}">
+    </div>
+    <textarea placeholder="Description / Achievements" class="input-field" style="resize:none; margin-bottom:0.5rem;" rows="3">${esc(data.description || '')}</textarea>
+    <button class="btn-danger" style="width:100%;" onclick="this.closest('.exp-entry').remove(); updatePreview()">Remove</button>
+  `;
+  list.appendChild(div);
+  updatePreview();
 }
 
 function addEducation(data = {}) {
-    const list = document.getElementById('educationList');
-    const div = document.createElement('div');
-    div.className = 'glass-accent p-4 rounded edu-entry';
-    div.innerHTML = `
-        <input type="text" placeholder="Degree / Qualification" class="input-field mb-2" value="${esc(data.degree || data.field_of_study || '')}">
-        <input type="text" placeholder="Institution" class="input-field mb-2" value="${esc(data.institution || data.school || '')}">
-        <div class="grid grid-cols-2 gap-2 mb-2">
-            <input type="text" placeholder="Start Year" class="input-field" value="${esc(data.start_date || '')}">
-            <input type="text" placeholder="End Year (or Expected)" class="input-field" value="${esc(data.end_date || data.graduation_year || '')}">
-        </div>
-        <button class="btn-danger w-full" onclick="this.closest('.edu-entry').remove(); updatePreview()">Remove</button>
-    `;
-    list.appendChild(div);
-    updatePreview();
+  const list = document.getElementById('educationList');
+  const div = document.createElement('div');
+  div.className = 'glass-accent edu-entry';
+  div.style.cssText = 'padding:1rem; border-radius:0.5rem;';
+  div.innerHTML = `
+    <input type="text" placeholder="Degree / Qualification" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.degree || data.field_of_study || '')}">
+    <input type="text" placeholder="Institution" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.institution || data.school || '')}">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;">
+      <input type="text" placeholder="Start Year" class="input-field" value="${esc(data.start_date || '')}">
+      <input type="text" placeholder="End Year (or Expected)" class="input-field" value="${esc(data.end_date || data.graduation_year || '')}">
+    </div>
+    <button class="btn-danger" style="width:100%;" onclick="this.closest('.edu-entry').remove(); updatePreview()">Remove</button>
+  `;
+  list.appendChild(div);
+  updatePreview();
 }
 
 function addCertification(data = {}) {
-    const list = document.getElementById('certificationsList');
-    const div = document.createElement('div');
-    div.className = 'glass-accent p-4 rounded cert-entry';
-    div.innerHTML = `
-        <input type="text" placeholder="Certification Name" class="input-field mb-2" value="${esc(data.name || '')}">
-        <input type="text" placeholder="Issuing Organization" class="input-field mb-2" value="${esc(data.issuer || data.issuing_organization || '')}">
-        <input type="text" placeholder="Date Issued" class="input-field mb-2" value="${esc(data.date || data.issue_date || '')}">
-        <button class="btn-danger w-full" onclick="this.closest('.cert-entry').remove(); updatePreview()">Remove</button>
-    `;
-    list.appendChild(div);
-    updatePreview();
+  const list = document.getElementById('certificationsList');
+  const div = document.createElement('div');
+  div.className = 'glass-accent cert-entry';
+  div.style.cssText = 'padding:1rem; border-radius:0.5rem;';
+  div.innerHTML = `
+    <input type="text" placeholder="Certification Name" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.name || '')}">
+    <input type="text" placeholder="Issuing Organization" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.issuer || data.issuing_organization || '')}">
+    <input type="text" placeholder="Date Issued" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.date || data.issue_date || '')}">
+    <button class="btn-danger" style="width:100%;" onclick="this.closest('.cert-entry').remove(); updatePreview()">Remove</button>
+  `;
+  list.appendChild(div);
+  updatePreview();
 }
 
 function addProject(data = {}) {
-    const list = document.getElementById('projectsList');
-    const div = document.createElement('div');
-    div.className = 'glass-accent p-4 rounded project-entry';
-    div.innerHTML = `
-        <input type="text" placeholder="Project Name" class="input-field mb-2" value="${esc(data.name || data.title || '')}">
-        <input type="url" placeholder="Project URL (optional)" class="input-field mb-2" value="${esc(data.url || data.link || '')}">
-        <textarea placeholder="Project Description" class="input-field resize-none mb-2" rows="2">${esc(data.description || '')}</textarea>
-        <button class="btn-danger w-full" onclick="this.closest('.project-entry').remove(); updatePreview()">Remove</button>
-    `;
-    list.appendChild(div);
-    updatePreview();
+  const list = document.getElementById('projectsList');
+  const div = document.createElement('div');
+  div.className = 'glass-accent project-entry';
+  div.style.cssText = 'padding:1rem; border-radius:0.5rem;';
+  div.innerHTML = `
+    <input type="text" placeholder="Project Name" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.name || data.title || '')}">
+    <input type="url" placeholder="Project URL (optional)" class="input-field" style="margin-bottom:0.5rem;" value="${esc(data.url || data.link || '')}">
+    <textarea placeholder="Project Description" class="input-field" style="resize:none; margin-bottom:0.5rem;" rows="2">${esc(data.description || '')}</textarea>
+    <button class="btn-danger" style="width:100%;" onclick="this.closest('.project-entry').remove(); updatePreview()">Remove</button>
+  `;
+  list.appendChild(div);
+  updatePreview();
 }
 
 function esc(str) {
-    return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ============================================================
+// LIVE PREVIEW
+// ============================================================
 function updatePreview() {
-    const fullName = document.getElementById('fullName')?.value || '';
-    const jobTitle = document.getElementById('jobTitle')?.value || '';
-    const email = document.getElementById('email')?.value || '';
-    const phone = document.getElementById('phone')?.value || '';
-    const location = document.getElementById('location')?.value || '';
-    const linkedin = document.getElementById('linkedin')?.value || '';
-    const website = document.getElementById('website')?.value || '';
-    const summary = document.getElementById('summary')?.value || '';
-
-    let contactParts = [email, phone, location].filter(Boolean);
-    if (linkedin) contactParts.push('<a href="' + linkedin + '" style="color:#0099cc">' + linkedin.replace(/https?:\/\//, '') + '</a>');
-    if (website) contactParts.push('<a href="' + website + '" style="color:#0099cc">' + website.replace(/https?:\/\//, '') + '</a>');
-
-    let expHTML = '';
-    document.querySelectorAll('#experienceList .exp-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input, textarea');
-        const title = inputs[0]?.value, company = inputs[1]?.value;
-        const start = inputs[2]?.value, end = inputs[3]?.value;
-        const desc = inputs[4]?.value;
-        if (title || company) {
-            expHTML += '<div style="margin-bottom:10px">';
-            expHTML += '<div class="exp-title">' + esc(title) + '</div>';
-            expHTML += '<div class="exp-meta">' + [esc(company), [esc(start), esc(end)].filter(Boolean).join(' — ')].filter(Boolean).join(' &bull; ') + '</div>';
-            if (desc) expHTML += '<p style="white-space:pre-line">' + esc(desc) + '</p>';
-            expHTML += '</div>';
-        }
-    });
-
-    let eduHTML = '';
-    document.querySelectorAll('#educationList .edu-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input');
-        const degree = inputs[0]?.value, school = inputs[1]?.value;
-        const start = inputs[2]?.value, end = inputs[3]?.value;
-        if (degree || school) {
-            eduHTML += '<div style="margin-bottom:8px">';
-            eduHTML += '<div class="exp-title">' + esc(degree) + '</div>';
-            eduHTML += '<div class="exp-meta">' + [esc(school), [esc(start), esc(end)].filter(Boolean).join(' — ')].filter(Boolean).join(' &bull; ') + '</div>';
-            eduHTML += '</div>';
-        }
-    });
-
-    const skillsRaw = document.getElementById('skills')?.value || '';
-    let skillsHTML = skillsRaw.split(',').map(s => s.trim()).filter(Boolean).map(s => '<span class="skill-tag">' + esc(s) + '</span>').join('');
-
-    let certHTML = '';
-    document.querySelectorAll('#certificationsList .cert-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input');
-        const name = inputs[0]?.value, issuer = inputs[1]?.value, date = inputs[2]?.value;
-        if (name) {
-            certHTML += '<div class="exp-meta">' + esc(name) + (issuer ? ' &bull; ' + esc(issuer) : '') + (date ? ' (' + esc(date) + ')' : '') + '</div>';
-        }
-    });
-
-    let projHTML = '';
-    document.querySelectorAll('#projectsList .project-entry').forEach(entry => {
-        const inputs = entry.querySelectorAll('input, textarea');
-        const name = inputs[0]?.value, url = inputs[1]?.value, desc = inputs[2]?.value;
-        if (name) {
-            projHTML += '<div style="margin-bottom:8px">';
-            projHTML += '<div class="exp-title">' + (url ? '<a href="' + esc(url) + '" style="color:#0099cc">' + esc(name) + '</a>' : esc(name)) + '</div>';
-            if (desc) projHTML += '<p>' + esc(desc) + '</p>';
-            projHTML += '</div>';
-        }
-    });
-
-    document.getElementById('preview').innerHTML = `
-        <h1>${esc(fullName)}</h1>
-        ${jobTitle ? '<div style="font-size:14px;color:#444;margin-bottom:4px">' + esc(jobTitle) + '</div>' : ''}
-        <div class="contact-line">${contactParts.join(' &nbsp;|&nbsp; ')}</div>
-        ${summary ? '<div class="section-title">Professional Summary</div><p style="white-space:pre-line">' + esc(summary) + '</p>' : ''}
-        ${expHTML ? '<div class="section-title">Experience</div>' + expHTML : ''}
-        ${eduHTML ? '<div class="section-title">Education</div>' + eduHTML : ''}
-        ${skillsHTML ? '<div class="section-title">Skills</div><div style="margin-top:4px">' + skillsHTML + '</div>' : ''}
-        ${certHTML ? '<div class="section-title">Certifications</div>' + certHTML : ''}
-        ${projHTML ? '<div class="section-title">Projects</div>' + projHTML : ''}
-    `;
-    hasUnsavedChanges = true;
+  const fullName = document.getElementById('fullName')?.value || '';
+  const jobTitle = document.getElementById('jobTitle')?.value || '';
+  const email = document.getElementById('email')?.value || '';
+  const phone = document.getElementById('phone')?.value || '';
+  const location = document.getElementById('location')?.value || '';
+  const linkedin = document.getElementById('linkedin')?.value || '';
+  const website = document.getElementById('website')?.value || '';
+  const summary = document.getElementById('summary')?.value || '';
+  let contactParts = [email, phone, location].filter(Boolean);
+  if (linkedin) contactParts.push('<a href="' + linkedin + '" style="color:#0099cc">' + linkedin.replace(/https?:\/\//, '') + '</a>');
+  if (website) contactParts.push('<a href="' + website + '" style="color:#0099cc">' + website.replace(/https?:\/\//, '') + '</a>');
+  let expHTML = '';
+  document.querySelectorAll('#experienceList .exp-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input, textarea');
+    const title = inputs[0]?.value, company = inputs[1]?.value;
+    const start = inputs[2]?.value, end = inputs[3]?.value, desc = inputs[4]?.value;
+    if (title || company) {
+      expHTML += '<div style="margin-bottom:10px">';
+      expHTML += '<div class="exp-title">' + esc(title) + '</div>';
+      expHTML += '<div class="exp-meta">' + [esc(company), [esc(start), esc(end)].filter(Boolean).join(' — ')].filter(Boolean).join(' &bull; ') + '</div>';
+      if (desc) expHTML += '<p style="white-space:pre-line">' + esc(desc) + '</p>';
+      expHTML += '</div>';
+    }
+  });
+  let eduHTML = '';
+  document.querySelectorAll('#educationList .edu-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input');
+    const degree = inputs[0]?.value, school = inputs[1]?.value;
+    const start = inputs[2]?.value, end = inputs[3]?.value;
+    if (degree || school) {
+      eduHTML += '<div style="margin-bottom:8px">';
+      eduHTML += '<div class="exp-title">' + esc(degree) + '</div>';
+      eduHTML += '<div class="exp-meta">' + [esc(school), [esc(start), esc(end)].filter(Boolean).join(' — ')].filter(Boolean).join(' &bull; ') + '</div>';
+      eduHTML += '</div>';
+    }
+  });
+  const skillsRaw = document.getElementById('skills')?.value || '';
+  let skillsHTML = skillsRaw.split(',').map(s => s.trim()).filter(Boolean).map(s => '<span class="skill-tag">' + esc(s) + '</span>').join('');
+  let certHTML = '';
+  document.querySelectorAll('#certificationsList .cert-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input');
+    const name = inputs[0]?.value, issuer = inputs[1]?.value, date = inputs[2]?.value;
+    if (name) certHTML += '<div class="exp-meta">' + esc(name) + (issuer ? ' &bull; ' + esc(issuer) : '') + (date ? ' (' + esc(date) + ')' : '') + '</div>';
+  });
+  let projHTML = '';
+  document.querySelectorAll('#projectsList .project-entry').forEach(entry => {
+    const inputs = entry.querySelectorAll('input, textarea');
+    const name = inputs[0]?.value, url = inputs[1]?.value, desc = inputs[2]?.value;
+    if (name) {
+      projHTML += '<div style="margin-bottom:8px">';
+      projHTML += '<div class="exp-title">' + (url ? '<a href="' + esc(url) + '" style="color:#0099cc">' + esc(name) + '</a>' : esc(name)) + '</div>';
+      if (desc) projHTML += '<p>' + esc(desc) + '</p>';
+      projHTML += '</div>';
+    }
+  });
+  document.getElementById('preview').innerHTML = `
+    <h1>${esc(fullName)}</h1>
+    ${jobTitle ? '<div style="font-size:14px;color:#444;margin-bottom:4px">' + esc(jobTitle) + '</div>' : ''}
+    <div class="contact-line">${contactParts.join(' &nbsp;|&nbsp; ')}</div>
+    ${summary ? '<div class="section-title">Professional Summary</div><p style="white-space:pre-line">' + esc(summary) + '</p>' : ''}
+    ${expHTML ? '<div class="section-title">Experience</div>' + expHTML : ''}
+    ${eduHTML ? '<div class="section-title">Education</div>' + eduHTML : ''}
+    ${skillsHTML ? '<div class="section-title">Skills</div><div style="margin-top:4px">' + skillsHTML + '</div>' : ''}
+    ${certHTML ? '<div class="section-title">Certifications</div>' + certHTML : ''}
+    ${projHTML ? '<div class="section-title">Projects</div>' + projHTML : ''}
+  `;
+  hasUnsavedChanges = true;
 }
 
+// ============================================================
+// AI OPTIMIZER
+// ============================================================
 function optimizeContent() {
-    document.getElementById('optimizeResults').innerHTML = `
-        <div class="glass-accent p-6 rounded">
-            <h3 class="text-lg font-semibold cyan-glow mb-4">&#x2728; Content Enhancement Suggestions</h3>
-            <ul class="space-y-2 text-slate-300">
-                <li>&#x2713; Add quantifiable metrics to all achievements (e.g. "increased revenue by 30%")</li>
-                <li>&#x2713; Use stronger action verbs: "Led" &rarr; "Spearheaded", "Managed" &rarr; "Directed"</li>
-                <li>&#x2713; Add impact statements to each role</li>
-                <li>&#x2713; Keep descriptions to 2-4 bullet points per role</li>
-            </ul>
-        </div>
-    `;
+  document.getElementById('optimizeResults').innerHTML = `
+    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
+      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x2728; Content Enhancement Suggestions</h4>
+      <ul style="display:flex; flex-direction:column; gap:0.5rem; color:var(--color-text-muted);">
+        <li>&#x2713; Add quantifiable metrics to all achievements (e.g. "increased revenue by 30%")</li>
+        <li>&#x2713; Use stronger action verbs: "Led" &rarr; "Spearheaded", "Managed" &rarr; "Directed"</li>
+        <li>&#x2713; Add impact statements to each role</li>
+        <li>&#x2713; Keep descriptions to 2-4 bullet points per role</li>
+      </ul>
+    </div>`;
 }
 
 function optimizeATS() {
-    const skillCount = (document.getElementById('skills')?.value || '').split(',').filter(Boolean).length;
-    const score = Math.min(100, 60 + skillCount * 3);
-    document.getElementById('optimizeResults').innerHTML = `
-        <div class="glass-accent p-6 rounded">
-            <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F3AF; ATS Compatibility Score: ${score}/100</h3>
-            <div class="space-y-2 text-slate-300">
-                <p>&#x2713; Resume structure is ATS-friendly</p>
-                <p>${skillCount > 5 ? '&#x2713;' : '&#x26A0;'} Skills listed: ${skillCount} ${skillCount <= 5 ? '(add more industry keywords)' : '(good)'}</p>
-                <p>&#x2713; No tables or complex formatting detected</p>
-                <p>&#x26A0; Consider adding a job-specific keyword summary section</p>
-            </div>
-        </div>
-    `;
+  const skillCount = (document.getElementById('skills')?.value || '').split(',').filter(Boolean).length;
+  const score = Math.min(100, 60 + skillCount * 3);
+  document.getElementById('optimizeResults').innerHTML = `
+    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
+      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F3AF; ATS Compatibility Score: ${score}/100</h4>
+      <div style="display:flex; flex-direction:column; gap:0.5rem; color:var(--color-text-muted);">
+        <p>&#x2713; Resume structure is ATS-friendly</p>
+        <p>${skillCount > 5 ? '&#x2713;' : '&#x26A0;'} Skills listed: ${skillCount} ${skillCount <= 5 ? '(add more industry keywords)' : '(good)'}</p>
+        <p>&#x2713; No tables or complex formatting detected</p>
+        <p>&#x26A0; Consider adding a job-specific keyword summary section</p>
+      </div>
+    </div>`;
 }
 
 function recommendSkills() {
-    document.getElementById('optimizeResults').innerHTML = `
-        <div class="glass-accent p-6 rounded">
-            <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F4A1; Recommended Skills to Add</h3>
-            <div class="flex flex-wrap gap-2">
-                ${['Machine Learning','Cloud Architecture','Agile / Scrum','API Design','Team Leadership','Data Analysis','CI/CD','TypeScript'].map(s => '<span class="bg-cyan-500/20 text-cyan-300 px-3 py-1 rounded cursor-pointer" onclick="addSkillTag(\'' + s + '\')">' + s + ' +</span>').join('')}
-            </div>
-            <p class="text-slate-500 text-xs mt-3">Click a skill to add it to your resume.</p>
-        </div>
-    `;
+  document.getElementById('optimizeResults').innerHTML = `
+    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
+      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4A1; Recommended Skills to Add</h4>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+        ${['Machine Learning','Cloud Architecture','Agile / Scrum','API Design','Team Leadership','Data Analysis','CI/CD','TypeScript'].map(s => '<span style="background:rgba(88,199,215,0.15); color:var(--color-primary); padding:4px 12px; border-radius:999px; cursor:pointer;" onclick="addSkillTag(\'' + s + '\')">' + s + ' +</span>').join('')}
+      </div>
+      <p style="color:var(--color-text-faint); font-size:0.75rem; margin-top:0.75rem;">Click a skill to add it to your resume.</p>
+    </div>`;
 }
 
 function addSkillTag(skill) {
-    const el = document.getElementById('skills');
-    const current = el.value.trim();
-    el.value = current ? current + ', ' + skill : skill;
-    updatePreview();
+  const el = document.getElementById('skills');
+  const current = el.value.trim();
+  el.value = current ? current + ', ' + skill : skill;
+  updatePreview();
 }
 
 function analyzeResume() {
-    const expCount = document.querySelectorAll('#experienceList .exp-entry').length;
-    const eduCount = document.querySelectorAll('#educationList .edu-entry').length;
-    const skillCount = (document.getElementById('skills')?.value || '').split(',').filter(Boolean).length;
-    const words = document.getElementById('summary')?.value?.split(/\s+/).length || 0;
-    document.getElementById('optimizeResults').innerHTML = `
-        <div class="glass-accent p-6 rounded">
-            <h3 class="text-lg font-semibold cyan-glow mb-4">&#x1F4CA; Resume Analysis</h3>
-            <div class="space-y-2 text-slate-300">
-                <p>Experience entries: ${expCount}</p>
-                <p>Education entries: ${eduCount}</p>
-                <p>Skills listed: ${skillCount}</p>
-                <p>Summary word count: ${words} ${words > 80 ? '(consider shortening)' : words < 20 ? '(too short)' : '(good)'}</p>
-            </div>
-        </div>
-    `;
+  const expCount = document.querySelectorAll('#experienceList .exp-entry').length;
+  const eduCount = document.querySelectorAll('#educationList .edu-entry').length;
+  const skillCount = (document.getElementById('skills')?.value || '').split(',').filter(Boolean).length;
+  const words = document.getElementById('summary')?.value?.split(/\s+/).length || 0;
+  document.getElementById('optimizeResults').innerHTML = `
+    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
+      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4CA; Resume Analysis</h4>
+      <div style="display:flex; flex-direction:column; gap:0.5rem; color:var(--color-text-muted);">
+        <p>Experience entries: ${expCount}</p>
+        <p>Education entries: ${eduCount}</p>
+        <p>Skills listed: ${skillCount}</p>
+        <p>Summary word count: ${words} ${words > 80 ? '(consider shortening)' : words < 20 ? '(too short)' : '(good)'}</p>
+      </div>
+    </div>`;
 }
 
+// ============================================================
+// EXPORT
+// ============================================================
 function downloadPDF() {
-    const element = document.getElementById('preview');
-    const name = document.getElementById('fullName')?.value || 'resume';
-    html2pdf().set({
-        margin: 10,
-        filename: name.replace(/\s+/g, '_') + '_resume.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-    }).from(element).save();
+  const element = document.getElementById('preview');
+  const name = document.getElementById('fullName')?.value || 'resume';
+  html2pdf().set({
+    margin: 10,
+    filename: name.replace(/\s+/g, '_') + '_resume.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  }).from(element).save();
 }
 
 function downloadJSON() {
-    const data = buildResumePayload();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'resume.json'; a.click();
-    URL.revokeObjectURL(url);
+  const data = buildResumePayload();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'resume.json'; a.click();
+  URL.revokeObjectURL(url);
 }
 
 function saveDraft() {
-    const data = buildResumePayload();
-    localStorage.setItem('resumeDraft_' + (currentResumeId || 'local'), JSON.stringify(data));
-    showStatus('success', 'Draft saved locally in your browser.');
-    setTimeout(() => hideStatus(), 2500);
+  const data = buildResumePayload();
+  localStorage.setItem('resumeDraft_' + (currentResumeId || 'local'), JSON.stringify(data));
+  showStatus('success', 'Draft saved locally in your browser.');
+  setTimeout(() => hideStatus(), 2500);
 }
 
 function loadLocalDraft() {
-    const key = 'resumeDraft_' + (currentResumeId || 'local');
-    const saved = localStorage.getItem(key);
-    if (saved) {
-        try {
-            populateFormFromResume(JSON.parse(saved));
-            showStatus('info', 'Loaded local draft.');
-            setTimeout(() => hideStatus(), 2500);
-        } catch (e) {}
-    } else {
-        populateFormFromResume({
-            personal_info: {
-                full_name: 'Your Name',
-                professional_title: 'Your Title',
-                email: 'email@example.com',
-                phone: '(555) 000-0000',
-                location: 'City, State',
-                summary: 'Professional summary goes here.'
-            },
-            experience: [],
-            education: [],
-            skills: [],
-            certifications: [],
-            projects: []
-        });
-    }
+  const key = 'resumeDraft_' + (currentResumeId || 'local');
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    try {
+      populateFormFromResume(JSON.parse(saved));
+      showStatus('info', 'Loaded local draft.');
+      setTimeout(() => hideStatus(), 2500);
+    } catch (e) {}
+  } else {
+    populateFormFromResume({
+      personal_info: {
+        full_name: 'Your Name', professional_title: 'Your Title',
+        email: 'email@example.com', phone: '(555) 000-0000',
+        location: 'City, State', summary: 'Professional summary goes here.'
+      },
+      experience: [], education: [], skills: [], certifications: [], projects: []
+    });
+  }
 }
 
 // ============================================================
-// DEPARTURE DATE SELECTOR
+// DEPARTURE DATE SELECTOR (preserved in full)
 // ============================================================
 (function () {
-    var PILOT_SEAT_LABEL = 'WagonMan';
-    var SET_DEPARTURE_URL = '/api/set-departure';
-    var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
+  var PILOT_SEAT_LABEL = 'WagonMan';
+  var SET_DEPARTURE_URL = '/api/set-departure';
+  var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
 
-    function formatDateLabel(dateStr) {
-        if (!dateStr) return dateStr;
-        var d = new Date(dateStr + 'T00:00:00.000Z');
-        return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+  function formatDateLabel(dateStr) {
+    if (!dateStr) return dateStr;
+    var d = new Date(dateStr + 'T00:00:00.000Z');
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+  }
+
+  function midpointDate(startStr, endStr) {
+    var start = new Date(startStr + 'T00:00:00.000Z');
+    var end   = new Date(endStr   + 'T00:00:00.000Z');
+    var mid   = new Date((start.getTime() + end.getTime()) / 2);
+    return mid.toISOString().slice(0, 10);
+  }
+
+  function renderDateOptions(windowStart, windowEnd, seatId, passengerEmail) {
+    var optionA = windowStart;
+    var optionB = midpointDate(windowStart, windowEnd);
+    var optionC = windowEnd;
+    var container = document.getElementById('departureDateOptions');
+    if (!container) return;
+    container.innerHTML = '';
+    var options = [
+      { label: 'Earliest — ' + formatDateLabel(optionA), value: optionA },
+      { label: 'Mid-window — ' + formatDateLabel(optionB), value: optionB },
+      { label: 'Latest — ' + formatDateLabel(optionC), value: optionC }
+    ];
+    options.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.className = 'btn-secondary-studio';
+      btn.style.cssText = 'text-align:left; padding:10px 16px; font-size:13px; width:100%;';
+      btn.textContent = opt.label;
+      btn.addEventListener('click', function () {
+        handleDateSelection(opt.value, seatId, passengerEmail, container);
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  function handleDateSelection(selectedDate, seatId, passengerEmail, optionsContainer) {
+    var confirmMsg = document.getElementById('departureConfirmMsg');
+    var errorMsg   = document.getElementById('departureErrorMsg');
+    if (confirmMsg) { confirmMsg.classList.add('hidden'); confirmMsg.textContent = ''; }
+    if (errorMsg)   { errorMsg.classList.add('hidden');   errorMsg.textContent = ''; }
+    if (optionsContainer) {
+      optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = true; b.style.opacity = '0.5'; });
     }
-
-    function midpointDate(startStr, endStr) {
-        var start = new Date(startStr + 'T00:00:00.000Z');
-        var end   = new Date(endStr   + 'T00:00:00.000Z');
-        var mid   = new Date((start.getTime() + end.getTime()) / 2);
-        return mid.toISOString().slice(0, 10);
-    }
-
-    function renderDateOptions(windowStart, windowEnd, seatId, passengerEmail) {
-        var optionA = windowStart;
-        var optionB = midpointDate(windowStart, windowEnd);
-        var optionC = windowEnd;
-        var container = document.getElementById('departureDateOptions');
-        if (!container) return;
-        container.innerHTML = '';
-        var options = [
-            { label: 'Earliest — ' + formatDateLabel(optionA), value: optionA },
-            { label: 'Mid-window — ' + formatDateLabel(optionB), value: optionB },
-            { label: 'Latest — ' + formatDateLabel(optionC), value: optionC }
-        ];
-        options.forEach(function (opt) {
-            var btn = document.createElement('button');
-            btn.className = 'btn-secondary';
-            btn.style.cssText = 'text-align:left; padding:10px 16px; font-size:13px; width:100%;';
-            btn.textContent = opt.label;
-            btn.addEventListener('click', function () {
-                handleDateSelection(opt.value, seatId, passengerEmail, container);
-            });
-            container.appendChild(btn);
-        });
-    }
-
-    function handleDateSelection(selectedDate, seatId, passengerEmail, optionsContainer) {
-        var confirmMsg = document.getElementById('departureConfirmMsg');
-        var errorMsg   = document.getElementById('departureErrorMsg');
-        if (confirmMsg) { confirmMsg.classList.add('hidden'); confirmMsg.textContent = ''; }
-        if (errorMsg)   { errorMsg.classList.add('hidden');   errorMsg.textContent = ''; }
-        if (optionsContainer) {
-            optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = true; b.style.opacity = '0.5'; });
+    fetch(SET_DEPARTURE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seat_id: seatId, passenger_email: passengerEmail, selected_date: selectedDate })
+    }).then(function (resp) {
+      if (resp.ok) {
+        if (optionsContainer) optionsContainer.classList.add('hidden');
+        var label = formatDateLabel(selectedDate);
+        if (confirmMsg) {
+          confirmMsg.textContent = 'Your departure is confirmed for ' + label + '. Your flight is ready.';
+          confirmMsg.classList.remove('hidden');
         }
-        fetch(SET_DEPARTURE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ seat_id: seatId, passenger_email: passengerEmail, selected_date: selectedDate })
-        }).then(function (resp) {
-            if (resp.ok) {
-                if (optionsContainer) optionsContainer.classList.add('hidden');
-                var label = formatDateLabel(selectedDate);
-                if (confirmMsg) {
-                    confirmMsg.textContent = 'Your departure is confirmed for ' + label + '. Your flight is ready.';
-                    confirmMsg.classList.remove('hidden');
-                }
-            } else {
-                resp.json().then(function (data) {
-                    var errMsg = (data && data.error) ? data.error : 'Something went wrong. Please try again or contact support.';
-                    if (errorMsg) { errorMsg.textContent = errMsg; errorMsg.classList.remove('hidden'); }
-                }).catch(function () {
-                    if (errorMsg) { errorMsg.textContent = 'Something went wrong. Please try again or contact support.'; errorMsg.classList.remove('hidden'); }
-                });
-                if (optionsContainer) {
-                    optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
-                }
-            }
+      } else {
+        resp.json().then(function (data) {
+          var errMsg = (data && data.error) ? data.error : 'Something went wrong. Please try again or contact support.';
+          if (errorMsg) { errorMsg.textContent = errMsg; errorMsg.classList.remove('hidden'); }
         }).catch(function () {
-            if (errorMsg) { errorMsg.textContent = 'Something went wrong. Please try again or contact support.'; errorMsg.classList.remove('hidden'); }
-            if (optionsContainer) {
-                optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
-            }
+          if (errorMsg) { errorMsg.textContent = 'Something went wrong. Please try again or contact support.'; errorMsg.classList.remove('hidden'); }
         });
-    }
+        if (optionsContainer) {
+          optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+        }
+      }
+    }).catch(function () {
+      if (errorMsg) { errorMsg.textContent = 'Something went wrong. Please try again or contact support.'; errorMsg.classList.remove('hidden'); }
+      if (optionsContainer) {
+        optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+      }
+    });
+  }
 
-    function initDepartureSelector() {
-        var params = new URLSearchParams(window.location.search);
-        var seatId = params.get('seat_id');
-        if (!seatId) return;
-        var panel = document.getElementById('departureSelectorPanel');
-        if (!panel) return;
-        var token = (typeof getAuthToken === 'function') ? getAuthToken() : null;
-        var headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = 'Bearer ' + token;
-        fetch(BASE44_SEAT_API + '/' + seatId, { headers: headers })
-            .then(function (resp) {
-                if (!resp.ok) return null;
-                return resp.json();
-            })
-            .then(function (seat) {
-                if (!seat) return;
-                if (seat.seat_label === PILOT_SEAT_LABEL || seat.role === 'pilot') return;
-                if (seat.scheduled_departure_date) {
-                    var confirmMsg = document.getElementById('departureConfirmMsg');
-                    if (confirmMsg) {
-                        confirmMsg.textContent = 'Your departure is confirmed for ' + formatDateLabel(seat.scheduled_departure_date) + '. Your flight is ready.';
-                        confirmMsg.classList.remove('hidden');
-                    }
-                    panel.classList.remove('hidden');
-                    return;
-                }
-                if (!seat.departure_window_start || !seat.departure_window_end) return;
-                var passengerEmail = seat.user_email || '';
-                renderDateOptions(seat.departure_window_start, seat.departure_window_end, seatId, passengerEmail);
-                panel.classList.remove('hidden');
-            })
-            .catch(function () { /* silently skip on error */ });
-    }
+  function initDepartureSelector() {
+    var params = new URLSearchParams(window.location.search);
+    var seatId = params.get('seat_id');
+    if (!seatId) return;
+    var panel = document.getElementById('departureSelectorPanel');
+    if (!panel) return;
+    var token = (typeof getAuthToken === 'function') ? getAuthToken() : null;
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    fetch(BASE44_SEAT_API + '/' + seatId, { headers: headers })
+      .then(function (resp) {
+        if (!resp.ok) return null;
+        return resp.json();
+      })
+      .then(function (seat) {
+        if (!seat) return;
+        if (seat.seat_label === PILOT_SEAT_LABEL || seat.role === 'pilot') return;
+        if (seat.scheduled_departure_date) {
+          var confirmMsg = document.getElementById('departureConfirmMsg');
+          if (confirmMsg) {
+            confirmMsg.textContent = 'Your departure is confirmed for ' + formatDateLabel(seat.scheduled_departure_date) + '. Your flight is ready.';
+            confirmMsg.classList.remove('hidden');
+          }
+          panel.classList.remove('hidden');
+          return;
+        }
+        if (!seat.departure_window_start || !seat.departure_window_end) return;
+        var passengerEmail = seat.user_email || '';
+        renderDateOptions(seat.departure_window_start, seat.departure_window_end, seatId, passengerEmail);
+        panel.classList.remove('hidden');
+      })
+      .catch(function () { /* silently skip on error */ });
+  }
 
-    window._initDepartureSelector = initDepartureSelector;
+  window._initDepartureSelector = initDepartureSelector;
 })();
 
 // ============================================================
 // INIT — chunked to reduce TBT
 // ============================================================
 window.addEventListener('load', async () => {
-    // Chunk 1: register DOM listeners (fast, synchronous)
-    const params = new URLSearchParams(window.location.search);
-    const resumeId = params.get('resumeId');
+  // Chunk 1: register DOM listeners (fast, synchronous)
+  const params = new URLSearchParams(window.location.search);
+  const resumeId = params.get('resumeId');
 
-    document.addEventListener('input', (e) => {
-        if (e.target.matches('input, textarea')) {
-            updatePreview();
-        }
-    });
+  document.addEventListener('input', (e) => {
+    if (e.target.matches('input, textarea')) updatePreview();
+  });
 
-    window.addEventListener('beforeunload', (e) => {
-        if (hasUnsavedChanges && currentResumeId) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
-
-    await yieldToMain(); // yield — let browser paint before heavy work
-
-    // Chunk 2: load resume data (network / localStorage)
-    if (resumeId) {
-        currentResumeId = resumeId;
-        await loadResumeFromCareerNavigator(resumeId);
-    } else {
-        loadLocalDraft();
+  window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges && currentResumeId) {
+      e.preventDefault();
+      e.returnValue = '';
     }
+  });
 
-    await yieldToMain(); // yield before departure selector
+  await yieldToMain();
 
-    // Chunk 3: departure date selector
-    if (typeof window._initDepartureSelector === 'function') {
-        window._initDepartureSelector();
-    }
+  // Chunk 2: load resume data (network / localStorage)
+  if (resumeId) {
+    currentResumeId = resumeId;
+    await loadResumeFromCareerNavigator(resumeId);
+  } else {
+    loadLocalDraft();
+  }
+
+  await yieldToMain();
+
+  // Chunk 3: departure date selector
+  if (typeof window._initDepartureSelector === 'function') {
+    window._initDepartureSelector();
+  }
 });
 </script>
 
-<!-- Mission Control Gateway Wiring — Addendum Apr 7, 2026
+<!-- ── Theme toggle ─────────────────────────────────────────────────────── -->
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector('[data-theme-toggle]');
+  var current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  root.setAttribute('data-theme', current);
+  function renderIcon() {
+    if (!btn) return;
+    btn.innerHTML = current === 'dark'
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+  renderIcon();
+  if (btn) btn.addEventListener('click', function () {
+    current = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', current);
+    renderIcon();
+  });
+})();
+</script>
+
+<!-- ── Status strip tokenization — updates from seat record when seat_id present ── -->
+<script>
+(function () {
+  var params  = new URLSearchParams(window.location.search);
+  var seatId  = params.get('seat_id')  || '';
+  var tujCode = params.get('tuj_code') || '';
+
+  // When seat_id is present, reflect passenger state in status strip
+  if (seatId) {
+    var laneEl = document.getElementById('mcStatusLane');
+    var opsEl  = document.getElementById('mcStatusOperators');
+    var nextEl = document.getElementById('mcStatusNextMove');
+    var pillEl = document.getElementById('gatePillText');
+
+    // Optimistic update from URL — refined if seat record loads
+    if (tujCode && laneEl) laneEl.textContent = tujCode;
+    if (pillEl) pillEl.textContent = 'Seat active · ' + (tujCode || seatId);
+
+    // Attempt to refine from seat record (non-blocking, silent on error)
+    var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
+    fetch(BASE44_SEAT_API + '/' + seatId, { headers: { 'Content-Type': 'application/json' } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (seat) {
+        if (!seat) return;
+        if (laneEl && seat.cabin_class)  laneEl.textContent = seat.cabin_class + ' · ' + (tujCode || seatId);
+        if (opsEl  && seat.status)       opsEl.textContent  = seat.status;
+        if (nextEl && seat.scheduled_departure_date) {
+          nextEl.textContent = 'Departure set · ' + seat.scheduled_departure_date.slice(0, 10);
+        }
+        if (pillEl && seat.cabin_class) pillEl.textContent = seat.cabin_class + ' · ' + (tujCode || seatId) + ' · active';
+      })
+      .catch(function () { /* silently skip */ });
+  }
+})();
+</script>
+
+<!-- ── Mission Control Gateway Wiring — Apr 7, 2026 (preserved)
      Reads seat_id + tuj_code from URL and sets all three CTA hrefs dynamically.
      Spec: Mission Control Gateway — Wiring Addendum for Manus
      Constraint: seat_id parsing already handled above; this block adds tuj_code
-     passthrough and mission-control CTA routing. -->
+     passthrough and mission-control CTA routing. ── -->
 <script>
 (function () {
   var params  = new URLSearchParams(window.location.search);
