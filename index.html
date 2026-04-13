@@ -584,6 +584,38 @@
       display: none;
     }
 
+    /* ── Mission Control: Status Strip ─────────────────────────────────── */
+    .mc-status-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(168,196,0,0.1);
+    }
+    .mc-status-card {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(168,196,0,0.15);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+    }
+    .mc-status-label {
+      font-size: 0.65rem;
+      color: rgba(168,196,0,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.25rem;
+    }
+    .mc-status-value {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.3;
+    }
+    @media (max-width: 480px) {
+      .mc-status-strip { grid-template-columns: 1fr; }
+    }
+
     /* ── Mission Control: Sections ───────────────────────────────────────── */
     .mc-section {
       margin-bottom: 1.75rem;
@@ -1500,6 +1532,24 @@
           <span id="mc-gs-count-value" class="mc-gs-value">Loading…</span>
         </div>
         <a id="mc-gs-cta" class="mc-gs-cta" href="#seat-request-form" data-action="none">Request seat</a>
+      </div>
+
+
+      <!-- ── Status Strip — tokenized: STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE ── -->
+      <!-- JS defaults shown when no seat_id present; URL params + seat record override on load. -->
+      <div class="mc-status-strip" id="mcStatusStrip">
+        <div class="mc-status-card">
+          <div class="mc-status-label">Current lane</div>
+          <div class="mc-status-value" id="mcStatusLane">Boarding</div>
+        </div>
+        <div class="mc-status-card">
+          <div class="mc-status-label">Visible operators</div>
+          <div class="mc-status-value" id="mcStatusOperators">5 active</div>
+        </div>
+        <div class="mc-status-card">
+          <div class="mc-status-label">Clearest next move</div>
+          <div class="mc-status-value" id="mcStatusNextMove">Review signal path</div>
+        </div>
       </div>
 
       <!-- ── Section 1: 8-Step Boarding Sequence ─────────────────────────────────────────── -->
@@ -2736,6 +2786,16 @@
                 a.href = u.toString();
               } catch (e) { /* skip malformed hrefs */ }
             });
+            // Wire seat_id + tuj_code into all /Studio links (tile + boarding step 3)
+            var _tujCode = new URLSearchParams(location.search).get('tuj_code') || '';
+            document.querySelectorAll('a[href="/Studio"], a[href^="/Studio?"]').forEach(function (a) {
+              try {
+                var su = new URL(a.href, location.origin);
+                su.searchParams.set('seat_id', seatId);
+                if (_tujCode) su.searchParams.set('tuj_code', _tujCode);
+                a.href = su.toString();
+              } catch (e) { /* skip */ }
+            });
             // Wire seat_id into CalendarJet consultation link in boarding steps
             var calBoardingLink = document.getElementById('bstep-5-cta');
             if (calBoardingLink) {
@@ -3475,5 +3535,61 @@
     })();
   </script>
 
+  <!-- ── Status strip tokenization — STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE ── -->
+  <!-- Runs once on DOMContentLoaded. Reads seat_id + tuj_code from URL.
+       When seat_id present: optimistic update from URL, then async refinement from seat record.
+       When absent: JS defaults (Boarding / 5 active / Review signal path) remain. -->
+  <script>
+  (function () {
+    var STATUS_LANE       = 'Boarding';
+    var STATUS_OPERATORS  = '5 active';
+    var STATUS_NEXT_MOVE  = 'Review signal path';
+
+    var params  = new URLSearchParams(window.location.search);
+    var seatId  = params.get('seat_id')  || '';
+    var tujCode = params.get('tuj_code') || '';
+
+    function applyStrip(lane, ops, next, pill) {
+      var laneEl = document.getElementById('mcStatusLane');
+      var opsEl  = document.getElementById('mcStatusOperators');
+      var nextEl = document.getElementById('mcStatusNextMove');
+      var seatEl = document.getElementById('dashboard-seat-id');
+      if (laneEl) laneEl.textContent = lane;
+      if (opsEl)  opsEl.textContent  = ops;
+      if (nextEl) nextEl.textContent = next;
+      if (pill && seatEl) seatEl.textContent = pill;
+    }
+
+    if (seatId) {
+      // Optimistic update from URL params
+      applyStrip(
+        tujCode || seatId,
+        STATUS_OPERATORS,
+        STATUS_NEXT_MOVE,
+        tujCode ? tujCode + ' · active' : seatId
+      );
+
+      // Async refinement from seat record (non-blocking, silent on error)
+      fetch('/api/seat?id=' + encodeURIComponent(seatId))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (seat) {
+          if (!seat) return;
+          var lane = seat.cabin_class
+            ? seat.cabin_class + (tujCode ? ' · ' + tujCode : '')
+            : (tujCode || seatId);
+          var ops  = seat.status || STATUS_OPERATORS;
+          var next = seat.scheduled_departure_date
+            ? 'Departure set · ' + seat.scheduled_departure_date.slice(0, 10)
+            : STATUS_NEXT_MOVE;
+          var pill = seat.cabin_class
+            ? seat.cabin_class + ' · ' + (tujCode || seatId) + ' · active'
+            : (tujCode ? tujCode + ' · active' : seatId);
+          applyStrip(lane, ops, next, pill);
+        })
+        .catch(function () { /* silently skip — defaults already applied */ });
+    }
+    // No seat_id: JS defaults (STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE) already set in HTML
+  })();
+  </script>
 </body>
 </html>
