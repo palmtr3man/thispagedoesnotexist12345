@@ -74,7 +74,7 @@ export const GATE = {
 
   /**
    * @type {string} GET /api/seat/:id — validates a seat ID against Base44.
-   * @note Pending Base44 credit restoration (Phase 5).
+   * Netlify function live as of Apr 14, 2026 (commit 6b0c83c). Scenario A confirmed.
    */
   VALIDATE_SEAT: '/api/seat',
 

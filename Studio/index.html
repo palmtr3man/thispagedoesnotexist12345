@@ -346,7 +346,7 @@
           <h1 class="mc-h1">Look out over the operators moving your journey.</h1>
           <p class="mc-lede">This is not a dashboard first. It is a glass-front vantage point into the hidden machinery behind your seat: recruiters, referrals, ATS filters, handoffs, follow-ups, and signals that usually stay out of sight.</p>
           <div class="mc-cta-row">
-            <a class="mc-btn mc-btn-primary" href="#control-surfaces">Enter Mission Control</a>
+            <a class="mc-btn mc-btn-primary" href="https://www.thispagedoesnotexist12345.tech/CommandCenter" target="_blank" rel="noopener noreferrer">Enter Mission Control</a><!-- P3 fix — Apr 14, 2026: was #control-surfaces anchor -->
             <a class="mc-btn mc-btn-secondary" href="#studio-main">Open One-Page Studio</a>
           </div>
         </div>
@@ -1045,6 +1045,10 @@ function loadLocalDraft() {
 (function () {
   var PILOT_SEAT_LABEL = 'WagonMan';
   var SET_DEPARTURE_URL = '/api/set-departure';
+  // Intentional direct Base44 call — reads rich departure-window fields
+  // (departure_window_start, departure_window_end, scheduled_departure_date, user_email)
+  // that /api/seat does not return. This is data hydration, not seat validation.
+  // Do not replace with /api/seat/:id without extending that endpoint's response schema.
   var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
 
   function formatDateLabel(dateStr) {
@@ -1238,7 +1242,11 @@ window.addEventListener('load', async () => {
     if (tujCode && laneEl) laneEl.textContent = tujCode;
     if (pillEl) pillEl.textContent = 'Seat active · ' + (tujCode || seatId);
 
-    // Attempt to refine from seat record (non-blocking, silent on error)
+    // Intentional direct Base44 call — reads rich display fields (cabin_class,
+    // status, scheduled_departure_date) for status strip refinement.
+    // /api/seat only returns { valid, seat_id, status } and cannot serve these fields.
+    // This is non-blocking UI hydration, not seat validation. Do not replace with
+    // /api/seat/:id without extending that endpoint's response schema.
     var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
     fetch(BASE44_SEAT_API + '/' + seatId, { headers: { 'Content-Type': 'application/json' } })
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -1275,12 +1283,13 @@ window.addEventListener('load', async () => {
       : 'https://www.thispagedoesnotexist12345.com/';
   }
 
-  // Operator trace → mission-control
+  // Operator trace → .tech/CommandCenter (P4 fix — Apr 14, 2026)
+  // origin changed from 'gateway' to 'operator-trace' for analytics clarity.
   var traceEl = document.querySelector('[data-cta="operator-trace"]');
   if (traceEl) {
     traceEl.href = seatId
-      ? 'https://www.thispagedoesnotexist12345.com/mission-control?tuj_code=' + tujCode + '&seat_id=' + seatId + '&origin=gateway'
-      : 'https://www.thispagedoesnotexist12345.com/mission-control';
+      ? 'https://www.thispagedoesnotexist12345.tech/CommandCenter?seat_id=' + seatId + '&tuj_code=' + tujCode + '&origin=operator-trace'
+      : 'https://www.thispagedoesnotexist12345.tech/CommandCenter';
   }
 
   // Studio entry (self-referential with params preserved)
