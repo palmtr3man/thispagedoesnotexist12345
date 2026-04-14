@@ -3,14 +3,15 @@
   Template: boarding_pass_paid_v1
   SendGrid ID: d-9290e951724f4b028d94945d4f06b69f
   Version: v1-dark-neon (ACTIVE)
-  Last updated: Apr 7, 2026
+  Last updated: Apr 14, 2026
 
   Dynamic variables:
-    {{first_name}}    — Passenger first name
-    {{last_name}}     — Passenger last name
-    {{seat_id}}       — Seat label (e.g. TUJ-KC2222)
-    {{passport_url}}  — server-side: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
-    {{signup_date}}   — Optional boarding date string (e.g. "Apr 7, 2026"); falls back to "Confirmed"
+    {{first_name}}      — Passenger first name
+    {{last_name}}       — Passenger last name
+    {{seat_id}}         — Seat label (e.g. TUJ-KC2222)
+    {{tuj_code}}        — Internal tracking code for TUJ seat / flight context (e.g. TUJ-KC2222)
+    {{passport_url}}    — server-side: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
+    {{signup_date}}     — Optional boarding date string (e.g. "Apr 7, 2026"); falls back to "Confirmed"
     {{unsubscribe_url}} — SendGrid unsubscribe token
 
   Test data:
@@ -18,9 +19,18 @@
       "first_name": "Kevin",
       "last_name": "Clark",
       "seat_id": "TUJ-KC2222",
+      "tuj_code": "TUJ-KC2222",
       "passport_url": "https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-KC2222",
       "signup_date": "Apr 7, 2026"
     }
+
+  PATCHES:
+    1. Apr 7, 2026 — Initial v1-dark-neon build
+    2. Apr 7, 2026 — Secondary CTA → /Studio (commit a63b91c)
+    3. Apr 7, 2026 — .tech → .com domain correction
+    4. Apr 7, 2026 — Alpha Flight 1 → {{flight_code}} token
+    5. Apr 14, 2026 — Secondary CTA href: /Studio → /Studio?seat_id={{seat_id}}&tuj_code={{tuj_code}} (post-incident hardening)
+    6. Apr 14, 2026 — Alpha test banner block removed (internal-only label, not for production sends)
 -->
 <html lang="en">
 <head>
