@@ -62,6 +62,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/seat/:id"
+  to = "/.netlify/functions/seat?id=:id"
+  status = 200
+
+[[redirects]]
   from = "/api/seat"
   to = "/.netlify/functions/seat"
   status = 200

@@ -101,7 +101,16 @@ exports.handler = async (event) => {
   }
 
   // ── Extract + validate seat_id format ─────────────────────────────────────
-  const seatId = (event.queryStringParameters || {}).id || '';
+  // Support both query param (?id=TUJ-XXXXXX) and path param (/api/seat/TUJ-XXXXXX via netlify.toml redirect)
+  let seatId = (event.queryStringParameters || {}).id || '';
+  if (!seatId) {
+    // If not in query string, attempt to extract from the end of the path
+    const pathParts = event.path.split('/');
+    const lastPart = pathParts[pathParts.length - 1];
+    if (lastPart && lastPart !== 'seat') {
+      seatId = lastPart;
+    }
+  }
   if (!seatId || !SEAT_ID_REGEX.test(seatId)) {
     return {
       statusCode: 400,
