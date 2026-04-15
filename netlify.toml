@@ -83,6 +83,11 @@
   to = "/.netlify/functions/admin-deny"
   status = 200
 
+[[redirects]]
+  from = "/api/waitlist-manifest"
+  to = "/.netlify/functions/waitlist-manifest"
+  status = 200
+
 # Passenger Door — BLOCKER-07: Newsletter Landing + TUJ Seat Gate + ResumeFitCheck
 # Receives passengers from the .us newsletter boarding_pass deep-link:
 #   https://www.thispagedoesnotexist12345.com/door?seat_id=TUJ-XXXXXX
