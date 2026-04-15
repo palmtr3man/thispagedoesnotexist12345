@@ -1404,11 +1404,11 @@
     </div>
 
     <!-- ── BLOCKER-01: Info Modal — What is TUJ Explainer + Alpha Disclaimer ── -->
-    <div id="info-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="info-modal-title">
+    <div id="info-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="info-modal-title" aria-hidden="true">
       <div class="info-modal-card">
         <button class="info-modal-close" id="info-modal-close" aria-label="Close">&times;</button>
         <h2 id="info-modal-title">✈️ What is The Ultimate Journey?</h2>
-        <p class="info-modal-tagline">PageForward Airways &mdash; FL 032126 &mdash; Alpha Flight 1</p>
+        <p class="info-modal-tagline">PageForward Airways &mdash; FL 041726 &mdash; Alpha Flight 1</p>
 
         <div class="info-modal-section">
           <h3>The Mission</h3>
@@ -3376,12 +3376,21 @@
       setTimeout(refreshMcNavBtn, 1200);
     })();
 
-    // ── BLOCKER-01: Info Modal — open / close wiring ──
+     // ── BLOCKER-01: Info Modal — open / close wiring (QA pass Apr 15 2026) ──
     (function() {
       var overlay = document.getElementById('info-modal-overlay');
       var openBtn = document.getElementById('info-btn');
       var closeBtn = document.getElementById('info-modal-close');
       if (!overlay || !openBtn) return;
+
+      // Focus trap: collect all focusable elements inside the modal card
+      function getFocusable() {
+        return Array.prototype.slice.call(
+          overlay.querySelectorAll(
+            'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter(function(el) { return !el.closest('[hidden]'); });
+      }
 
       function openInfoModal() {
         overlay.classList.add('active');
@@ -3402,9 +3411,24 @@
         if (e.target === overlay) closeInfoModal();
       });
 
-      // Close on Escape key
+      // Close on Escape key + focus trap on Tab
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && overlay.classList.contains('active')) closeInfoModal();
+        if (!overlay.classList.contains('active')) return;
+        if (e.key === 'Escape') {
+          closeInfoModal();
+          return;
+        }
+        if (e.key === 'Tab') {
+          var focusable = getFocusable();
+          if (!focusable.length) { e.preventDefault(); return; }
+          var first = focusable[0];
+          var last  = focusable[focusable.length - 1];
+          if (e.shiftKey) {
+            if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+          } else {
+            if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+          }
+        }
       });
     })();
 
