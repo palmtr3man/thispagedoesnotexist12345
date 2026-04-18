@@ -327,18 +327,27 @@ async function sendSeatConfirmation(seat) {
   const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
   const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
 
+  // Fix 5b (Apr 18, 2026): add signup_date (boarding_pass_free_v1 uses {{signup_date}})
+  //   and tuj_code (boarding_pass_paid_v1 uses {{tuj_code}} for tracking).
+  //   signup_date defaults to today's date in a readable format if not supplied.
+  const signupDate = seat.signup_date ||
+    new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
   const dynamicData = {
     first_name,
     last_name,
     user_email,
     seat_id:             canonicalSeatId,
     seatreference:       canonicalSeatId,
+    tuj_code:            canonicalSeatId,        // Fix 5b: boarding_pass_paid_v1 uses {{tuj_code}}
     cabin_class:         cabin_class || 'Economy',
+    signup_date:         signupDate,             // Fix 5b: boarding_pass_free_v1 uses {{signup_date}}
     passport_url:        passportUrl,
     first_task_url:      firstTaskUrl,
     secondary_url:       secondaryUrl,
     platform_url:        mainSiteUrl,           // Fix 4: resolves {{platform_url}} Main Site footer link
-    flight_display_name: flightLabel            // F-190 Apr 12: required by boarding pass + instructions templates
+    flight_code:         flightLabel,           // Fix 5 (Apr 18, 2026): templates use {{flight_code}}, not {{flight_display_name}}
+    flight_display_name: flightLabel            // kept for backward-compat; canonical token is flight_code
   };
 
   // Select templates based on tier
