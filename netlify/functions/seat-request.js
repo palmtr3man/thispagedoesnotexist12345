@@ -117,9 +117,21 @@ async function checkExistingRequest({ email, notionApiKey, databaseId }) {
         'Notion-Version': NOTION_API_VERSION
       },
       body: JSON.stringify({
+        // Exclude Denied records so previously denied passengers can re-submit.
+        // Denied is treated as a closed/voided state — only Pending Review,
+        // Approved, Waitlisted, and Level Lounge are considered active duplicates.
+        // Fix (Apr 19, 2026): compound filter added to prevent permanent lockout.
         filter: {
-          property: 'Email',
-          email: { equals: email }
+          and: [
+            {
+              property: 'Email',
+              email: { equals: email }
+            },
+            {
+              property: 'Status',
+              select: { does_not_equal: 'Denied' }
+            }
+          ]
         },
         page_size: 1
       })
