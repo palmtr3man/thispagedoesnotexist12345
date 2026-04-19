@@ -325,6 +325,7 @@ async function sendSeatConfirmation(seat) {
   const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}`;
   const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}`;
   const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
+  const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech'; // Base44 app — /Dashboard, /FlightLog, /CommandCenter etc.
   const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
 
   // Fix 5b (Apr 18, 2026): add signup_date (boarding_pass_free_v1 uses {{signup_date}})
@@ -347,7 +348,19 @@ async function sendSeatConfirmation(seat) {
     secondary_url:       secondaryUrl,
     platform_url:        mainSiteUrl,           // Fix 4: resolves {{platform_url}} Main Site footer link
     flight_code:         flightLabel,           // Fix 5 (Apr 18, 2026): templates use {{flight_code}}, not {{flight_display_name}}
-    flight_display_name: flightLabel            // kept for backward-compat; canonical token is flight_code
+    flight_display_name: flightLabel,           // kept for backward-compat; canonical token is flight_code
+
+    // Mission Control deep-link fields (spec: link audit rewrite, Apr 2026)
+    // Templates should use these instead of root-only /?seat_id= links.
+    // Routes on the Base44 .tech app use platformTechUrl; .com Studio uses mainSiteUrl.
+    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}`,
+    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}`,
+    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}`,
+    mission_reminders:    `${platformTechUrl}/FlightLog?view=reminders&seat_id=${canonicalSeatId}`,
+    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}`,
+    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}`,
+    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}`,
+    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}`,
   };
 
   // Select templates based on tier
