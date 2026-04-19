@@ -103,7 +103,7 @@ exports.handler = async function (event) {
     return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Invalid JSON body' }) };
   }
 
-  const { seat_request_id, cabin_class = 'Economy', flight_id = 'FL032126' } = body;
+  const { seat_request_id, cabin_class = 'Economy', flight_id = 'FL041926' } = body;
   if (!seat_request_id || typeof seat_request_id !== 'string') {
     return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'seat_request_id is required' }) };
   }

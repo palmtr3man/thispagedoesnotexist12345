@@ -69,7 +69,7 @@ const ASM_GROUPS_TO_DISPLAY  = ASM_MARKETING_GROUP_ID
   : [ASM_GROUP_ID];
 const NOTION_API_VERSION = '2022-06-28';
 const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '5e6440af0ad94c6d89a8442ec2c528f3';
-const SUBJECT      = 'Your seat request is in — FL 032126 ✈️';
+const SUBJECT      = 'Your seat request is in — FL 041926 ✈️';
 
 // --- Gate Contract constants ---
 const SEAT_ID_PREFIX = 'TUJ-';
@@ -213,7 +213,7 @@ async function subscribeToBeehiiv(email, firstName, apiKey, pubId) {
         send_welcome_email: true,
         utm_source: 'seat-request',
         utm_medium: 'netlify-function',
-        utm_campaign: 'fl032126-gate',
+        utm_campaign: 'fl041926-gate',
         custom_fields: [
           { name: 'first_name', value: firstName }
         ]
