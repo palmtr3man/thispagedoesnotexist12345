@@ -1902,7 +1902,7 @@
             fetch('/api/seat-request', {
               method: 'POST',
               headers: {'Content-Type':'application/json'},
-              body: JSON.stringify(Object.assign({ name: name, email: email, age_token: _ageToken, source: 'landing' }, (new URLSearchParams(window.location.search).get('seat_id') ? { seat_id_override: new URLSearchParams(window.location.search).get('seat_id') } : {})))
+              body: JSON.stringify(Object.assign({ name: name, email: email, age_token: _ageToken, source: 'landing' }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
             })
             .then(function(r){ return r.json(); })
             .then(function(d){
@@ -2591,6 +2591,9 @@
       var _status     = null;   // last fetched /api/seat-status payload
       var _seatId     = null;   // validated seat_id for this session
       var _ageGateCb  = null;   // pending callback after age confirm
+      // Capture ?seat_id= immediately on page load before validateSeatId may strip it.
+      // Used as seat_id_override in form submissions for pre-assigned cohort passengers.
+      var _seatIdOverride = new URLSearchParams(window.location.search).get('seat_id') || null;
 
       // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -3112,7 +3115,7 @@
               email:     emailVal,
               age_token: _ageToken2,
               source:    'landing'
-            }, (new URLSearchParams(window.location.search).get('seat_id') ? { seat_id_override: new URLSearchParams(window.location.search).get('seat_id') } : {})))
+            }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
           })
           .then(function (r) { return r.json(); })
           .then(function (d) {
