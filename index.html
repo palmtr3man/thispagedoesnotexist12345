@@ -3571,6 +3571,73 @@
     })();
   </script>
 
+  <!-- ── Mission Control deep-link wiring — Apr 19, 2026
+       Rewrites all stale .tech root-only hrefs to named routes using seat_id from URL.
+       Spec: link audit rewrite, Apr 2026.
+       Targets: bstep-2-cta, bstep-6-cta, bstep-7-cta, bstep-8-cta,
+                .mc-tile[Systems], .mc-section-link[Build], .mc-action-btn[Systems],
+                .btn-systems (nav bar) ── -->
+  <script>
+  (function () {
+    var TECH   = 'https://www.thispagedoesnotexist12345.tech';
+    var params = new URLSearchParams(window.location.search);
+    var seatId  = params.get('seat_id')  || '';
+    var tujCode = params.get('tuj_code') || '';
+
+    function deepLink(path, extraQuery) {
+      var url = TECH + path;
+      var qs  = [];
+      if (extraQuery) qs.push(extraQuery);
+      if (seatId)  qs.push('seat_id='  + encodeURIComponent(seatId));
+      if (tujCode) qs.push('tuj_code=' + encodeURIComponent(tujCode));
+      return qs.length ? url + '?' + qs.join('&') : url;
+    }
+
+    // Step 2 — Complete Your Profile → /Passengers
+    var s2 = document.getElementById('bstep-2-cta');
+    if (s2) s2.href = deepLink('/Passengers');
+
+    // Step 6 — Add 5 Target Companies → /FlightLog
+    var s6 = document.getElementById('bstep-6-cta');
+    if (s6) s6.href = deepLink('/FlightLog');
+
+    // Step 7 — Submit 3 Applications → /Applications
+    var s7 = document.getElementById('bstep-7-cta');
+    if (s7) s7.href = deepLink('/Applications');
+
+    // Step 8 — Set Follow-Up Reminders → /FlightLog?view=reminders
+    var s8 = document.getElementById('bstep-8-cta');
+    if (s8) s8.href = deepLink('/FlightLog', 'view=reminders');
+
+    // Ecosystem tile — Systems → /Dashboard
+    document.querySelectorAll('.mc-tile').forEach(function (el) {
+      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
+        el.href = deepLink('/Dashboard');
+      }
+    });
+
+    // Section link — "Open in Systems →" (The Build section) → /FlightLog
+    document.querySelectorAll('.mc-section-link').forEach(function (el) {
+      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
+        el.href = deepLink('/FlightLog');
+      }
+    });
+
+    // Footer action button — ⚙️ Systems → /Dashboard
+    document.querySelectorAll('.mc-action-btn').forEach(function (el) {
+      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
+        el.href = deepLink('/Dashboard');
+      }
+    });
+
+    // Nav bar Systems button (.btn-systems)
+    var navSys = document.querySelector('.btn-systems');
+    if (navSys && (navSys.getAttribute('href') === TECH || navSys.getAttribute('href') === TECH + '/')) {
+      navSys.href = deepLink('/Dashboard');
+    }
+  })();
+  </script>
+
   <!-- ── Status strip tokenization — STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE ── -->
   <!-- Runs once on DOMContentLoaded. Reads seat_id + tuj_code from URL.
        When seat_id present: optimistic update from URL, then async refinement from seat record.
