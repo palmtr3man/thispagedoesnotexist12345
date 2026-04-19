@@ -2651,8 +2651,16 @@
         return localStorage.getItem(AGE_KEY) === '1';
       }
 
+      function hasValidAgeToken() {
+        return !!sessionStorage.getItem('tuj_age_token');
+      }
+
       function needsAgeGate() {
-        return !isAgeVerified();
+        // Fix (Apr 19, 2026): localStorage flag persists across sessions but
+        // sessionStorage token is cleared on browser close. If the flag is set
+        // but the token is missing, show the gate again to re-issue a fresh
+        // signed token — prevents silent block on seat request submission.
+        return !isAgeVerified() || !hasValidAgeToken();
       }
 
       // ── Core: fetch + resolve state ───────────────────────────────────────
