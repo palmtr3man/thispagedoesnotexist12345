@@ -347,7 +347,19 @@ async function sendSeatConfirmation(seat) {
     secondary_url:       secondaryUrl,
     platform_url:        mainSiteUrl,           // Fix 4: resolves {{platform_url}} Main Site footer link
     flight_code:         flightLabel,           // Fix 5 (Apr 18, 2026): templates use {{flight_code}}, not {{flight_display_name}}
-    flight_display_name: flightLabel            // kept for backward-compat; canonical token is flight_code
+    flight_display_name: flightLabel,           // kept for backward-compat; canonical token is flight_code
+
+    // Mission Control deep-link fields (spec: link audit rewrite, Apr 2026)
+    // Templates should use these instead of root-only /?seat_id= links.
+    // All paths use mainSiteUrl (www.) per canonical .com prefix rule.
+    mission_passengers:   `${mainSiteUrl}/Passengers?seat_id=${canonicalSeatId}`,
+    mission_flight_log:   `${mainSiteUrl}/FlightLog?seat_id=${canonicalSeatId}`,
+    mission_applications: `${mainSiteUrl}/Applications?seat_id=${canonicalSeatId}`,
+    mission_reminders:    `${mainSiteUrl}/FlightLog?view=reminders&seat_id=${canonicalSeatId}`,
+    mission_interviews:   `${mainSiteUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}`,
+    mission_dashboard:    `${mainSiteUrl}/Dashboard?seat_id=${canonicalSeatId}`,
+    mission_command:      `${mainSiteUrl}/CommandCenter?seat_id=${canonicalSeatId}`,
+    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}`,
   };
 
   // Select templates based on tier
