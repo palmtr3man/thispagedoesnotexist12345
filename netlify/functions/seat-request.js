@@ -303,7 +303,7 @@ exports.handler = async function (event, context) {
     };
   }
 
-   const { name, email, age_token, source, tier, cabin_tier, amount_paid, referral_code: inboundReferralCode } = body;
+   const { name, email, age_token, source, tier, cabin_tier, amount_paid, referral_code: inboundReferralCode, seat_id_override } = body;
   // --- Validate: age_token (Gate Contract §2a / §5 — BLOCKER-04) ---
   // Must be a valid HMAC-signed token issued by /api/verify-age within the last 24h.
   // age_confirmed: boolean is no longer accepted — token required.
@@ -444,8 +444,19 @@ exports.handler = async function (event, context) {
   }
 
   // --- Generate seat_id (Gate Contract §3) ---
-  const seatId = generateSeatId();
-  console.log(`[seat-request] Generated seat_id ${seatId} for ${emailTrimmed}`);
+  // seat_id_override: allows pre-assigned Alpha cohort passengers to submit with
+  // their canonical ID (e.g. TUJ-KC2222) instead of a randomly generated one.
+  // Validation: must match /^TUJ-[A-Z0-9]{4,}$/ — same regex as handleSeatOpened.
+  // If override is invalid, fall back to generateSeatId() silently.
+  const SEAT_ID_OVERRIDE_REGEX = /^TUJ-[A-Z0-9]{4,}$/;
+  let seatId;
+  if (seat_id_override && typeof seat_id_override === 'string' && SEAT_ID_OVERRIDE_REGEX.test(seat_id_override.trim().toUpperCase())) {
+    seatId = seat_id_override.trim().toUpperCase();
+    console.log(`[seat-request] Using seat_id_override ${seatId} for ${emailTrimmed}`);
+  } else {
+    seatId = generateSeatId();
+    console.log(`[seat-request] Generated seat_id ${seatId} for ${emailTrimmed}`);
+  }
 
   // --- Build passport URL with seat_id pre-filled (Gate Contract §4 — email handoff) ---
   // Fix 3b (Apr 5, 2026): encodeURIComponent removed per canonical spec.

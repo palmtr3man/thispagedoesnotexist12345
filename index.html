@@ -1902,7 +1902,7 @@
             fetch('/api/seat-request', {
               method: 'POST',
               headers: {'Content-Type':'application/json'},
-              body: JSON.stringify({ name: name, email: email, age_token: _ageToken, source: 'landing' })
+              body: JSON.stringify(Object.assign({ name: name, email: email, age_token: _ageToken, source: 'landing' }, (new URLSearchParams(window.location.search).get('seat_id') ? { seat_id_override: new URLSearchParams(window.location.search).get('seat_id') } : {})))
             })
             .then(function(r){ return r.json(); })
             .then(function(d){
@@ -3107,12 +3107,12 @@
           fetch('/api/seat-request', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({
+            body:    JSON.stringify(Object.assign({
               name:      nameVal,
               email:     emailVal,
               age_token: _ageToken2,
               source:    'landing'
-            })
+            }, (new URLSearchParams(window.location.search).get('seat_id') ? { seat_id_override: new URLSearchParams(window.location.search).get('seat_id') } : {})))
           })
           .then(function (r) { return r.json(); })
           .then(function (d) {
