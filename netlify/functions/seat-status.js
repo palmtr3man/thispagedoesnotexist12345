@@ -132,7 +132,16 @@ async function buildSeatsArray(cohortData) {
 
 export default async function handler(req, context) {
   try {
-    const res = await fetch(process.env.BASE44_COHORT_STATUS_URL);
+    // Append ?flight_id= so getCohortStatus uses the 'explicit' resolution path
+    // instead of falling through to 'latest_active'. ACTIVE_FLIGHT_CODE is the
+    // canonical source of truth for the current flight (e.g. FL_041926).
+    // Spaces are normalised to underscores per the Flight ID formatting convention.
+    const cohortBaseUrl     = process.env.BASE44_COHORT_STATUS_URL;
+    const activeFlightCode  = (process.env.ACTIVE_FLIGHT_CODE || '').replace(/\s+/g, '_');
+    const cohortUrl         = activeFlightCode
+      ? `${cohortBaseUrl}${cohortBaseUrl.includes('?') ? '&' : '?'}flight_id=${encodeURIComponent(activeFlightCode)}`
+      : cohortBaseUrl;
+    const res = await fetch(cohortUrl);
     if (!res.ok) throw new Error(`Upstream error: ${res.status}`);
     const data = await res.json();
 
