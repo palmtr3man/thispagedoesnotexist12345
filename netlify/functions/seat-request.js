@@ -491,7 +491,8 @@ exports.handler = async function (event, context) {
     platform_url: platformUrl,
     signal_url:   signalUrl,
     passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.com?seat_id=TUJ-XXXXXX
-    request_date: requestDate
+    request_date: requestDate,
+    flight_code:  process.env.ACTIVE_FLIGHT_CODE || 'FL 041926'
   };
 
   // correlation_id: no flight_id or passenger_id at this stage — use seat_id as request anchor
