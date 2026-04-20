@@ -878,7 +878,86 @@
       box-shadow: 0 0 10px rgba(168,196,0,0.18);
     }
 
-    /* ── Mission Control: Responsive ─────────────────────────────────────── */
+    /* ── Mission Control: Seat Activation Panel (Pilot only) ──────────────── */
+    .mc-activate-panel {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(0,217,255,0.18);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem 1rem;
+      margin-top: 0.25rem;
+    }
+    .mc-activate-panel-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #00D9FF;
+      text-transform: uppercase;
+      margin-bottom: 0.7rem;
+    }
+    .mc-activate-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: flex-end;
+      margin-bottom: 0.6rem;
+    }
+    .mc-activate-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex: 1;
+      min-width: 120px;
+    }
+    .mc-activate-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+    }
+    .mc-activate-select {
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(0,217,255,0.25);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.82rem;
+      padding: 0.42rem 0.65rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .mc-activate-select:focus { border-color: rgba(0,217,255,0.6); }
+    .mc-activate-btn {
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.46rem 1.1rem;
+      border-radius: 6px;
+      border: 1px solid rgba(0,217,255,0.45);
+      color: #00D9FF;
+      background: rgba(0,217,255,0.07);
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+    .mc-activate-btn:hover {
+      border-color: rgba(0,217,255,0.75);
+      background: rgba(0,217,255,0.13);
+      box-shadow: 0 0 10px rgba(0,217,255,0.2);
+    }
+    .mc-activate-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .mc-activate-status {
+      font-size: 0.74rem;
+      min-height: 1.1em;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.03em;
+    }
+    .mc-activate-status.ok  { color: #A8C400; }
+    .mc-activate-status.err { color: #FF4D4D; }
+
+    /* ── Mission Control: Responsive ─────────────────────────────────────────────────────── */
     @media (max-width: 400px) {
       .mc-tiles { grid-template-columns: 1fr; }
       .mc-header { flex-direction: column; }
@@ -1745,7 +1824,42 @@
         </div>
       </div>
 
-      <!-- ── Section 4: Quick Actions ───────────────────────────────────────── -->
+      <!-- ── Section: Seat Activation Panel (Pilot only — hidden for passengers) ── -->
+      <div class="mc-section" id="mc-seat-activate-section" style="display:none;">
+        <h3 class="mc-section-title">&#10022; Seat Activation</h3>
+        <p class="mc-section-desc" style="margin-bottom:0.75rem;">Select the boarding type and cabin class for this flight, then activate to trigger the email sequence.</p>
+        <div class="mc-activate-panel">
+          <div class="mc-activate-panel-title">&#9632; Activate Seat</div>
+          <div class="mc-activate-row">
+            <div class="mc-activate-field">
+              <label class="mc-activate-label" for="mc-boarding-type">Boarding Type</label>
+              <select class="mc-activate-select" id="mc-boarding-type">
+                <option value="">-- Select --</option>
+                <option value="executive_pre">executive_pre &mdash; Exec Pre-Board (Pilot KC only)</option>
+                <option value="standard">standard &mdash; Standard Dual-Tier</option>
+                <option value="vip">vip &mdash; VIP Flight (FL 042426)</option>
+                <option value="beta">beta &mdash; Beta Flight (FL 050526)</option>
+                <option value="sponsored">sponsored &mdash; Sponsored Access</option>
+              </select>
+            </div>
+            <div class="mc-activate-field">
+              <label class="mc-activate-label" for="mc-cabin-class">Cabin Class</label>
+              <select class="mc-activate-select" id="mc-cabin-class">
+                <option value="">-- Select --</option>
+                <option value="First">First &mdash; Paid tier</option>
+                <option value="Sponsored">Sponsored &mdash; Sponsored tier</option>
+                <option value="Economy">Economy &mdash; Free tier</option>
+              </select>
+            </div>
+          </div>
+          <div class="mc-activate-row" style="margin-bottom:0.4rem;">
+            <button class="mc-activate-btn" id="mc-activate-btn" disabled>Activate Seat</button>
+          </div>
+          <div class="mc-activate-status" id="mc-activate-status"></div>
+        </div>
+      </div>
+
+      <!-- ── Section 4: Quick Actions ────────────────────────────────────────────────── -->
       <div class="mc-section mc-section--actions">
         <h3 class="mc-section-title">⚡ Quick Actions</h3>
         <div class="mc-actions">
@@ -3390,6 +3504,101 @@
       document.addEventListener('DOMContentLoaded', refreshMcNavBtn);
       // Also refresh after TUJ state machine may have stored a seat_id
       setTimeout(refreshMcNavBtn, 1200);
+    })();
+
+    // ── Seat Activation Panel — Pilot only (Apr 20, 2026) ──────────────────────────────
+    // The panel is hidden by default (display:none on #mc-seat-activate-section).
+    // It becomes visible only when the session seat_id matches the Pilot's TUJ-KC2222
+    // and the pilot_token is present in sessionStorage (set by the Pilot at login).
+    // The panel calls POST /api/seat-activate with boarding_type, cabin_class, and
+    // pilot_token. On success it shows a confirmation; on error it shows the reason.
+    (function () {
+      var PILOT_SEAT_ID = 'TUJ-KC2222';
+      var PILOT_TOKEN_KEY = 'tuj_pilot_token';
+
+      var section    = document.getElementById('mc-seat-activate-section');
+      var typeSelect = document.getElementById('mc-boarding-type');
+      var classSelect= document.getElementById('mc-cabin-class');
+      var activateBtn= document.getElementById('mc-activate-btn');
+      var statusEl   = document.getElementById('mc-activate-status');
+
+      if (!section || !typeSelect || !classSelect || !activateBtn || !statusEl) return;
+
+      // Show the panel only for Pilot KC
+      function maybeShowPanel() {
+        var storedSeat = sessionStorage.getItem('tuj_seat_id') || '';
+        var pilotToken = sessionStorage.getItem(PILOT_TOKEN_KEY) || '';
+        if (storedSeat === PILOT_SEAT_ID && pilotToken) {
+          section.style.display = '';
+        } else {
+          section.style.display = 'none';
+        }
+      }
+
+      // Enable the Activate button only when both dropdowns have a value
+      function syncBtn() {
+        activateBtn.disabled = !(typeSelect.value && classSelect.value);
+      }
+
+      typeSelect.addEventListener('change', syncBtn);
+      classSelect.addEventListener('change', syncBtn);
+
+      activateBtn.addEventListener('click', function () {
+        var boardingType = typeSelect.value;
+        var cabinClass   = classSelect.value;
+        var pilotToken   = sessionStorage.getItem(PILOT_TOKEN_KEY) || '';
+        var seatId       = sessionStorage.getItem('tuj_seat_id') || '';
+
+        if (!boardingType || !cabinClass) {
+          setStatus('Select both boarding type and cabin class before activating.', 'err');
+          return;
+        }
+        if (!pilotToken) {
+          setStatus('Pilot token not found in session. Re-enter your seat ID to authenticate.', 'err');
+          return;
+        }
+
+        activateBtn.disabled = true;
+        setStatus('Activating…', '');
+
+        fetch('/.netlify/functions/seat-activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            seat_id:       seatId,
+            boarding_type: boardingType,
+            cabin_class:   cabinClass,
+            pilot_token:   pilotToken
+          })
+        })
+        .then(function (res) { return res.json().then(function (body) { return { status: res.status, body: body }; }); })
+        .then(function (r) {
+          if (r.body.ok) {
+            setStatus('✔ Seat activated — ' + boardingType + ' / ' + cabinClass + '. Email sequence triggered.', 'ok');
+            typeSelect.value  = '';
+            classSelect.value = '';
+            activateBtn.disabled = true;
+          } else {
+            var msg = (r.body.error || 'Unknown error') + (r.status === 403 ? ' (auth)' : '');
+            setStatus('✖ ' + msg, 'err');
+            activateBtn.disabled = false;
+          }
+        })
+        .catch(function (err) {
+          setStatus('✖ Network error: ' + err.message, 'err');
+          activateBtn.disabled = false;
+        });
+      });
+
+      function setStatus(msg, cls) {
+        statusEl.textContent = msg;
+        statusEl.className   = 'mc-activate-status' + (cls ? ' ' + cls : '');
+      }
+
+      // Run on load and after state changes
+      maybeShowPanel();
+      document.addEventListener('tuj:statechange', maybeShowPanel);
+      setTimeout(maybeShowPanel, 1500);
     })();
 
      // ── BLOCKER-01: Info Modal — open / close wiring (QA pass Apr 15 2026) ──

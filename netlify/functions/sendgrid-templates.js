@@ -23,6 +23,9 @@
  *   SENDGRID_TEMPLATE_BOARDING_PASS_PAID         → boarding_pass_paid_v1
  *   SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_FREE → boarding_instructions_free_v1
  *   SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_PAID → boarding_instructions_paid_v1
+ *   SENDGRID_TEMPLATE_SPONSORED_APPROVED          → sponsored_approved_v1
+ *   SENDGRID_TEMPLATE_VIP_BOARDING_PASS           → vip_boarding_pass_v1           (STUB — template pending)
+ *   SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS   → vip_boarding_instructions_v1   (STUB — template pending)
  *
  * Fallback IDs are the confirmed canonical values from the SendGrid Template
  * Registry (Notion). They exist so local dev without a .env file still resolves
@@ -61,6 +64,13 @@ const FALLBACKS = {
   boarding_pass_paid_v1:           'd-9290e951724f4b028d94945d4f06b69f',
   boarding_instructions_free_v1:   'd-747dac53dd2c4b47b33400376aad1672',
   boarding_instructions_paid_v1:   'd-d8ec12e940944c5596af1fa740cf7f07',
+  // ── Sponsored path ───────────────────────────────────────────────────────
+  sponsored_approved_v1:           'd-7a7628db6a1e4430b1394a069d0438b0',
+  // ── VIP path — STUBS (templates not yet created in SendGrid) ─────────────
+  // Replace null with the real d-... IDs once created. Do NOT set SENDGRID_STRICT_TEMPLATE_CHECK=true
+  // until these are populated, or cold-start validation will throw.
+  vip_boarding_pass_v1:            null,  // STUB — pending SendGrid template creation (FL 042426)
+  vip_boarding_instructions_v1:    null,  // STUB — pending SendGrid template creation (FL 042426)
 };
 
 // ---------------------------------------------------------------------------
@@ -93,6 +103,17 @@ const TEMPLATES = {
     process.env.SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_FREE || FALLBACKS.boarding_instructions_free_v1,
   boarding_instructions_paid_v1:
     process.env.SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_PAID || FALLBACKS.boarding_instructions_paid_v1,
+  // ── Sponsored path ───────────────────────────────────────────────────────
+  sponsored_approved_v1:
+    process.env.SENDGRID_TEMPLATE_SPONSORED_APPROVED         || FALLBACKS.sponsored_approved_v1,
+  // ── VIP path — STUBS (null until templates are created in SendGrid) ──────
+  // Once created: set SENDGRID_TEMPLATE_VIP_BOARDING_PASS and
+  // SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS in Netlify env, then update
+  // FALLBACKS above with the canonical d-... IDs.
+  vip_boarding_pass_v1:
+    process.env.SENDGRID_TEMPLATE_VIP_BOARDING_PASS          || FALLBACKS.vip_boarding_pass_v1         || null,
+  vip_boarding_instructions_v1:
+    process.env.SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS  || FALLBACKS.vip_boarding_instructions_v1 || null,
 };
 
 // ---------------------------------------------------------------------------

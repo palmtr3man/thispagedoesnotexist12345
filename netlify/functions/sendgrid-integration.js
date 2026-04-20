@@ -8,12 +8,23 @@
  *   boarding_type = "executive_pre"
  *     → exec_preboard_opentowork_v1  (single send; no boarding_confirmation stamp)
  *
- *   boarding_type = anything else (F-190 dual-tier boarding sequence)
+ *   boarding_type = "vip"
+ *     1. vip_boarding_pass_v1          (STUB — template pending creation in SendGrid)
+ *     2. vip_boarding_instructions_v1  (STUB — template pending creation in SendGrid)
+ *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
+ *
+ *   boarding_type = "sponsored"
+ *     → sponsored_approved_v1  (single send; stamps boarding_confirmation_sent_at)
+ *
+ *   boarding_type = "standard" | "beta" | anything else (F-190 dual-tier boarding sequence)
  *     1. boarding_pass_paid_v1   (if cabin_class === 'First')
  *        boarding_pass_free_v1   (all other cabin_class values)
  *     2. boarding_instructions_paid_v1   (if cabin_class === 'First')
  *        boarding_instructions_free_v1   (all other cabin_class values)
  *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
+ *
+ * boarding_type enum (Mission Control Seat Activation Panel — Apr 20, 2026):
+ *   executive_pre | vip | sponsored | standard | beta
  *
  * Provider: SendGrid only (AutoSend retired Apr 12, 2026 — F-190 Phase 2).
  *
@@ -50,7 +61,10 @@ assertTemplates([
   'boarding_pass_paid_v1',
   'boarding_instructions_free_v1',
   'boarding_instructions_paid_v1',
-  'exec_preboard_opentowork_v1'
+  'exec_preboard_opentowork_v1',
+  'sponsored_approved_v1',
+  // vip_boarding_pass_v1 and vip_boarding_instructions_v1 are STUBS — not yet in SendGrid.
+  // assertTemplates is skipped for these until the templates are created and IDs are registered.
 ]);
 
 const TEMPLATE_BOARDING_PASS_FREE           = TEMPLATES.boarding_pass_free_v1;
@@ -58,6 +72,10 @@ const TEMPLATE_BOARDING_PASS_PAID           = TEMPLATES.boarding_pass_paid_v1;
 const TEMPLATE_BOARDING_INSTRUCTIONS_FREE   = TEMPLATES.boarding_instructions_free_v1;
 const TEMPLATE_BOARDING_INSTRUCTIONS_PAID   = TEMPLATES.boarding_instructions_paid_v1;
 const TEMPLATE_EXEC_PREBOARD                = TEMPLATES.exec_preboard_opentowork_v1;
+const TEMPLATE_SPONSORED_APPROVED           = TEMPLATES.sponsored_approved_v1;
+// VIP templates — STUBS pending SendGrid creation. Will be null until registered.
+const TEMPLATE_VIP_BOARDING_PASS            = TEMPLATES.vip_boarding_pass_v1          || null;
+const TEMPLATE_VIP_BOARDING_INSTRUCTIONS    = TEMPLATES.vip_boarding_instructions_v1  || null;
 
 /**
  * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
@@ -305,7 +323,66 @@ async function sendSeatConfirmation(seat) {
     return { success: true };
   }
 
-  // ── F-190 Dual-Tier Boarding Sequence ─────────────────────────────────────
+  // ── VIP path ───────────────────────────────────────────────────────────────
+  // Routes to vip_boarding_pass_v1 + vip_boarding_instructions_v1.
+  // STUB: templates are pending creation in SendGrid. If either template ID is
+  // null (not yet registered), the send is aborted with a clear error so the
+  // operator knows to create the templates before activating a VIP seat.
+  if (boarding_type === 'vip') {
+    console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=vip, routing to VIP dual-send sequence`);
+    if (!TEMPLATE_VIP_BOARDING_PASS || !TEMPLATE_VIP_BOARDING_INSTRUCTIONS) {
+      console.error(`[sendgrid-integration] Seat ${seatId} — VIP templates not yet registered in sendgrid-templates.js. Create vip_boarding_pass_v1 and vip_boarding_instructions_v1 in SendGrid and add their IDs to the registry before activating a VIP seat.`);
+      return { success: false, error: 'vip_boarding_pass_v1 and vip_boarding_instructions_v1 templates are not yet registered. Create them in SendGrid and add IDs to sendgrid-templates.js.' };
+    }
+    const vipPassSent = await sendViaSendGrid(
+      sendgridKey, fromEmail, user_email,
+      TEMPLATE_VIP_BOARDING_PASS, dynamicData,
+      { ...logCtx, template_key: 'vip_boarding_pass_v1' }
+    );
+    if (!vipPassSent) {
+      console.error(`[sendgrid-integration] vip_boarding_pass_v1 send failed for seat ${seatId} — aborting sequence`);
+      return { success: false, error: 'vip_boarding_pass_v1 send failed' };
+    }
+    const vipInstructionsSent = await sendViaSendGrid(
+      sendgridKey, fromEmail, user_email,
+      TEMPLATE_VIP_BOARDING_INSTRUCTIONS, dynamicData,
+      { ...logCtx, template_key: 'vip_boarding_instructions_v1' }
+    );
+    if (!vipInstructionsSent) {
+      console.error(`[sendgrid-integration] vip_boarding_instructions_v1 send failed for seat ${seatId} — boarding_pass already sent, stamp withheld`);
+      return { success: false, error: 'vip_boarding_instructions_v1 send failed' };
+    }
+    if (base44SeatUrl && seatId) {
+      await updateSeatRecord(base44SeatUrl, seatId, {
+        boarding_confirmation_sent_at: new Date().toISOString()
+      });
+    }
+    return { success: true };
+  }
+
+  // ── Sponsored path ─────────────────────────────────────────────────────────
+  // Routes to sponsored_approved_v1 (single send).
+  // Stamps boarding_confirmation_sent_at after confirmed 2xx.
+  if (boarding_type === 'sponsored') {
+    console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=sponsored, routing to sponsored_approved_v1`);
+    const sponsoredSent = await sendViaSendGrid(
+      sendgridKey, fromEmail, user_email,
+      TEMPLATE_SPONSORED_APPROVED, dynamicData,
+      { ...logCtx, template_key: 'sponsored_approved_v1' }
+    );
+    if (!sponsoredSent) {
+      console.error(`[sendgrid-integration] sponsored_approved_v1 send failed for seat ${seatId}`);
+      return { success: false, error: 'sponsored_approved_v1 send failed' };
+    }
+    if (base44SeatUrl && seatId) {
+      await updateSeatRecord(base44SeatUrl, seatId, {
+        boarding_confirmation_sent_at: new Date().toISOString()
+      });
+    }
+    return { success: true };
+  }
+
+  // ── F-190 Dual-Tier Boarding Sequence (standard | beta | fallback) ─────────
   // Tier determination: cabin_class === 'First' → paid; all other values → free
   // (Base44 canonical field is cabin_class, NOT tier or cabin_tier)
   const isPaid = cabin_class === 'First';
