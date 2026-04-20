@@ -238,7 +238,11 @@
     .mc-tag { padding: 7px 11px; border-radius: 999px; font-size: var(--text-xs); letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--color-border); color: var(--color-text-muted); }
     .mc-footer-note { color: var(--color-text-faint); font-size: var(--text-sm); margin-top: 4px; }
 
-    /* ── Studio tool section ──────────────────────────────────────────────── */
+    /* ── Studio tabs base ────────────────────────────────────────────────────── */
+    .mc-studio-tabs { display: flex; }
+    .mc-studio-tabs button { flex-shrink: 0; white-space: nowrap; }
+
+    /* ── Studio tool section ───────────────────────────────────────────────────────── */
     .mc-studio-section { margin-top: var(--space-6); }
     .mc-studio-header {
       display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
@@ -294,8 +298,12 @@
       .mc-hero, .mc-control-band { grid-template-columns: 1fr; }
       .mc-window-panel, .mc-hero-copy { min-height: auto; }
     }
+
+    /* ── Tablet / large mobile (≤ 720px) ────────────────────────────────── */
     @media (max-width: 720px) {
       .mc-shell { padding: var(--space-3) var(--space-4); }
+
+      /* Topbar: stack brand + actions vertically */
       .mc-topbar {
         border-radius: var(--radius-lg);
         padding: var(--space-3) var(--space-4);
@@ -303,6 +311,8 @@
         flex-direction: column;
         gap: var(--space-3);
         top: 8px;
+        width: 100%;
+        box-sizing: border-box;
       }
       .mc-top-actions {
         width: 100%;
@@ -314,6 +324,7 @@
         padding: 7px 10px;
         flex: 1 1 auto;
         min-width: 0;
+        max-width: 100%;
       }
       .mc-pill span:last-child {
         overflow: hidden;
@@ -322,30 +333,101 @@
       }
       #saveBackBtn { font-size: 0.75rem; padding: 0 12px; }
       .mc-btn { font-size: 0.8125rem; padding: 0 14px; }
-      .mc-status-strip { grid-template-columns: 1fr; }
+
+      /* Hero copy: comfortable padding, full-width heading */
+      .mc-hero-copy { padding: var(--space-5); }
+      .mc-h1 { font-size: clamp(2.25rem, 9vw, 3.5rem); max-width: 100%; }
+      .mc-lede { max-width: 100%; }
+
+      /* CTA row: stack buttons full-width */
+      .mc-cta-row { flex-direction: column; gap: var(--space-3); margin-top: var(--space-5); }
+      .mc-cta-row .mc-btn { width: 100%; justify-content: center; }
+
+      /* Scroll hint: ensure it sits below the CTA stack */
+      .mc-scroll-hint { margin-top: var(--space-4); }
+
+      /* Status strip: single column */
+      .mc-status-strip {
+        grid-template-columns: 1fr;
+        margin-top: var(--space-5);
+      }
+      .mc-status-card { padding: var(--space-4); }
+      .mc-status-label { margin-bottom: 6px; }
+      .mc-status-value { font-size: var(--text-base) !important; }
+
+      /* Departure selector: full-width, wrap gracefully */
+      #departureSelectorPanel { padding: 1rem; }
+
+      /* Resume title bar: wrap on narrow screens */
+      #resumeTitleBar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      #resumeIdDisplay { width: 100%; }
+
+      /* Window panel: compact height */
+      .mc-window-panel { min-height: 260px; }
+      .mc-window-view { min-height: 220px; }
+
+      /* Window head: wrap the two labels */
+      .mc-window-head {
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4);
+        font-size: 0.75rem;
+      }
+
+      /* Operator blips: scale down and reposition for smaller window */
+      .mc-operator-blip {
+        width: 120px;
+        height: 80px;
+        padding: 10px;
+        border-radius: 14px;
+      }
+      .mc-operator-blip strong { font-size: 12px; }
+      .mc-operator-blip small { font-size: 10px; }
+      .mc-operator-blip.one  { left: 4%; }
+      .mc-operator-blip.two  { left: 35%; }
+      .mc-operator-blip.three { right: 4%; }
+
+      /* Control surfaces band */
+      .mc-section-card { padding: var(--space-4); }
+      .mc-h2 { font-size: clamp(1.75rem, 6vw, 2.5rem); }
+      .mc-subcopy { max-width: 100%; }
+
+      /* Control rows: single column stack */
       .mc-control-row {
         grid-template-columns: 1fr;
         gap: var(--space-2);
       }
-      .mc-control-row .mc-tag,
-      .mc-control-row .mc-btn { align-self: flex-start; }
-      .mc-h1 { font-size: clamp(2.25rem, 9vw, 3.5rem); max-width: 100%; }
-      .mc-hero-copy { padding: var(--space-5); }
-      .mc-cta-row { flex-direction: column; }
-      .mc-cta-row .mc-btn { width: 100%; justify-content: center; }
-      .mc-window-panel { min-height: 260px; }
-      .mc-window-view { min-height: 220px; }
-      .mc-section-card { padding: var(--space-4); }
+      .mc-control-row .mc-tag { align-self: flex-start; }
+      .mc-control-row .mc-btn {
+        align-self: flex-start;
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* Studio section header */
       .mc-studio-header {
         flex-direction: column;
         align-items: flex-start;
         padding: var(--space-4);
         gap: var(--space-3);
       }
+      .mc-studio-header-left h2 { font-size: 1.375rem; }
       .mc-studio-body { padding: var(--space-4); }
+
+      /* Studio tabs: scrollable row */
+      .mc-studio-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        white-space: nowrap;
+      }
+      .mc-studio-tabs::-webkit-scrollbar { display: none; }
     }
 
-    /* ── iOS-specific mobile fixes (375–430px) ──────────────────────────── */
+    /* ── Small mobile / iOS (≤ 480px) ───────────────────────────────────── */
     @media (max-width: 480px) {
       /* Safe area insets for iPhone notch / Dynamic Island / home bar */
       .mc-shell {
@@ -354,6 +436,7 @@
         padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
         width: 100%;
         max-width: 100vw;
+        overflow-x: hidden;
       }
       .mc-topbar {
         padding-top: max(var(--space-3), env(safe-area-inset-top));
@@ -363,7 +446,36 @@
         max-width: 100%;
         left: 0;
         right: 0;
+        box-sizing: border-box;
       }
+
+      /* Hero copy: tighter padding on very small screens */
+      .mc-hero-copy { padding: var(--space-4); }
+      .mc-h1 { font-size: clamp(2rem, 10vw, 2.75rem); }
+
+      /* Status strip: tighter cards */
+      .mc-status-card { padding: var(--space-3); }
+
+      /* Departure selector: full-width date options */
+      #departureDateOptions { flex-direction: column; }
+
+      /* Window panel: more compact */
+      .mc-window-panel { min-height: 220px; }
+      .mc-window-view { min-height: 180px; }
+
+      /* Operator blips: smaller, prevent overflow */
+      .mc-operator-blip {
+        width: 100px;
+        height: 72px;
+        padding: 8px;
+        border-radius: 10px;
+        max-width: calc(33vw - 0.5rem);
+      }
+      .mc-operator-blip strong { font-size: 11px; margin-top: 4px; }
+      .mc-operator-blip small { font-size: 9px; }
+      .mc-operator-blip.one  { left: 2%; }
+      .mc-operator-blip.two  { left: 34%; }
+      .mc-operator-blip.three { right: 2%; }
 
       /* Studio tabs: scrollable row instead of overflow-hidden */
       .mc-studio-body > div[style*="display:flex"][style*="border-bottom"],
@@ -390,28 +502,28 @@
         grid-template-columns: 1fr !important;
       }
 
-      /* Export tab: single column */
+      /* Export grid: single column */
       #export-tab [style*="grid-template-columns:repeat(3"],
-      #export-tab [style*="grid-template-columns: repeat(3"] {
+      #export-tab [style*="grid-template-columns: repeat(3"],
+      #exportGrid {
         grid-template-columns: 1fr !important;
       }
 
       /* Resume preview: reduce padding so it fits narrow screens */
       .resume-preview {
-        padding: 20px 16px;
-        font-size: 13px;
+        padding: 16px 12px;
+        font-size: 12px;
       }
-      .resume-preview h1 { font-size: 18px; }
+      .resume-preview h1 { font-size: 17px; }
+      .resume-preview .contact-line { font-size: 11px; }
 
-      /* Prevent horizontal overflow from wide inline elements */
-      .mc-operator-blip { max-width: calc(50vw - 2rem); }
-      .mc-operator-blip strong { font-size: 12px; }
-
-      /* Tighten status strip cards */
-      .mc-status-card { padding: var(--space-3); }
-
-      /* Make buttons full-width in control rows on very small screens */
+      /* Control rows: tighter on very small screens */
+      .mc-control-row { padding: var(--space-3); }
       .mc-control-row .mc-btn { width: 100%; justify-content: center; }
+
+      /* Studio body: tighter padding */
+      .mc-studio-body { padding: var(--space-3); }
+      .mc-studio-header { padding: var(--space-3); }
     }
   </style>
 
@@ -606,7 +718,7 @@
       </div>
       <div class="mc-studio-body">
         <!-- Tabs -->
-        <div style="display:flex; gap:2rem; border-bottom:1px solid var(--color-border); margin-bottom:2rem;">
+        <div id="studioTabs" class="mc-studio-tabs" style="display:flex; gap:2rem; border-bottom:1px solid var(--color-border); margin-bottom:2rem;">
           <button class="tab-active" style="padding-bottom:1rem; font-weight:600; transition:color 0.2s;" onclick="switchTab('editor', event)">Resume Editor</button>
           <button class="tab-inactive" style="padding-bottom:1rem; font-weight:600; transition:color 0.2s;" onclick="switchTab('preview', event)">Live Preview</button>
           <button class="tab-inactive" style="padding-bottom:1rem; font-weight:600; transition:color 0.2s;" onclick="switchTab('optimize', event)">AI Optimizer</button>
