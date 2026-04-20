@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Mission Control Gateway — One Page Studio | The Ultimate Journey</title>
 
   <!-- SEO Meta -->
@@ -287,12 +287,117 @@
       .mc-window-panel, .mc-hero-copy { min-height: auto; }
     }
     @media (max-width: 720px) {
-      .mc-shell { padding: var(--space-4); }
-      .mc-topbar { border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); align-items: flex-start; flex-direction: column; }
-      .mc-top-actions { width: 100%; justify-content: space-between; }
+      .mc-shell { padding: var(--space-3) var(--space-4); }
+      .mc-topbar {
+        border-radius: var(--radius-lg);
+        padding: var(--space-3) var(--space-4);
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--space-3);
+        top: 8px;
+      }
+      .mc-top-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+      .mc-pill {
+        font-size: 0.75rem;
+        padding: 7px 10px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .mc-pill span:last-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #saveBackBtn { font-size: 0.75rem; padding: 0 12px; }
+      .mc-btn { font-size: 0.8125rem; padding: 0 14px; }
       .mc-status-strip { grid-template-columns: 1fr; }
-      .mc-control-row { grid-template-columns: 1fr; }
-      .mc-h1 { max-width: 9ch; }
+      .mc-control-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+      }
+      .mc-control-row .mc-tag,
+      .mc-control-row .mc-btn { align-self: flex-start; }
+      .mc-h1 { font-size: clamp(2.25rem, 9vw, 3.5rem); max-width: 100%; }
+      .mc-hero-copy { padding: var(--space-5); }
+      .mc-cta-row { flex-direction: column; }
+      .mc-cta-row .mc-btn { width: 100%; justify-content: center; }
+      .mc-window-panel { min-height: 260px; }
+      .mc-window-view { min-height: 220px; }
+      .mc-section-card { padding: var(--space-4); }
+      .mc-studio-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-4);
+        gap: var(--space-3);
+      }
+      .mc-studio-body { padding: var(--space-4); }
+    }
+
+    /* ── iOS-specific mobile fixes (375–430px) ──────────────────────────── */
+    @media (max-width: 480px) {
+      /* Safe area insets for iPhone notch / Dynamic Island / home bar */
+      .mc-shell {
+        padding-left: max(var(--space-3), env(safe-area-inset-left));
+        padding-right: max(var(--space-3), env(safe-area-inset-right));
+        padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
+      }
+      .mc-topbar {
+        padding-top: max(var(--space-3), env(safe-area-inset-top));
+        top: 0;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      }
+
+      /* Studio tabs: scrollable row instead of overflow-hidden */
+      .mc-studio-body > div[style*="display:flex"][style*="border-bottom"],
+      .mc-studio-body > div[style*="display: flex"][style*="border-bottom"] {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 1.25rem;
+        padding-bottom: 0;
+        scrollbar-width: none;
+      }
+      .mc-studio-body > div[style*="display:flex"][style*="border-bottom"]::-webkit-scrollbar,
+      .mc-studio-body > div[style*="display: flex"][style*="border-bottom"]::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Editor tab: single column */
+      #editor-tab {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* AI Optimizer tab: single column */
+      #optimize-tab [style*="grid-template-columns:1fr 1fr"],
+      #optimize-tab [style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Export tab: single column */
+      #export-tab [style*="grid-template-columns:repeat(3"],
+      #export-tab [style*="grid-template-columns: repeat(3"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Resume preview: reduce padding so it fits narrow screens */
+      .resume-preview {
+        padding: 20px 16px;
+        font-size: 13px;
+      }
+      .resume-preview h1 { font-size: 18px; }
+
+      /* Prevent horizontal overflow from wide inline elements */
+      .mc-operator-blip { max-width: calc(50vw - 2rem); }
+      .mc-operator-blip strong { font-size: 12px; }
+
+      /* Tighten status strip cards */
+      .mc-status-card { padding: var(--space-3); }
+
+      /* Make buttons full-width in control rows on very small screens */
+      .mc-control-row .mc-btn { width: 100%; justify-content: center; }
     }
   </style>
 
