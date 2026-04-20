@@ -415,7 +415,7 @@
     }
   </style>
 
-  <script src="https://cdn.tailwindcss.com" defer></script>
+  <!-- Tailwind CDN removed Apr 20, 2026: page uses custom design-token CSS; CDN was unused overhead -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 
   <!-- Umami Analytics -->
@@ -518,9 +518,9 @@
         </div>
         <div class="mc-window-view">
           <div class="mc-tower-signal"></div>
-          <div class="mc-operator-blip one"><small>Recruiter desk</small><strong>Gate 03 · reviewing profile</strong></div>
-          <div class="mc-operator-blip two"><small>ATS filter</small><strong>Ramp check · parsing resume</strong></div>
-          <div class="mc-operator-blip three"><small>Referral line</small><strong>Pushback queued · waiting handoff</strong></div>
+          <div class="mc-operator-blip one"><small id="blipLabel1">Recruiter desk</small><strong id="blipStatus1">Gate 03 · reviewing profile</strong></div>
+          <div class="mc-operator-blip two"><small id="blipLabel2">ATS filter</small><strong id="blipStatus2">Ramp check · parsing resume</strong></div>
+          <div class="mc-operator-blip three"><small id="blipLabel3">Referral line</small><strong id="blipStatus3">Pushback queued · waiting handoff</strong></div>
           <div class="mc-plane" aria-hidden="true"></div>
           <div class="mc-launchpad" aria-hidden="true"></div>
           <div class="mc-smoke" aria-hidden="true"></div>
@@ -614,7 +614,7 @@
         </div>
 
         <!-- Editor Tab -->
-        <div id="editor-tab" style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+        <div id="editor-tab">
           <div class="glass" style="padding:1.5rem;">
             <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">Edit Resume</h3>
             <div style="margin-bottom:2rem;">
@@ -653,11 +653,15 @@
               <button class="btn-secondary-studio" style="width:100%; margin-top:1rem; justify-content:center;" onclick="addProject()">+ Add Project</button>
             </div>
           </div>
+        </div><!-- /editor-tab -->
+
+        <!-- Preview Tab -->
+        <div id="preview-tab" class="hidden">
           <div class="glass" style="padding:1.5rem;">
             <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">Live Preview</h3>
             <div id="preview" class="resume-preview fade-in"></div>
           </div>
-        </div>
+        </div><!-- /preview-tab -->
 
         <!-- Optimize Tab -->
         <div id="optimize-tab" class="hidden">
@@ -710,7 +714,7 @@
         <div id="export-tab" class="hidden">
           <div class="glass" style="padding:2rem;">
             <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">Export &amp; Download</h3>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;">
+            <div id="exportGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;">
               <div class="glass-accent" style="padding:1.5rem; text-align:center;">
                 <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4C4; PDF</h4>
                 <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Download your resume as a professional PDF document.</p>
@@ -726,6 +730,12 @@
                 <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Save your resume locally in your browser.</p>
                 <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="saveDraft()">Save Draft</button>
               </div>
+              <!-- Career Navigator card — content set by initCareerNavigatorCard() on load -->
+              <div class="glass-accent" id="careerNavCard" style="padding:1.5rem; text-align:center;">
+                <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F680; Career Navigator</h4>
+                <p id="careerNavCardBody" style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Loading&hellip;</p>
+                <button id="careerNavCardBtn" class="btn-primary-studio" style="width:100%; justify-content:center;">Open Career Navigator</button>
+              </div>
             </div>
           </div>
         </div>
@@ -736,6 +746,13 @@
 </div><!-- /mc-shell -->
 
 <script>
+// ── Debounce helper ─────────────────────────────────────────────────────────
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+const debouncedUpdatePreview = debounce(() => updatePreview(), 300);
+
 // ── TBT reduction: yield between long init tasks ────────────────────────────
 function yieldToMain() {
   return new Promise(resolve => {
@@ -757,7 +774,7 @@ function hasResumeContent() {
 }
 
 function switchTab(tab, event) {
-  ['editor','optimize','export'].forEach(t => {
+  ['editor','preview','optimize','export'].forEach(t => {
     const el = document.getElementById(t + '-tab');
     if (el) el.classList.toggle('hidden', t !== tab);
   });
@@ -1092,45 +1109,56 @@ function updatePreview() {
 }
 
 // ============================================================
-// AI OPTIMIZER
+// AI OPTIMIZER — real API-backed functions (Fix #2)
 // ============================================================
+
+// Shared helper: calls /api/studio-ai and renders the markdown result
+async function callStudioAI(action, extraPayload = {}) {
+  const results = document.getElementById('optimizeResults');
+  if (!results) return;
+
+  // Show loading state
+  results.innerHTML = `<div style="padding:1.25rem; border-radius:0.75rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.18); color:var(--color-text-muted); font-size:0.875rem; display:flex; align-items:center; gap:0.75rem;"><span class="spinner"></span> Analysing your resume…</div>`;
+
+  const resume = buildResumePayload();
+  try {
+    const res = await fetch('/api/studio-ai', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ action, resume, ...extraPayload }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Unknown error');
+
+    // Render markdown result (basic conversion: **bold**, ## headings, - lists)
+    const html = data.result
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^### (.+)$/gm, '<h5 style="color:var(--color-primary);margin:0.75rem 0 0.25rem;">$1</h5>')
+      .replace(/^## (.+)$/gm,  '<h4 class="cyan-glow" style="margin:0.75rem 0 0.25rem;">$1</h4>')
+      .replace(/^# (.+)$/gm,   '<h3 class="cyan-glow" style="margin:0.75rem 0 0.25rem;">$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^[-*] (.+)$/gm, '<li style="margin-bottom:0.25rem;">$1</li>')
+      .replace(/(<li[^>]*>.*<\/li>\n?)+/g, m => `<ul style="padding-left:1.25rem; color:var(--color-text-muted);">${m}</ul>`)
+      .replace(/\n{2,}/g, '</p><p style="margin-top:0.5rem; color:var(--color-text-muted);">')
+      .replace(/\n/g, '<br>');
+
+    results.innerHTML = `<div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;"><p style="color:var(--color-text-muted);">${html}</p></div>`;
+  } catch (err) {
+    results.innerHTML = `<div style="padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(255,80,80,0.06); border:1px solid rgba(255,80,80,0.2); color:var(--color-text-muted); font-size:0.875rem;"><strong style="color:#ff8080;">AI analysis failed.</strong> ${esc(err.message)} &mdash; please try again.</div>`;
+  }
+}
+
 function optimizeContent() {
-  document.getElementById('optimizeResults').innerHTML = `
-    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
-      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x2728; Content Enhancement Suggestions</h4>
-      <ul style="display:flex; flex-direction:column; gap:0.5rem; color:var(--color-text-muted);">
-        <li>&#x2713; Add quantifiable metrics to all achievements (e.g. "increased revenue by 30%")</li>
-        <li>&#x2713; Use stronger action verbs: "Led" &rarr; "Spearheaded", "Managed" &rarr; "Directed"</li>
-        <li>&#x2713; Add impact statements to each role</li>
-        <li>&#x2713; Keep descriptions to 2-4 bullet points per role</li>
-      </ul>
-    </div>`;
+  callStudioAI('enhance');
 }
 
 function optimizeATS() {
-  const skillCount = (document.getElementById('skills')?.value || '').split(',').filter(Boolean).length;
-  const score = Math.min(100, 60 + skillCount * 3);
-  document.getElementById('optimizeResults').innerHTML = `
-    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
-      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F3AF; ATS Compatibility Score: ${score}/100</h4>
-      <div style="display:flex; flex-direction:column; gap:0.5rem; color:var(--color-text-muted);">
-        <p>&#x2713; Resume structure is ATS-friendly</p>
-        <p>${skillCount > 5 ? '&#x2713;' : '&#x26A0;'} Skills listed: ${skillCount} ${skillCount <= 5 ? '(add more industry keywords)' : '(good)'}</p>
-        <p>&#x2713; No tables or complex formatting detected</p>
-        <p>&#x26A0; Consider adding a job-specific keyword summary section</p>
-      </div>
-    </div>`;
+  const jd = (document.getElementById('atsJobDescription')?.value || '').trim();
+  callStudioAI('ats', { jobDescription: jd });
 }
 
 function recommendSkills() {
-  document.getElementById('optimizeResults').innerHTML = `
-    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
-      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4A1; Recommended Skills to Add</h4>
-      <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-        ${['Machine Learning','Cloud Architecture','Agile / Scrum','API Design','Team Leadership','Data Analysis','CI/CD','TypeScript'].map(s => '<span style="background:rgba(88,199,215,0.15); color:var(--color-primary); padding:4px 12px; border-radius:999px; cursor:pointer;" onclick="addSkillTag(\'' + s + '\')">' + s + ' +</span>').join('')}
-      </div>
-      <p style="color:var(--color-text-faint); font-size:0.75rem; margin-top:0.75rem;">Click a skill to add it to your resume.</p>
-    </div>`;
+  callStudioAI('skills');
 }
 
 function addSkillTag(skill) {
@@ -1141,20 +1169,37 @@ function addSkillTag(skill) {
 }
 
 function analyzeResume() {
-  const expCount = document.querySelectorAll('#experienceList .exp-entry').length;
-  const eduCount = document.querySelectorAll('#educationList .edu-entry').length;
-  const skillCount = (document.getElementById('skills')?.value || '').split(',').filter(Boolean).length;
-  const words = document.getElementById('summary')?.value?.split(/\s+/).length || 0;
-  document.getElementById('optimizeResults').innerHTML = `
-    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
-      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4CA; Resume Analysis</h4>
-      <div style="display:flex; flex-direction:column; gap:0.5rem; color:var(--color-text-muted);">
-        <p>Experience entries: ${expCount}</p>
-        <p>Education entries: ${eduCount}</p>
-        <p>Skills listed: ${skillCount}</p>
-        <p>Summary word count: ${words} ${words > 80 ? '(consider shortening)' : words < 20 ? '(too short)' : '(good)'}</p>
-      </div>
-    </div>`;
+  callStudioAI('analyze');
+}
+
+// ============================================================
+// CAREER NAVIGATOR EXPORT CARD (Fix #5)
+// ============================================================
+function initCareerNavigatorCard() {
+  const params   = new URLSearchParams(window.location.search);
+  const seatId   = params.get('seat_id') || sessionStorage.getItem('seat_id') || '';
+  const body     = document.getElementById('careerNavCardBody');
+  const btn      = document.getElementById('careerNavCardBtn');
+  const grid     = document.getElementById('exportGrid');
+
+  if (currentResumeId) {
+    // Opened from Career Navigator with a resumeId — offer save-back
+    if (body) body.textContent = 'Save your changes back to Career Navigator so your resume record stays in sync.';
+    if (btn) {
+      btn.textContent = 'Save to Career Navigator';
+      btn.onclick = saveBackToCareerNavigator;
+    }
+  } else {
+    // Standalone session — guide user to Career Navigator to create a record
+    const dashUrl = 'https://thispagedoesnotexist12345.tech/Dashboard' + (seatId ? '?seat_id=' + encodeURIComponent(seatId) : '');
+    if (body) body.innerHTML = 'To sync your resume with Career Navigator, open the Studio from within the app. <a href="' + dashUrl + '" style="color:var(--color-primary);">Go to Career Navigator →</a>';
+    if (btn) {
+      btn.textContent = 'Open Career Navigator';
+      btn.onclick = function () { window.open(dashUrl, '_blank'); };
+    }
+  }
+  // Expand grid to 4 columns now that the card is populated
+  if (grid) grid.style.gridTemplateColumns = 'repeat(4,1fr)';
 }
 
 // ============================================================
@@ -1343,7 +1388,7 @@ window.addEventListener('load', async () => {
   const resumeId = params.get('resumeId');
 
   document.addEventListener('input', (e) => {
-    if (e.target.matches('input, textarea')) updatePreview();
+    if (e.target.matches('input, textarea')) debouncedUpdatePreview();
   });
 
   window.addEventListener('beforeunload', (e) => {
@@ -1369,6 +1414,11 @@ window.addEventListener('load', async () => {
   if (typeof window._initDepartureSelector === 'function') {
     window._initDepartureSelector();
   }
+
+  await yieldToMain();
+
+  // Chunk 4: Career Navigator export card (Fix #5)
+  initCareerNavigatorCard();
 });
 </script>
 
@@ -1394,51 +1444,138 @@ window.addEventListener('load', async () => {
 })();
 </script>
 
-<!-- ── Status strip tokenization — updates from seat record when seat_id present ── -->
+<!-- ── Seat validation + status strip hydration — Apr 20, 2026 ──
+     Validates seat_id via /api/seat (gate-contract VALIDATE_SEAT) before
+     rendering authenticated state. Persists valid seat to sessionStorage
+     using GATE.SESSION_KEY ('seat_id') so it survives tab navigation.
+     Falls back to sessionStorage when URL param is absent.
+     Fail-open on network error (matches gate-contract resolveState() spec).
+     Hydrates status strip from Base44 rich fields after validation. -->
 <script>
 (function () {
+  var SEAT_ID_REGEX  = /^TUJ-[A-Z2-9]{6}$/;
+  var SESSION_KEY    = 'seat_id';
+  var VALIDATE_SEAT  = '/api/seat';
+  var VALIDATION_TIMEOUT_MS = 4000;
+  var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
+
   var params  = new URLSearchParams(window.location.search);
-  var seatId  = params.get('seat_id')  || '';
+  var urlId   = params.get('seat_id')  || '';
   var tujCode = params.get('tuj_code') || '';
 
-  // When seat_id is present, reflect passenger state in status strip
-  if (seatId) {
-    var laneEl = document.getElementById('mcStatusLane');
-    var opsEl  = document.getElementById('mcStatusOperators');
-    var nextEl = document.getElementById('mcStatusNextMove');
-    var pillEl = document.getElementById('gatePillText');
+  // Prefer URL param; fall back to sessionStorage (Fix #4)
+  var rawId = urlId || sessionStorage.getItem(SESSION_KEY) || '';
 
-    // Restore live-data styles on status cards when seat_id is present
-    [laneEl, opsEl, nextEl].forEach(function (el) {
-      if (el) { el.style.fontSize = ''; el.style.color = ''; }
+  if (!rawId || !SEAT_ID_REGEX.test(rawId)) return; // no valid seat — keep onboarding defaults
+
+  // Persist immediately so the session survives navigation without the URL param
+  sessionStorage.setItem(SESSION_KEY, rawId);
+
+  var laneEl = document.getElementById('mcStatusLane');
+  var opsEl  = document.getElementById('mcStatusOperators');
+  var nextEl = document.getElementById('mcStatusNextMove');
+  var pillEl = document.getElementById('gatePillText');
+
+  // Restore live-data styles and set optimistic values
+  [laneEl, opsEl, nextEl].forEach(function (el) {
+    if (el) { el.style.fontSize = ''; el.style.color = ''; }
+  });
+  if (laneEl) laneEl.textContent = tujCode || 'Boarding';
+  if (opsEl)  opsEl.textContent  = '5 active across ramp';
+  if (nextEl) nextEl.textContent = 'Review signal path';
+  if (pillEl) pillEl.textContent = 'Seat active · ' + (tujCode || rawId);
+
+  // ── Fix #1: Validate seat via /api/seat (fail-open on timeout/error) ────────────────
+  var controller = new AbortController();
+  var timer = setTimeout(function () { controller.abort(); }, VALIDATION_TIMEOUT_MS);
+  fetch(VALIDATE_SEAT + '?id=' + encodeURIComponent(rawId), { signal: controller.signal })
+    .then(function (r) {
+      clearTimeout(timer);
+      if (r.status === 400) {
+        // Malformed ID — clear session and reset to onboarding defaults
+        sessionStorage.removeItem(SESSION_KEY);
+        [laneEl, opsEl, nextEl].forEach(function (el) {
+          if (el) { el.style.fontSize = 'var(--text-sm)'; el.style.color = 'var(--color-text-muted)'; }
+        });
+        if (laneEl) laneEl.textContent = 'Add your seat ID to activate';
+        if (opsEl)  opsEl.textContent  = 'Unlocks with seat record';
+        if (nextEl) { nextEl.style.color = 'var(--color-primary)'; nextEl.textContent = 'Build your resume ↓'; }
+        if (pillEl) pillEl.textContent = 'Gate open · overlooked operators visible';
+        return null;
+      }
+      return r.ok ? r.json() : null;
+    })
+    .then(function (data) {
+      if (!data) return;
+      if (data.valid === false) {
+        // Seat inactive/not found — clear session and reset
+        sessionStorage.removeItem(SESSION_KEY);
+        [laneEl, opsEl, nextEl].forEach(function (el) {
+          if (el) { el.style.fontSize = 'var(--text-sm)'; el.style.color = 'var(--color-text-muted)'; }
+        });
+        if (laneEl) laneEl.textContent = 'Seat not recognised';
+        if (opsEl)  opsEl.textContent  = 'Check your seat ID';
+        if (nextEl) { nextEl.style.color = 'var(--color-primary)'; nextEl.textContent = 'Contact support →'; }
+        if (pillEl) pillEl.textContent = 'Seat not found';
+        return;
+      }
+      // Seat valid (or _unchecked fail-open) — now hydrate rich fields from Base44
+      // Intentional direct Base44 call — reads cabin_class, status,
+      // scheduled_departure_date not returned by /api/seat.
+      // This is non-blocking UI hydration only. Do not replace with /api/seat/:id
+      // without extending that endpoint's response schema.
+      fetch(BASE44_SEAT_API + '/' + rawId, { headers: { 'Content-Type': 'application/json' } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (seat) {
+          if (!seat) return;
+          if (laneEl && seat.cabin_class)  laneEl.textContent = seat.cabin_class + ' · ' + (tujCode || rawId);
+          if (opsEl  && seat.status)       opsEl.textContent  = seat.status;
+          if (nextEl && seat.scheduled_departure_date) {
+            nextEl.textContent = 'Departure set · ' + seat.scheduled_departure_date.slice(0, 10);
+          }
+          if (pillEl && seat.cabin_class) pillEl.textContent = seat.cabin_class + ' · ' + (tujCode || rawId) + ' · active';
+
+          // Fix #6: Update operator blips to reflect passenger's actual boarding stage
+          var b1 = document.getElementById('blipStatus1');
+          var b2 = document.getElementById('blipStatus2');
+          var b3 = document.getElementById('blipStatus3');
+          var l1 = document.getElementById('blipLabel1');
+          var l2 = document.getElementById('blipLabel2');
+          var l3 = document.getElementById('blipLabel3');
+          var st = (seat.status || '').toLowerCase();
+          if (seat.scheduled_departure_date) {
+            // Departure confirmed — post-boarding activity
+            if (l1) l1.textContent = 'Operator briefed';
+            if (b1) b1.textContent = 'Route locked · pre-flight check';
+            if (l2) l2.textContent = 'Flight log';
+            if (b2) b2.textContent = 'Active · monitoring signals';
+            if (l3) l3.textContent = 'Departure';
+            if (b3) b3.textContent = 'Confirmed · ' + seat.scheduled_departure_date.slice(0, 10);
+          } else if (st === 'opened') {
+            // Seat opened / actively boarding
+            if (l1) l1.textContent = 'Recruiter desk';
+            if (b1) b1.textContent = 'Gate 03 · reviewing profile';
+            if (l2) l2.textContent = 'ATS filter';
+            if (b2) b2.textContent = 'Ramp check · parsing resume';
+            if (l3) l3.textContent = 'Referral line';
+            if (b3) b3.textContent = 'Pushback queued · waiting handoff';
+          } else if (st === 'approved') {
+            // Seat approved / held — boarding in progress
+            if (l1) l1.textContent = 'Boarding gate';
+            if (b1) b1.textContent = 'Seat approved · boarding sequence active';
+            if (l2) l2.textContent = 'Operator';
+            if (b2) b2.textContent = 'Briefing in progress · route pending';
+            if (l3) l3.textContent = 'Departure window';
+            if (b3) b3.textContent = 'Calculating · awaiting confirmation';
+          }
+        })
+        .catch(function () { /* silently skip hydration on error */ });
+    })
+    .catch(function (err) {
+      clearTimeout(timer);
+      // Network error or AbortError (timeout) — fail open, keep optimistic values
+      console.warn('[Studio] seat validation', err.name === 'AbortError' ? 'timed out' : 'errored', '— failing open for', rawId);
     });
-
-    // Optimistic update from URL — refined if seat record loads
-    if (laneEl) laneEl.textContent = 'Boarding';
-    if (opsEl)  opsEl.textContent  = '5 active across ramp';
-    if (nextEl) nextEl.textContent = 'Review signal path';
-    if (tujCode && laneEl) laneEl.textContent = tujCode;
-    if (pillEl) pillEl.textContent = 'Seat active · ' + (tujCode || seatId);
-
-    // Intentional direct Base44 call — reads rich display fields (cabin_class,
-    // status, scheduled_departure_date) for status strip refinement.
-    // /api/seat only returns { valid, seat_id, status } and cannot serve these fields.
-    // This is non-blocking UI hydration, not seat validation. Do not replace with
-    // /api/seat/:id without extending that endpoint's response schema.
-    var BASE44_SEAT_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Seat';
-    fetch(BASE44_SEAT_API + '/' + seatId, { headers: { 'Content-Type': 'application/json' } })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (seat) {
-        if (!seat) return;
-        if (laneEl && seat.cabin_class)  laneEl.textContent = seat.cabin_class + ' · ' + (tujCode || seatId);
-        if (opsEl  && seat.status)       opsEl.textContent  = seat.status;
-        if (nextEl && seat.scheduled_departure_date) {
-          nextEl.textContent = 'Departure set · ' + seat.scheduled_departure_date.slice(0, 10);
-        }
-        if (pillEl && seat.cabin_class) pillEl.textContent = seat.cabin_class + ' · ' + (tujCode || seatId) + ' · active';
-      })
-      .catch(function () { /* silently skip */ });
-  }
 })();
 </script>
 
