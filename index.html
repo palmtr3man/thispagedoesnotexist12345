@@ -541,10 +541,9 @@
     /* ── Mission Control: Gate Status / Seat Counter (4-P3) ───────────────── */
     #mc-gate-status {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.75rem 1rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
       padding: 0.75rem 1rem;
       margin-bottom: 1.5rem;
       border: 1px solid rgba(168,196,0,0.18);
@@ -574,7 +573,10 @@
       background: transparent;
       cursor: pointer;
       text-decoration: none;
-      white-space: nowrap;
+      white-space: normal;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
       transition: background 0.15s, border-color 0.15s;
     }
     #mc-gate-status .mc-gs-cta:hover {
@@ -615,15 +617,6 @@
     }
     @media (max-width: 480px) {
       .mc-status-strip { grid-template-columns: 1fr; }
-      #mc-gate-status {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      #mc-gate-status .mc-gs-cta {
-        width: 100%;
-        text-align: center;
-        box-sizing: border-box;
-      }
     }
 
     /* ── Mission Control: Sections ───────────────────────────────────────── */
