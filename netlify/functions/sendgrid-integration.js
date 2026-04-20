@@ -320,10 +320,12 @@ async function sendSeatConfirmation(seat) {
   // F-190 Apr 12: CTA URLs use tuj_code (canonical TUJ seat ID e.g. TUJ-KC2222), not seat.id (UUID).
   //   first_task_url corrected to /ResumeFitCheck (was /Studio — wrong path).
   //   secondary_url corrected to /OnboardingPassport (was bare siteUrl — missing path).
+  // P2 Fix (Apr 19, 2026): &tuj_code= appended to firstTaskUrl, secondaryUrl, and mission_studio
+  //   so all 3 CTA links carry both seat_id and tuj_code. Closes P2 open bug.
   const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
   const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
-  const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}`;
-  const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}`;
+  const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
+  const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
   const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
   const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech'; // Base44 app — /Dashboard, /FlightLog, /CommandCenter etc.
   const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
@@ -360,7 +362,7 @@ async function sendSeatConfirmation(seat) {
     mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}`,
     mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}`,
     mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}`,
-    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}`,
+    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`,
   };
 
   // Select templates based on tier

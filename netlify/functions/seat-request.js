@@ -462,7 +462,8 @@ exports.handler = async function (event, context) {
   // Fix 3b (Apr 5, 2026): encodeURIComponent removed per canonical spec.
   // seat_id chars (A-Z, 2-9, hyphen) are URL-safe — no encoding needed or wanted.
   // Canonical form: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
-  const passportUrl = `${passportBase}?seat_id=${seatId}`;
+  // P2 Fix (Apr 19, 2026): tuj_code appended so the acknowledgement email CTA also carries both params.
+  const passportUrl = `${passportBase}?seat_id=${seatId}&tuj_code=${seatId}`;
 
   // Bug-003 fix: pass values without the leading-space pad so the SendGrid template
   // can render "Name: Kevin" style rows without label/value collision.

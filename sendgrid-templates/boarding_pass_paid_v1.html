@@ -31,6 +31,7 @@
     4. Apr 7, 2026 — Alpha Flight 1 → {{flight_code}} token
     5. Apr 14, 2026 — Secondary CTA href: /Studio → /Studio?seat_id={{seat_id}}&tuj_code={{tuj_code}} (post-incident hardening)
     6. Apr 14, 2026 — Alpha test banner block removed (internal-only label, not for production sends)
+    7. Apr 19, 2026 — P2 fix: applied patch 5 to live HTML (was still missing &tuj_code= in href)
 -->
 <html lang="en">
 <head>
@@ -184,7 +185,7 @@
       <a href="{{passport_url}}" class="cta-btn-primary">❖ Mission Control — First Class</a>
       <br />
       <!-- SECONDARY CTA: Boarding Gate -->
-      <a href="https://www.thispagedoesnotexist12345.com/Studio?seat_id={{seat_id}}" class="cta-btn-secondary">Proceed to Boarding Gate →</a>
+      <a href="https://www.thispagedoesnotexist12345.com/Studio?seat_id={{seat_id}}&tuj_code={{tuj_code}}" class="cta-btn-secondary">Proceed to Boarding Gate →</a>
     </div>
 
     <div class="footer">
