@@ -69,7 +69,8 @@ const ASM_GROUPS_TO_DISPLAY  = ASM_MARKETING_GROUP_ID
   : [ASM_GROUP_ID];
 const NOTION_API_VERSION = '2022-06-28';
 const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '5e6440af0ad94c6d89a8442ec2c528f3';
-const SUBJECT      = 'Your seat request is in — FL 041926 ✈️';
+const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL 041926';
+const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
 
 // --- Gate Contract constants ---
 const SEAT_ID_PREFIX = 'TUJ-';
@@ -482,22 +483,30 @@ exports.handler = async function (event, context) {
   };
 
   // --- Send user acknowledgement via SendGrid ---
+  // Canon token alignment (Apr 19, 2026): flight_code is canonical across all boarding templates.
+  // flight_id is aliased to the same value for backward-compat with seat_request_acknowledgement_v1
+  // which was built against {{flight_id}}. Both tokens resolve to the same string.
+  const activeFlightCode = process.env.ACTIVE_FLIGHT_CODE || ACTIVE_FLIGHT_CODE_DEFAULT;
   const dynamicTemplateData = {
-    subject:      SUBJECT,
+    subject:      SUBJECT_TEMPLATE(activeFlightCode),
     first_name:   firstName,
     full_name:    nameTrimmed,
     email:        emailTrimmed,
     seat_id:      seatId,
+    tuj_code:     seatId,          // alias: same value as seat_id for templates that use {{tuj_code}}
     source:       sourceValue,
     platform_url: platformUrl,
     signal_url:   signalUrl,
-    passport_url: passportUrl,   // https://www.thispagedoesnotexist12345.com?seat_id=TUJ-XXXXXX
+    passport_url: passportUrl,     // https://www.thispagedoesnotexist12345.com?seat_id=TUJ-XXXXXX&tuj_code=TUJ-XXXXXX
     request_date: requestDate,
-    flight_code:  process.env.ACTIVE_FLIGHT_CODE || 'FL 041926'
+    flight_code:  activeFlightCode,  // canonical token used by all boarding templates
+    flight_id:    activeFlightCode   // alias: seat_request_acknowledgement_v1 uses {{flight_id}}
   };
 
   // correlation_id: no flight_id or passenger_id at this stage — use seat_id as request anchor
   const correlationId = `req_${seatId}`;
+  // subject is now dynamic — update the SendGrid personalizations subject to match
+  // (SendGrid dynamic templates can override subject via personalizations.dynamic_template_data.subject)
 
   try {
     const t0_ack = Date.now();

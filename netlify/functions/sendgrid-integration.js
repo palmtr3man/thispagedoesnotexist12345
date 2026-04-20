@@ -349,8 +349,9 @@ async function sendSeatConfirmation(seat) {
     first_task_url:      firstTaskUrl,
     secondary_url:       secondaryUrl,
     platform_url:        mainSiteUrl,           // Fix 4: resolves {{platform_url}} Main Site footer link
-    flight_code:         flightLabel,           // Fix 5 (Apr 18, 2026): templates use {{flight_code}}, not {{flight_display_name}}
-    flight_display_name: flightLabel,           // kept for backward-compat; canonical token is flight_code
+    flight_code:         flightLabel,           // canonical token — all boarding templates use {{flight_code}}
+    flight_id:           flightLabel,           // alias: seat_request_acknowledgement_v1 uses {{flight_id}} (Apr 19, 2026 alignment)
+    flight_display_name: flightLabel,           // kept for backward-compat
 
     // Mission Control deep-link fields (spec: link audit rewrite, Apr 2026)
     // Templates should use these instead of root-only /?seat_id= links.
