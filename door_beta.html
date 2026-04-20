@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passenger Door — The Ultimate Journey</title>
+  <meta name="description" content="Your seat is confirmed. Step through the door." />
+  <!-- Prevent search indexing — this is a private passenger entry point -->
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:      #00D9FF;
+      --accent-dim:  rgba(0, 217, 255, 0.18);
+      --accent-glow: rgba(0, 217, 255, 0.35);
+      --bg:          #0A0A0A;
+      --glass:       rgba(10, 10, 10, 0.72);
+      --text:        #ffffff;
+      --muted:       rgba(255, 255, 255, 0.62);
+      --border:      rgba(0, 217, 255, 0.22);
+      --red:         #ff4d4d;
+      --red-dim:     rgba(255, 77, 77, 0.14);
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Starfield background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(0, 217, 255, 0.04) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(0,180,255,0.03) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 0 40px rgba(0, 217, 255, 0.06), 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    /* ── Header ── */
+    .wordmark {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .wordmark::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* ── States ── */
+    .state { display: none; }
+    .state.active { display: block; }
+
+    /* Loading */
+    #state-loading .spinner {
+      width: 36px;
+      height: 36px;
+      border: 2px solid rgba(0, 217, 255, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.25rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #state-loading p {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* Valid seat — boarding */
+    #state-valid .headline {
+      font-size: 1.55rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+    #state-valid .headline span { color: var(--accent); }
+    #state-valid .subline {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+      line-height: 1.55;
+    }
+
+    .seat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--accent-dim);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 1.75rem;
+    }
+    .seat-badge svg { flex-shrink: 0; }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 0.85rem 1.25rem;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      background: #bfdb00;
+      box-shadow: 0 0 28px rgba(0, 217, 255, 0.55);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
+    /* Invalid / no seat */
+    #state-invalid .icon {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    #state-invalid .headline {
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.6rem;
+    }
+    #state-invalid .subline {
+      font-size: 0.88rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.55;
+      margin-bottom: 1.75rem;
+    }
+    #state-invalid .btn-primary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+    #state-invalid .btn-primary:hover {
+      background: var(--accent-dim);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    /* Error */
+    #state-error .icon { font-size: 2rem; text-align: center; margin-bottom: 1rem; }
+    #state-error .headline {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    #state-error .subline {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 1.5rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.28);
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+    .footer a { color: rgba(0, 217, 255, 0.5); text-decoration: none; }
+    .footer a:hover { color: var(--accent); }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin: 1.5rem 0;
+    }
+
+    /* ── Checklist ── */
+    .checklist {
+      list-style: none;
+      margin-bottom: 1.75rem;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+      line-height: 1.45;
+    }
+    .checklist li .dot {
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 0.45rem;
+      box-shadow: 0 0 6px var(--accent-glow);
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.25rem; }
+      #state-valid .headline { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+    <div class="wordmark">The Ultimate Journey &mdash; Passenger Door</div>
+
+    <!-- STATE: Loading -->
+    <div id="state-loading" class="state active">
+      <div class="spinner"></div>
+      <p>Verifying your seat&hellip;</p>
+    </div>
+
+    <!-- STATE: Valid seat — proceed to ResumeFitCheck -->
+    <div id="state-valid" class="state">
+      <div class="headline">Your seat is <span>confirmed.</span></div>
+      <div class="subline">Welcome aboard. Your flight plan is ready.</div>
+      <div class="seat-badge" id="seat-badge-display">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <circle cx="6" cy="6" r="5.5" stroke="#00D9FF" stroke-width="1"/>
+          <path d="M3.5 6l1.8 1.8 3.2-3.2" stroke="#00D9FF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="seat-id-display">TUJ-XXXXXX</span>
+      </div>
+      <ul class="checklist">
+        <li><span class="dot"></span>Seat assigned and active</li>
+        <li><span class="dot"></span>Boarding sequence complete</li>
+        <li><span class="dot"></span>Resume Fit Check ready to run</li>
+      </ul>
+      <a id="cta-fitcheck" href="#" class="btn-primary">Run Resume Fit Check &rarr;</a>
+      <a id="cta-passport" href="#" class="btn-secondary">View Onboarding Passport</a>
+    </div>
+
+    <!-- STATE: Invalid / no seat -->
+    <div id="state-invalid" class="state">
+      <div class="icon">🛂</div>
+      <div class="headline">No confirmed seat found.</div>
+      <div class="subline">
+        This door is only accessible to passengers with a confirmed seat.<br />
+        If you haven&rsquo;t requested a seat yet, start at the beginning.
+      </div>
+      <a href="https://www.thispagedoesnotexist12345.com/#request-seat" class="btn-primary">
+        Request a Seat &rarr;
+      </a>
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-secondary">
+        Back to the newsletter
+      </a>
+    </div>
+
+    <!-- STATE: Error (API unreachable) -->
+    <div id="state-error" class="state">
+      <div class="icon">⚠️</div>
+      <div class="headline">Something went wrong.</div>
+      <div class="subline">
+        We couldn&rsquo;t verify your seat right now. Please try again in a moment.<br />
+        If the issue persists, contact <a href="mailto:support@thispagedoesnotexist12345.com" style="color:var(--accent)">support</a>.
+      </div>
+      <button class="btn-primary" onclick="location.reload()">Try again</button>
+    </div>
+
+    <hr class="divider" />
+    <div class="footer">
+      &copy; 2026 The Ultimate Journey &mdash;
+      <a href="https://newsletter.thispagedoesnotexist12345.us/">newsletter.thispagedoesnotexist12345.us</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const APP_URL    = 'https://theultimatejourney.base44.app';
+  const SEAT_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+
+  function showState(id) {
+    document.querySelectorAll('.state').forEach(function (el) {
+      el.classList.toggle('active', el.id === id);
+    });
+  }
+
+  function getSeatIdFromUrl() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      return (params.get('seat_id') || '').trim().toUpperCase();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function renderValidState(seatId) {
+    var displayEl = document.getElementById('seat-id-display');
+    if (displayEl) displayEl.textContent = seatId;
+
+    var fitCheckEl = document.getElementById('cta-fitcheck');
+    if (fitCheckEl) {
+      fitCheckEl.href = APP_URL + '/ResumeFitCheck?seat_id=' + encodeURIComponent(seatId);
+    }
+
+    var passportEl = document.getElementById('cta-passport');
+    if (passportEl) {
+      passportEl.href = APP_URL + '/OnboardingPassport?seat_id=' + encodeURIComponent(seatId);
+    }
+
+    showState('state-valid');
+  }
+
+  async function validateSeat(seatId) {
+    try {
+      var res = await fetch('/api/seat?id=' + encodeURIComponent(seatId), {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!res.ok) {
+        console.warn('[door] /api/seat returned', res.status);
+        showState('state-error');
+        return;
+      }
+
+      var data = await res.json();
+
+      if (data.valid === true) {
+        // Fail-open case: _unchecked means Base44 was unreachable but we let them through
+        renderValidState(seatId);
+      } else {
+        showState('state-invalid');
+      }
+    } catch (err) {
+      console.error('[door] Seat validation error:', err);
+      showState('state-error');
+    }
+  }
+
+  // ── Entry point ──────────────────────────────────────────────────────────
+  var seatId = getSeatIdFromUrl();
+
+  if (!seatId) {
+    // No seat_id in URL — show the invalid/no-seat state immediately
+    showState('state-invalid');
+    return;
+  }
+
+  if (!SEAT_REGEX.test(seatId)) {
+    // Malformed seat_id — show invalid state
+    showState('state-invalid');
+    return;
+  }
+
+  // Valid format — verify against /api/seat
+  validateSeat(seatId);
+})();
+</script>
+</body>
+</html>

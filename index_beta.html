@@ -1,0 +1,3702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon & PWA -->
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <!-- SEO Meta -->
+    <meta name="description" content="The Ultimate Journey — a career optimization platform. Join the flight manifest and be first to know when the gate opens.">
+    <meta name="robots" content="index,follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.thispagedoesnotexist12345.com/">
+    <meta property="og:title" content="The Ultimate Journey – Career Optimization Platform">
+    <meta property="og:description" content="Join the flight manifest and be first to know when the gate opens.">
+    <meta property="og:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Ultimate Journey – Career Optimization Platform">
+    <meta name="twitter:description" content="Join the flight manifest and be first to know when the gate opens.">
+    <meta name="twitter:image" content="https://www.thispagedoesnotexist12345.com/og-image.png">
+
+    <!-- JSON-LD: WebSite schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://www.thispagedoesnotexist12345.com/#website",
+      "name": "The Ultimate Journey",
+      "description": "A career optimization platform.",
+      "url": "https://www.thispagedoesnotexist12345.com/"
+    }
+    </script>
+
+  <title>The Ultimate Journey – Career Optimization Platform</title>
+
+  <!-- Umami Analytics — .com domain -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="5c935661-0414-4670-8777-a89e47266187"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #ffffff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 1.5rem 0 2rem;
+    }
+
+    /* Black Glass Theme */
+    body.black-glass {
+      background: #0A0A0A;
+    }
+
+    body.black-glass .container {
+      background: rgba(10, 10, 10, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body.black-glass h1 {
+      color: #00D9FF;
+    }
+
+    .container {
+      max-width: 700px;
+      width: 90%;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      opacity: 1;
+      color: #ffffff;
+      margin-bottom: 0.75rem;
+    }
+
+    .lede {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: rgba(255, 255, 255, 0.78);
+      margin-bottom: 1.75rem;
+      max-width: 520px;
+    }
+
+    /* Cyberpunk status section */
+    .status-section {
+      position: relative;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .status-scanlines {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 217, 255, 0.02) 2px,
+        rgba(0, 217, 255, 0.02) 4px
+      );
+      pointer-events: none;
+    }
+
+    .status-title {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      flex-wrap: wrap;
+    }
+
+    .status-title-label {
+      opacity: 1;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .badge {
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(0, 217, 255, 0.5);
+      background: rgba(0, 217, 255, 0.12);
+      color: #00D9FF;
+      white-space: nowrap;
+    }
+
+    .badge--highlight {
+      border-color: rgba(0, 217, 255, 0.6);
+      background: rgba(0, 217, 255, 0.15);
+      color: #00D9FF;
+    }
+
+    .badge--meta {
+      opacity: 0.7;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      opacity: 1;
+      color: #ffffff;
+      margin-bottom: 1.5rem;
+      max-width: 100%;
+      box-sizing: border-box;
+      word-wrap: break-word;
+    }
+
+    .status-text .date {
+      color: #00D9FF;
+      opacity: 0.8;
+    }
+
+    /* Hoverable path keywords */
+    .status-text .path {
+      color: #00D9FF;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-block;
+      position: relative;
+    }
+
+    .status-text .path::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #00D9FF;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .status-text .path:hover {
+      color: #fff;
+      text-shadow: 0 0 12px rgba(0, 217, 255, 0.9);
+      transform: scale(1.05);
+    }
+
+    .status-text .path:hover::after {
+      opacity: 1;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      letter-spacing: 0.05em;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 217, 255, 0.25);
+      color: #00D9FF;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 217, 255, 0.6);
+      box-shadow: 0 0 12px rgba(0, 217, 255, 0.2);
+    }
+
+    .btn-row-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    .btn-row-divider::before,
+    .btn-row-divider::after {
+      content: '';
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: rgba(0, 217, 255, 0.4);
+    }
+
+    .btn-row-divider span {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(0, 217, 255, 0.8);
+    }
+
+    .btn-row-waitlist {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .btn-waitlist {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 217, 255, 0.25);
+      color: #00D9FF;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+
+    .btn-waitlist:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 217, 255, 0.6);
+      box-shadow: 0 0 12px rgba(0, 217, 255, 0.2);
+    }
+
+    .btn-waitlist.unlocked {
+      border-color: rgba(0, 217, 255, 0.8);
+      box-shadow: 0 0 16px rgba(0, 217, 255, 0.35);
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.5); }
+    }
+    @keyframes arriving-glow {
+      0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 100, 0.4); }
+      50% { box-shadow: 0 0 14px rgba(0, 255, 100, 0.9); }
+    }
+    .badge--arriving {
+      background: rgba(0, 255, 100, 0.12);
+      color: #00ff64;
+      border: 1px solid rgba(0, 255, 100, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      animation: arriving-glow 2s ease-in-out infinite;
+    }
+    .arriving-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #00ff64;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse-green 1.2s ease-in-out infinite;
+    }
+
+    .status-title--carrier {
+      flex-wrap: wrap;
+      row-gap: 0.4rem;
+    }
+
+    .badge--highlight .full-text { display: inline; }
+    .badge--highlight .short-text { display: none; }
+
+    @media (max-width: 600px) {
+      .badge--highlight .full-text { display: none; }
+      .badge--highlight .short-text { display: inline; }
+    }
+
+    footer {
+      font-size: 0.75rem;
+      opacity: 0.4;
+      margin-top: 1.5rem;
+    }
+
+    /* ── State machine: body[data-state] visibility rules ─────────────────── */
+    /* Elements tagged [data-show-state] are hidden unless body matches */
+    [data-show-state] { display: none !important; }
+    body[data-state='loading']   [data-show-state~='loading']   { display: revert !important; }
+    body[data-state='landing']   [data-show-state~='landing']   { display: revert !important; }
+    body[data-state='dashboard'] [data-show-state~='dashboard'] { display: revert !important; }
+    body[data-state='departed']  [data-show-state~='departed']  { display: revert !important; }
+    /* Elements that show in multiple states */
+    body[data-state='landing']   [data-show-state~='any']       { display: revert !important; }
+    body[data-state='dashboard'] [data-show-state~='any']       { display: revert !important; }
+    body[data-state='departed']  [data-show-state~='any']       { display: revert !important; }
+
+    /* ── Age gate overlay ─────────────────────────────────────────────────── */
+    #age-gate-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+    #age-gate-overlay.active {
+      display: flex;
+    }
+    .age-gate-card {
+      max-width: 420px;
+      width: 90%;
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid rgba(0, 217, 255, 0.35);
+      border-radius: 14px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .age-gate-card h2 {
+      color: #00D9FF;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .age-gate-card p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+    /* DOB input grid (4-P2) */
+    .age-gate-dob {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.4fr;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .age-gate-dob-field { display: flex; flex-direction: column; }
+    .age-gate-dob label {
+      display: block;
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+    }
+    .age-gate-dob select,
+    .age-gate-dob input[type=number] {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(0, 217, 255, 0.25);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.55rem 0.4rem;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .age-gate-dob select:focus,
+    .age-gate-dob input[type=number]:focus {
+      outline: none;
+      border-color: rgba(0, 217, 255, 0.6);
+    }
+    /* hide number spinners */
+    .age-gate-dob input[type=number]::-webkit-inner-spin-button,
+    .age-gate-dob input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .age-gate-dob input[type=number] { -moz-appearance: textfield; }
+    #age-gate-error {
+      font-size: 0.8rem;
+      color: #ff6b6b;
+      min-height: 1.2em;
+      margin-bottom: 0.5rem;
+    }
+    .age-gate-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .age-gate-confirm {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      background: rgba(0, 217, 255, 0.12);
+      border: 1px solid rgba(0, 217, 255, 0.6);
+      color: #00D9FF;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .age-gate-confirm:hover:not(:disabled) {
+      background: rgba(0, 217, 255, 0.2);
+      box-shadow: 0 0 14px rgba(0, 217, 255, 0.25);
+    }
+    .age-gate-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+    .age-gate-deny {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0.25rem;
+      letter-spacing: 0.04em;
+    }
+    .age-gate-deny:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── Dashboard view (state: dashboard) ───────────────────────────────── */
+    /* Note: display, opacity, transform, filter, pointer-events are all owned    */
+    /* by the smooth-transition block above. Only layout/visual props here.       */
+    #dashboard-view {
+      display: none;
+      text-align: left;
+      padding: 1.5rem;
+      border: 1px solid rgba(0, 217, 255, 0.25);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.45);
+      margin-bottom: 1.5rem;
+    }
+    /* ── Mission Control: Header ──────────────────────────────────────────── */
+    .mc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .mc-title {
+      color: #00D9FF;
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      margin: 0 0 0.25rem;
+    }
+    .mc-subtitle {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.04em;
+      margin: 0;
+    }
+    .mc-seat-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.15rem;
+      flex-shrink: 0;
+    }
+    .mc-seat-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      color: rgba(0, 217, 255, 0.4);
+      text-transform: uppercase;
+    }
+    .mc-seat-id {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #00D9FF;
+      letter-spacing: 0.1em;
+      font-family: monospace;
+    }
+
+    /* ── Mission Control: Gate Status / Seat Counter (4-P3) ───────────────── */
+    #mc-gate-status {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0, 217, 255, 0.18);
+      border-radius: 6px;
+      background: rgba(0, 217, 255, 0.04);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+    }
+    #mc-gate-status .mc-gs-label {
+      color: rgba(0, 217, 255, 0.5);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    #mc-gate-status .mc-gs-value {
+      color: #00D9FF;
+      font-weight: 600;
+    }
+    #mc-gate-status .mc-gs-cta {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid rgba(0, 217, 255, 0.35);
+      border-radius: 4px;
+      color: #00D9FF;
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: normal;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    #mc-gate-status .mc-gs-cta:hover {
+      background: rgba(0, 217, 255, 0.1);
+      border-color: rgba(0, 217, 255, 0.6);
+    }
+    #mc-gate-status .mc-gs-cta[data-action='none'] {
+      display: none;
+    }
+
+    /* ── Mission Control: Status Strip ─────────────────────────────────── */
+    .mc-status-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    .mc-status-card {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(0, 217, 255, 0.15);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+    }
+    .mc-status-label {
+      font-size: 0.65rem;
+      color: rgba(0, 217, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.25rem;
+    }
+    .mc-status-value {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.3;
+    }
+    @media (max-width: 480px) {
+      .mc-status-strip { grid-template-columns: 1fr; }
+    }
+
+    /* ── Mission Control: Sections ───────────────────────────────────────── */
+    .mc-section {
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+    }
+    .mc-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .mc-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .mc-section-title {
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(0, 217, 255, 0.7);
+      margin: 0 0 0.5rem;
+    }
+    .mc-section-desc {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.45);
+      margin: 0 0 1rem;
+      line-height: 1.5;
+    }
+    .mc-section-link {
+      font-size: 0.75rem;
+      color: rgba(0, 217, 255, 0.55);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .mc-section-link:hover { color: #00D9FF; }
+
+    /* ── Mission Control: Boarding Steps ─────────────────────────────────── */
+    .boarding-steps {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .boarding-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 217, 255, 0.12);
+      background: rgba(0,0,0,0.3);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .boarding-step:hover {
+      border-color: rgba(0, 217, 255, 0.28);
+      background: rgba(0, 217, 255, 0.03);
+    }
+    .boarding-step.done {
+      border-color: rgba(0, 217, 255, 0.4);
+      background: rgba(0, 217, 255, 0.05);
+    }
+    .bstep-num {
+      font-size: 0.65rem;
+      font-family: monospace;
+      color: rgba(0, 217, 255, 0.35);
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+      padding-top: 0.1rem;
+      min-width: 1.5rem;
+    }
+    .boarding-step.done .bstep-num { color: rgba(0, 217, 255, 0.7); }
+    .bstep-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .bstep-name {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+    }
+    .boarding-step.done .bstep-name { color: #00D9FF; }
+    .bstep-desc {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.4;
+    }
+    .bstep-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.45rem;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #00D9FF;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      background: rgba(0, 217, 255, 0.06);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      width: fit-content;
+    }
+    .bstep-cta:hover {
+      background: rgba(0, 217, 255, 0.14);
+      border-color: rgba(0, 217, 255, 0.65);
+      color: #fff;
+    }
+    .bstep-cta-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.15s;
+    }
+    .bstep-cta:hover .bstep-cta-arrow { transform: translateX(3px); }
+    .bstep-status {
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      color: rgba(0, 217, 255, 0.25);
+      padding-top: 0.1rem;
+    }
+    .boarding-step.done .bstep-status { color: #00D9FF; }
+
+    /* ── Mission Control: Ecosystem Tiles ───────────────────────────────── */
+    .mc-tiles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+    }
+    .mc-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 0.9rem;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      background: rgba(0,0,0,0.35);
+      text-decoration: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      position: relative;
+    }
+    .mc-tile:hover {
+      border-color: rgba(0, 217, 255, 0.55);
+      background: rgba(0, 217, 255, 0.06);
+      box-shadow: 0 0 12px rgba(0, 217, 255, 0.12);
+    }
+    .mc-tile-icon { font-size: 1.2rem; }
+    .mc-tile-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #00D9FF;
+      letter-spacing: 0.03em;
+    }
+    .mc-tile-desc {
+      font-size: 0.74rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.4;
+    }
+    .mc-tile-arrow {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.85rem;
+      font-size: 0.85rem;
+      color: rgba(0, 217, 255, 0.3);
+      transition: color 0.2s, transform 0.2s;
+    }
+    .mc-tile:hover .mc-tile-arrow {
+      color: #00D9FF;
+      transform: translateX(3px);
+    }
+
+    /* ── Mission Control: The Build table ───────────────────────────────── */
+    .build-table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 217, 255, 0.15);
+      margin-bottom: 0.75rem;
+    }
+    .build-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .build-table thead tr {
+      background: rgba(0, 217, 255, 0.07);
+    }
+    .build-table th {
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      color: rgba(0, 217, 255, 0.6);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.12);
+    }
+    .build-table td {
+      padding: 0.5rem 0.75rem;
+      color: rgba(255,255,255,0.7);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .build-table tbody tr:last-child td { border-bottom: none; }
+    .build-table tbody tr:hover td { background: rgba(0, 217, 255, 0.04); }
+    .build-row--empty td {
+      text-align: center;
+      padding: 1.25rem;
+    }
+    .build-empty-msg {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.03em;
+    }
+    .build-status-key {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .build-key-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+    }
+    .build-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Mission Control: Quick Actions ─────────────────────────────────── */
+    .mc-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .mc-action-btn {
+      font-size: 0.82rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      color: #00D9FF;
+      text-decoration: none;
+      background: rgba(0,0,0,0.4);
+      letter-spacing: 0.03em;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .mc-action-btn:hover {
+      border-color: rgba(0, 217, 255, 0.7);
+      background: rgba(0, 217, 255, 0.08);
+      box-shadow: 0 0 10px rgba(0, 217, 255, 0.18);
+    }
+
+    /* ── Mission Control: Responsive ─────────────────────────────────────── */
+    @media (max-width: 400px) {
+      .mc-tiles { grid-template-columns: 1fr; }
+      .mc-header { flex-direction: column; }
+      .mc-seat-badge { align-items: flex-start; }
+    }
+    /* ── Smooth state transitions ─────────────────────────────────────────── */
+    /* All direct children of .container (except overlays + carousel) slide+fade on state change */
+    .container > :not(#age-gate-overlay):not(#dashboard-view):not(.carousel-wrap) {
+      will-change: transform, opacity, filter;
+      transition: opacity 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms ease;
+    }
+    /* Carousel-wrap fades with state but never translates — keeps slide math clean */
+    .container > .carousel-wrap {
+      transition: opacity 420ms ease;
+      will-change: opacity;
+    }
+
+    /* Dashboard starts invisible and shifted down — CSS drives the animation */
+    #dashboard-view {
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(4px);
+      pointer-events: none;
+      transition: opacity 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms ease;
+    }
+
+    /* In dashboard state: landing content slides up + fades out */
+    body[data-state='dashboard'] .container > :not(#age-gate-overlay):not(#dashboard-view):not(.carousel-wrap) {
+      opacity: 0;
+      transform: translateY(-18px);
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    /* In dashboard state: dashboard view slides in + fades in */
+    body[data-state='dashboard'] #dashboard-view {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      pointer-events: auto;
+    }
+
+    /* Suppress transitions during the loading flash to avoid jank */
+    /* Exclude .carousel-wrap and .carousel-track so slide animation is never killed */
+    body[data-state='loading'] .container > :not(.carousel-wrap) {
+      transition: none !important;
+    }
+
+    /* ── Age confirmation checkbox row ─────────────────────────────────────── */
+    .age-check {
+      width: 100%;
+      padding: 0.85rem 0.9rem;
+      border: 1px solid rgba(0, 217, 255, 0.35);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .age-check:has(input:checked) {
+      border-color: rgba(0, 217, 255, 0.7);
+    }
+    .age-check input[type='checkbox'] {
+      margin-top: 0.15rem;
+      flex-shrink: 0;
+      accent-color: #00D9FF;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .age-check span {
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Welcome Aboard banner (shown once on ?status=boarded) */
+    #welcome-aboard-banner {
+      display: none;
+      background: rgba(0, 217, 255, 0.1);
+      border: 1px solid rgba(0, 217, 255, 0.4);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.88rem;
+      color: #00D9FF;
+      letter-spacing: 0.03em;
+    }
+
+    .carousel-wrap {
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      width: 100%;
+      flex-shrink: 0;
+      padding: 1.75rem 1.5rem;
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    .carousel-slide h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #00D9FF;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.02em;
+    }
+
+    .carousel-slide p {
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 0.75rem;
+    }
+
+    .carousel-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(0, 217, 255, 0.25);
+      border: 1px solid rgba(0, 217, 255, 0.4);
+      cursor: pointer;
+      transition: background 0.25s, box-shadow 0.25s;
+    }
+
+    .carousel-dot.active {
+      background: #00D9FF;
+      box-shadow: 0 0 6px rgba(0, 217, 255, 0.6);
+    }
+
+    .puzzle-tracker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      width: 100%;
+    }
+
+    .puzzle-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(0, 217, 255, 0.3);
+    }
+
+    .puzzle-diamonds {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .puzzle-diamond {
+      font-size: 1.1rem;
+      color: rgba(0, 217, 255, 0.2);
+      transition: color 0.35s ease, text-shadow 0.35s ease;
+    }
+
+    .puzzle-diamond.lit {
+      color: #00D9FF;
+      text-shadow: 0 0 8px rgba(0, 217, 255, 0.7), 0 0 16px rgba(0, 217, 255, 0.4);
+    }
+
+    /* St. Patrick's Day Theme (March 17 only) */
+    .st-patricks { --accent: #2E8B3A; }
+
+    .st-patricks .btn,
+    .st-patricks .btn-waitlist,
+    .st-patricks .boarding-card,
+    .st-patricks .status-section,
+    .st-patricks .carousel,
+    .st-patricks .carousel-slide h3,
+    .st-patricks .puzzle-label,
+    .st-patricks .puzzle-diamond.lit {
+      border-color: #2E8B3A;
+      color: #2E8B3A;
+      text-shadow: none;
+    }
+
+    .st-patricks h1 { color: #2E8B3A; }
+
+    .st-patricks .badge {
+      border-color: rgba(46, 139, 58, 0.5);
+      background: rgba(46, 139, 58, 0.12);
+      color: #2E8B3A;
+    }
+
+    .st-patricks .badge--highlight {
+      border-color: rgba(46, 139, 58, 0.6);
+      background: rgba(46, 139, 58, 0.15);
+      color: #2E8B3A;
+    }
+
+    .st-patricks .btn-waitlist.unlocked {
+      box-shadow: 0 0 16px rgba(46, 139, 58, 0.4);
+    }
+
+    footer .st-patricks-accent { color: #2E8B3A; }
+
+    @media (max-width: 480px) {
+      .container { width: 95%; padding: 2rem 1.25rem; }
+      h1 { font-size: 1.6rem; }
+      .status-section { padding: 1.25rem 1rem; }
+      .status-title { font-size: 0.8rem; }
+      .btn-row { flex-direction: column; align-items: stretch; }
+      .btn { text-align: center; width: 100%; }
+      .btn-row-waitlist { padding: 0 0; }
+      .btn-waitlist { width: 100%; text-align: center; }
+      .carousel-slide { padding: 1.25rem 1rem; }
+    }
+
+    .gate-locked-msg {
+      display: none;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 217, 255, 0.15);
+      color: rgba(0, 217, 255, 0.4);
+      text-align: center;
+      cursor: default;
+      margin-bottom: 1rem;
+    }
+
+    .gate-closed-reveal {
+      display: none;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 217, 255, 0.25);
+      background: rgba(0, 0, 0, 0.5);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    /* Countdown Timer */
+    .countdown-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 48px;
+    }
+
+    .countdown-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #00D9FF;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(0, 217, 255, 0.5);
+      margin-top: 0.2rem;
+    }
+
+    .countdown-sep {
+      font-size: 1.4rem;
+      color: rgba(0, 217, 255, 0.4);
+      align-self: flex-start;
+      padding-top: 0.1rem;
+    }
+
+    .countdown-departed {
+      font-size: 0.85rem;
+      color: rgba(0, 217, 255, 0.5);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 0.75rem 0 0.25rem;
+    }
+  
+    /* Canvas hero — flight-path particle animation (ported from career-navigator) */
+    #hero-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #hero-canvas.ready {
+      opacity: 1;
+    }
+    body > .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── BLOCKER-01: Info Modal — What is TUJ Explainer + Alpha Disclaimer ── */
+    #info-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      background: rgba(0, 217, 255, 0.08);
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      color: rgba(0, 217, 255, 0.85);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+      margin-top: 0.75rem;
+    }
+    #info-btn:hover {
+      background: rgba(0, 217, 255, 0.15);
+      border-color: rgba(0, 217, 255, 0.6);
+      color: #00D9FF;
+    }
+    #info-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    #info-modal-overlay.active { display: flex; }
+    .info-modal-card {
+      max-width: 480px;
+      width: 100%;
+      background: rgba(10, 10, 10, 0.97);
+      border: 1px solid rgba(0, 217, 255, 0.35);
+      border-radius: 16px;
+      padding: 2rem 1.75rem 1.75rem;
+      text-align: left;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .info-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 1.25rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .info-modal-close:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .info-modal-card h2 {
+      color: #00D9FF;
+      font-size: 1.25rem;
+      margin-bottom: 0.35rem;
+    }
+    .info-modal-card .info-modal-tagline {
+      font-size: 0.8rem;
+      color: rgba(0, 217, 255, 0.55);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .info-modal-section {
+      margin-bottom: 1.1rem;
+    }
+    .info-modal-section h3 {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(0, 217, 255, 0.7);
+      margin-bottom: 0.4rem;
+    }
+    .info-modal-section p {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .info-modal-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .info-modal-steps li {
+      font-size: 0.87rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.55;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .info-modal-steps li .step-icon { flex-shrink: 0; }
+    .info-modal-disclaimer {
+      background: rgba(255, 180, 0, 0.07);
+      border: 1px solid rgba(255, 180, 0, 0.25);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.1rem;
+    }
+    .info-modal-disclaimer h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 180, 0, 0.8);
+      margin-bottom: 0.35rem;
+    }
+    .info-modal-disclaimer p {
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.6;
+      margin: 0;
+    }
+    .info-modal-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+    .info-modal-links a {
+      font-size: 0.82rem;
+      color: #00D9FF;
+      text-decoration: none;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .info-modal-links a:hover {
+      background: rgba(0, 217, 255, 0.1);
+      border-color: rgba(0, 217, 255, 0.6);
+    }
+</style>
+</head>
+<body class="black-glass" data-state="loading">
+  <div class="container">
+    <h1 data-show-state="landing departed">🚀 The Ultimate Journey</h1>
+    <p class="subtitle" data-show-state="landing departed">Career Optimization Platform</p>
+
+    <!-- Static lede — 10-second clarity fix (Apr 12, 2026) -->
+    <!-- Answers "what is this and why should I care?" without relying on the carousel. -->
+    <p class="lede" data-show-state="landing departed">A focused career program that maps your experience to what the market is actually hiring for — one cohort, five seats, full-system support from resume to offer.</p>
+
+    <!-- BLOCKER-01: Info button — triggers What is TUJ modal -->
+    <div data-show-state="landing departed" style="text-align:center;margin-bottom:0.5rem;">
+      <button id="info-btn" aria-haspopup="dialog" aria-controls="info-modal-overlay" data-umami-event="Info Modal Open">
+        ℹ️ What is TUJ?
+      </button>
+    </div>
+
+    <!-- CAROUSEL -->
+    <div class="carousel-wrap" data-show-state="landing departed">
+      <div class="carousel" id="mainCarousel">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide">
+            <h3>Your career has a flight plan.</h3>
+            <p>The Ultimate Journey runs one focused cohort through the full system — mapping your experience to what the market is actually hiring for.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>Built for the overlooked operator.</h3>
+            <p>This first cohort is for operators who've been out of the market, restarting, or stuck. No experience floor. No gatekeeping — just clear checkpoints.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>One flight. Five seats.</h3>
+            <p>PageForward Airways is carrying 5 passengers on this flight through the TUJ system. Every outcome is logged to the manifest and shared in the newsletter.</p>
+          </div>
+          <div class="carousel-slide">
+            <h3>Gate open. Then wheels up.</h3>
+            <p>Every bug, fix, and passenger milestone is recorded. When this flight departs, the gate closes until the next cohort is scheduled.</p>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots">
+        <div class="carousel-dot active" data-index="0"></div>
+        <div class="carousel-dot" data-index="1"></div>
+        <div class="carousel-dot" data-index="2"></div>
+        <div class="carousel-dot" data-index="3"></div>
+      </div>
+    </div>
+
+    <!-- ── BLOCKER-01: Info Modal — What is TUJ Explainer + Alpha Disclaimer ── -->
+    <div id="info-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="info-modal-title" aria-hidden="true">
+      <div class="info-modal-card">
+        <button class="info-modal-close" id="info-modal-close" aria-label="Close">&times;</button>
+        <h2 id="info-modal-title">✈️ What is The Ultimate Journey?</h2>
+        <p class="info-modal-tagline">PageForward Airways &mdash; FL 041926 &mdash; Alpha Flight 1</p>
+
+        <div class="info-modal-section">
+          <h3>The Mission</h3>
+          <p>The Ultimate Journey is a focused career optimization program — one cohort, five seats, full-system support from resume to offer. We map your experience to what the market is actually hiring for, then work the system until you land.</p>
+        </div>
+
+        <div class="info-modal-section">
+          <h3>What &ldquo;Request a Seat&rdquo; Means</h3>
+          <p>Requesting a seat puts you on the flight manifest. There are exactly 5 seats on this flight. Once the tower reviews your request and confirms your seat, you receive a boarding pass and access to the full TUJ system.</p>
+        </div>
+
+        <div class="info-modal-section">
+          <h3>What Happens After Boarding</h3>
+          <ul class="info-modal-steps">
+            <li><span class="step-icon">🎫</span> Boarding pass issued &rarr; you land in the Studio</li>
+            <li><span class="step-icon">📄</span> Upload your resume + paste a job description</li>
+            <li><span class="step-icon">🎯</span> Run Resume Fit Check &rarr; ATS score + gap analysis</li>
+            <li><span class="step-icon">✏️</span> Tailor your resume variant in One Page Studio</li>
+            <li><span class="step-icon">🚀</span> Apply, track, and close in the Application Hub</li>
+          </ul>
+        </div>
+
+        <div class="info-modal-disclaimer">
+          <h3>⚠️ Alpha Disclaimer</h3>
+          <p>This is a <strong>family alpha</strong> — a private, invite-only test flight with 5 seats. The system is live but not public. Bugs will happen. Your feedback shapes what gets built next. This is not a course, a subscription, or a product launch. It is a working flight.</p>
+        </div>
+
+        <div class="info-modal-links">
+          <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" data-umami-event="Info Modal — Signal Link">📡 Signal Newsletter</a>
+          <a href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer" data-umami-event="Info Modal — Support Link">📅 Book a Consultation</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Age Gate Overlay (4-P2: Option C — DOB collection + age_token) ── -->
+    <div id="age-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
+      <div class="age-gate-card">
+        <h2 id="age-gate-title">✈️ Passenger Verification</h2>
+        <p>The Ultimate Journey is designed for career-focused adults. Please confirm your date of birth to continue boarding.</p>
+        <div class="age-gate-dob">
+          <div class="age-gate-dob-field">
+            <label for="ag-month">Month</label>
+            <select id="ag-month" aria-label="Birth month">
+              <option value="">MM</option>
+              <option value="1">01</option><option value="2">02</option>
+              <option value="3">03</option><option value="4">04</option>
+              <option value="5">05</option><option value="6">06</option>
+              <option value="7">07</option><option value="8">08</option>
+              <option value="9">09</option><option value="10">10</option>
+              <option value="11">11</option><option value="12">12</option>
+            </select>
+          </div>
+          <div class="age-gate-dob-field">
+            <label for="ag-day">Day</label>
+            <select id="ag-day" aria-label="Birth day"><option value="">DD</option></select>
+          </div>
+          <div class="age-gate-dob-field">
+            <label for="ag-year">Year</label>
+            <input id="ag-year" type="number" placeholder="YYYY" min="1900" max="2099" aria-label="Birth year" />
+          </div>
+        </div>
+        <div id="age-gate-error" role="alert"></div>
+        <div class="age-gate-actions">
+          <button class="age-gate-confirm" id="age-gate-confirm-btn" disabled>Verify Age &amp; Continue</button>
+          <button class="age-gate-deny" id="age-gate-deny-btn">I cannot confirm — take me back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Seat ID Entry Modal (shown when ?mission-control without valid seat_id) ── -->
+    <div id="seat-id-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="sig-title" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+      <div class="age-gate-card" style="max-width:380px;">
+        <h2 id="sig-title" style="color:#00D9FF;font-size:1.25rem;margin-bottom:0.5rem;">❖ Mission Control</h2>
+        <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:1.25rem;line-height:1.6;">Enter your Seat ID to access your dashboard.<br><span style="font-size:0.78rem;opacity:0.6;">Your ID was included in your boarding confirmation email.</span></p>
+        <input
+          id="sig-input"
+          type="text"
+          placeholder="TUJ-XXXXXX"
+          maxlength="10"
+          autocomplete="off"
+          spellcheck="false"
+          style="width:100%;padding:0.65rem 0.9rem;border-radius:8px;border:1px solid rgba(0, 217, 255, 0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:1rem;font-family:monospace;letter-spacing:0.1em;text-transform:uppercase;outline:none;box-sizing:border-box;margin-bottom:0.5rem;"
+          oninput="this.value=this.value.toUpperCase();"
+          onfocus="this.style.borderColor='rgba(0, 217, 255, 0.8)'"
+          onblur="this.style.borderColor='rgba(0, 217, 255, 0.35)'"
+        />
+        <div id="sig-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1.2em;margin-bottom:0.5rem;line-height:1.5;"></div>
+        <div class="age-gate-actions">
+          <button class="age-gate-confirm" id="sig-confirm-btn">Access Mission Control</button>
+          <button class="age-gate-deny" id="sig-cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Mission Control Dashboard (state: dashboard) ───────────────── -->
+    <div id="dashboard-view">
+
+      <!-- Welcome Aboard banner (shown once on ?status=boarded) -->
+      <div id="welcome-aboard-banner">
+        🎉 Welcome Aboard — your seat is confirmed. Check your inbox for your boarding pass.
+      </div>
+
+      <!-- ── Header row: title + seat badge ───────────────────────────────────── -->
+      <div class="mc-header">
+        <div>
+          <h2 class="mc-title">❖ Mission Control</h2>
+          <p class="mc-subtitle">Your career optimization platform is active.</p>
+        </div>
+        <div class="mc-seat-badge">
+          <span class="mc-seat-label">SEAT</span>
+          <span id="dashboard-seat-id" class="mc-seat-id">—</span>
+        </div>
+      </div>
+
+      <!-- ── Gate Status / Seat Counter (4-P3) ─────────────────────────────────────────── -->
+      <!-- Driven by resolveGateState() in the TUJ State Machine (below).
+           JS populates #mc-gs-count-value and #mc-gs-cta on every rerender(). -->
+      <div id="mc-gate-status">
+        <div>
+          <span class="mc-gs-label">Gate Status</span>
+          <span id="mc-gs-count-value" class="mc-gs-value">Loading…</span>
+        </div>
+        <a id="mc-gs-cta" class="mc-gs-cta" href="#seat-request-form" data-action="none">Request seat</a>
+      </div>
+
+
+      <!-- ── Status Strip — tokenized: STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE ── -->
+      <!-- JS defaults shown when no seat_id present; URL params + seat record override on load. -->
+      <div class="mc-status-strip" id="mcStatusStrip">
+        <div class="mc-status-card">
+          <div class="mc-status-label">Current lane</div>
+          <div class="mc-status-value" id="mcStatusLane">Boarding</div>
+        </div>
+        <div class="mc-status-card">
+          <div class="mc-status-label">Visible operators</div>
+          <div class="mc-status-value" id="mcStatusOperators">5 active</div>
+        </div>
+        <div class="mc-status-card">
+          <div class="mc-status-label">Clearest next move</div>
+          <div class="mc-status-value" id="mcStatusNextMove">Review signal path</div>
+        </div>
+      </div>
+
+      <!-- ── Section 1: 8-Step Boarding Sequence ─────────────────────────────────────────── -->
+      <div class="mc-section">
+        <h3 class="mc-section-title">📍 Boarding Sequence</h3>
+        <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
+        <ol class="boarding-steps">
+
+          <!-- Step 1: Subscribe to Signal — already done on boarding -->
+          <li class="boarding-step done" id="bstep-1">
+            <span class="bstep-num">01</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Subscribe to Signal</span>
+              <span class="bstep-desc">Your mission brief arrives via newsletter. Issue #001 is your first brief.</span>
+              <a class="bstep-cta" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">
+                Open Signal <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="1">✔</span>
+          </li>
+
+          <!-- Step 2: Complete Your Profile — opens Systems / OnboardingPassport -->
+          <li class="boarding-step" id="bstep-2">
+            <span class="bstep-num">02</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Complete Your Profile</span>
+              <span class="bstep-desc">Set your headline, target titles, and location in your passenger record.</span>
+              <a class="bstep-cta" id="bstep-2-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open Systems — Passenger Record <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="2">○</span>
+          </li>
+
+          <!-- Step 3: Link Resume to Studio -->
+          <li class="boarding-step" id="bstep-3">
+            <span class="bstep-num">03</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Link Your Resume to Studio</span>
+              <span class="bstep-desc">Upload or build your one-page resume in the AI Resume Builder.</span>
+              <a class="bstep-cta" href="/Studio" target="_blank" rel="noopener noreferrer">
+                Open Studio <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="3">○</span>
+          </li>
+
+          <!-- Step 4: Optimize LinkedIn -->
+          <li class="boarding-step" id="bstep-4">
+            <span class="bstep-num">04</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Optimize LinkedIn</span>
+              <span class="bstep-desc">Headline, About, and Skills aligned with your target titles.</span>
+              <a class="bstep-cta" href="https://www.linkedin.com/in/me" target="_blank" rel="noopener noreferrer">
+                Open LinkedIn Profile <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="4">○</span>
+          </li>
+
+          <!-- Step 5: Book a Consultation -->
+          <!-- CalendarJet CTA is hidden by default; shown only when intake_mode=CALENDARJET -->
+          <li class="boarding-step" id="bstep-5">
+            <span class="bstep-num">05</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Book a Consultation</span>
+              <span class="bstep-desc" id="bstep-5-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
+              <a class="bstep-cta" id="bstep-5-cta" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer" style="display:none;">
+                Book 30-Min Session <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="5">○</span>
+          </li>
+
+          <!-- Step 6: Add 5 Target Companies -->
+          <li class="boarding-step" id="bstep-6">
+            <span class="bstep-num">06</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Add 5 Target Companies</span>
+              <span class="bstep-desc">Research and log your first five target companies in The Build.</span>
+              <a class="bstep-cta" id="bstep-6-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open The Build <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="6">○</span>
+          </li>
+
+          <!-- Step 7: Submit 3 Applications -->
+          <li class="boarding-step" id="bstep-7">
+            <span class="bstep-num">07</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Submit 3 Applications</span>
+              <span class="bstep-desc">Apply to three roles. Log each one in The Build pipeline.</span>
+              <a class="bstep-cta" id="bstep-7-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Log Applications in The Build <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="7">○</span>
+          </li>
+
+          <!-- Step 8: Set Follow-Up Reminders -->
+          <li class="boarding-step" id="bstep-8">
+            <span class="bstep-num">08</span>
+            <div class="bstep-body">
+              <span class="bstep-name">Set Follow-Up Reminders</span>
+              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission in The Build.</span>
+              <a class="bstep-cta" id="bstep-8-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+                Open The Build — Set Reminders <span class="bstep-cta-arrow">→</span>
+              </a>
+            </div>
+            <span class="bstep-status" data-step="8">○</span>
+          </li>
+
+        </ol>
+      </div>
+
+      <!-- ── Section 2: Ecosystem Tiles ─────────────────────────────────────── -->
+      <div class="mc-section">
+        <h3 class="mc-section-title">📡 Your Paths</h3>
+        <div class="mc-tiles">
+
+          <a class="mc-tile" href="/Studio" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">📄</span>
+            <span class="mc-tile-name">Studio</span>
+            <span class="mc-tile-desc">AI Resume Builder — ATS-optimized, one-page, PDF export</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+          <a class="mc-tile" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">📡</span>
+            <span class="mc-tile-name">Signal</span>
+            <span class="mc-tile-desc">Weekly mission briefs — strategy, tools, and field intelligence</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+          <a class="mc-tile" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">⚙️</span>
+            <span class="mc-tile-name">Systems</span>
+            <span class="mc-tile-desc">Onboarding passport, boarding documents, and job tracker</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+          <a class="mc-tile" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">
+            <span class="mc-tile-icon">🗺️</span>
+            <span class="mc-tile-name">Field Guide</span>
+            <span class="mc-tile-desc">Career field guide — subscriber access only</span>
+            <span class="mc-tile-arrow">→</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- ── Section 3: The Build — Application Pipeline ──────────────────────── -->
+      <div class="mc-section">
+        <div class="mc-section-header">
+          <h3 class="mc-section-title">🛠 The Build — Application Pipeline</h3>
+          <a class="mc-section-link" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">Open in Systems →</a>
+        </div>
+        <p class="mc-section-desc">Track every role. Update status as you move through each stage. Full tracker lives in Systems (.tech).</p>
+        <div class="build-table-wrap">
+          <table class="build-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Applied</th>
+                <th>Follow-Up</th>
+              </tr>
+            </thead>
+            <tbody id="build-pipeline-body">
+              <tr class="build-row build-row--empty">
+                <td colspan="6">
+                  <span class="build-empty-msg">🔵 No applications logged yet — add your first target company to get started.</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="build-status-key">
+          <span class="build-key-item"><span class="build-dot" style="background:#4A90D9"></span>Researching</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#F5A623"></span>Applied</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#F8A100"></span>In Review</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#00D9FF"></span>Interview</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#7ED321"></span>Offer</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#ff4444"></span>Closed</span>
+        </div>
+      </div>
+
+      <!-- ── Section 4: Quick Actions ───────────────────────────────────────── -->
+      <div class="mc-section mc-section--actions">
+        <h3 class="mc-section-title">⚡ Quick Actions</h3>
+        <div class="mc-actions">
+          <a class="mc-action-btn" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer">
+            📅 Book a Consultation
+          </a>
+          <a class="mc-action-btn" href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer">
+            ☕ Support the Journey
+          </a>
+          <a class="mc-action-btn" href="https://www.linkedin.com/in/kclark27" target="_blank" rel="noopener noreferrer">
+            🔗 LinkedIn
+          </a>
+        </div>
+      </div>
+
+      <!-- ── Dashboard footer nav ──────────────────────────────────────────── -->
+      <div class="mc-section" style="border-bottom:none;margin-bottom:0;padding-bottom:0;padding-top:0.5rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;">
+          <a class="mc-action-btn" href="/Studio" target="_blank" rel="noopener noreferrer">📄 Studio</a>
+          <a class="mc-action-btn" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">📡 Signal</a>
+          <a class="mc-action-btn" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">⚙️ Systems</a>
+          <a class="mc-action-btn" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">📚 Resources</a>
+        </div>
+        <p style="font-size:0.7rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:0.75rem;letter-spacing:0.04em;">&copy; 2026 The Ultimate Journey</p>
+      </div>
+
+    </div><!-- /#dashboard-view -->
+
+    <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
+    <div class="status-section" id="loading-dock" data-show-state="landing departed">
+      <div class="status-scanlines"></div>
+
+      <div class="status-title">
+        <span class="status-title-label">Flight:</span>
+        <span class="badge badge--flight" id="flight-number">Solo Flight 1 ✈️</span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Arrival Time:</span>
+        <span class="badge badge--arriving" id="arrival-time">
+          <span class="arriving-dot"></span>
+          <span id="arrival-text">8:34 AM ET</span>
+        </span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Departure Time:</span>
+        <span class="badge badge--highlight" id="departure-time-badge">2:01 AM ET</span>
+
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Departure Date:</span>
+        <span class="badge badge--arriving" id="departure-date">
+          <span class="arriving-dot"></span>April 3
+        </span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Status:</span>
+        <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
+          <span class="full-text">DELAYED</span>
+          <span class="short-text">DELAYED</span>
+        </span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Loading Dock:</span>
+        <span class="badge badge--status" id="dock-status">GATE OPEN</span>
+      </div>
+
+      <!-- Countdown Timer -->
+      <div id="countdown-container" style="margin-top:1rem;margin-bottom:0.25rem;">
+        <div class="countdown-wrap" id="countdown-wrap">
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-hours">00</span>
+            <span class="countdown-label">Hours</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-minutes">00</span>
+            <span class="countdown-label">Minutes</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-seconds">00</span>
+            <span class="countdown-label">Seconds</span>
+          </div>
+        </div>
+        <div class="countdown-departed" id="countdown-departed" style="display:none;">✈️ Wheels Up — Flight Departed</div>
+      </div>
+
+      <!-- Seat ID invalid recovery notice (shown by rerender() when seat_id is rejected) -->
+      <div
+        id="seat-invalid-notice"
+        data-show-state="landing"
+        style="display:none;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.35);border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.55;text-align:center;margin-bottom:0.75rem;"
+      >
+        That Seat ID wasn’t found on this flight.
+        Check your boarding confirmation email, or
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#00D9FF;text-decoration:underline;">join Signal</a>
+        to stay on the manifest.
+      </div>
+
+      <!-- F148: Primary CTA → POST /api/seat-request -->
+      <!-- #cta-wrapper: stacked + centered so seat-count note renders below the button, not inline -->
+      <div id="cta-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:1.25rem auto;text-align:center;">
+
+        <!-- Step 1: Request a Seat button (shown by default) -->
+        <button
+          class="btn-waitlist unlocked"
+          id="waitlistBtn"
+          data-umami-event="Waitlist Click"
+          onclick="(function(){
+            document.getElementById('waitlistBtn').style.display = 'none';
+            var f = document.getElementById('seat-request-form');
+            f.style.display = 'flex';
+            f.querySelector('input[name=name]').focus();
+          })()"
+        >
+          ✈️ Request a Seat
+        </button>
+
+        <!-- Join the Waitlist CTA — shown when flight is full (open_count >= 5) -->
+        <a
+          id="joinWaitlistBtn"
+          href="https://newsletter.thispagedoesnotexist12345.us/"
+          class="btn-waitlist unlocked"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-umami-event="Join Waitlist Click"
+          style="display:none;"
+        >
+          📡 Join the Waitlist
+        </a>
+
+        <!-- Step 2: Inline name + email form (hidden until button clicked) -->
+        <form
+          id="seat-request-form"
+          style="display:none;flex-direction:column;align-items:center;gap:0.6rem;width:100%;max-width:340px;"
+          onsubmit="(function(e){
+            e.preventDefault();
+            var form  = document.getElementById('seat-request-form');
+            var name  = form.querySelector('input[name=name]').value.trim();
+            var email = form.querySelector('input[name=email]').value.trim();
+            var errEl = document.getElementById('seat-form-error');
+            var subBtn = document.getElementById('seat-submit-btn');
+            errEl.textContent = '';
+            if (!name)  { errEl.textContent = 'Name is required.'; return; }
+            if (!email) { errEl.textContent = 'Email is required.'; return; }
+            var _ageToken = sessionStorage.getItem('tuj_age_token') || null;
+            if (!_ageToken) {
+              errEl.textContent = 'Age verification required. Please complete the passenger verification step first.';
+              return;
+            }
+            subBtn.disabled = true;
+            subBtn.textContent = '⏳ Submitting…';
+            fetch('/api/seat-request', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify(Object.assign({ name: name, email: email, age_token: _ageToken, source: 'landing' }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+              if (d.waitlisted) {
+                // F143: Cohort full — show "You're on the next flight" state
+                form.style.display = 'none';
+                var wlConf = document.getElementById('seat-request-waitlisted');
+                if (wlConf) wlConf.style.display = 'block';
+              } else if (d.ok) {
+                form.style.display = 'none';
+                var conf = document.getElementById('seat-request-confirm');
+                conf.style.display = 'block';
+              } else {
+                errEl.textContent = d.error || 'Something went wrong — please try again.';
+                subBtn.disabled = false;
+                subBtn.textContent = '✈️ Submit Request';
+              }
+            })
+            .catch(function(){
+              errEl.textContent = 'Network error — please try again.';
+              subBtn.disabled = false;
+              subBtn.textContent = '✈️ Submit Request';
+            });
+          })(event)"
+        >
+          <input
+            name="name"
+            type="text"
+            placeholder="Your name"
+            autocomplete="name"
+            required
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(0, 217, 255, 0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(0, 217, 255, 0.8)'"
+            onblur="this.style.borderColor='rgba(0, 217, 255, 0.35)'"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Your email"
+            autocomplete="email"
+            required
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(0, 217, 255, 0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(0, 217, 255, 0.8)'"
+            onblur="this.style.borderColor='rgba(0, 217, 255, 0.35)'"
+          />
+          <span id="seat-form-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1em;"></span>
+
+          <!-- Age confirmation checkbox -->
+          <label class="age-check" for="age-confirmed">
+            <input id="age-confirmed" name="age_confirmed" type="checkbox" required />
+            <span>I confirm that I am 21 years of age or older.</span>
+          </label>
+
+          <div style="display:flex;gap:0.5rem;width:100%;">
+            <button
+              type="button"
+              style="flex:0 0 auto;padding:0.6rem 1rem;border-radius:6px;border:1px solid rgba(0, 217, 255, 0.25);background:rgba(0,0,0,0.4);color:rgba(0, 217, 255, 0.6);font-size:0.85rem;cursor:pointer;"
+              onclick="(function(){
+                document.getElementById('seat-request-form').style.display = 'none';
+                document.getElementById('waitlistBtn').style.display = '';
+              })()"
+            >Cancel</button>
+            <button
+              id="seat-submit-btn"
+              type="submit"
+              class="btn-waitlist unlocked"
+              style="flex:1;padding:0.6rem 1rem;"
+              disabled
+            >✈️ Submit Request</button>
+          </div>
+        </form>
+
+        <!-- Step 3a: Confirmation — seat reserved (hidden until successful submit) -->
+        <div
+          id="seat-request-confirm"
+          style="display:none;font-size:0.9rem;color:#00D9FF;letter-spacing:0.03em;padding:0.5rem 0;"
+        >
+          ✅ Your seat request has been received. Check your inbox for the next steps.
+        </div>
+
+        <!-- Step 3b: Waitlist confirmation — cohort full (F143) -->
+        <div id="seat-request-waitlisted" style="display:none;padding:1rem 0;">
+          <p style="font-size:1rem;color:#00D9FF;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">You're on the next flight.</p>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:1rem;">All 5 seats on this flight are full.<br>We'll notify you the moment a seat opens — passengers graduate when they land an offer.</p>
+          <a href="/ResumeFitCheck" class="btn-waitlist unlocked" style="display:inline-block;">▶ While you wait, run an ATS check</a>
+        </div>
+
+        <!-- seat-count span appended here by applySeatGate() -->
+        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(0, 217, 255, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
+      </div>
+
+      <!-- Secondary CTA: Book a Consultation via CalendarJet (gate-closed / consultation flow only) -->
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.25rem;padding-top:1rem;border-top:1px solid rgba(0, 217, 255, 0.1);">
+        <a
+          href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345"
+          class="btn"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-umami-event="Book a Consultation Click"
+          style="font-size:0.8rem;padding:0.5rem 1rem;"
+        >📅 Book a Consultation</a>
+      </div>
+
+      <!-- Gate-closed locked state (hidden when gate is open) -->
+      <div class="gate-locked-msg" style="display:none">
+        🔒 Next Flight — Studio → Signal → Systems
+      </div>
+
+      <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
+      <div class="gate-closed-reveal" style="display:none">
+        <h3 style="color:#00D9FF;margin-bottom:0.5rem">Next cohort assembling.</h3>
+        <p style="opacity:0.8;margin-bottom:1.25rem">Stay on the manifest — you'll be first to know when the gate opens.</p>
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-waitlist" target="_blank" rel="noopener noreferrer">
+          📡 Join Signal — Stay on the manifest
+        </a>
+      </div>
+    </div>
+
+
+    <!-- BLACK GLASS BUTTONS -->
+    <div class="btn-row" data-show-state="landing departed">
+      <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
+      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
+      <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
+    </div>
+    <!-- MISSION CONTROL BUTTON — separate row, below Studio/Signal/Systems/Support -->
+    <div class="btn-row" data-show-state="landing departed" style="margin-top:-0.25rem;">
+      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
+    </div>
+
+    <!-- PUZZLE PATH TRACKER -->
+    <div class="puzzle-tracker" id="puzzleTracker" data-show-state="landing departed">
+      <span class="puzzle-label">Paths Activated</span>
+      <div class="puzzle-diamonds">
+        <span class="puzzle-diamond" id="diamond-signal" title="Signal">✦</span>
+        <span class="puzzle-diamond" id="diamond-systems" title="Systems">✦</span>
+        <span class="puzzle-diamond" id="diamond-support" title="Support">✦</span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="btn-row-divider" data-show-state="landing departed">
+      <span>next step</span>
+    </div>
+
+    <!-- NEXT STEP GUIDANCE -->
+    <div class="btn-row-waitlist" data-show-state="landing departed" style="display: block; text-align: center; margin-bottom: 2rem;">
+      <p style="font-size: 0.85rem; color: rgba(0, 217, 255, 0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
+    </div>
+
+    <!-- Option B: About / Footer Links -->
+    <section data-show-state="landing departed" style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(0, 217, 255, 0.1); font-size:0.8rem;">
+      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(0, 217, 255, 0.6); text-decoration:none; margin:0 0.75rem;">About / Field Guide</a>
+      <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(0, 217, 255, 0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
+      <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(0, 217, 255, 0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
+    </section>
+    <footer data-show-state="landing departed">
+      &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
+    </footer>
+  </div>
+
+    <script>
+    // Carousel logic — init is deferred until after the TUJ state machine's
+    // initial rerender() settles, so the loading-state transition-none rule
+    // never suppresses the slide animation on first paint.
+    (function() {
+      function initCarousel() {
+        const track = document.getElementById('carouselTrack');
+        const dots = document.querySelectorAll('.carousel-dot');
+        const carousel = document.getElementById('mainCarousel');
+        if (!track || !carousel) return;
+        let current = 0;
+        const total = track.children.length || 4;
+        let autoTimer;
+        let touchStartX = 0;
+        let touchDeltaX = 0;
+        let isDragging = false;
+        function goTo(index) {
+          current = (index + total) % total;
+          track.style.transform = 'translateX(-' + (current * 100) + '%)';
+          dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+        }
+        function startAuto() {
+          clearInterval(autoTimer);
+          autoTimer = setInterval(function() { goTo(current + 1); }, 4000);
+        }
+        dots.forEach(function(dot) {
+          dot.addEventListener('click', function() {
+            goTo(parseInt(dot.dataset.index));
+            startAuto();
+          });
+        });
+        carousel.addEventListener('touchstart', function(e) {
+          touchStartX = e.touches[0].clientX;
+          isDragging = true;
+          clearInterval(autoTimer);
+        }, { passive: true });
+        carousel.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          touchDeltaX = e.touches[0].clientX - touchStartX;
+        }, { passive: true });
+        carousel.addEventListener('touchend', function() {
+          if (Math.abs(touchDeltaX) > 40) {
+            goTo(touchDeltaX < 0 ? current + 1 : current - 1);
+          }
+          touchDeltaX = 0;
+          isDragging = false;
+          startAuto();
+        });
+        goTo(0);
+        startAuto();
+      }
+      // Wait for the TUJ state machine to complete its first rerender
+      // (typically 300-800ms for the /api/seat-status fetch) before starting
+      // the carousel, so the loading-state CSS never kills the slide transition.
+      // Falls back to 900ms if the state machine hasn't fired yet.
+      function waitForState() {
+        if (window.__TUJ && window.__TUJ.state && window.__TUJ.state !== 'loading') {
+          initCarousel();
+        } else {
+          setTimeout(initCarousel, 900);
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', waitForState);
+      } else {
+        waitForState();
+      }
+    })();
+
+    // Puzzle tracker + Waitlist unlock
+    (function() {
+      const pathDiamonds = {
+        signal:  document.getElementById('diamond-signal'),
+        systems: document.getElementById('diamond-systems'),
+        support: document.getElementById('diamond-support')
+      };
+      const waitlistBtn = document.getElementById('waitlistBtn');
+
+      function updatePuzzleUI() {
+        const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+        ['signal', 'systems', 'support'].forEach(function(path) {
+          if (chosen.includes(path)) { pathDiamonds[path].classList.add('lit'); }
+        });
+        if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
+          if (document.body.classList.contains('gate-closed')) {
+            const reveal = document.querySelector('.gate-closed-reveal');
+            const lockedMsg = document.querySelector('.gate-locked-msg');
+            if (reveal) reveal.style.display = 'block';
+            if (lockedMsg) lockedMsg.style.display = 'none';
+          } else {
+            if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+          }
+        }
+      }
+
+      document.querySelectorAll('.btn-row .btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const path = btn.dataset.path;
+          if (!path) return;
+          localStorage.setItem('last-path', path);
+          const chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+          if (!chosen.includes(path)) {
+            chosen.push(path);
+            localStorage.setItem('paths-chosen', JSON.stringify(chosen));
+          }
+          if (pathDiamonds[path]) { pathDiamonds[path].classList.add('lit'); }
+          if (chosen.includes('signal') && chosen.includes('systems') && chosen.includes('support')) {
+            localStorage.setItem('puzzle-stage', 'unlocked');
+            if (typeof umami !== 'undefined') { umami.track('Puzzle Unlocked'); }
+            if (document.body.classList.contains('gate-closed')) {
+              const reveal = document.querySelector('.gate-closed-reveal');
+              const lockedMsg = document.querySelector('.gate-locked-msg');
+              if (reveal) reveal.style.display = 'block';
+              if (lockedMsg) lockedMsg.style.display = 'none';
+            } else {
+              if (waitlistBtn) waitlistBtn.classList.add('unlocked');
+            }
+          }
+        });
+      });
+
+      updatePuzzleUI();
+    })();
+
+    // ── API-driven gate + seat status (replaces clock-based state machine) ──
+    // Reads all Admin/Base44 fields from /api/seat-status and drives every
+    // DOM element: flight badge, status badge, dock label, dates, countdown,
+    // CTA button visibility, intake mode, and seat count.
+    (function () {
+
+      // ── Helpers ────────────────────────────────────────────────────────────
+
+      /**
+       * Format an ISO timestamp (e.g. "2026-04-15T14:00:00Z") to a short time string
+       * in US Eastern time ("2:00 PM ET").
+       */
+      function fmtTime(iso) {
+        if (!iso) return null;
+        var d = new Date(iso);
+        if (isNaN(d)) return null;
+        return d.toLocaleTimeString('en-US', {
+          hour: 'numeric', minute: '2-digit',
+          timeZone: 'America/New_York', timeZoneName: 'short'
+        });
+      }
+
+      /**
+       * Format an ISO timestamp to a short date string ("April 15").
+       */
+      function fmtDate(iso) {
+        if (!iso) return null;
+        var d = new Date(iso);
+        if (isNaN(d)) return null;
+        return d.toLocaleDateString('en-US', {
+          month: 'long', day: 'numeric', timeZone: 'America/New_York'
+        });
+      }
+
+      /**
+       * Map next_flight_status → human-readable full/short badge labels.
+       * These go into #dock-status-badge (.full-text / .short-text).
+       */
+      function statusLabels(nextFlightStatus) {
+        switch (nextFlightStatus) {
+          case 'BOARDING_SOON': return { full: 'BOARDING SOON', short: 'BOARDING' };
+          case 'DEPARTED':      return { full: 'DEPARTED',      short: 'DEPARTED' };
+          case 'SCHEDULED':
+          default:              return { full: 'SCHEDULED',     short: 'SCHED' };
+        }
+      }
+
+      // ── Fetch ──────────────────────────────────────────────────────────────
+
+      async function fetchSeatStatus() {
+        try {
+          var res = await fetch('/api/seat-status');
+          if (!res.ok) return null;
+          return await res.json();
+        } catch (e) {
+          console.warn('[seat-status] Could not fetch:', e);
+          return null;
+        }
+      }
+
+      // ── Countdown integration ──────────────────────────────────────────────
+      // Exposed on window so the countdown timer IIFE can pick up the live
+      // departure date instead of the old hardcoded timestamp.
+      window.__seatStatusReady = null; // will be set after first fetch
+
+      // ── Main function ──────────────────────────────────────────────────────
+
+      // Expose on window so the TUJ state machine can call with a pre-fetched status
+      window.__applySeatGate = async function applySeatGate(cachedStatus) {
+        var status = cachedStatus || await fetchSeatStatus();
+        if (!status) return; // fail open — leave DOM as-is if API is unreachable
+
+        // ── DOM refs ─────────────────────────────────────────────���───────────
+        var flightEl        = document.getElementById('flight-number');
+        var dockEl          = document.getElementById('dock-status');
+        var statusBadgeEl   = document.getElementById('dock-status-badge');
+        var fullEl          = statusBadgeEl ? statusBadgeEl.querySelector('.full-text') : null;
+        var shortEl         = statusBadgeEl ? statusBadgeEl.querySelector('.short-text') : null;
+        var arrivalTextEl   = document.getElementById('arrival-text');
+        var depTimeBadgeEl  = document.getElementById('departure-time-badge');
+        var depDateEl       = document.getElementById('departure-date');
+        var ctaSubtextEl    = document.getElementById('cta-subtext');
+        var waitlistBtn     = document.getElementById('waitlistBtn');
+        var joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
+        var calBtn          = document.querySelector('[data-umami-event="Book a Consultation Click"]');
+        var lockedMsg       = document.querySelector('.gate-locked-msg');
+        var statusNote      = document.querySelector('p.status-text[style*="opacity: 0.7"]');
+
+        // Helper for #departure-date inner text node (after the .arriving-dot span)
+        function setDepartureDate(text) {
+          if (!depDateEl) return;
+          var dot = depDateEl.querySelector('.arriving-dot');
+          if (dot && dot.nextSibling) {
+            dot.nextSibling.textContent = text;
+          } else if (dot) {
+            depDateEl.appendChild(document.createTextNode(text));
+          }
+        }
+
+        // ── 1. Flight label badge (#flight-number) ───────────────────────��
+        // Driven by Admin → NextFlightConfig → next_flight_number
+        if (flightEl) {
+          var label = status.flight_label && status.flight_label.trim()
+            ? status.flight_label.trim() + ' ✈️'
+            : 'Next Departure ✈️';
+          flightEl.textContent = label;
+        }
+
+        // ── 2. Gate / status badge (#dock-status-badge) ───────────────────
+        // Driven by Admin → NextFlightConfig → next_flight_status
+        // Base44 emits the collapsed key (nextflightstatus); accept both forms.
+        var nextFlightStatus = status.nextflightstatus || status.next_flight_status || 'SCHEDULED';
+        var labels = statusLabels(nextFlightStatus);
+        if (fullEl)  fullEl.textContent  = labels.full;
+        if (shortEl) shortEl.textContent = labels.short;
+
+        // Status badge colour: red for DEPARTED, green/default otherwise
+        if (statusBadgeEl) {
+          if (nextFlightStatus === 'DEPARTED') {
+            statusBadgeEl.style.color       = '#ff4444';
+            statusBadgeEl.style.borderColor = 'rgba(255,68,68,0.6)';
+            statusBadgeEl.style.background  = 'rgba(255,68,68,0.15)';
+          } else if (nextFlightStatus === 'BOARDING_SOON') {
+            statusBadgeEl.style.color       = 'rgb(0, 217, 255)';
+            statusBadgeEl.style.borderColor = 'rgba(0, 217, 255, 0.6)';
+            statusBadgeEl.style.background  = 'rgba(0, 217, 255, 0.12)';
+          } else {
+            // SCHEDULED — neutral
+            statusBadgeEl.style.color       = '';
+            statusBadgeEl.style.borderColor = '';
+            statusBadgeEl.style.background  = '';
+          }
+        }
+
+        // ── 3. Loading dock label (#dock-status) ──────────────────────────
+        // Driven by gate_status field (derived from PUBLIC_GATE_STATE override in seat-status.js)
+        // 'hold'     = gate is operator-paused; treat as closed for public display (QA #6 fix).
+        // 'conflict' = multiple active flights detected (QA #5 Layer 3); show safe fallback.
+        var gateStatusNorm = (status.gate_status || '').toLowerCase();
+
+        // QA #7 — UI guard: QA flight isolation violation.
+        // If the Netlify function returned gate_status: 'qa_isolation_violation' (HTTP 422),
+        // a QA flight is active on the public page. Surface a neutral holding state.
+        if (gateStatusNorm === 'qa_isolation_violation') {
+          if (dockEl) dockEl.textContent = 'GATE CLOSED';
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          console.warn('[TUJ] QA isolation violation: active flight is a QA flight. Check Supabase flights table and apply no_active_qa_flight index.');
+          return;
+        }
+
+        // F-VIP-01 — UI guard: VIP flight suppression (Layer 3 of 3).
+        // If the Netlify function returned HTTP 451 with _vip_suppressed: true,
+        // a VIP flight was active but has been withheld from public display.
+        // gate_status is already 'closed' in the payload; this guard ensures
+        // no VIP flight label leaks into the UI and logs a discreet console note.
+        if (status._vip_suppressed === true) {
+          // gate_status is already 'closed' — fall through to normal closed rendering
+          // but clear any flight_label that might have been set before the guard ran.
+          status.flight_label = null;
+          console.info('[TUJ] VIP flight active — public gate showing closed state (F-VIP-01).');
+          // Do NOT return early: let the normal 'closed' rendering path run so
+          // the "Next Departure" badge (nextflightdeparturedate) still displays.
+        }
+
+        // QA #5 — Layer 3: UI fallback for flight invariant conflict.
+        // If the Netlify function returned gate_status: 'conflict' (HTTP 409 body),
+        // surface a neutral holding state rather than showing potentially wrong seat data.
+        if (gateStatusNorm === 'conflict') {
+          if (dockEl) dockEl.textContent = 'GATE CLOSED';
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          // Log to console so operators can diagnose without exposing to users
+          console.warn('[TUJ] Gate conflict: multiple active flights detected. Check Supabase flights table.');
+          return;
+        }
+
+        var gateOpen = gateStatusNorm !== 'departed' && gateStatusNorm !== 'closed' && gateStatusNorm !== 'hold';
+        if (dockEl) {
+          dockEl.textContent = gateOpen ? 'GATE OPEN' : 'GATE CLOSED';
+        }
+
+        // ── 4. Body class: gate-closed (affects puzzle reveal and CTA layout) ─
+        if (nextFlightStatus === 'DEPARTED') {
+          document.body.classList.add('gate-closed');
+        } else {
+          document.body.classList.remove('gate-closed');
+        }
+
+        // ── 5. Arrival time (#arrival-text) ───────────────────────────────
+        // Driven by Admin → next_flight_arrival_date
+        // Base44 emits the collapsed key (nextflightarrivaldate); accept both forms.
+        if (arrivalTextEl) {
+          var arrivalTime = fmtTime(status.nextflightarrivaldate || status.next_flight_arrival_date);
+          arrivalTextEl.textContent = arrivalTime || '—';
+        }
+
+        // ── 6. Departure time badge (#departure-time-badge) ───────────────
+        // Driven by Admin → next_flight_departure_date
+        // Base44 emits the collapsed key (nextflightdeparturedate); accept both forms.
+        var depDateRaw = status.nextflightdeparturedate || status.next_flight_departure_date || null;
+        if (depTimeBadgeEl) {
+          var depTime = fmtTime(depDateRaw);
+          depTimeBadgeEl.textContent = depTime || '—';
+        }
+
+        // ── 7. Departure date badge (#departure-date) ─────────────────────
+        // Driven by Admin → next_flight_departure_date
+        var depDateText = fmtDate(depDateRaw) || 'Next Departure';
+        setDepartureDate(depDateText);
+
+        // ── 8. Live countdown target ──────────────────────────────────────
+        // Expose the departure date for the countdown timer IIFE to pick up.
+        // If no departure date is set, the countdown stays hidden.
+        window.__seatStatusReady = {
+          departureDate: depDateRaw,
+          gateOpen:      gateOpen,
+        };
+
+        // ── 9. CTA subtext (custom_status_message) ────────────────────────
+        // Driven by Admin → current_flight_status_message (or auto-generated)
+        // Base44 emits the collapsed key (customstatusmessage); accept both forms.
+        if (ctaSubtextEl) {
+          var customMsg = status.customstatusmessage || status.custom_status_message || '';
+          if (customMsg) {
+            ctaSubtextEl.textContent = customMsg;
+            ctaSubtextEl.style.display = 'block';
+          } else {
+            ctaSubtextEl.style.display = 'none';
+          }
+        }
+
+        // ── 10. status-text note (seats-filled threshold message) ─────────
+        if (statusNote) {
+          if (status.seats_filled >= 3) {
+            statusNote.textContent = 'Five seats. One mission. Next cohort now boarding.';
+            statusNote.style.display = '';
+          } else {
+            statusNote.innerHTML = '';
+            statusNote.style.display = 'none';
+          }
+        }
+
+        // ── 11. CTA button visibility + intake_mode ───────────────────────
+        // DEPARTED gate → show joinWaitlistBtn, hide everything else
+        if (nextFlightStatus === 'DEPARTED') {
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          if (lockedMsg) lockedMsg.style.display = 'block';
+          // Puzzle reveal for users who completed all three paths
+          (function() {
+            var chosen = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+            if (['signal','systems','support'].every(function(p) { return chosen.includes(p); })) {
+              var reveal = document.querySelector('.gate-closed-reveal');
+              var lMsg   = document.querySelector('.gate-locked-msg');
+              if (reveal) reveal.style.display = 'block';
+              if (lMsg)   lMsg.style.display   = 'none';
+            }
+          })();
+          return; // nothing more to do for a departed gate
+        }
+
+        // Gate is open from here down
+        if (lockedMsg) lockedMsg.style.display = 'none';
+
+        // ── HOLD / CLOSED gate → suppress all seat CTAs (QA #6 fix) ──────
+        // When PUBLIC_GATE_STATE=hold or closed, hide seat request + waitlist CTAs.
+        if (gateStatusNorm === 'hold' || gateStatusNorm === 'closed') {
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+          return;
+        }
+
+        // Alpha mode off → hide the seat request button entirely
+        if (!status.alpha_mode) {
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          return;
+        }
+
+        // Flight full → show waitlist CTA
+        if (status.open_count >= status.max_seats || status.seats_remaining <= 0) {
+          if (waitlistBtn)     waitlistBtn.style.display = 'none';
+          if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
+          return;
+        }
+
+        // ── intake_mode → controls which primary CTA is active ───────────
+        // CALENDARJET: hide seat request button, enable consultation booking link
+        // SENDGRID / CONSTANTCONTACT: show seat request button, disable consultation link
+        var intakeMode = status.intake_mode || 'SENDGRID';
+        var calUrl = 'https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345';
+
+        // ── Step 05 boarding CTA: CalendarJet link only in CALENDARJET mode ──────
+        var bstep5Cta  = document.getElementById('bstep-5-cta');
+        var bstep5Desc = document.getElementById('bstep-5-desc');
+        if (intakeMode === 'CALENDARJET') {
+          // Show the booking link and update description
+          if (bstep5Cta)  bstep5Cta.style.display = '';
+          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Use the link below to schedule.';
+        } else {
+          // SENDGRID / CONSTANTCONTACT: no outbound link — reply to Welcome email
+          if (bstep5Cta)  bstep5Cta.style.display = 'none';
+          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Reply to your Welcome email to schedule.';
+        }
+
+        if (intakeMode === 'CALENDARJET') {
+          // Hide the SendGrid seat request CTA; show the CalendarJet booking link
+          if (waitlistBtn) waitlistBtn.style.display = 'none';
+          if (calBtn) {
+            calBtn.setAttribute('href', calUrl);
+            calBtn.removeAttribute('aria-disabled');
+            calBtn.setAttribute('tabindex', '0');
+            calBtn.style.pointerEvents = '';
+            calBtn.style.opacity = '';
+            calBtn.style.cursor = '';
+            calBtn.style.display = '';
+          }
+        } else {
+          // SENDGRID or CONSTANTCONTACT: seat request button is the active CTA
+          if (waitlistBtn) waitlistBtn.style.display = '';
+          if (calBtn) {
+            // Keep consultation link present but visually disabled
+            calBtn.removeAttribute('href');
+            calBtn.setAttribute('aria-disabled', 'true');
+            calBtn.setAttribute('tabindex', '-1');
+            calBtn.style.pointerEvents = 'none';
+            calBtn.style.opacity = '0.4';
+            calBtn.style.cursor = 'not-allowed';
+          }
+
+          // ── 12. Live seat count below the CTA button ──────────────────
+          var seatWord = status.seats_remaining === 1 ? 'seat' : 'seats';
+          var existing = document.getElementById('cta-seat-count');
+          if (existing) existing.remove();
+          var seatInfo = document.createElement('span');
+          seatInfo.id = 'cta-seat-count';
+          seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(0, 217, 255, 0.7);letter-spacing:0.03em;';
+          seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining — next departure';
+          var ctaWrapper = document.getElementById('cta-wrapper');
+          if (ctaWrapper) {
+            ctaWrapper.appendChild(seatInfo);
+          } else if (waitlistBtn && waitlistBtn.parentNode) {
+            waitlistBtn.parentNode.insertBefore(seatInfo, waitlistBtn.nextSibling);
+          }
+        }
+      }
+
+      // Legacy entry point — now driven by window.__TUJ.rerender().
+      // Keep the setInterval removed; rerender() owns the 60s cadence.
+      window.__applySeatGate();
+
+    })();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // TUJ STATE MACHINE — Gate Contract v2
+    // Exposes window.__TUJ with: rerender(), showAgeGate(onConfirm), state
+    // ═══════════════════════════════════════════════════════════════════════
+    (function () {
+
+      // ── Constants ────────────────────────────────────────────────────────
+      var AGE_KEY    = 'tuj_age_verified';   // localStorage — persistent
+      var SEAT_KEY   = 'seat_id';            // sessionStorage — per-session
+      var SEAT_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+      var MIN_AGE    = 21;
+
+      // ── State ────────────────────────────────────────────────────────────
+      var _state      = 'loading';
+      var _status     = null;   // last fetched /api/seat-status payload
+      var _seatId     = null;   // validated seat_id for this session
+      var _ageGateCb  = null;   // pending callback after age confirm
+      // Capture ?seat_id= immediately on page load before validateSeatId may strip it.
+      // Used as seat_id_override in form submissions for pre-assigned cohort passengers.
+      var _seatIdOverride = new URLSearchParams(window.location.search).get('seat_id') || null;
+
+      // ── Helpers ──────────────────────────────────────────────────────────
+
+      // getSeatIdRaw() — reads seat_id from URL or sessionStorage without validation.
+      // Returns the raw string if it matches the format regex, else null.
+      function getSeatIdRaw() {
+        var fromSession = sessionStorage.getItem(SEAT_KEY);
+        var fromUrl     = new URLSearchParams(location.search).get('seat_id');
+        var id = fromUrl || fromSession || null;
+        if (id && SEAT_REGEX.test(id)) return id;
+        return null;
+      }
+
+      // validateSeatId(id) — async; calls /api/seat to confirm the seat is active.
+      // Resolution contract:
+      //   valid: true  → seat confirmed; persists to sessionStorage; returns id.
+      //   valid: false → seat invalid/inactive; clears sessionStorage; returns null.
+      //   fetch error  → fail-open; persists to sessionStorage; returns id.
+      //                  (preserves existing behaviour when Base44 is unreachable)
+      async function validateSeatId(id) {
+        if (!id) return null;
+        // Persist immediately so the session survives a hard refresh mid-flight.
+        sessionStorage.setItem(SEAT_KEY, id);
+        try {
+          var res = await fetch('/api/seat?id=' + encodeURIComponent(id));
+          if (!res.ok) {
+            // Non-2xx from our own function (e.g. 400 bad format) — treat as invalid.
+            if (res.status === 400) {
+              console.warn('[TUJ] seat validation: 400 bad format for', id);
+              sessionStorage.removeItem(SEAT_KEY);
+              return null;
+            }
+            // Any other non-2xx (5xx etc.) — fail open.
+            console.warn('[TUJ] seat validation: non-2xx (' + res.status + ') — failing open for', id);
+            return id;
+          }
+          var data = await res.json();
+          if (data.valid === false) {
+            console.warn('[TUJ] seat validation: invalid seat', id, '— reason:', data.reason || 'unknown');
+            sessionStorage.removeItem(SEAT_KEY);
+            return null;
+          }
+          // valid: true (or _unchecked: true fail-open from function)
+          return id;
+        } catch (e) {
+          // Network error / timeout — fail open.
+          console.warn('[TUJ] seat validation: fetch error — failing open for', id, e);
+          return id;
+        }
+      }
+
+      // getSeatId() — kept for legacy callers; synchronous read only (no API call).
+      function getSeatId() {
+        return getSeatIdRaw();
+      }
+
+      function isAgeVerified() {
+        return localStorage.getItem(AGE_KEY) === '1';
+      }
+
+      function hasValidAgeToken() {
+        return !!sessionStorage.getItem('tuj_age_token');
+      }
+
+      function needsAgeGate() {
+        // Fix (Apr 19, 2026): localStorage flag persists across sessions but
+        // sessionStorage token is cleared on browser close. If the flag is set
+        // but the token is missing, show the gate again to re-issue a fresh
+        // signed token — prevents silent block on seat request submission.
+        return !isAgeVerified() || !hasValidAgeToken();
+      }
+
+      // ── Core: fetch + resolve state ───────────────────────────────────────
+      async function fetchStatus() {
+        try {
+          var res = await fetch('/api/seat-status');
+          if (!res.ok) return null;
+          return await res.json();
+        } catch (e) {
+          console.warn('[TUJ] seat-status fetch failed:', e);
+          return null;
+        }
+      }
+
+      function computeState(status, seatId) {
+        if (!status) return 'landing'; // fail open
+        var departed = (status.nextflightstatus || status.next_flight_status) === 'DEPARTED'
+                    || status.gate_status === 'departed';
+        if (departed)        return 'departed';
+        if (seatId)          return 'dashboard';
+        return 'landing';
+      }
+
+      // ── Smooth state transition helper ────────────────────────────────────
+      // Sets body[data-state] inside a rAF so the browser has a chance to
+      // paint the intermediate state before CSS transitions fire.
+      // The 520ms timeout matches the longest transition duration.
+      function transitionToState(nextState) {
+        document.body.classList.add('state-transitioning');
+        requestAnimationFrame(function () {
+          document.body.setAttribute('data-state', nextState);
+        });
+        setTimeout(function () {
+          document.body.classList.remove('state-transitioning');
+        }, 520);
+      }
+
+      function setDashboardDisplay(visible) {
+        var dashboardView = document.getElementById('dashboard-view');
+        if (!dashboardView) return;
+        dashboardView.style.display = visible ? 'block' : 'none';
+      }
+
+      // ── Gate Status / Seat Counter helpers (4-P3) ───────────────────────────────
+      // resolveGateState(status) — maps raw /api/seat-status payload to
+      // a display descriptor consumed by updateGateStatusWidget().
+      // Returns: { label: string, cta: { text: string, action: string, href: string } }
+      function resolveGateState(status) {
+        // QA #2 fix: read capacity from live API response; fall back to 5 if absent.
+        // After Apr 16 Base44 patch, status.max_seats will reflect activeFlight.capacity.
+        var MAX = (status && typeof status.max_seats === 'number' && status.max_seats > 0)
+                  ? status.max_seats
+                  : 5;
+        if (!status) {
+          return { label: 'Status unavailable', cta: { text: '', action: 'none', href: '#' } };
+        }
+        var gateStatus = (status.gate_status || '').toLowerCase();
+        var departed   = (status.nextflightstatus || status.next_flight_status) === 'DEPARTED'
+                      || gateStatus === 'departed';
+        if (departed) {
+          return { label: 'Flight departed', cta: { text: '', action: 'none', href: '#' } };
+        }
+        if (gateStatus === 'closed') {
+          return { label: 'Flight full — all seats filled', cta: { text: '', action: 'none', href: '#' } };
+        }
+        // open or unknown — show live count
+        var openCount = typeof status.open_count === 'number' ? status.open_count
+                      : typeof status.seats_remaining === 'number' ? status.seats_remaining
+                      : null;
+        if (openCount === null) {
+          return { label: 'Seats coming soon', cta: { text: '', action: 'none', href: '#' } };
+        }
+        if (openCount <= 0) {
+          return { label: 'Flight full — all seats filled', cta: { text: '', action: 'none', href: '#' } };
+        }
+        var label = openCount + ' of ' + MAX + ' seat' + (MAX !== 1 ? 's' : '') + ' open';
+        return {
+          label: label,
+          cta: { text: 'Invite a crew member', action: 'invite', href: '#seat-request-form' }
+        };
+      }
+
+      // updateGateStatusWidget(status) — writes resolveGateState() output
+      // into #mc-gs-count-value and #mc-gs-cta.
+      function updateGateStatusWidget(status) {
+        var countEl = document.getElementById('mc-gs-count-value');
+        var ctaEl   = document.getElementById('mc-gs-cta');
+        var gs = resolveGateState(status);
+        if (countEl) countEl.textContent = gs.label;
+        if (ctaEl) {
+          ctaEl.textContent       = gs.cta.text;
+          ctaEl.setAttribute('data-action', gs.cta.action);
+          ctaEl.setAttribute('href', gs.cta.href);
+        }
+      }
+
+      // ── Apply state to DOM ────────────────────────────────────────────────
+      function applyState(state, status, seatId) {
+        var previousState = _state;
+        _state = state;
+
+        // ── Dashboard content prep (before transition fires) ──────────────
+        // Populate text content while still in loading state so the
+        // dashboard view is ready before CSS makes it visible.
+        var seatIdEl = document.getElementById('dashboard-seat-id');
+        var waBanner = document.getElementById('welcome-aboard-banner');
+        var dashboardView = document.getElementById('dashboard-view');
+
+        if (dashboardView) {
+          if (state === 'dashboard') {
+            setDashboardDisplay(true);
+          } else if (previousState !== 'dashboard') {
+            setDashboardDisplay(false);
+          }
+        }
+
+        if (state === 'dashboard') {
+          if (seatIdEl) seatIdEl.textContent = seatId || '';
+          // Wire seat_id into all .tech links so OnboardingPassport receives it
+          if (seatId) {
+            // Update Mission Control nav button href with seat_id
+            var mcNavBtn = document.getElementById('mc-nav-btn');
+            if (mcNavBtn) {
+              mcNavBtn.href = '/?seat_id=' + encodeURIComponent(seatId);
+            }
+          }
+          if (seatId) {
+            document.querySelectorAll('a[href*="thispagedoesnotexist12345.tech"]').forEach(function (a) {
+              try {
+                var u = new URL(a.href);
+                u.searchParams.set('seat_id', seatId);
+                a.href = u.toString();
+              } catch (e) { /* skip malformed hrefs */ }
+            });
+            // Wire seat_id + tuj_code into all /Studio links (tile + boarding step 3)
+            var _tujCode = new URLSearchParams(location.search).get('tuj_code') || '';
+            document.querySelectorAll('a[href="/Studio"], a[href^="/Studio?"]').forEach(function (a) {
+              try {
+                var su = new URL(a.href, location.origin);
+                su.searchParams.set('seat_id', seatId);
+                if (_tujCode) su.searchParams.set('tuj_code', _tujCode);
+                a.href = su.toString();
+              } catch (e) { /* skip */ }
+            });
+            // Wire seat_id into CalendarJet consultation link in boarding steps
+            var calBoardingLink = document.getElementById('bstep-5-cta');
+            if (calBoardingLink) {
+              try {
+                var cu = new URL(calBoardingLink.href);
+                cu.searchParams.set('seat_id', seatId);
+                calBoardingLink.href = cu.toString();
+              } catch (e) { /* skip */ }
+            }
+          }
+          // Welcome Aboard banner: show once if ?status=boarded in URL
+          if (waBanner) {
+            var params = new URLSearchParams(location.search);
+            if (params.get('status') === 'boarded' && !sessionStorage.getItem('wa_shown')) {
+              waBanner.style.display = 'block';
+              sessionStorage.setItem('wa_shown', '1');
+            }
+          }
+        } else {
+          // Reset welcome banner when leaving dashboard state
+          if (waBanner) waBanner.style.display = 'none';
+        }
+
+        // ── Gate Status / Seat Counter widget (4-P3) ─────────────────────────────────
+        // Driven entirely by resolveGateState() output — no raw API shapes in UI layer.
+        if (state === 'dashboard') {
+          updateGateStatusWidget(status);
+        }
+
+        // ── BLOCKER-06: Studio Stateful CTA — Swap Request a Seat / Run Fit Check ──────
+        // When a confirmed passenger enters dashboard state, the primary CTA swaps
+        // from "Request a Seat" to "Run Resume Fit Check" pointing to the Studio.
+        // When leaving dashboard state the Fit Check CTA is hidden and the Request
+        // a Seat button is restored (visibility managed by applySeatGate below).
+        (function () {
+          var waitlistBtnEl  = document.getElementById('waitlistBtn');
+          var ctaWrapperEl   = document.getElementById('cta-wrapper');
+          var fitCheckBtnId  = 'tuj-fitcheck-cta';
+          var existingFitBtn = document.getElementById(fitCheckBtnId);
+          if (state === 'dashboard' && seatId) {
+            // Hide the Request a Seat button — passenger already has a seat
+            if (waitlistBtnEl) waitlistBtnEl.style.display = 'none';
+            var fitUrl = 'https://theultimatejourney.base44.app/ResumeFitCheck?seat_id=' + encodeURIComponent(seatId);
+            if (!existingFitBtn && ctaWrapperEl) {
+              // First time: create and inject the Fit Check CTA
+              var fitBtn = document.createElement('a');
+              fitBtn.id        = fitCheckBtnId;
+              fitBtn.className = 'btn-waitlist unlocked';
+              fitBtn.setAttribute('data-umami-event', 'Run Fit Check Click');
+              fitBtn.setAttribute('target', '_blank');
+              fitBtn.setAttribute('rel', 'noopener noreferrer');
+              fitBtn.href      = fitUrl;
+              fitBtn.textContent = '\u25B6 Run Resume Fit Check';
+              fitBtn.style.textDecoration = 'none';
+              ctaWrapperEl.insertBefore(fitBtn, ctaWrapperEl.firstChild);
+            } else if (existingFitBtn) {
+              existingFitBtn.href         = fitUrl;
+              existingFitBtn.style.display = '';
+            }
+          } else {
+            // Non-dashboard state: hide Fit Check CTA
+            // waitlistBtn visibility is managed by applySeatGate() below
+            if (existingFitBtn) existingFitBtn.style.display = 'none';
+          }
+        })();
+
+        // ── Hand off to window.__applySeatGate() for all badge/CTA logic ──────
+        // Fire before the transition so badge text is correct when it fades in.
+        if (typeof window.__applySeatGate === 'function') {
+          window.__applySeatGate(status || null);
+        }
+
+        // ── Animate the state change ───────────────────────────────────────
+        transitionToState(state);
+
+        if (dashboardView && state !== 'dashboard' && previousState === 'dashboard') {
+          setTimeout(function () {
+            if (_state !== 'dashboard' && document.body.getAttribute('data-state') === state) {
+              setDashboardDisplay(false);
+            }
+          }, 540);
+        }
+
+        console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
+      }
+
+      // ── Public: rerender() ───────────────────────────────────────────────────────────────
+      async function rerender() {
+        // Preserve scroll position so the loading-state flash never resets the page
+        var savedScrollY = window.scrollY || window.pageYOffset || 0;
+        document.body.setAttribute('data-state', 'loading');
+
+        // Fetch gate status and validate seat_id in parallel for speed.
+        var rawId = getSeatIdRaw();
+        var results = await Promise.all([
+          fetchStatus(),
+          validateSeatId(rawId)   // null if rawId is null; fail-open on error
+        ]);
+        _status = results[0];
+        _seatId = results[1];  // null means invalid/missing; non-null means confirmed
+
+        // If rawId was present but validateSeatId returned null, the seat was
+        // explicitly rejected. Strip it from the URL so a refresh doesn't re-trigger
+        // the validation loop, and surface a recovery notice.
+        if (rawId && !_seatId) {
+          var params = new URLSearchParams(location.search);
+          params.delete('seat_id');
+          var newSearch = params.toString();
+          history.replaceState({}, '', newSearch ? '?' + newSearch : location.pathname);
+          // Surface inline recovery notice (shown in landing state)
+          var noticeEl = document.getElementById('seat-invalid-notice');
+          if (noticeEl) noticeEl.style.display = 'block';
+        } else {
+          var noticeEl = document.getElementById('seat-invalid-notice');
+          if (noticeEl) noticeEl.style.display = 'none';
+        }
+
+        var state = computeState(_status, _seatId);
+        applyState(state, _status, _seatId);
+        // Restore scroll after the state transition fires (next rAF)
+        requestAnimationFrame(function () {
+          window.scrollTo(0, savedScrollY);
+        });
+      }
+
+      // ── Public: showAgeGate(onConfirm) ───────────────────────────────────
+      // Shows the age gate overlay. onConfirm fires after user confirms.
+      function showAgeGate(onConfirm) {
+        _ageGateCb = onConfirm || null;
+        var overlay = document.getElementById('age-gate-overlay');
+        if (overlay) overlay.classList.add('active');
+      }
+
+      function hideAgeGate() {
+        var overlay = document.getElementById('age-gate-overlay');
+        if (overlay) overlay.classList.remove('active');
+      }
+
+      // ── Age gate DOB wiring (4-P2: Option C) ─────────────────────────────
+      // Populates day dropdown, enables confirm when DOB is complete.
+      // On confirm: POSTs to /api/verify-age, stores signed age_token in sessionStorage.
+      document.addEventListener('DOMContentLoaded', function () {
+        var monthSel    = document.getElementById('ag-month');
+        var daySel      = document.getElementById('ag-day');
+        var yearInput   = document.getElementById('ag-year');
+        var confirmBtn  = document.getElementById('age-gate-confirm-btn');
+        var denyBtn     = document.getElementById('age-gate-deny-btn');
+        var errorEl     = document.getElementById('age-gate-error');
+        var AGE_TOKEN_KEY = 'tuj_age_token'; // sessionStorage — signed token
+
+        function populateDays() {
+          var m = parseInt(monthSel ? monthSel.value : '', 10);
+          var y = parseInt(yearInput ? yearInput.value : '', 10);
+          var maxDay = (m && y && !isNaN(y)) ? new Date(y, m, 0).getDate()
+                     : m ? new Date(2000, m, 0).getDate() : 31;
+          var prev = daySel ? daySel.value : '';
+          if (daySel) {
+            daySel.innerHTML = '<option value="">DD</option>';
+            for (var d = 1; d <= maxDay; d++) {
+              var opt = document.createElement('option');
+              opt.value = d;
+              opt.textContent = String(d).padStart(2, '0');
+              daySel.appendChild(opt);
+            }
+            if (prev && parseInt(prev, 10) <= maxDay) daySel.value = prev;
+          }
+        }
+
+        function isComplete() {
+          return monthSel && monthSel.value &&
+                 daySel   && daySel.value &&
+                 yearInput && yearInput.value && yearInput.value.length === 4 &&
+                 !isNaN(parseInt(yearInput.value, 10));
+        }
+
+        function updateBtn() {
+          if (confirmBtn) confirmBtn.disabled = !isComplete();
+        }
+
+        if (monthSel)  monthSel.addEventListener('change', function () { populateDays(); updateBtn(); });
+        if (daySel)    daySel.addEventListener('change', updateBtn);
+        if (yearInput) {
+          yearInput.addEventListener('input', function () { populateDays(); updateBtn(); });
+        }
+
+        if (confirmBtn) {
+          confirmBtn.addEventListener('click', async function () {
+            if (!isComplete()) return;
+            if (errorEl) errorEl.textContent = '';
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = '⏳ Verifying…';
+            var m   = String(parseInt(monthSel.value, 10)).padStart(2, '0');
+            var d   = String(parseInt(daySel.value, 10)).padStart(2, '0');
+            var y   = yearInput.value.trim();
+            var dob = y + '-' + m + '-' + d;
+            try {
+              var res  = await fetch('/api/verify-age', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date_of_birth: dob })
+              });
+              var data = await res.json();
+              if (data.ok && data.age_token) {
+                sessionStorage.setItem(AGE_TOKEN_KEY, data.age_token);
+                localStorage.setItem(AGE_KEY, '1'); // backward compat
+                hideAgeGate();
+                if (typeof _ageGateCb === 'function') {
+                  _ageGateCb();
+                  _ageGateCb = null;
+                }
+              } else {
+                if (errorEl) errorEl.textContent = data.reason || 'Age verification failed. Please check your date of birth.';
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Verify Age & Continue';
+              }
+            } catch (err) {
+              console.error('[age-gate] verify-age error:', err);
+              if (errorEl) errorEl.textContent = 'Verification failed. Please check your connection and try again.';
+              confirmBtn.disabled = false;
+              confirmBtn.textContent = 'Verify Age & Continue';
+            }
+          });
+        }
+
+        if (denyBtn) {
+          denyBtn.addEventListener('click', function () {
+            hideAgeGate();
+            _ageGateCb = null;
+          });
+        }
+      });
+
+      // ── Gate the seat request CTA ─────────────────────────────────────────
+      // Intercept the existing waitlistBtn click to check age first.
+      document.addEventListener('DOMContentLoaded', function () {
+        var waitlistBtn = document.getElementById('waitlistBtn');
+        if (!waitlistBtn) return;
+
+        // Replace inline onclick with a gated version
+        waitlistBtn.removeAttribute('onclick');
+        waitlistBtn.addEventListener('click', function () {
+          if (needsAgeGate()) {
+            showAgeGate(function () {
+              // Age confirmed — now reveal the form (original onclick logic)
+              waitlistBtn.style.display = 'none';
+              var f = document.getElementById('seat-request-form');
+              if (f) {
+                f.style.display = 'flex';
+                var nameInput = f.querySelector('input[name=name]');
+                if (nameInput) nameInput.focus();
+              }
+            });
+          } else {
+            // Already verified — reveal form directly
+            waitlistBtn.style.display = 'none';
+            var f = document.getElementById('seat-request-form');
+            if (f) {
+              f.style.display = 'flex';
+              var nameInput = f.querySelector('input[name=name]');
+              if (nameInput) nameInput.focus();
+            }
+          }
+        });
+      });
+
+      // ── Wire seat-request form to return seat_id + trigger rerender ───────
+      document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('seat-request-form');
+        if (!form) return;
+
+        var subBtn       = document.getElementById('seat-submit-btn');
+        var ageCheckbox  = document.getElementById('age-confirmed');
+
+        // ── Enable / disable submit based on checkbox state ────────────────
+        if (ageCheckbox && subBtn) {
+          ageCheckbox.addEventListener('change', function () {
+            subBtn.disabled = !ageCheckbox.checked;
+          });
+        }
+
+        // BLOCKER-04: Replace age_confirmed boolean with age_token (HMAC-signed from /api/verify-age).
+        // The age gate overlay stores the token in sessionStorage under 'tuj_age_token'.
+        form.removeAttribute('onsubmit');
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var nameVal  = form.querySelector('input[name=name]').value.trim();
+          var emailVal = form.querySelector('input[name=email]').value.trim();
+          var errEl    = document.getElementById('seat-form-error');
+          errEl.textContent = '';
+          if (!nameVal)  { errEl.textContent = 'Name is required.';  return; }
+          if (!emailVal) { errEl.textContent = 'Email is required.'; return; }
+          var _ageToken2 = sessionStorage.getItem('tuj_age_token') || null;
+          if (!_ageToken2) {
+            errEl.textContent = 'Age verification required. Please complete the passenger verification step first.';
+            return;
+          }
+          subBtn.disabled    = true;
+          subBtn.textContent = '⏳ Submitting…';
+
+          fetch('/api/seat-request', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(Object.assign({
+              name:      nameVal,
+              email:     emailVal,
+              age_token: _ageToken2,
+              source:    'landing'
+            }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
+          })
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d.ok && d.seat_id) {
+              sessionStorage.setItem(SEAT_KEY, d.seat_id);
+              form.style.display = 'none';
+              // ── Gate Contract: auto-mark Step 1 (Signal subscription) done ──
+              // beehiiv subscribe already fired server-side; mark locally so
+              // OnboardingPassport shows Step 1 as done on first .tech load.
+              try {
+                if (window.__TUJPassport && typeof window.__TUJPassport.saveStepFlag === 'function') {
+                  window.__TUJPassport.saveStepFlag(d.seat_id, 'signal', true);
+                  console.log('[TUJ] Step 1 (signal) marked done for', d.seat_id);
+                } else {
+                  // __TUJPassport is not loaded on .com — this is expected.
+                  // Write the flag directly using the same key contract so
+                  // .tech picks it up when the passenger navigates there.
+                  var _pKey = 'tuj:' + d.seat_id + ':boarding:step:signal';
+                  localStorage.setItem(_pKey, '1');
+                  console.log('[TUJ] Step 1 (signal) flag written directly:', _pKey);
+                }
+              } catch (flagErr) {
+                console.error('[TUJ] Failed to mark Step 1 done — seat_id:', d.seat_id, 'stepKey: signal', flagErr);
+              }
+              // Redirect to dashboard state with Welcome Aboard banner
+              var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
+              history.replaceState({}, '', newUrl);
+              window.__TUJ.rerender();
+            } else if (d.waitlisted) {
+              // F143: Cohort full — show "You're on the next flight" state
+              form.style.display = 'none';
+              var wlConf = document.getElementById('seat-request-waitlisted');
+              if (wlConf) wlConf.style.display = 'block';
+            } else if (d.ok) {
+              // Legacy ok:true without seat_id (Base44 stub path)
+              form.style.display = 'none';
+              var conf = document.getElementById('seat-request-confirm');
+              if (conf) conf.style.display = 'block';
+            } else if (d.duplicate) {
+              // One seat per email — surface a clear, friendly message
+              // If the API returned the existing seat_id, redirect directly to dashboard
+              if (d.seat_id) {
+                sessionStorage.setItem(SEAT_KEY, d.seat_id);
+                form.style.display = 'none';
+                var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
+                history.replaceState({}, '', newUrl);
+                window.__TUJ.rerender();
+              } else {
+                errEl.textContent  = d.error || 'A seat request has already been submitted for this email. Check your inbox for your original confirmation.';
+                subBtn.disabled    = false;
+                subBtn.textContent = '✈️ Submit Request';
+              }
+            } else {
+              errEl.textContent  = d.error || 'Something went wrong — please try again.';
+              subBtn.disabled    = false;
+              subBtn.textContent = '✈️ Submit Request';
+            }
+          })
+          .catch(function () {
+            errEl.textContent  = 'Network error — please try again.';
+            subBtn.disabled    = false;
+            subBtn.textContent = '✈️ Submit Request';
+          });
+        });
+      });
+
+      // ── Expose public API ─────────────────────────────────────────────────
+      window.__TUJ = {
+        rerender:     rerender,
+        showAgeGate:  showAgeGate,
+        get state()   { return _state; },
+        get status()  { return _status; },
+        get seatId()  { return _seatId; }
+      };
+
+      // ── Boot: run on DOMContentLoaded ─────────────────────────────────────
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', rerender);
+      } else {
+        rerender();
+      }
+
+      // Re-run every 60s (same cadence as the old applySeatGate interval)
+      setInterval(rerender, 60000);
+
+    })();
+
+    // ── Live countdown timer — target driven by applySeatGate() ─────────────
+    // Waits for window.__seatStatusReady to be populated by the IIFE above,
+    // then starts counting down to next_flight_departure_date.
+    (function () {
+      var wrap      = document.getElementById('countdown-wrap');
+      var departed  = document.getElementById('countdown-departed');
+      var cdHours   = document.getElementById('cd-hours');
+      var cdMinutes = document.getElementById('cd-minutes');
+      var cdSeconds = document.getElementById('cd-seconds');
+      var timer     = null;
+      var target    = null;
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function tick() {
+        if (!target) { if (wrap) wrap.style.display = 'none'; return; }
+        var now  = new Date();
+        var diff = target - now;
+        if (diff <= 0) {
+          if (wrap)     wrap.style.display = 'none';
+          // Only show "Wheels Up" message if gate is also departed
+          var rdy = window.__seatStatusReady;
+          if (departed && rdy && !rdy.gateOpen) departed.style.display = 'block';
+          if (timer) clearInterval(timer);
+          return;
+        }
+        var totalSec = Math.floor(diff / 1000);
+        var secs  = totalSec % 60;
+        var mins  = Math.floor(totalSec / 60) % 60;
+        var hours = Math.floor(totalSec / 3600);
+        if (cdHours)   cdHours.textContent   = pad(hours);
+        if (cdMinutes) cdMinutes.textContent = pad(mins);
+        if (cdSeconds) cdSeconds.textContent = pad(secs);
+      }
+
+      // Poll until applySeatGate() has populated window.__seatStatusReady
+      var pollInterval = setInterval(function () {
+        var rdy = window.__seatStatusReady;
+        if (rdy === null) return; // not yet populated
+        clearInterval(pollInterval);
+
+        if (!rdy.departureDate) {
+          // No departure date set in Admin — hide countdown entirely
+          if (wrap) wrap.style.display = 'none';
+          return;
+        }
+
+        target = new Date(rdy.departureDate);
+        if (isNaN(target.getTime())) {
+          if (wrap) wrap.style.display = 'none';
+          return;
+        }
+
+        // Show the countdown wrap now that we have a valid target
+        if (wrap) wrap.style.display = '';
+        tick();
+        timer = setInterval(tick, 1000);
+      }, 100);
+    })();
+
+    // ── Seat ID Gate Modal — wires the ❖ Mission Control nav button and entry prompt ──
+    (function () {
+      var SEAT_KEY  = 'seat_id';
+      var SEAT_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+
+      var overlay   = document.getElementById('seat-id-gate-overlay');
+      var sigInput  = document.getElementById('sig-input');
+      var sigError  = document.getElementById('sig-error');
+      var sigConfirm = document.getElementById('sig-confirm-btn');
+      var sigCancel  = document.getElementById('sig-cancel-btn');
+      var mcNavBtn   = document.getElementById('mc-nav-btn');
+
+      // Show the Mission Control nav button only when a valid seat_id is in session
+      function refreshMcNavBtn() {
+        var stored = sessionStorage.getItem(SEAT_KEY);
+        if (mcNavBtn) {
+          if (stored && SEAT_REGEX.test(stored)) {
+            mcNavBtn.href = '/?seat_id=' + encodeURIComponent(stored);
+            mcNavBtn.style.display = '';
+          } else {
+            // No valid seat in session — show button but it opens the entry modal
+            mcNavBtn.href = '#';
+            mcNavBtn.style.display = '';
+          }
+        }
+      }
+
+      function openGate() {
+        if (overlay) {
+          overlay.style.display = 'flex';
+          if (sigInput) { sigInput.value = ''; sigInput.focus(); }
+          if (sigError) sigError.textContent = '';
+        }
+      }
+
+      function closeGate() {
+        if (overlay) overlay.style.display = 'none';
+      }
+
+      // Mission Control nav button click: if seat in session go direct, else open modal
+      if (mcNavBtn) {
+        mcNavBtn.addEventListener('click', function (e) {
+          var stored = sessionStorage.getItem(SEAT_KEY);
+          if (stored && SEAT_REGEX.test(stored)) {
+            // Valid seat in session — let the href navigate normally
+            return;
+          }
+          e.preventDefault();
+          openGate();
+        });
+      }
+
+      // Confirm: validate input, call /api/seat, then navigate to dashboard
+      if (sigConfirm) {
+        sigConfirm.addEventListener('click', function () {
+          var val = (sigInput ? sigInput.value.trim().toUpperCase() : '');
+          if (!SEAT_REGEX.test(val)) {
+            if (sigError) {
+              sigError.innerHTML = 'That code doesn\'t match a seat on this flight. If you haven\'t boarded yet, <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#00D9FF;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+            }
+            if (sigInput) sigInput.focus();
+            return;
+          }
+
+          // Disable button + show loading state while we validate against Base44
+          sigConfirm.disabled = true;
+          sigConfirm.textContent = 'Verifying…';
+          if (sigError) sigError.textContent = '';
+
+          fetch('/api/seat?id=' + encodeURIComponent(val))
+            .then(function (r) {
+              // Non-2xx other than 400: fail open and navigate
+              if (!r.ok && r.status !== 400) return { valid: true, _unchecked: true };
+              return r.json();
+            })
+            .then(function (data) {
+              if (data.valid === false) {
+                // Seat not found or inactive — show error, do not navigate
+                sigConfirm.disabled = false;
+                sigConfirm.textContent = 'Access Mission Control';
+                if (sigError) {
+                  sigError.innerHTML = 'That Seat ID wasn\'t found on this flight. Double-check your boarding email, or <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#00D9FF;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+                }
+                if (sigInput) sigInput.focus();
+                return;
+              }
+              // Valid (or fail-open) — persist and navigate
+              sessionStorage.setItem(SEAT_KEY, val);
+              closeGate();
+              window.location.href = '/?seat_id=' + encodeURIComponent(val);
+            })
+            .catch(function () {
+              // Network error — fail open and navigate
+              sessionStorage.setItem(SEAT_KEY, val);
+              closeGate();
+              window.location.href = '/?seat_id=' + encodeURIComponent(val);
+            });
+        });
+      }
+
+      // Allow Enter key in input to confirm
+      if (sigInput) {
+        sigInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && sigConfirm) sigConfirm.click();
+        });
+      }
+
+      // Cancel button
+      if (sigCancel) {
+        sigCancel.addEventListener('click', closeGate);
+      }
+
+      // Close on overlay background click
+      if (overlay) {
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeGate();
+        });
+      }
+
+      // Initial state: show/configure Mission Control nav button
+      document.addEventListener('DOMContentLoaded', refreshMcNavBtn);
+      // Also refresh after TUJ state machine may have stored a seat_id
+      setTimeout(refreshMcNavBtn, 1200);
+    })();
+
+     // ── BLOCKER-01: Info Modal — open / close wiring (QA pass Apr 15 2026) ──
+    (function() {
+      var overlay = document.getElementById('info-modal-overlay');
+      var openBtn = document.getElementById('info-btn');
+      var closeBtn = document.getElementById('info-modal-close');
+      if (!overlay || !openBtn) return;
+
+      // Focus trap: collect all focusable elements inside the modal card
+      function getFocusable() {
+        return Array.prototype.slice.call(
+          overlay.querySelectorAll(
+            'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter(function(el) { return !el.closest('[hidden]'); });
+      }
+
+      function openInfoModal() {
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+        if (closeBtn) closeBtn.focus();
+      }
+      function closeInfoModal() {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        openBtn.focus();
+      }
+
+      openBtn.addEventListener('click', openInfoModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeInfoModal);
+
+      // Close on backdrop click
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeInfoModal();
+      });
+
+      // Close on Escape key + focus trap on Tab
+      document.addEventListener('keydown', function(e) {
+        if (!overlay.classList.contains('active')) return;
+        if (e.key === 'Escape') {
+          closeInfoModal();
+          return;
+        }
+        if (e.key === 'Tab') {
+          var focusable = getFocusable();
+          if (!focusable.length) { e.preventDefault(); return; }
+          var first = focusable[0];
+          var last  = focusable[focusable.length - 1];
+          if (e.shiftKey) {
+            if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+          } else {
+            if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+          }
+        }
+      });
+    })();
+
+    // Black Glass always active
+    (function() {
+      const themeStatus = document.getElementById('theme-status');
+      document.body.classList.add('black-glass');
+      themeStatus.textContent = 'Black Glass Theme Active';
+    })();
+
+    // St. Patrick's Day theme (March 17 only)
+    (function() {
+      const now = new Date();
+      if (now.getMonth() === 2 && now.getDate() === 17) {
+        document.body.classList.add('st-patricks');
+      }
+    })();
+
+  </script>
+
+
+  <!-- Canvas hero — flight-path particle animation (ported from career-navigator commit 5e14238) -->
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+
+  <script>
+    (function () {
+      var canvas = document.getElementById('hero-canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var raf;
+      var particles = [];
+      var PARTICLE_COUNT = 55;
+      // Match site accent: #00D9FF = rgb(0, 217, 255)
+      var ACCENT = { r: 0, g: 217, b: 255 };
+
+      function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function randomBetween(a, b) {
+        return a + Math.random() * (b - a);
+      }
+
+      function createParticle() {
+        var angle = randomBetween(0, Math.PI * 2);
+        var speed = randomBetween(0.15, 0.55);
+        return {
+          x:     randomBetween(0, canvas.width),
+          y:     randomBetween(0, canvas.height),
+          vx:    Math.cos(angle) * speed,
+          vy:    Math.sin(angle) * speed,
+          size:  randomBetween(1, 2.5),
+          alpha: randomBetween(0.08, 0.35),
+          trail: []
+        };
+      }
+
+      function initParticles() {
+        particles = [];
+        for (var i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push(createParticle());
+        }
+      }
+
+      function drawFrame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          p.trail.push({ x: p.x, y: p.y });
+          if (p.trail.length > 18) p.trail.shift();
+
+          if (p.x < -10)                p.x = canvas.width  + 10;
+          if (p.x > canvas.width  + 10) p.x = -10;
+          if (p.y < -10)                p.y = canvas.height + 10;
+          if (p.y > canvas.height + 10) p.y = -10;
+
+          if (p.trail.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(p.trail[0].x, p.trail[0].y);
+            for (var t = 1; t < p.trail.length; t++) {
+              ctx.lineTo(p.trail[t].x, p.trail[t].y);
+            }
+            ctx.strokeStyle = 'rgba(' + ACCENT.r + ',' + ACCENT.g + ',' + ACCENT.b + ',' + (p.alpha * 0.4) + ')';
+            ctx.lineWidth = p.size * 0.5;
+            ctx.stroke();
+          }
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + ACCENT.r + ',' + ACCENT.g + ',' + ACCENT.b + ',' + p.alpha + ')';
+          ctx.fill();
+        }
+
+        raf = requestAnimationFrame(drawFrame);
+      }
+
+      function start() {
+        resize();
+        initParticles();
+        canvas.classList.add('ready');
+        drawFrame();
+      }
+
+      window.addEventListener('resize', function () {
+        resize();
+        initParticles();
+      });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+          cancelAnimationFrame(raf);
+        } else {
+          drawFrame();
+        }
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+      } else {
+        start();
+      }
+    })();
+  </script>
+
+  <!-- ── Mission Control deep-link wiring — Apr 19, 2026
+       Rewrites all stale .tech root-only hrefs to named routes using seat_id from URL.
+       Spec: link audit rewrite, Apr 2026.
+       Targets: bstep-2-cta, bstep-6-cta, bstep-7-cta, bstep-8-cta,
+                .mc-tile[Systems], .mc-section-link[Build], .mc-action-btn[Systems],
+                .btn-systems (nav bar) ── -->
+  <script>
+  (function () {
+    var TECH   = 'https://www.thispagedoesnotexist12345.tech';
+    var params = new URLSearchParams(window.location.search);
+    var seatId  = params.get('seat_id')  || '';
+    var tujCode = params.get('tuj_code') || '';
+
+    function deepLink(path, extraQuery) {
+      var url = TECH + path;
+      var qs  = [];
+      if (extraQuery) qs.push(extraQuery);
+      if (seatId)  qs.push('seat_id='  + encodeURIComponent(seatId));
+      if (tujCode) qs.push('tuj_code=' + encodeURIComponent(tujCode));
+      return qs.length ? url + '?' + qs.join('&') : url;
+    }
+
+    // Step 2 — Complete Your Profile → /Passengers
+    var s2 = document.getElementById('bstep-2-cta');
+    if (s2) s2.href = deepLink('/Passengers');
+
+    // Step 6 — Add 5 Target Companies → /JDLibrary
+    var s6 = document.getElementById('bstep-6-cta');
+    if (s6) s6.href = deepLink('/JDLibrary');
+
+    // Step 7 — Submit 3 Applications → /Applications
+    var s7 = document.getElementById('bstep-7-cta');
+    if (s7) s7.href = deepLink('/Applications');
+
+    // Step 8 — Set Follow-Up Reminders → /InterviewsAndFollowUps
+    var s8 = document.getElementById('bstep-8-cta');
+    if (s8) s8.href = deepLink('/InterviewsAndFollowUps');
+
+    // Ecosystem tile — Systems → /Dashboard
+    document.querySelectorAll('.mc-tile').forEach(function (el) {
+      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
+        el.href = deepLink('/Dashboard');
+      }
+    });
+
+    // Section link — "Open in Systems →" (The Build section) → /FlightLog
+    document.querySelectorAll('.mc-section-link').forEach(function (el) {
+      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
+        el.href = deepLink('/FlightLog');
+      }
+    });
+
+    // Footer action button — ⚙️ Systems → /Dashboard
+    document.querySelectorAll('.mc-action-btn').forEach(function (el) {
+      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
+        el.href = deepLink('/Dashboard');
+      }
+    });
+
+    // Nav bar Systems button (.btn-systems)
+    var navSys = document.querySelector('.btn-systems');
+    if (navSys && (navSys.getAttribute('href') === TECH || navSys.getAttribute('href') === TECH + '/')) {
+      navSys.href = deepLink('/Dashboard');
+    }
+  })();
+  </script>
+
+  <!-- ── Status strip tokenization — STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE ── -->
+  <!-- Runs once on DOMContentLoaded. Reads seat_id + tuj_code from URL.
+       When seat_id present: optimistic update from URL, then async refinement from seat record.
+       When absent: JS defaults (Boarding / 5 active / Review signal path) remain. -->
+  <script>
+  (function () {
+    var STATUS_LANE       = 'Boarding';
+    var STATUS_OPERATORS  = '5 active';
+    var STATUS_NEXT_MOVE  = 'Review signal path';
+
+    var params  = new URLSearchParams(window.location.search);
+    var seatId  = params.get('seat_id')  || '';
+    var tujCode = params.get('tuj_code') || '';
+
+    function applyStrip(lane, ops, next, pill) {
+      var laneEl = document.getElementById('mcStatusLane');
+      var opsEl  = document.getElementById('mcStatusOperators');
+      var nextEl = document.getElementById('mcStatusNextMove');
+      var seatEl = document.getElementById('dashboard-seat-id');
+      if (laneEl) laneEl.textContent = lane;
+      if (opsEl)  opsEl.textContent  = ops;
+      if (nextEl) nextEl.textContent = next;
+      if (pill && seatEl) seatEl.textContent = pill;
+    }
+
+    if (seatId) {
+      // Optimistic update from URL params
+      applyStrip(
+        tujCode || seatId,
+        STATUS_OPERATORS,
+        STATUS_NEXT_MOVE,
+        tujCode ? tujCode + ' · active' : seatId
+      );
+
+      // Async refinement from seat record (non-blocking, silent on error)
+      fetch('/api/seat?id=' + encodeURIComponent(seatId))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (seat) {
+          if (!seat) return;
+          var lane = seat.cabin_class
+            ? seat.cabin_class + (tujCode ? ' · ' + tujCode : '')
+            : (tujCode || seatId);
+          var ops  = seat.status || STATUS_OPERATORS;
+          var next = seat.scheduled_departure_date
+            ? 'Departure set · ' + seat.scheduled_departure_date.slice(0, 10)
+            : STATUS_NEXT_MOVE;
+          var pill = seat.cabin_class
+            ? seat.cabin_class + ' · ' + (tujCode || seatId) + ' · active'
+            : (tujCode ? tujCode + ' · active' : seatId);
+          applyStrip(lane, ops, next, pill);
+        })
+        .catch(function () { /* silently skip — defaults already applied */ });
+    }
+    // No seat_id: JS defaults (STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE) already set in HTML
+  })();
+  </script>
+</body>
+</html>
