@@ -140,6 +140,11 @@
     .mc-btn-secondary { border-color: var(--color-border); background: rgba(255,255,255,0.04); }
     .mc-btn-secondary:hover { background: rgba(255,255,255,0.08); }
 
+    /* ── Scroll affordance ────────────────────────────────────────────────── */
+    .mc-scroll-hint { margin-top: var(--space-4); }
+    .mc-scroll-hint a { opacity: 0.55; transition: opacity 0.2s; }
+    .mc-scroll-hint a:hover { opacity: 1; }
+
     /* ── Status strip ─────────────────────────────────────────────────────── */
     .mc-status-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-3); margin-top: var(--space-8); }
     .mc-status-card { padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); }
@@ -451,24 +456,31 @@
           <h1 class="mc-h1">Look out over the operators moving your journey.</h1>
           <p class="mc-lede">This is not a dashboard first. It is a glass-front vantage point into the hidden machinery behind your seat: recruiters, referrals, ATS filters, handoffs, follow-ups, and signals that usually stay out of sight.</p>
           <div class="mc-cta-row">
-            <a class="mc-btn mc-btn-primary" href="https://www.thispagedoesnotexist12345.tech/CommandCenter" target="_blank" rel="noopener noreferrer">Enter Mission Control</a><!-- P3 fix — Apr 14, 2026: was #control-surfaces anchor -->
+            <a class="mc-btn mc-btn-primary" href="https://www.thispagedoesnotexist12345.tech/Dashboard" target="_blank" rel="noopener noreferrer" data-cta="mission-control">Enter Mission Control</a><!-- Fix — Apr 20, 2026: was .tech/CommandCenter (admin-only); corrected to passenger Dashboard with seat_id passthrough -->
             <a class="mc-btn mc-btn-secondary" href="#studio-main">Open One-Page Studio</a>
           </div>
+          <!-- Scroll affordance: guides new users to the Studio tool below the lounge -->
+          <p class="mc-scroll-hint" id="mcScrollHint" aria-hidden="true">
+            <a href="#studio-main" style="color:var(--color-text-faint); font-size:var(--text-xs); letter-spacing:0.1em; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px;">
+              Resume builder below
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </a>
+          </p>
         </div>
 
         <!-- Status strip — tokenized: values update from seat record when seat_id present -->
         <div class="mc-status-strip" aria-label="Mission control summary" id="mcStatusStrip">
           <div class="mc-status-card">
             <div class="mc-status-label">Current lane</div>
-            <div class="mc-status-value" id="mcStatusLane">Boarding</div>
+            <div class="mc-status-value" id="mcStatusLane" style="font-size:var(--text-sm); color:var(--color-text-muted);">Add your seat ID to activate</div>
           </div>
           <div class="mc-status-card">
             <div class="mc-status-label">Visible operators</div>
-            <div class="mc-status-value" id="mcStatusOperators">5 active across ramp</div>
+            <div class="mc-status-value" id="mcStatusOperators" style="font-size:var(--text-sm); color:var(--color-text-muted);">Unlocks with seat record</div>
           </div>
           <div class="mc-status-card">
             <div class="mc-status-label">Clearest next move</div>
-            <div class="mc-status-value" id="mcStatusNextMove">Review signal path</div>
+            <div class="mc-status-value" id="mcStatusNextMove" style="font-size:var(--text-sm); color:var(--color-primary);">Build your resume ↓</div>
           </div>
         </div>
 
@@ -642,6 +654,23 @@
         <div id="optimize-tab" class="hidden">
           <div class="glass" style="padding:2rem;">
             <h3 class="cyan-glow" style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem;">AI Resume Optimizer</h3>
+
+            <!-- Empty-state guard: shown when resume has no meaningful content -->
+            <div id="optimizerEmptyState" style="display:none; margin-bottom:1.5rem; padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.18);">
+              <p style="color:var(--color-text-muted); font-size:0.875rem; margin:0;">
+                <strong style="color:var(--color-primary);">Add your experience first.</strong>
+                Fill in your name, summary, and at least one experience entry in the
+                <a href="#" onclick="switchTab('editor', event); return false;" style="color:var(--color-primary); text-decoration:underline;">Resume Editor</a>
+                tab to unlock AI analysis.
+              </p>
+            </div>
+
+            <!-- Job description input for ATS scoring -->
+            <div style="margin-bottom:1.5rem;">
+              <label for="atsJobDescription" style="display:block; font-size:0.875rem; font-weight:600; color:var(--color-text-muted); margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.08em;">Target Job Description <span style="font-weight:400; text-transform:none; letter-spacing:0;">(required for ATS Score)</span></label>
+              <textarea id="atsJobDescription" rows="5" placeholder="Paste the full job description here. The ATS Score compares your resume against this role’s keywords and requirements." class="input-field" style="resize:vertical;"></textarea>
+            </div>
+
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
               <div class="glass-accent" style="padding:1.5rem;">
                 <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x2728; Content Enhancement</h4>
@@ -651,7 +680,7 @@
               <div class="glass-accent" style="padding:1.5rem;">
                 <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F3AF; ATS Optimization</h4>
                 <p style="color:var(--color-text-muted); margin-bottom:1rem; font-size:0.875rem;">Ensure your resume passes Applicant Tracking Systems with keyword optimization and formatting suggestions.</p>
-                <button class="btn-primary-studio" style="width:100%; justify-content:center;" onclick="optimizeATS()">Check ATS Score</button>
+                <button class="btn-primary-studio" style="width:100%; justify-content:center;" id="atsScoreBtn" onclick="optimizeATSGuarded()">Check ATS Score</button>
               </div>
               <div class="glass-accent" style="padding:1.5rem;">
                 <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:1rem;">&#x1F4A1; Skill Recommendations</h4>
@@ -709,7 +738,15 @@ function yieldToMain() {
   });
 }
 
-// ── Tab switching ────────────────────────────────────────────────────────────
+// ── Tab switching ────────────────────────────────────────────────────────────────────────────────────
+function hasResumeContent() {
+  const name    = (document.getElementById('fullName')?.value  || '').trim();
+  const summary = (document.getElementById('summary')?.value   || '').trim();
+  const expList = document.getElementById('experienceList');
+  const hasExp  = expList && expList.querySelectorAll('.experience-entry').length > 0;
+  return name.length > 0 || summary.length > 0 || hasExp;
+}
+
 function switchTab(tab, event) {
   ['editor','optimize','export'].forEach(t => {
     const el = document.getElementById(t + '-tab');
@@ -723,6 +760,25 @@ function switchTab(tab, event) {
       btn.style.transition = 'color 0.2s';
     });
   }
+  // Show empty-state guard when switching to the optimizer with no content
+  if (tab === 'optimize') {
+    const guard = document.getElementById('optimizerEmptyState');
+    if (guard) guard.style.display = hasResumeContent() ? 'none' : 'block';
+  }
+}
+
+// ── ATS guarded call ──────────────────────────────────────────────────────────────────────────────────
+function optimizeATSGuarded() {
+  const jd = (document.getElementById('atsJobDescription')?.value || '').trim();
+  if (!jd) {
+    const results = document.getElementById('optimizeResults');
+    if (results) {
+      results.innerHTML = '<div style="padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.18); color:var(--color-text-muted); font-size:0.875rem;"><strong style="color:var(--color-primary);">Job description required.</strong> Paste the target role’s job description in the field above so the ATS Score can compare your resume against it.</div>';
+    }
+    document.getElementById('atsJobDescription')?.focus();
+    return;
+  }
+  optimizeATS();
 }
 
 // ============================================================
@@ -1343,7 +1399,15 @@ window.addEventListener('load', async () => {
     var nextEl = document.getElementById('mcStatusNextMove');
     var pillEl = document.getElementById('gatePillText');
 
+    // Restore live-data styles on status cards when seat_id is present
+    [laneEl, opsEl, nextEl].forEach(function (el) {
+      if (el) { el.style.fontSize = ''; el.style.color = ''; }
+    });
+
     // Optimistic update from URL — refined if seat record loads
+    if (laneEl) laneEl.textContent = 'Boarding';
+    if (opsEl)  opsEl.textContent  = '5 active across ramp';
+    if (nextEl) nextEl.textContent = 'Review signal path';
     if (tujCode && laneEl) laneEl.textContent = tujCode;
     if (pillEl) pillEl.textContent = 'Seat active · ' + (tujCode || seatId);
 
@@ -1379,6 +1443,14 @@ window.addEventListener('load', async () => {
   var params  = new URLSearchParams(window.location.search);
   var seatId  = params.get('seat_id')  || '';
   var tujCode = params.get('tuj_code') || '';
+
+  // Mission Control entry — passenger Dashboard (not admin CommandCenter)
+  var mcEl = document.querySelector('[data-cta="mission-control"]');
+  if (mcEl) {
+    mcEl.href = seatId
+      ? 'https://www.thispagedoesnotexist12345.tech/Dashboard?seat_id=' + seatId + '&tuj_code=' + tujCode
+      : 'https://www.thispagedoesnotexist12345.tech/Dashboard';
+  }
 
   // Boarding signal review
   var boardingEl = document.querySelector('[data-cta="boarding-signal"]');
