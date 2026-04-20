@@ -71,11 +71,6 @@
   to = "/.netlify/functions/seat"
   status = 200
 
-# Studio AI Optimizer — server-side OpenAI proxy
-[[redirects]]
-  from = "/api/studio-ai"
-  to = "/.netlify/functions/studio-ai"
-  status = 200
 
 # Admin Tower — BLOCKER-03: Approve/Deny Flow
 # Secured by x-admin-secret header (ADMIN_SECRET env var)

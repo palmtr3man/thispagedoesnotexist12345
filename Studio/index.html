@@ -1109,56 +1109,160 @@ function updatePreview() {
 }
 
 // ============================================================
-// AI OPTIMIZER — real API-backed functions (Fix #2)
+// AI OPTIMIZER — user-supplied OpenAI API key (BYOK)
 // ============================================================
 
-// Shared helper: calls /api/studio-ai and renders the markdown result
-async function callStudioAI(action, extraPayload = {}) {
+const OPENAI_SESSION_KEY = 'studio_openai_key';
+const OPENAI_CHAT_URL    = 'https://api.openai.com/v1/chat/completions';
+const OPENAI_MODEL       = 'gpt-4o-mini';
+
+// Returns the stored key, or null if not set
+function getOpenAIKey() {
+  return sessionStorage.getItem(OPENAI_SESSION_KEY) || null;
+}
+
+// Prompts the user to enter their key and stores it for the session
+function promptForOpenAIKey() {
+  const results = document.getElementById('optimizeResults');
+  if (!results) return;
+  results.innerHTML = `
+    <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
+      <h4 class="cyan-glow" style="font-size:1rem; font-weight:600; margin-bottom:0.75rem;">&#x1F511; Connect your OpenAI API key</h4>
+      <p style="color:var(--color-text-muted); font-size:0.875rem; margin-bottom:1rem;">The AI Optimizer uses your own OpenAI key — you are billed directly by OpenAI at their standard rates. Your key is stored only in this browser session and is never sent to our servers.</p>
+      <input type="password" id="openAIKeyInput" placeholder="sk-..." class="input-field" style="margin-bottom:0.75rem; font-family:monospace; letter-spacing:0.05em;">
+      <div style="display:flex; gap:0.75rem;">
+        <button class="btn-primary-studio" style="flex:1; justify-content:center;" onclick="saveOpenAIKey()">Connect key</button>
+        <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="btn-secondary-studio" style="flex:1; justify-content:center; text-decoration:none;">Get a key →</a>
+      </div>
+      <p style="color:var(--color-text-faint); font-size:0.75rem; margin-top:0.75rem;">Key is cleared automatically when you close this browser tab.</p>
+    </div>`;
+  const inp = document.getElementById('openAIKeyInput');
+  if (inp) inp.focus();
+}
+
+function saveOpenAIKey() {
+  const inp = document.getElementById('openAIKeyInput');
+  const key = (inp?.value || '').trim();
+  if (!key.startsWith('sk-')) {
+    if (inp) { inp.style.borderColor = 'rgba(255,80,80,0.6)'; inp.focus(); }
+    return;
+  }
+  sessionStorage.setItem(OPENAI_SESSION_KEY, key);
+  const results = document.getElementById('optimizeResults');
+  if (results) results.innerHTML = `<div style="padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.18); color:var(--color-text-muted); font-size:0.875rem;"><strong style="color:var(--color-primary);">Key connected.</strong> Choose an analysis above to get started.</div>`;
+}
+
+function clearOpenAIKey() {
+  sessionStorage.removeItem(OPENAI_SESSION_KEY);
+  const results = document.getElementById('optimizeResults');
+  if (results) results.innerHTML = `<div style="padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.18); color:var(--color-text-muted); font-size:0.875rem;">API key cleared. <button onclick="promptForOpenAIKey()" style="background:none; border:none; color:var(--color-primary); cursor:pointer; padding:0; font-size:inherit;">Connect a new key</button> to use the AI tools.</div>`;
+}
+
+function renderMarkdown(raw) {
+  return raw
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h5 style="color:var(--color-primary);margin:0.75rem 0 0.25rem;">$1</h5>')
+    .replace(/^## (.+)$/gm,  '<h4 class="cyan-glow" style="margin:0.75rem 0 0.25rem;">$1</h4>')
+    .replace(/^# (.+)$/gm,   '<h3 class="cyan-glow" style="margin:0.75rem 0 0.25rem;">$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^[-*] (.+)$/gm, '<li style="margin-bottom:0.25rem;">$1</li>')
+    .replace(/(<li[^>]*>.*<\/li>\n?)+/g, m => `<ul style="padding-left:1.25rem; color:var(--color-text-muted);">${m}</ul>`)
+    .replace(/\n{2,}/g, '</p><p style="margin-top:0.5rem; color:var(--color-text-muted);">')
+    .replace(/\n/g, '<br>');
+}
+
+function buildOpenAIMessages(action, resume, jobDescription) {
+  const pi = resume.personal_info || {};
+  const lines = [];
+  if (pi.full_name)          lines.push(`Name: ${pi.full_name}`);
+  if (pi.professional_title) lines.push(`Title: ${pi.professional_title}`);
+  if (pi.summary)            lines.push(`\nSummary:\n${pi.summary}`);
+  if (resume.experience?.length) {
+    lines.push('\nExperience:');
+    resume.experience.forEach(e => {
+      lines.push(`  ${e.title} at ${e.company} (${e.start_date} – ${e.end_date})`);
+      if (e.description) lines.push(`  ${e.description}`);
+    });
+  }
+  if (resume.education?.length) {
+    lines.push('\nEducation:');
+    resume.education.forEach(e => lines.push(`  ${e.degree} — ${e.institution}`));
+  }
+  if (resume.skills?.length) lines.push(`\nSkills: ${resume.skills.join(', ')}`);
+  const resumeText = lines.join('\n');
+
+  const prompts = {
+    enhance: {
+      system: 'You are an expert resume writer. Provide concise, actionable suggestions to improve the resume content. Focus on impact, quantifiable achievements, and strong action verbs. Return a short markdown list (max 8 items).',
+      user:   `Review this resume and provide specific content enhancement suggestions:\n\n${resumeText}`
+    },
+    ats: {
+      system: 'You are an ATS expert. Analyse the resume against the job description and provide: 1) an ATS compatibility score out of 100, 2) matched keywords, 3) missing keywords, 4) specific improvements. Return structured markdown.',
+      user:   `Job Description:\n${jobDescription}\n\nResume:\n${resumeText}`
+    },
+    skills: {
+      system: 'You are a career coach. Based on the resume, suggest 8–12 specific, relevant skills the candidate should add. Tailor to their industry and role. Return a markdown list with a one-line explanation for each.',
+      user:   `Based on this resume, suggest skills to add:\n\n${resumeText}`
+    },
+    analyze: {
+      system: 'You are a professional resume reviewer. Provide a structured analysis covering: overall impression, strengths, weaknesses, and 3 priority improvements. Be specific and actionable. Return structured markdown.',
+      user:   `Analyse this resume:\n\n${resumeText}`
+    }
+  };
+  const p = prompts[action];
+  return [
+    { role: 'system', content: p.system },
+    { role: 'user',   content: p.user   }
+  ];
+}
+
+async function callOpenAI(action, extraPayload = {}) {
   const results = document.getElementById('optimizeResults');
   if (!results) return;
 
-  // Show loading state
+  const key = getOpenAIKey();
+  if (!key) { promptForOpenAIKey(); return; }
+
   results.innerHTML = `<div style="padding:1.25rem; border-radius:0.75rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.18); color:var(--color-text-muted); font-size:0.875rem; display:flex; align-items:center; gap:0.75rem;"><span class="spinner"></span> Analysing your resume…</div>`;
 
   const resume = buildResumePayload();
+  const messages = buildOpenAIMessages(action, resume, extraPayload.jobDescription || '');
+
   try {
-    const res = await fetch('/api/studio-ai', {
+    const res = await fetch(OPENAI_CHAT_URL, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ action, resume, ...extraPayload }),
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body:    JSON.stringify({ model: OPENAI_MODEL, max_tokens: 800, messages }),
     });
+    if (res.status === 401) {
+      sessionStorage.removeItem(OPENAI_SESSION_KEY);
+      results.innerHTML = `<div style="padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(255,80,80,0.06); border:1px solid rgba(255,80,80,0.2); color:var(--color-text-muted); font-size:0.875rem;"><strong style="color:#ff8080;">Invalid API key.</strong> Your key was cleared. <button onclick="promptForOpenAIKey()" style="background:none; border:none; color:var(--color-primary); cursor:pointer; padding:0; font-size:inherit;">Connect a new key</button>.</div>`;
+      return;
+    }
+    if (!res.ok) throw new Error(`OpenAI returned HTTP ${res.status}`);
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Unknown error');
-
-    // Render markdown result (basic conversion: **bold**, ## headings, - lists)
-    const html = data.result
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/^### (.+)$/gm, '<h5 style="color:var(--color-primary);margin:0.75rem 0 0.25rem;">$1</h5>')
-      .replace(/^## (.+)$/gm,  '<h4 class="cyan-glow" style="margin:0.75rem 0 0.25rem;">$1</h4>')
-      .replace(/^# (.+)$/gm,   '<h3 class="cyan-glow" style="margin:0.75rem 0 0.25rem;">$1</h3>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^[-*] (.+)$/gm, '<li style="margin-bottom:0.25rem;">$1</li>')
-      .replace(/(<li[^>]*>.*<\/li>\n?)+/g, m => `<ul style="padding-left:1.25rem; color:var(--color-text-muted);">${m}</ul>`)
-      .replace(/\n{2,}/g, '</p><p style="margin-top:0.5rem; color:var(--color-text-muted);">')
-      .replace(/\n/g, '<br>');
-
-    results.innerHTML = `<div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;"><p style="color:var(--color-text-muted);">${html}</p></div>`;
+    const text = data.choices?.[0]?.message?.content || '';
+    results.innerHTML = `
+      <div class="glass-accent" style="padding:1.5rem; border-radius:0.5rem;">
+        <p style="color:var(--color-text-muted);">${renderMarkdown(text)}</p>
+        <p style="margin-top:1rem; font-size:0.75rem; color:var(--color-text-faint);">Powered by your OpenAI key &middot; <button onclick="clearOpenAIKey()" style="background:none; border:none; color:var(--color-text-faint); cursor:pointer; padding:0; font-size:inherit; text-decoration:underline;">Clear key</button></p>
+      </div>`;
   } catch (err) {
-    results.innerHTML = `<div style="padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(255,80,80,0.06); border:1px solid rgba(255,80,80,0.2); color:var(--color-text-muted); font-size:0.875rem;"><strong style="color:#ff8080;">AI analysis failed.</strong> ${esc(err.message)} &mdash; please try again.</div>`;
+    results.innerHTML = `<div style="padding:1rem 1.25rem; border-radius:0.75rem; background:rgba(255,80,80,0.06); border:1px solid rgba(255,80,80,0.2); color:var(--color-text-muted); font-size:0.875rem;"><strong style="color:#ff8080;">AI analysis failed.</strong> ${esc(err.message)} — please try again.</div>`;
   }
 }
 
 function optimizeContent() {
-  callStudioAI('enhance');
+  callOpenAI('enhance');
 }
 
 function optimizeATS() {
   const jd = (document.getElementById('atsJobDescription')?.value || '').trim();
-  callStudioAI('ats', { jobDescription: jd });
+  callOpenAI('ats', { jobDescription: jd });
 }
 
 function recommendSkills() {
-  callStudioAI('skills');
+  callOpenAI('skills');
 }
 
 function addSkillTag(skill) {
@@ -1169,7 +1273,7 @@ function addSkillTag(skill) {
 }
 
 function analyzeResume() {
-  callStudioAI('analyze');
+  callOpenAI('analyze');
 }
 
 // ============================================================
