@@ -21,20 +21,23 @@ For the live registry (template IDs, version IDs, active versions, send context)
 ## Template Token Sets
 
 ### boarding_pass_paid_v1
-`d-9290e951724f4b028d94945d4f06b69f` · active: `v1-dark-neon`
-Tokens: `first_name`, `last_name`, `seat_id`, `passport_url`, `signup_date`, `unsubscribe_url`
+`d-9290e951724f4b028d94945d4f06b69f` · active: `v1-dark-neon` (confirmed Apr 14, 2026)
+Tokens: `first_name`, `last_name`, `seat_id`, `tuj_code`, `passport_url`, `signup_date`, `cabin_class`, `flight_code`, `unsubscribe_url`
+> Token audit (Apr 21, 2026): added `tuj_code`, `flight_code`, `cabin_class` — present in sendgrid-integration.js dynamicData but previously missing from this doc.
 
 ### boarding_pass_free_v1
-`d-91ca65ce16634f299a46af4f0645d540` · active: `v7-dark-neon-canonical-2026-04-07`
-Tokens: `first_name`, `seat_id`, `passport_url`, `unsubscribe_url`
+`d-91ca65ce16634f299a46af4f0645d540` · active: `v7-dark-neon-canonical-2026-04-07` (confirmed Apr 14, 2026)
+Tokens: `first_name`, `seat_id`, `tuj_code`, `passport_url`, `signup_date`, `cabin_class`, `flight_code`, `unsubscribe_url`
+> Token audit (Apr 21, 2026): added `tuj_code`, `signup_date`, `flight_code`, `cabin_class` — present in dynamicData payload but previously missing from this doc.
 
 ### boarding_instructions_paid_v1
 `d-d8ec12e940944c5596af1fa740cf7f07` · active: `v7-dark-neon-canonical-2026-04-07` · v5 inactive
 Tokens: `first_name`, `flight_code`, `first_task_url`, `seat_id`, `secondary_url`, `unsubscribe_url`
 
 ### boarding_instructions_free_v1
-`d-747dac53dd2c4b47b33400376aad1672` · active: `v1-dark-neon`
-Tokens: `first_name`, `seat_id`, `unsubscribe_url`
+`d-747dac53dd2c4b47b33400376aad1672` · active: `v7-dark-neon-canonical-2026-04-07` (confirmed Apr 14, 2026)
+Tokens: `first_name`, `seat_id`, `tuj_code`, `first_task_url`, `secondary_url`, `platform_url`, `flight_code`, `unsubscribe_url`
+> Token audit (Apr 21, 2026): added `tuj_code`, `first_task_url`, `secondary_url`, `platform_url`, `flight_code` — all present in template HTML and dynamicData. Active version corrected from `v1-dark-neon` to `v7-dark-neon-canonical-2026-04-07`.
 
 ### internalsignupnotification_v1
 Internal only — no unsubscribe token required
@@ -75,5 +78,7 @@ Commit: `f876e25` — use as rollback reference when March campaigns resume.
 ## Notes
 
 - `founding_fare_unlocked_v1` — no active version in SendGrid as of Apr 7, 2026. Paste HTML and activate when ready.
-- `boarding_instructions_paid_v1` — Notion master registry table needs manual update: active version = `v7-dark-neon-canonical-2026-04-07`, token set = `first_name, flight_code, first_task_url, seat_id, secondary_url, unsubscribe_url`.
+- `boarding_instructions_paid_v1` — Notion registry updated Apr 21, 2026. Active version = `v7-dark-neon-canonical-2026-04-07`. Full token set: `first_name`, `flight_code`, `first_task_url`, `seat_id`, `tuj_code`, `secondary_url`, `platform_url`, `unsubscribe_url`.
+- `ACTIVE_FLIGHT_CODE_DEFAULT` in `seat-request.js` updated from `FL 041926` → `FL 042126` (Apr 21, 2026).
+- Alpha test banners remain in all announcement templates — must be stripped before live sends (FL 042126).
 - All announcement templates: banner stripped before live sends. Test sends pending daily quota reset.
