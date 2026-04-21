@@ -62,6 +62,8 @@
   <style>
     *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+    /* ── Global overflow containment ─────────────────────────────────────── */
+    html, body { max-width: 100%; overflow-x: hidden; }
 
     /* ── Mission Control design tokens ───────────────────────────────────── */
     :root, [data-theme="light"] {
@@ -100,7 +102,7 @@
     .tap-target { min-height: 48px; min-width: 48px; display: inline-flex; align-items: center; justify-content: center; padding: .5rem 1rem; }
 
     /* ── Layout shell ─────────────────────────────────────────────────────── */
-    .mc-shell { max-width: 1360px; margin: 0 auto; padding: var(--space-6); width: 100%; box-sizing: border-box; }
+    .mc-shell { max-width: 1360px; margin: 0 auto; padding: var(--space-6); width: 100%; box-sizing: border-box; overflow-x: hidden; }
 
     /* ── Topbar ───────────────────────────────────────────────────────────── */
     .mc-topbar {
@@ -111,28 +113,29 @@
       position: sticky; top: 16px; z-index: 20;
       width: 100%; box-sizing: border-box;
     }
-    .mc-brand { display: flex; align-items: center; gap: var(--space-3); }
+    .mc-brand { display: flex; align-items: center; gap: var(--space-3); min-width: 0; flex: 1 1 auto; }
     .mc-logo { width: 40px; height: 40px; padding: 8px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); }
-    .mc-brand-title { font-size: var(--text-sm); letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-text-muted); }
-    .mc-brand-name { font-size: var(--text-base); font-weight: 600; }
-    .mc-top-actions { display: flex; align-items: center; gap: var(--space-3); }
+    .mc-brand-title { font-size: var(--text-sm); letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mc-brand-name { font-size: var(--text-base); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mc-top-actions { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; min-width: 0; }
     .mc-pill {
       display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-full);
       border: 1px solid var(--color-border); background: rgba(255,255,255,0.03); color: var(--color-text-muted); font-size: var(--text-sm);
+      min-width: 0; max-width: 100%; overflow: hidden;
     }
     .mc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); box-shadow: 0 0 0 6px rgba(88,199,215,0.08); }
     .mc-theme-toggle { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--color-border); background: rgba(255,255,255,0.03); }
 
     /* ── Hero gateway ─────────────────────────────────────────────────────── */
-    .mc-hero { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: var(--space-6); align-items: stretch; margin-bottom: var(--space-6); }
+    .mc-hero { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: var(--space-6); align-items: stretch; margin-bottom: var(--space-6); width: 100%; box-sizing: border-box; }
     .mc-panel {
       position: relative; overflow: hidden; border-radius: calc(var(--radius-xl) + 6px); border: 1px solid var(--color-border);
       background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); box-shadow: var(--color-shadow);
     }
-    .mc-hero-copy { padding: clamp(1.75rem, 3vw, 3.5rem); min-height: 540px; display: flex; flex-direction: column; justify-content: space-between; }
+    .mc-hero-copy { padding: clamp(1.75rem, 3vw, 3.5rem); min-height: 540px; display: flex; flex-direction: column; justify-content: space-between; width: 100%; box-sizing: border-box; overflow-x: hidden; }
     .mc-eyebrow { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.2em; color: var(--color-gold); margin-bottom: var(--space-4); }
     .mc-h1 { font-family: var(--font-display); font-size: clamp(3rem, 6vw, 6.5rem); line-height: 0.95; letter-spacing: -0.04em; max-width: 11ch; }
-    .mc-lede { margin-top: var(--space-5); max-width: 58ch; color: var(--color-text-muted); }
+    .mc-lede { margin-top: var(--space-5); max-width: min(58ch, 100%); color: var(--color-text-muted); }
     .mc-cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
     .mc-btn {
       min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 18px; border-radius: var(--radius-full);
@@ -149,7 +152,7 @@
     .mc-scroll-hint a:hover { opacity: 1; }
 
     /* ── Status strip ─────────────────────────────────────────────────────── */
-    .mc-status-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-3); margin-top: var(--space-8); }
+    .mc-status-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-3); margin-top: var(--space-8); width: 100%; box-sizing: border-box; }
     .mc-status-card { padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); }
     .mc-status-label { font-size: var(--text-xs); letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-text-faint); margin-bottom: 8px; }
     .mc-status-value { font-size: var(--text-lg); font-weight: 600; }
@@ -220,11 +223,11 @@
     }
 
     /* ── Control surfaces band ────────────────────────────────────────────── */
-    .mc-bands { display: grid; gap: var(--space-6); }
-    .mc-control-band { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: var(--space-6); }
-    .mc-section-card { padding: var(--space-6); }
+    .mc-bands { display: grid; gap: var(--space-6); width: 100%; overflow-x: hidden; }
+    .mc-control-band { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: var(--space-6); width: 100%; box-sizing: border-box; }
+    .mc-section-card { padding: var(--space-6); width: 100%; box-sizing: border-box; }
     .mc-h2 { font-family: var(--font-display); font-size: clamp(2rem, 3vw, 3rem); letter-spacing: -0.03em; margin-bottom: var(--space-3); }
-    .mc-subcopy { color: var(--color-text-muted); max-width: 62ch; }
+    .mc-subcopy { color: var(--color-text-muted); max-width: min(62ch, 100%); }
     .mc-timeline { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
     .mc-timeline-item { display: grid; grid-template-columns: auto 1fr; gap: var(--space-4); align-items: start; }
     .mc-timeline-mark { width: 12px; height: 12px; margin-top: 8px; border-radius: 50%; background: var(--color-gold); box-shadow: 0 0 0 7px rgba(217,179,106,0.08); }
@@ -234,31 +237,36 @@
     .mc-control-row {
       display: grid; grid-template-columns: 1.1fr auto auto; gap: var(--space-3); align-items: center;
       padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.03); border: 1px solid var(--color-border);
+      width: 100%; box-sizing: border-box;
     }
     .mc-tag { padding: 7px 11px; border-radius: 999px; font-size: var(--text-xs); letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--color-border); color: var(--color-text-muted); }
     .mc-footer-note { color: var(--color-text-faint); font-size: var(--text-sm); margin-top: 4px; }
 
     /* ── Studio tabs base ────────────────────────────────────────────────────── */
-    .mc-studio-tabs { display: flex; }
+    .mc-studio-tabs { display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; max-width: 100%; }
+    .mc-studio-tabs::-webkit-scrollbar { display: none; }
     .mc-studio-tabs button { flex-shrink: 0; white-space: nowrap; }
 
     /* ── Studio tool section ───────────────────────────────────────────────────────── */
-    .mc-studio-section { margin-top: var(--space-6); }
+    .mc-studio-section { margin-top: var(--space-6); width: 100%; max-width: 100%; overflow-x: hidden; }
     .mc-studio-header {
       display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
       padding: var(--space-5) var(--space-6); border-radius: var(--radius-xl) var(--radius-xl) 0 0;
       background: rgba(255,255,255,0.03); border: 1px solid var(--color-border); border-bottom: none;
+      width: 100%; box-sizing: border-box; overflow: hidden;
     }
+    .mc-studio-header-left { min-width: 0; flex: 1 1 auto; }
     .mc-studio-header-left h2 { font-family: var(--font-display); font-size: clamp(1.5rem, 2.5vw, 2rem); letter-spacing: -0.02em; }
     .mc-studio-header-left p { color: var(--color-text-muted); font-size: var(--text-sm); margin-top: 4px; }
     .mc-studio-body {
       border: 1px solid var(--color-border); border-top: none; border-radius: 0 0 var(--radius-xl) var(--radius-xl);
       background: rgba(255,255,255,0.02); padding: var(--space-6);
+      width: 100%; box-sizing: border-box; overflow-x: hidden;
     }
 
     /* ── Studio tool: legacy utility classes (preserved) ─────────────────── */
-    .glass { background: rgba(15,23,42,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(88,199,215,0.2); border-radius: 0.5rem; }
-    .glass-accent { background: rgba(88,199,215,0.08); border: 1px solid rgba(88,199,215,0.2); border-radius: 0.5rem; }
+    .glass { background: rgba(15,23,42,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(88,199,215,0.2); border-radius: 0.5rem; width: 100%; box-sizing: border-box; }
+    .glass-accent { background: rgba(88,199,215,0.08); border: 1px solid rgba(88,199,215,0.2); border-radius: 0.5rem; width: 100%; box-sizing: border-box; }
     .cyan-glow { color: var(--color-primary); }
     [data-theme="light"] .cyan-glow { color: var(--color-primary); }
     .btn-primary-studio { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%); color: var(--color-text-inverse); font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; align-items: center; }
@@ -273,7 +281,7 @@
     [data-theme="light"] .input-field { background: rgba(11,142,160,0.04); border-color: rgba(11,142,160,0.18); color: var(--color-text); }
     [data-theme="light"] .input-field:focus { border-color: rgba(11,142,160,0.45); background: rgba(11,142,160,0.08); }
     .section-header { border-bottom: 2px solid rgba(88,199,215,0.25); padding-bottom: 12px; margin-bottom: 16px; }
-    .resume-preview { background: white; color: #000; padding: 40px; border-radius: 8px; font-family: 'Calibri','Arial',sans-serif; line-height: 1.6; }
+    .resume-preview { background: white; color: #000; padding: 40px; border-radius: 8px; font-family: 'Calibri','Arial',sans-serif; line-height: 1.6; width: 100%; box-sizing: border-box; overflow-x: hidden; }
     .resume-preview h1 { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
     .resume-preview .contact-line { font-size: 12px; color: #555; margin-bottom: 12px; border-bottom: 2px solid #00d9ff; padding-bottom: 8px; }
     .resume-preview .section-title { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #0099cc; border-bottom: 1px solid #ddd; padding-bottom: 3px; margin-top: 14px; margin-bottom: 6px; }
@@ -297,11 +305,12 @@
     @media (max-width: 1080px) {
       .mc-hero, .mc-control-band { grid-template-columns: 1fr; }
       .mc-window-panel, .mc-hero-copy { min-height: auto; }
+      .mc-hero, .mc-control-band, .mc-panel, .mc-section-card { width: 100%; max-width: 100%; box-sizing: border-box; }
     }
 
     /* ── Tablet / large mobile (≤ 720px) ────────────────────────────────── */
     @media (max-width: 720px) {
-      .mc-shell { padding: var(--space-3) var(--space-4); }
+      .mc-shell { padding: var(--space-3) var(--space-4); overflow-x: hidden; }
 
       /* Topbar: stack brand + actions vertically */
       .mc-topbar {
@@ -423,8 +432,17 @@
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         white-space: nowrap;
+        max-width: 100%;
       }
       .mc-studio-tabs::-webkit-scrollbar { display: none; }
+
+      /* Ensure all panels and sections stay within viewport */
+      .mc-panel, .mc-hero, .mc-control-band, .mc-section-card,
+      .mc-studio-section, .mc-studio-header, .mc-studio-body,
+      .glass, .glass-accent {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
     }
 
     /* ── Small mobile / iOS (≤ 480px) ───────────────────────────────────── */
@@ -436,6 +454,16 @@
         padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
         width: 100%;
         max-width: 100vw;
+        overflow-x: hidden;
+      }
+      /* Prevent any child from causing horizontal overflow */
+      .mc-bands, .mc-hero, .mc-control-band, .mc-panel,
+      .mc-studio-section, .mc-studio-header, .mc-studio-body,
+      .glass, .glass-accent, #editor-tab, #preview-tab,
+      #optimize-tab, #export-tab {
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
         overflow-x: hidden;
       }
       .mc-topbar {
@@ -548,7 +576,7 @@
           <path d="M16 8l4 4-4 4" />
         </svg>
       </div>
-      <div>
+      <div style="min-width:0;">
         <div class="mc-brand-title">The Ultimate Journey</div>
         <div class="mc-brand-name">Mission Control Gateway</div>
       </div>
@@ -606,7 +634,7 @@
         </div>
 
         <!-- Departure selector panel (preserved — shown when seat has departure window) -->
-        <div id="departureSelectorPanel" class="hidden" style="margin-top:1.5rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.2); border-radius:0.75rem; padding:1.25rem;">
+          <div id="departureSelectorPanel" class="hidden" style="margin-top:1.5rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.2); border-radius:0.75rem; padding:1.25rem; width:100%; box-sizing:border-box;">
           <p style="color:var(--color-text-muted); margin-bottom:0.75rem; font-size:14px;">Your flight window is ready. Select your departure date:</p>
           <div id="departureDateOptions" style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.5rem;"></div>
           <div id="departureConfirmMsg" class="hidden status-bar status-success" style="margin-top:8px; margin-bottom:0;"></div>
@@ -614,7 +642,7 @@
         </div>
 
         <!-- Resume title bar (preserved — shown when editing a specific resume) -->
-        <div id="resumeTitleBar" class="hidden" style="margin-top:1rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.2); border-radius:0.75rem; padding:0.75rem 1rem; display:flex; align-items:center; justify-content:space-between;">
+        <div id="resumeTitleBar" class="hidden" style="margin-top:1rem; background:rgba(88,199,215,0.06); border:1px solid rgba(88,199,215,0.2); border-radius:0.75rem; padding:0.75rem 1rem; display:flex; align-items:center; justify-content:space-between; width:100%; box-sizing:border-box;">
           <div>
             <span style="color:var(--color-text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">Editing Resume &bull;</span>
             <span id="resumeTitleDisplay" style="font-weight:600; margin-left:0.25rem;"></span>
