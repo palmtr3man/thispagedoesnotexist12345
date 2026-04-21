@@ -386,18 +386,32 @@
         font-size: 0.75rem;
       }
 
-      /* Operator blips: scale down and reposition for smaller window */
-      .mc-operator-blip {
-        width: 120px;
-        height: 80px;
-        padding: 10px;
-        border-radius: 14px;
+      /* Operator blips: stack vertically for cleaner mobile view (Option B) */
+      .mc-window-view {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding: 12px;
+        gap: 8px;
       }
-      .mc-operator-blip strong { font-size: 12px; }
+      .mc-operator-blip {
+        position: relative;
+        width: auto;
+        min-width: 0;
+        max-width: 100%;
+        height: auto;
+        bottom: auto;
+        left: auto !important;
+        right: auto !important;
+        padding: 10px 14px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .mc-operator-blip strong { font-size: 12px; margin-top: 0; }
       .mc-operator-blip small { font-size: 10px; }
-      .mc-operator-blip.one  { left: 4%; }
-      .mc-operator-blip.two  { left: 35%; }
-      .mc-operator-blip.three { right: 4%; }
 
       /* Control surfaces band */
       .mc-section-card { padding: var(--space-4); }
@@ -491,19 +505,14 @@
       .mc-window-panel { min-height: 220px; }
       .mc-window-view { min-height: 180px; }
 
-      /* Operator blips: smaller, prevent overflow */
+      /* Operator blips: hide middle blip, show only two on very small screens (Option A) */
+      .mc-operator-blip.two { display: none; }
       .mc-operator-blip {
-        width: 100px;
-        height: 72px;
-        padding: 8px;
+        padding: 8px 12px;
         border-radius: 10px;
-        max-width: calc(33vw - 0.5rem);
       }
-      .mc-operator-blip strong { font-size: 11px; margin-top: 4px; }
+      .mc-operator-blip strong { font-size: 11px; }
       .mc-operator-blip small { font-size: 9px; }
-      .mc-operator-blip.one  { left: 2%; }
-      .mc-operator-blip.two  { left: 34%; }
-      .mc-operator-blip.three { right: 2%; }
 
       /* Studio tabs: scrollable row instead of overflow-hidden */
       .mc-studio-body > div[style*="display:flex"][style*="border-bottom"],
