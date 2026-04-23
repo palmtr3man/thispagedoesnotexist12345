@@ -69,7 +69,7 @@ const ASM_GROUPS_TO_DISPLAY  = ASM_MARKETING_GROUP_ID
   : [ASM_GROUP_ID];
 const NOTION_API_VERSION = '2022-06-28';
 const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '5e6440af0ad94c6d89a8442ec2c528f3';
-const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL 042126'; // updated Apr 21, 2026 — Alpha Flight 1 rescheduled from FL 041926
+const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL 042426'; // updated Apr 21, 2026 — Alpha Flight 1 rescheduled from FL 041926
 const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
 
 // --- Gate Contract constants ---
