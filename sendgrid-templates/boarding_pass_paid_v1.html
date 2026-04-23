@@ -10,7 +10,7 @@
     {{last_name}}       — Passenger last name
     {{seat_id}}         — Seat label (e.g. TUJ-KC2222)
     {{tuj_code}}        — Internal tracking code for TUJ seat / flight context (e.g. TUJ-KC2222)
-    {{passport_url}}    — server-side: https://www.thispagedoesnotexist12345.tech/OnboardingPassport?seat_id=TUJ-XXXXXX&tuj_code=TUJ-XXXXXX&flight_code=FL_XXXXXX
+    {{passport_url}}    — server-side: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
     {{signup_date}}     — Optional boarding date string (e.g. "Apr 7, 2026"); falls back to "Confirmed"
     {{unsubscribe_url}} — SendGrid unsubscribe token
 
@@ -20,7 +20,7 @@
       "last_name": "Clark",
       "seat_id": "TUJ-KC2222",
       "tuj_code": "TUJ-KC2222",
-      "passport_url": "https://www.thispagedoesnotexist12345.tech/OnboardingPassport?seat_id=TUJ-KC2222&tuj_code=TUJ-KC2222&flight_code=FL_042126",
+      "passport_url": "https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-KC2222",
       "signup_date": "Apr 7, 2026"
     }
 
@@ -33,12 +33,12 @@
     6. Apr 14, 2026 — Alpha test banner block removed (internal-only label, not for production sends)
     7. Apr 19, 2026 — P2 fix: applied patch 5 to live HTML (was still missing &tuj_code= in href)
     8. Apr 22, 2026 — URL mapping fix (FL 042126):
-       - passport_url token: .com/?seat_id= → .tech/OnboardingPassport?seat_id=&tuj_code=&flight_code=
-       - Boarding Gate CTA: .com/Studio → .tech/Studio (correct domain for SPA routes)
+       - Boarding Gate CTA: .com/Studio → .tech/Studio reverted → .com/Studio (Studio is on .com, not .tech)
        - Footer: Request a Seat .com/ root → .com/request-seat
-       - Footer: View Master Requirements view-link.cx shortlink → .tech/mission-control/requirements
+       - Footer: View Master Requirements removed from footer (not aligned with other templates)
        - Footer: Reject & Return .tech/ root → newsletter.thispagedoesnotexist12345.us/
        - Alpha test banner removed (production template)
+       - passport_url: remains .com/?seat_id= (Mission Control renders via resolveState() on .com)
 -->
 <html lang="en">
 <head>
@@ -189,14 +189,13 @@
       <a href="{{passport_url}}" class="cta-btn-primary">❖ Mission Control — First Class</a>
       <br />
       <!-- SECONDARY CTA: Boarding Gate -->
-      <a href="https://www.thispagedoesnotexist12345.tech/Studio?seat_id={{seat_id}}&tuj_code={{tuj_code}}" class="cta-btn-secondary">Proceed to Boarding Gate →</a>
+      <a href="https://www.thispagedoesnotexist12345.com/Studio?seat_id={{seat_id}}&tuj_code={{tuj_code}}" class="cta-btn-secondary">Proceed to Boarding Gate →</a>
     </div>
 
     <div class="footer">
       <div class="tuj-footer">The Ultimate Journey · PageForward Airways</div>
       You're receiving this because you've been invited to {{flight_code}} — First Class.<br />
       <a href="https://www.thispagedoesnotexist12345.com/request-seat">Request a Seat</a> &nbsp;·&nbsp;
-      <a href="https://www.thispagedoesnotexist12345.tech/mission-control/requirements">View Master Requirements</a> &nbsp;·&nbsp;
       <a href="https://newsletter.thispagedoesnotexist12345.us/" style="color:#555555;">Reject &amp; Return</a><br />
       <a href="{{unsubscribe_url}}" style="color:#555555;">Unsubscribe</a><br /><br />
       © 2026 The Ultimate Journey. All rights reserved.
