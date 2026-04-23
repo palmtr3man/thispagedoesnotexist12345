@@ -410,7 +410,7 @@ async function sendSeatConfirmation(seat) {
   const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech'; // Base44 app — /Dashboard, /FlightLog, /CommandCenter etc.
   const flightLabel     = flight_display_name || flight_id || 'TUJ FLIGHT';
   const flightCodeParam = flightLabel ? `&flight_code=${encodeURIComponent(flightLabel)}` : '';
-  const passportUrl     = `${siteUrl}/?seat_id=${canonicalSeatId}`;
+  const passportUrl     = `${platformTechUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}${flightCodeParam}`;
   const firstTaskUrl    = `${platformTechUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}${flightCodeParam}`;
   const secondaryUrl    = `${platformTechUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}${flightCodeParam}`;
 
