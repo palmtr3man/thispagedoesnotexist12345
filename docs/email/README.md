@@ -13,7 +13,7 @@ For the live registry (template IDs, version IDs, active versions, send context)
 |---|---|
 | Request a Seat | `https://www.thispagedoesnotexist12345.com/request-seat` |
 | View Master Requirements | `https://www.thispagedoesnotexist12345.tech/mission-control/requirements` |
-| Reject & Return | `https://www.thispagedoesnotexist12345.tech/reject-return` |
+| Reject & Return | `https://newsletter.thispagedoesnotexist12345.us/` |
 | Unsubscribe | `{{unsubscribe_url}}` |
 
 ---
@@ -32,7 +32,8 @@ Tokens: `first_name`, `seat_id`, `tuj_code`, `passport_url`, `signup_date`, `cab
 
 ### boarding_instructions_paid_v1
 `d-d8ec12e940944c5596af1fa740cf7f07` · active: `v7-dark-neon-canonical-2026-04-07` · v5 inactive
-Tokens: `first_name`, `flight_code`, `first_task_url`, `seat_id`, `secondary_url`, `unsubscribe_url`
+Tokens: `first_name`, `seat_id`, `tuj_code`, `flight_code`, `first_task_url`, `secondary_url`, `platform_url`, `unsubscribe_url`
+> URL Mapping Fix (Apr 22, 2026): `first_task_url` → `.tech/OnboardingPassport?seat_id=&tuj_code=&flight_code=` (primary — profile completion first); `secondary_url` → `.tech/ResumeFitCheck?seat_id=&tuj_code=&flight_code=` (secondary). Footer: Reject & Return → `.us` newsletter (was `.tech/` root); View Master Requirements → `.tech/mission-control/requirements` (was `view-link.cx` shortlink).
 
 ### boarding_instructions_free_v1
 `d-747dac53dd2c4b47b33400376aad1672` · active: `v7-dark-neon-canonical-2026-04-07` (confirmed Apr 14, 2026)
@@ -78,7 +79,7 @@ Commit: `f876e25` — use as rollback reference when March campaigns resume.
 ## Notes
 
 - `founding_fare_unlocked_v1` — no active version in SendGrid as of Apr 7, 2026. Paste HTML and activate when ready.
-- `boarding_instructions_paid_v1` — Notion registry updated Apr 21, 2026. Active version = `v7-dark-neon-canonical-2026-04-07`. Full token set: `first_name`, `flight_code`, `first_task_url`, `seat_id`, `tuj_code`, `secondary_url`, `platform_url`, `unsubscribe_url`.
+- `boarding_instructions_paid_v1` — Notion registry updated Apr 21, 2026. Active version = `v7-dark-neon-canonical-2026-04-07`. Full token set: `first_name`, `seat_id`, `tuj_code`, `flight_code`, `first_task_url`, `secondary_url`, `platform_url`, `unsubscribe_url`. URL Mapping Fix Apr 22, 2026: `first_task_url` → `.tech/OnboardingPassport` (primary); `secondary_url` → `.tech/ResumeFitCheck` (secondary); both carry `&flight_code=`. Footer: Reject & Return → `.us` newsletter; View Master Requirements → `.tech/mission-control/requirements`.
 - `ACTIVE_FLIGHT_CODE_DEFAULT` in `seat-request.js` updated from `FL 041926` → `FL 042126` (Apr 21, 2026).
 - Alpha test banners remain in all announcement templates — must be stripped before live sends (FL 042126).
 - All announcement templates: banner stripped before live sends. Test sends pending daily quota reset.
