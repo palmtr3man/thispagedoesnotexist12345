@@ -441,6 +441,7 @@ async function sendSeatConfirmation(seat) {
     mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}`,
     mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}`,
     mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`,
+    seats_available:      seat.seats_available ?? seat.seats_reserved ?? 1,  // VIP defaults to 1; dynamic for other tiers
   };
 
   // Select templates based on tier
