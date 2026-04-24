@@ -399,13 +399,20 @@ async function sendSeatConfirmation(seat) {
   //   secondary_url corrected to /OnboardingPassport (was bare siteUrl — missing path).
   // P2 Fix (Apr 19, 2026): &tuj_code= appended to firstTaskUrl, secondaryUrl, and mission_studio
   //   so all 3 CTA links carry both seat_id and tuj_code. Closes P2 open bug.
+  // URL Mapping Fix (Apr 22, 2026): firstTaskUrl and secondaryUrl corrected to use platformTechUrl
+  //   (.tech Base44 SPA) instead of siteUrl (.com static site). /OnboardingPassport and /ResumeFitCheck
+  //   do not exist on .com — they 404 after the non-www → www redirect. Both routes live on .tech.
+  //   Sequencing updated: OnboardingPassport is now the primary first task (profile completion before
+  //   fit check); ResumeFitCheck is the secondary. flight_code added to both CTA URLs so the flight
+  //   context is carried through resolveState() on the .tech app.
   const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
-  const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
-  const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
-  const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
-  const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
+  const mainSiteUrl     = 'https://www.thispagedoesnotexist12345.com';
   const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech'; // Base44 app — /Dashboard, /FlightLog, /CommandCenter etc.
-  const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
+  const flightLabel     = flight_display_name || flight_id || 'TUJ FLIGHT';
+  const flightCodeParam = flightLabel ? `&flight_code=${encodeURIComponent(flightLabel)}` : '';
+  const passportUrl     = `${mainSiteUrl}/?seat_id=${canonicalSeatId}`;
+  const firstTaskUrl    = `${platformTechUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}${flightCodeParam}`;
+  const secondaryUrl    = `${platformTechUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}${flightCodeParam}`;
 
   // Fix 5b (Apr 18, 2026): add signup_date (boarding_pass_free_v1 uses {{signup_date}})
   //   and tuj_code (boarding_pass_paid_v1 uses {{tuj_code}} for tracking).

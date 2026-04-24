@@ -32,6 +32,13 @@
     5. Apr 14, 2026 — Secondary CTA href: /Studio → /Studio?seat_id={{seat_id}}&tuj_code={{tuj_code}} (post-incident hardening)
     6. Apr 14, 2026 — Alpha test banner block removed (internal-only label, not for production sends)
     7. Apr 19, 2026 — P2 fix: applied patch 5 to live HTML (was still missing &tuj_code= in href)
+    8. Apr 22, 2026 — URL mapping fix (FL 042426):
+       - Boarding Gate CTA: .com/Studio → .tech/Studio reverted → .com/Studio (Studio is on .com, not .tech)
+       - Footer: Request a Seat .com/ root → .com/request-seat
+       - Footer: View Master Requirements removed from footer (not aligned with other templates)
+       - Footer: Reject & Return .tech/ root → newsletter.thispagedoesnotexist12345.us/
+       - Alpha test banner removed (production template)
+       - passport_url: remains .com/?seat_id= (Mission Control renders via resolveState() on .com)
 -->
 <html lang="en">
 <head>
@@ -101,10 +108,7 @@
   <!-- Preview text (hidden) -->
   <span style="display:none;max-height:0;overflow:hidden;">Your First Class seat on Alpha Flight 1 is confirmed. Your Seat ID is inside.</span>
 
-  <!-- Alpha test banner — REMOVE BEFORE PRODUCTION SEND -->
-  <div style="background-color:#1a0a00;padding:8px 16px;text-align:center;margin-bottom:0;">
-    <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#FF8C00;letter-spacing:1px;text-transform:uppercase;">⚠️ Alpha Test — FL 041926 &nbsp;|&nbsp; Internal Only — Do Not Forward</p>
-  </div>
+  <!-- Alpha test banner removed — production template (patch 8, Apr 22 2026) -->
 
   <div class="wrapper">
 
@@ -191,9 +195,8 @@
     <div class="footer">
       <div class="tuj-footer">The Ultimate Journey · PageForward Airways</div>
       You're receiving this because you've been invited to {{flight_code}} — First Class.<br />
-      <a href="https://www.thispagedoesnotexist12345.com/">Request a Seat</a> &nbsp;·&nbsp;
-      <a href="https://view-link.cx/d7sGLORJ0DF">View Master Requirements</a> &nbsp;·&nbsp;
-      <a href="https://www.thispagedoesnotexist12345.tech/" style="color:#555555;">Reject &amp; Return</a><br />
+      <a href="https://www.thispagedoesnotexist12345.com/request-seat">Request a Seat</a> &nbsp;·&nbsp;
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" style="color:#555555;">Reject &amp; Return</a><br />
       <a href="{{unsubscribe_url}}" style="color:#555555;">Unsubscribe</a><br /><br />
       © 2026 The Ultimate Journey. All rights reserved.
     </div>

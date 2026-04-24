@@ -13,13 +13,20 @@
   Fix 3b (Apr 5, 2026): encodeURIComponent removed from server-side first_task_url construction.
          seat_id chars (A-Z, 2-9, hyphen) are URL-safe — no encoding needed.
          No template HTML changes required (CTA uses {{first_task_url}} indirection).
+  URL Mapping Fix (Apr 22, 2026): Footer links corrected.
+         Request a Seat: .com/ root → .com/request-seat (canonical seat request form anchor).
+         Reject & Return: .tech/ root → newsletter.thispagedoesnotexist12345.us/ (.us canonical).
+         View Master Requirements: view-link.cx shortlink → .tech/mission-control/requirements (canonical).
+         first_task_url now resolves to .tech/OnboardingPassport (was .com/ResumeFitCheck — 404).
+         secondary_url now resolves to .tech/ResumeFitCheck (was .com/OnboardingPassport — 404).
+         Both CTA URLs now carry &flight_code= for resolveState() context on .tech.
 
   Dynamic variables used:
     {{first_name}}      — Passenger first name
     {{seat_id}}         — Seat label (e.g. TUJ-XXXXXX)
-    {{first_task_url}}  — Deep-link to ResumeFitCheck (?seat_id=...)
-    {{secondary_url}}   — Secondary link (Jobs page)
-    {{platform_url}}    — Base platform URL
+    {{first_task_url}}  — Deep-link to OnboardingPassport (?seat_id=...&tuj_code=...&flight_code=...)
+    {{secondary_url}}   — Deep-link to ResumeFitCheck (?seat_id=...&tuj_code=...&flight_code=...)
+    {{platform_url}}    — Base platform URL (.com)
     {{unsubscribe_url}} — Unsubscribe link
 -->
 <html lang="en">
@@ -88,10 +95,11 @@
                     <div style="width: 28px; height: 28px; background-color: #00D9FF; border-radius: 50%; text-align: center; line-height: 28px; font-size: 13px; font-weight: 700; color: #0a0a0a;">1</div>
                   </td>
                   <td style="vertical-align: top;">
-                    <p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #ffffff;">Complete your Resume Fit Check</p>
+                    <p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #ffffff;">Complete your Onboarding Passport</p>
                     <p style="margin: 0; font-size: 12px; color: #888888; line-height: 1.5;">
-                      This is your first task. It maps your experience to what the market is hiring for right now.
-                      Your seat ID is pre-loaded — just click the button below.
+                      Your first task is to complete your profile. This unlocks the full system and pre-loads
+                      your seat context so every tool knows who you are. Your seat ID is pre-loaded — just click
+                      the button below.
                     </p>
                   </td>
                 </tr>
@@ -104,9 +112,10 @@
                     <div style="width: 28px; height: 28px; background-color: #2a2a4e; border-radius: 50%; text-align: center; line-height: 28px; font-size: 13px; font-weight: 700; color: #00D9FF; border: 1px solid #00D9FF;">2</div>
                   </td>
                   <td style="vertical-align: top;">
-                    <p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #ffffff;">Review your active job targets</p>
+                    <p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #ffffff;">Run your Resume Fit Check</p>
                     <p style="margin: 0; font-size: 12px; color: #888888; line-height: 1.5;">
-                      After your Fit Check, head to the Jobs board to review the roles the system has queued for you.
+                      Once your profile is complete, run your Fit Check. It maps your experience to what the
+                      market is hiring for right now and queues the roles the system has lined up for you.
                     </p>
                   </td>
                 </tr>
@@ -159,11 +168,9 @@
                 You're receiving this as part of your {{flight_code}} boarding sequence.
               </p>
               <p style="margin: 0; font-size: 11px;">
-                <a href="https://www.thispagedoesnotexist12345.com/" style="color: #00D9FF; text-decoration: none;">Request a Seat</a>
+                <a href="https://www.thispagedoesnotexist12345.com/request-seat" style="color: #00D9FF; text-decoration: none;">Request a Seat</a>
                 &nbsp;&middot;&nbsp;
-                <a href="https://view-link.cx/d7sGLORJ0DF" style="color: #00D9FF; text-decoration: none;">View Master Requirements</a>
-                &nbsp;&middot;&nbsp;
-                <a href="https://www.thispagedoesnotexist12345.tech/" style="color: #555555; text-decoration: none;">Reject &amp; Return</a>
+                <a href="https://newsletter.thispagedoesnotexist12345.us/" style="color: #555555; text-decoration: none;">Reject &amp; Return</a>
               </p>
               <p style="margin: 8px 0 0 0; font-size: 11px;">
                 <a href="{{unsubscribe_url}}" style="color: #555555; text-decoration: none;">Unsubscribe</a>
