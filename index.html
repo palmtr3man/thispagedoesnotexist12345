@@ -736,6 +736,80 @@
       transition: transform 0.15s;
     }
     .bstep-cta:hover .bstep-cta-arrow { transform: translateX(3px); }
+
+    /* ── Paid-access pill — insertion point 3 (landing page) ─────────────────
+       Secondary pill shown below the seat request form / waitlist button.
+       Visible only when gate is open (managed by applySeatGate / JS toggle).
+       Hidden by default; JS reveals it alongside waitlistBtn.
+    ─────────────────────────────────────────────────────────────────────────── */
+    #paid-access-pill {
+      display: none; /* shown by JS when gate is open */
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.38rem 0.9rem;
+      border-radius: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.5);
+      background: rgba(99, 102, 241, 0.08);
+      color: rgba(165, 180, 252, 0.9);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    #paid-access-pill:hover {
+      border-color: rgba(99, 102, 241, 0.85);
+      background: rgba(99, 102, 241, 0.18);
+      color: #fff;
+    }
+    #paid-access-pill .pill-icon {
+      font-size: 0.8rem;
+      line-height: 1;
+    }
+
+    /* ── OnboardingPassport compact banner — insertion point 2 ───────────────
+       Compact banner rendered inside bstep-2 (Complete Your Profile step),
+       below the existing .tech redirect CTA, before the user leaves for .tech.
+       Hidden by default; shown only when gate is open and seat_id is present.
+    ─────────────────────────────────────────────────────────────────────────── */
+    .paid-lane-banner {
+      display: none; /* shown by JS */
+      margin-top: 0.55rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      background: rgba(99, 102, 241, 0.07);
+      font-size: 0.72rem;
+      color: rgba(165, 180, 252, 0.85);
+      line-height: 1.45;
+    }
+    .paid-lane-banner strong {
+      color: rgba(199, 210, 254, 1);
+      font-weight: 700;
+    }
+    .paid-lane-banner a.plb-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-top: 0.4rem;
+      padding: 0.28rem 0.7rem;
+      border-radius: 6px;
+      border: 1px solid rgba(99, 102, 241, 0.55);
+      background: rgba(99, 102, 241, 0.12);
+      color: rgba(165, 180, 252, 1);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .paid-lane-banner a.plb-cta:hover {
+      background: rgba(99, 102, 241, 0.25);
+      border-color: rgba(99, 102, 241, 0.9);
+      color: #fff;
+    }
     .bstep-status {
       font-size: 0.9rem;
       flex-shrink: 0;
@@ -1664,6 +1738,24 @@
               <a class="bstep-cta" id="bstep-2-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
                 Open Systems — Passenger Record <span class="bstep-cta-arrow">→</span>
               </a>
+              <!-- ── INSERTION POINT 2: OnboardingPassport compact banner ────────────
+                   Compact payment banner shown before the user leaves for .tech.
+                   Hidden by default; JS reveals it when gate is open + seat_id present.
+                   CTA: "Confirm payment to continue" → BMAC support URL.
+              ─────────────────────────────────────────────────────────────────────── -->
+              <div class="paid-lane-banner" id="paid-lane-banner-bstep2">
+                <strong>Skip the waitlist — activate a paid seat.</strong>
+                Paid seats board ahead of free beta seats and unlock full access immediately.
+                <br>
+                <a
+                  id="paid-lane-banner-bstep2-cta"
+                  class="plb-cta"
+                  href="https://buymeacoffee.com/theultimatejourney"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-umami-event="Paid Lane Banner Click (bstep2)"
+                >⚡ Confirm payment to continue →</a>
+              </div>
             </div>
             <span class="bstep-status" data-step="2">○</span>
           </li>
@@ -2110,6 +2202,22 @@
 
         <!-- seat-count span appended here by applySeatGate() -->
         <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(0, 217, 255, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
+
+        <!-- ── INSERTION POINT 3: Paid-access pill ─────────────────────────────────
+             Secondary pill shown below the seat request form.
+             Visible only when gate is open (JS reveals it alongside waitlistBtn).
+             Hidden when gate is closed, departed, or cohort is full.
+             CTA: "Move to paid access now" → BMAC support URL.
+        ─────────────────────────────────────────────────────────────────────────── -->
+        <a
+          id="paid-access-pill"
+          href="https://buymeacoffee.com/theultimatejourney"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-umami-event="Paid Access Pill Click"
+        >
+          <span class="pill-icon">⚡</span> Move to paid access now
+        </a>
       </div>
 
       <!-- Secondary CTA: Book a Consultation via CalendarJet (gate-closed / consultation flow only) -->
@@ -2682,6 +2790,34 @@
             ctaWrapper.appendChild(seatInfo);
           } else if (waitlistBtn && waitlistBtn.parentNode) {
             waitlistBtn.parentNode.insertBefore(seatInfo, waitlistBtn.nextSibling);
+          }
+
+          // ── INSERTION POINT 3: Paid-access pill ─────────────────────────────────
+          // Show secondary paid-access pill below the seat request form.
+          // Only shown when gate is open, alpha mode is on, and seats remain.
+          // Pill is hidden in all other gate states (departed, closed, hold, full).
+          var paidPill = document.getElementById('paid-access-pill');
+          if (paidPill) paidPill.style.display = 'inline-flex';
+        }
+
+        // ── INSERTION POINT 2: OnboardingPassport compact banner ───────────────────
+        // Show the compact paid-lane banner inside bstep-2 when gate is open.
+        // The banner is always shown when the gate is open (regardless of seat_id),
+        // as it targets users who have already boarded and are about to navigate
+        // to .tech — the last moment to prompt payment confirmation.
+        var plbBstep2 = document.getElementById('paid-lane-banner-bstep2');
+        if (plbBstep2 && gateOpen) {
+          plbBstep2.style.display = 'block';
+          // Wire BMAC URL from env constant (falls back to hardcoded support URL)
+          var plbCta = document.getElementById('paid-lane-banner-bstep2-cta');
+          if (plbCta) {
+            // Append seat_id to BMAC URL if present so BMAC webhook can reconcile
+            var _seatIdForBmac = (new URLSearchParams(window.location.search)).get('seat_id') ||
+                                 sessionStorage.getItem('seat_id') || '';
+            var bmacBase = 'https://buymeacoffee.com/theultimatejourney';
+            plbCta.href = _seatIdForBmac
+              ? bmacBase + '?seat_id=' + encodeURIComponent(_seatIdForBmac)
+              : bmacBase;
           }
         }
       }
