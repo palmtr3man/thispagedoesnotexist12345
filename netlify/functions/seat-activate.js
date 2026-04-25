@@ -94,7 +94,7 @@ async function fetchSeat(base44SeatUrl, seatId) {
  */
 async function patchSeat(base44SeatUrl, seat, fields) {
   const apiKey = process.env.BASE44APIKEY || '';
-  const internalId = seat._id;
+  const internalId = seat.id || seat._id;
   const res = await fetch(`${base44SeatUrl}/${internalId}`, {
     method:  'PUT',
     headers: { 'Content-Type': 'application/json', 'api_key': apiKey },
