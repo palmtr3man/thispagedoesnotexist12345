@@ -450,7 +450,7 @@ async function sendSeatConfirmation(seat) {
     departure_time:       seat.departure_time || flight?.departure_time || 'TBD',
     boarding_group:       seat.boarding_group    || 'VIP — Group 1',
     seat_assignment:      canonicalSeatId,
-    gate:                 seat.gate              || 'Gate A1 — BracketBarbie Lounge',
+    gate:                 seat.gate              || 'Gate A1 — Bracket.Barbie Lounge',
     boarding_open_time:   seat.boarding_open_time  || '',
     boarding_close_time:  seat.boarding_close_time || '',
   };
