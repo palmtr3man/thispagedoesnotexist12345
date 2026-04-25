@@ -433,14 +433,14 @@ async function sendSeatConfirmation(seat) {
     // Mission Control deep-link fields (spec: link audit rewrite, Apr 2026)
     // Templates should use these instead of root-only /?seat_id= links.
     // Routes on the Base44 .tech app use platformTechUrl; .com Studio uses mainSiteUrl.
-    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}`,
-    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}`,
-    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}`,
-    mission_reminders:    `${platformTechUrl}/FlightLog?view=reminders&seat_id=${canonicalSeatId}`,
-    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}`,
-    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}`,
-    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}`,
-    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`,
+    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_reminders:    `${platformTechUrl}/FlightLog?view=reminders&seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
     seats_available:      seat.seats_available ?? seat.seats_reserved ?? 1,  // VIP defaults to 1; dynamic for other tiers
     // VIP boarding pass manifest tokens (vip_boarding_pass_v1)
     passenger_name:       `${first_name} ${last_name}`.trim(),
