@@ -2140,6 +2140,19 @@
     </div>
 
 
+    <!-- TUJ THEME SONG — speaker icon, click to play/pause -->
+    <div id="tuj-audio-bar" data-show-state="landing departed" style="text-align:center; margin-bottom:0.5rem;">
+      <audio id="tuj-theme-audio" src="/TUJFrontPAGETheme.mp3" preload="auto" loop></audio>
+      <button id="tuj-speaker-btn"
+        title="Play TUJ Theme"
+        aria-label="Toggle theme song"
+        style="background:none; border:none; cursor:pointer; font-size:1.6rem; opacity:0.75; transition:opacity 0.2s, transform 0.15s; vertical-align:middle;"
+        onmouseover="this.style.opacity='1'; this.style.transform='scale(1.15)';"
+        onmouseout="this.style.opacity='0.75'; this.style.transform='scale(1)';"
+      >🔇</button>
+      <span id="tuj-audio-label" style="font-size:0.7rem; color:rgba(255,20,147,0.55); vertical-align:middle; margin-left:0.3rem; letter-spacing:0.04em;">TUJ Theme</span>
+    </div>
+
     <!-- BLACK GLASS BUTTONS -->
     <div class="btn-row" data-show-state="landing departed">
       <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
@@ -2179,7 +2192,7 @@
       <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(255, 20, 147,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
     </section>
     <footer data-show-state="landing departed">
-      &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
+      &copy; 2026 The Ultimate Journey | <span id="theme-status">Bracket.Barbie Theme Active</span>
     </footer>
   </div>
 
@@ -3906,6 +3919,40 @@
     }
     // No seat_id: JS defaults (STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE) already set in HTML
   })();
+  </script>
+  <!-- TUJ Theme Song — speaker toggle handler -->
+  <script>
+    (function () {
+      var audio = document.getElementById('tuj-theme-audio');
+      var btn   = document.getElementById('tuj-speaker-btn');
+      var label = document.getElementById('tuj-audio-label');
+      if (!audio || !btn) return;
+
+      var playing = false;
+
+      function setIcon() {
+        btn.textContent  = playing ? '\uD83D\uDD0A' : '\uD83D\uDD07'; // 🔊 / 🔇
+        label.textContent = playing ? 'Now Playing' : 'TUJ Theme';
+        label.style.color = playing ? 'rgba(255,20,147,0.85)' : 'rgba(255,20,147,0.55)';
+      }
+
+      btn.addEventListener('click', function () {
+        if (playing) {
+          audio.pause();
+          playing = false;
+        } else {
+          audio.play().then(function () {
+            playing = true;
+            setIcon();
+          }).catch(function () { /* autoplay blocked — user must click again */ });
+        }
+        setIcon();
+      });
+
+      // Auto-play muted on arrival (respects browser autoplay policy)
+      // Unmutes only when user clicks the speaker icon
+      audio.volume = 0.6;
+    })();
   </script>
 </body>
 </html>
