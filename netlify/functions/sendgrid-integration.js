@@ -442,6 +442,16 @@ async function sendSeatConfirmation(seat) {
     mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}`,
     mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`,
     seats_available:      seat.seats_available ?? seat.seats_reserved ?? 1,  // VIP defaults to 1; dynamic for other tiers
+    // VIP boarding pass manifest tokens (vip_boarding_pass_v1)
+    passenger_name:       `${first_name} ${last_name}`.trim(),
+    departure_airport:    seat.departure_airport || '',
+    arrival_airport:      seat.arrival_airport   || 'Destination: Career Clarity',
+    departure_time:       seat.departure_time    || '',
+    boarding_group:       seat.boarding_group    || 'VIP — Group 1',
+    seat_assignment:      canonicalSeatId,
+    gate:                 seat.gate              || 'Gate A1 — BracketBarbie Lounge',
+    boarding_open_time:   seat.boarding_open_time  || '',
+    boarding_close_time:  seat.boarding_close_time || '',
   };
 
   // Select templates based on tier
