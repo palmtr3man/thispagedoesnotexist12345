@@ -63,8 +63,8 @@ assertTemplates([
   'boarding_instructions_paid_v1',
   'exec_preboard_opentowork_v1',
   'sponsored_approved_v1',
-  // vip_boarding_pass_v1 and vip_boarding_instructions_v1 are STUBS — not yet in SendGrid.
-  // assertTemplates is skipped for these until the templates are created and IDs are registered.
+  'vip_boarding_pass_v1',           // FL 042426 Birthday Flight — live, confirmed Apr 20, 2026
+  'vip_boarding_instructions_v1',   // FL 042426 Birthday Flight — live, confirmed Apr 20, 2026
 ]);
 
 const TEMPLATE_BOARDING_PASS_FREE           = TEMPLATES.boarding_pass_free_v1;
@@ -447,7 +447,7 @@ async function sendSeatConfirmation(seat) {
     passenger_name:       `${first_name} ${last_name}`.trim(),
     departure_airport:    seat.departure_airport || '',
     arrival_airport:      seat.arrival_airport   || 'Destination: Career Clarity',
-    departure_time:       seat.departure_time    || '',
+    departure_time:       seat.departure_time || flight?.departure_time || 'TBD',
     boarding_group:       seat.boarding_group    || 'VIP — Group 1',
     seat_assignment:      canonicalSeatId,
     gate:                 seat.gate              || 'Gate A1 — BracketBarbie Lounge',
