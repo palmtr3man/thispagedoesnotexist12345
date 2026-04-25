@@ -62,33 +62,47 @@ const HEADERS = {
 };
 
 /**
- * Fetch the current Seat record from Base44.
+ * Fetch the current Seat record from Base44 by tuj_code.
  */
 async function fetchSeat(base44SeatUrl, seatId) {
-  const res = await fetch(`${base44SeatUrl}/${seatId}`, {
+  const apiKey = process.env.BASE44APIKEY || '';
+  // Query by tuj_code field
+  const url = `${base44SeatUrl}?tuj_code=${encodeURIComponent(seatId)}`;
+  const res = await fetch(url, {
     method:  'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'api_key': apiKey },
   });
   if (!res.ok) {
     const err = new Error(`Base44 GET failed: ${res.status}`);
     err.status = res.status;
     throw err;
   }
-  return res.json();
+  const data = await res.json();
+  // Base44 returns an array when filtering
+  const seat = Array.isArray(data) ? data[0] : data;
+  if (!seat) {
+    const err = new Error(`Seat ${seatId} not found in Base44`);
+    err.status = 404;
+    throw err;
+  }
+  return seat;
 }
 
 /**
  * Write boarding_type and cabin_class to the Seat record in Base44.
+ * Uses the internal _id from the fetched seat record.
  */
-async function patchSeat(base44SeatUrl, seatId, fields) {
-  const res = await fetch(`${base44SeatUrl}/${seatId}`, {
-    method:  'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(fields),
+async function patchSeat(base44SeatUrl, seat, fields) {
+  const apiKey = process.env.BASE44APIKEY || '';
+  const internalId = seat._id;
+  const res = await fetch(`${base44SeatUrl}/${internalId}`, {
+    method:  'PUT',
+    headers: { 'Content-Type': 'application/json', 'api_key': apiKey },
+    body:    JSON.stringify({ ...seat, ...fields }),
   });
   if (!res.ok) {
     const text = await res.text();
-    const err = new Error(`Base44 PATCH failed: ${res.status} — ${text}`);
+    const err = new Error(`Base44 PUT failed: ${res.status} — ${text}`);
     err.status = res.status;
     throw err;
   }
@@ -180,8 +194,8 @@ exports.handler = async (event) => {
   }
 
   // ── Env var checks ─────────────────────────────────────────────────────────
-  const base44SeatUrl = process.env.BASE44_SEAT_URL;
-  const siteUrl       = (process.env.SITE_URL || 'https://thispagedoesnotexist12345.com').replace(/\/$/, '');
+  let base44SeatUrl = process.env.BASE44_SEAT_URL;
+  const siteUrl     = (process.env.SITE_URL || 'https://thispagedoesnotexist12345.com').replace(/\/$/, '');
 
   if (!base44SeatUrl) {
     return {
@@ -189,6 +203,11 @@ exports.handler = async (event) => {
       headers: HEADERS,
       body: JSON.stringify({ ok: false, error: 'BASE44_SEAT_URL is not configured' }),
     };
+  }
+
+  // Correct legacy SPA URL to the Base44 REST API URL
+  if (base44SeatUrl.includes('theultimatejourney.base44.app')) {
+    base44SeatUrl = 'https://app.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
   }
 
   // ── Fetch current seat record ──────────────────────────────────────────────
@@ -239,7 +258,7 @@ exports.handler = async (event) => {
   // ── Write boarding_type + cabin_class to Base44 ────────────────────────────
   let updatedSeat;
   try {
-    updatedSeat = await patchSeat(base44SeatUrl, seat_id, { boarding_type, cabin_class });
+    updatedSeat = await patchSeat(base44SeatUrl, seat, { boarding_type, cabin_class });
   } catch (err) {
     return {
       statusCode: 502,
