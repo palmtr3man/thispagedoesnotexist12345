@@ -9,8 +9,8 @@
  *     → exec_preboard_opentowork_v1  (single send; no boarding_confirmation stamp)
  *
  *   boarding_type = "vip"
- *     1. vip_boarding_pass_v1          (STUB — template pending creation in SendGrid)
- *     2. vip_boarding_instructions_v1  (STUB — template pending creation in SendGrid)
+ *     1. vip_boarding_pass_v1          (FL 042426 Birthday Flight — live, confirmed Apr 20, 2026)
+ *     2. vip_boarding_instructions_v1  (FL 042426 Birthday Flight — live, confirmed Apr 20, 2026)
  *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
  *
  *   boarding_type = "sponsored"
@@ -73,9 +73,9 @@ const TEMPLATE_BOARDING_INSTRUCTIONS_FREE   = TEMPLATES.boarding_instructions_fr
 const TEMPLATE_BOARDING_INSTRUCTIONS_PAID   = TEMPLATES.boarding_instructions_paid_v1;
 const TEMPLATE_EXEC_PREBOARD                = TEMPLATES.exec_preboard_opentowork_v1;
 const TEMPLATE_SPONSORED_APPROVED           = TEMPLATES.sponsored_approved_v1;
-// VIP templates — STUBS pending SendGrid creation. Will be null until registered.
-const TEMPLATE_VIP_BOARDING_PASS            = TEMPLATES.vip_boarding_pass_v1          || null;
-const TEMPLATE_VIP_BOARDING_INSTRUCTIONS    = TEMPLATES.vip_boarding_instructions_v1  || null;
+// VIP templates — live (FL 042426 Birthday Flight, confirmed Apr 20, 2026)
+const TEMPLATE_VIP_BOARDING_PASS            = TEMPLATES.vip_boarding_pass_v1;
+const TEMPLATE_VIP_BOARDING_INSTRUCTIONS    = TEMPLATES.vip_boarding_instructions_v1;
 
 /**
  * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
