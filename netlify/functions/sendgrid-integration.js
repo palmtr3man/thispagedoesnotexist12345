@@ -323,6 +323,55 @@ async function sendSeatConfirmation(seat) {
     return { success: true };
   }
 
+  // ── Shared payload construction (used by VIP, sponsored, and standard paths) ──
+  // Fix (Apr 25, 2026): moved above VIP/sponsored blocks to resolve TDZ — dynamicData
+  // was declared at line ~417 but referenced at line ~339 inside the VIP block.
+  const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
+  const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
+  const canonicalFlightId = (flight_id || flightLabel).replace(/ /g, '_'); // normalize spaces → underscores
+  const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
+  const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
+  const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
+  const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
+  const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech';
+  const signupDate = seat.signup_date ||
+    new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const dynamicData = {
+    first_name,
+    last_name,
+    user_email,
+    seat_id:             canonicalSeatId,
+    seatreference:       canonicalSeatId,
+    tuj_code:            canonicalSeatId,
+    cabin_class:         cabin_class || 'Economy',
+    signup_date:         signupDate,
+    passport_url:        passportUrl,
+    first_task_url:      firstTaskUrl,
+    secondary_url:       secondaryUrl,
+    platform_url:        mainSiteUrl,
+    flight_code:         flightLabel,
+    flight_id:           flight_id || flightLabel,
+    flight_display_name: flightLabel,
+    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_reminders:    `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}&view=reminders`,
+    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    seats_available:      seat.seats_available ?? seat.seats_reserved ?? 1,
+    passenger_name:       `${first_name} ${last_name}`.trim(),
+    departure_airport:    seat.departure_airport || '',
+    arrival_airport:      seat.arrival_airport   || 'Destination: Career Clarity',
+    departure_time:       seat.departure_time || '',
+    boarding_group:       seat.boarding_group    || 'VIP — Group 1',
+    seat_assignment:      canonicalSeatId,
+    gate:                 seat.gate              || 'Gate A1 — Bracket.Barbie Lounge',
+    boarding_open_time:   seat.boarding_open_time  || '',
+    boarding_close_time:  seat.boarding_close_time || '',
+  };
+
   // ── VIP path ───────────────────────────────────────────────────────────────
   // Routes to vip_boarding_pass_v1 + vip_boarding_instructions_v1.
   // STUB: templates are pending creation in SendGrid. If either template ID is
@@ -385,75 +434,9 @@ async function sendSeatConfirmation(seat) {
   // ── F-190 Dual-Tier Boarding Sequence (standard | beta | fallback) ─────────
   // Tier determination: cabin_class === 'First' → paid; all other values → free
   // (Base44 canonical field is cabin_class, NOT tier or cabin_tier)
+  // NOTE: dynamicData is constructed above (moved Apr 25, 2026 to fix TDZ for VIP path)
   const isPaid = cabin_class === 'First';
   console.log(`[sendgrid-integration] Seat ${seatId} — cabin_class=${cabin_class || 'undefined'} → ${isPaid ? 'PAID' : 'FREE'} boarding sequence`);
-
-  // Construct full payload (Fix 1 + Fix 2: all CTAs include ?seat_id=)
-  // Fix 4 (Apr 5, 2026): platform_url added — resolves {{platform_url}} Main Site footer link in
-  //   boarding_pass_free_v1, boarding_pass_paid_v1, boarding_instructions_free_v1,
-  //   boarding_instructions_paid_v1. Was previously unmapped -> rendered as base44.app URL.
-  // Fix 3b (Apr 5, 2026): passport_url corrected to /?seat_id= (was /Studio?seat_id=).
-  //   seat_id chars (A-Z, 2-9, hyphen) are URL-safe — encodeURIComponent removed per canonical spec.
-  // F-190 Apr 12: CTA URLs use tuj_code (canonical TUJ seat ID e.g. TUJ-KC2222), not seat.id (UUID).
-  //   first_task_url corrected to /ResumeFitCheck (was /Studio — wrong path).
-  //   secondary_url corrected to /OnboardingPassport (was bare siteUrl — missing path).
-  // P2 Fix (Apr 19, 2026): &tuj_code= appended to firstTaskUrl, secondaryUrl, and mission_studio
-  //   so all 3 CTA links carry both seat_id and tuj_code. Closes P2 open bug.
-  const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
-  const canonicalFlightId = (flight_id || flightLabel).replace(/ /g, '_'); // normalize spaces → underscores (e.g. 'FL 042426' → 'FL_042426')
-  const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
-  const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
-  const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
-  const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
-  const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech'; // Base44 app — /Dashboard, /FlightLog, /CommandCenter etc.
-  const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
-
-  // Fix 5b (Apr 18, 2026): add signup_date (boarding_pass_free_v1 uses {{signup_date}})
-  //   and tuj_code (boarding_pass_paid_v1 uses {{tuj_code}} for tracking).
-  //   signup_date defaults to today's date in a readable format if not supplied.
-  const signupDate = seat.signup_date ||
-    new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-  const dynamicData = {
-    first_name,
-    last_name,
-    user_email,
-    seat_id:             canonicalSeatId,
-    seatreference:       canonicalSeatId,
-    tuj_code:            canonicalSeatId,        // Fix 5b: boarding_pass_paid_v1 uses {{tuj_code}}
-    cabin_class:         cabin_class || 'Economy',
-    signup_date:         signupDate,             // Fix 5b: boarding_pass_free_v1 uses {{signup_date}}
-    passport_url:        passportUrl,
-    first_task_url:      firstTaskUrl,
-    secondary_url:       secondaryUrl,
-    platform_url:        mainSiteUrl,           // Fix 4: resolves {{platform_url}} Main Site footer link
-    flight_code:         flightLabel,           // canonical token — all boarding templates use {{flight_code}}
-    flight_id:           flight_id || flightLabel, // raw flight ID from seat record — ensures all templates receive the actual flight_id
-    flight_display_name: flightLabel,           // kept for backward-compat
-
-    // Mission Control deep-link fields (spec: link audit rewrite, Apr 2026)
-    // Templates should use these instead of root-only /?seat_id= links.
-    // Routes on the Base44 .tech app use platformTechUrl; .com Studio uses mainSiteUrl.
-    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_reminders:    `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}&view=reminders`,
-    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    seats_available:      seat.seats_available ?? seat.seats_reserved ?? 1,  // VIP defaults to 1; dynamic for other tiers
-    // VIP boarding pass manifest tokens (vip_boarding_pass_v1)
-    passenger_name:       `${first_name} ${last_name}`.trim(),
-    departure_airport:    seat.departure_airport || '',
-    arrival_airport:      seat.arrival_airport   || 'Destination: Career Clarity',
-    departure_time:       seat.departure_time || flight?.departure_time || 'TBD',
-    boarding_group:       seat.boarding_group    || 'VIP — Group 1',
-    seat_assignment:      canonicalSeatId,
-    gate:                 seat.gate              || 'Gate A1 — Bracket.Barbie Lounge',
-    boarding_open_time:   seat.boarding_open_time  || '',
-    boarding_close_time:  seat.boarding_close_time || '',
-  };
 
   // Select templates based on tier
   const boardingPassTemplateId        = isPaid ? TEMPLATE_BOARDING_PASS_PAID        : TEMPLATE_BOARDING_PASS_FREE;
