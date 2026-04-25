@@ -400,6 +400,7 @@ async function sendSeatConfirmation(seat) {
   // P2 Fix (Apr 19, 2026): &tuj_code= appended to firstTaskUrl, secondaryUrl, and mission_studio
   //   so all 3 CTA links carry both seat_id and tuj_code. Closes P2 open bug.
   const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
+  const canonicalFlightId = (flight_id || flightLabel).replace(/ /g, '_'); // normalize spaces → underscores (e.g. 'FL 042426' → 'FL_042426')
   const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
   const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
   const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
@@ -433,14 +434,14 @@ async function sendSeatConfirmation(seat) {
     // Mission Control deep-link fields (spec: link audit rewrite, Apr 2026)
     // Templates should use these instead of root-only /?seat_id= links.
     // Routes on the Base44 .tech app use platformTechUrl; .com Studio uses mainSiteUrl.
-    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
-    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
-    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
-    mission_reminders:    `${platformTechUrl}/FlightLog?view=reminders&seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
-    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
-    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
-    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
-    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${flight_id || flightLabel}`,
+    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_reminders:    `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}&view=reminders`,
+    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
+    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
     seats_available:      seat.seats_available ?? seat.seats_reserved ?? 1,  // VIP defaults to 1; dynamic for other tiers
     // VIP boarding pass manifest tokens (vip_boarding_pass_v1)
     passenger_name:       `${first_name} ${last_name}`.trim(),
