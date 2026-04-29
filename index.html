@@ -2108,6 +2108,12 @@
           <a href="/ResumeFitCheck" class="btn-waitlist unlocked" style="display:inline-block;">▶ While you wait, run an ATS check</a>
         </div>
 
+        <!-- Step 3c: Hold state — operator-paused intake (hold_mode=true) -->
+        <div id="seat-request-hold" style="display:none;padding:1rem 0;">
+          <p style="font-size:1rem;color:#ffd740;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">⏸ Boarding is temporarily paused.</p>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;">We're preparing for the next flight. Check back soon — the gate will reopen shortly.</p>
+        </div>
+
         <!-- seat-count span appended here by applySeatGate() -->
         <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(255, 20, 147, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
       </div>
@@ -3286,6 +3292,11 @@
                 subBtn.disabled    = false;
                 subBtn.textContent = '✈️ Submit Request';
               }
+            } else if (d.error === 'hold_active') {
+              // hold_mode=true — hide form, show hold state message
+              form.style.display = 'none';
+              var holdEl = document.getElementById('seat-request-hold');
+              if (holdEl) holdEl.style.display = 'block';
             } else {
               errEl.textContent  = d.error || 'Something went wrong — please try again.';
               subBtn.disabled    = false;
