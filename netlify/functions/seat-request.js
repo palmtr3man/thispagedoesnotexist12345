@@ -409,6 +409,35 @@ exports.handler = async function (event, context) {
           const wlSubId = await subscribeToBeehiiv(emailTrimmed, wlFirstName, beehiivKey, beehiivPub);
           await applyBeehiivWaitlistTag(wlSubId, beehiivKey, beehiivPub);
         }
+        // F143 §5 — Idempotency marker: write waitlist_email_sent_at to Supabase
+        // Prevents duplicate next_flight_waitlist_v1 sends on retry or re-submission.
+        const supabaseUrlWl = process.env.SUPABASE_URL;
+        const supabaseKeyWl = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (supabaseUrlWl && supabaseKeyWl) {
+          try {
+            const wlSentAt = new Date().toISOString();
+            // Upsert by email — creates or updates the waitlist record with the sent timestamp.
+            await fetch(`${supabaseUrlWl}/rest/v1/waitlist_submissions`, {
+              method: 'POST',
+              headers: {
+                apikey:         supabaseKeyWl,
+                Authorization:  `Bearer ${supabaseKeyWl}`,
+                'Content-Type': 'application/json',
+                Prefer:         'resolution=merge-duplicates,return=minimal'
+              },
+              body: JSON.stringify({
+                email:                  emailTrimmed.toLowerCase(),
+                first_name:             wlFirstName || null,
+                status:                 'waitlisted',
+                waitlist_email_sent_at: wlSentAt,
+                source:                 sourceValue || 'landing'
+              })
+            });
+            console.log(`[seat-request] F143 idempotency marker written for ${emailTrimmed} at ${wlSentAt}`);
+          } catch (wlSbErr) {
+            console.error('[seat-request] F143 Supabase idempotency marker write failed (non-blocking):', wlSbErr.message);
+          }
+        }
         return {
           statusCode: 200,
           headers,
