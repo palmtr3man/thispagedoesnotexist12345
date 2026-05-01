@@ -2,6 +2,11 @@
   publish = "."
   functions = "netlify/functions"
 
+[build.environment]
+  # NOTION_SEAT_DB_ID and NOTION_DRIFT_REPORT_DB_ID are Notion database IDs, not secrets.
+  # Omit from secrets scanning to prevent false-positive build failures.
+  SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID"
+
 [functions]
   node_bundler = "esbuild"
 
