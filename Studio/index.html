@@ -617,6 +617,44 @@
             <a class="mc-btn mc-btn-primary" href="https://www.thispagedoesnotexist12345.tech/Dashboard" target="_blank" rel="noopener noreferrer" data-cta="mission-control">Enter Mission Control</a><!-- Fix — Apr 20, 2026: was .tech/CommandCenter (admin-only); corrected to passenger Dashboard with seat_id passthrough -->
             <a class="mc-btn mc-btn-secondary" href="#studio-main">Open One-Page Studio</a>
           </div>
+
+          <!-- BLOCKER-06: Stateful CTA — Request a Seat / Run Fit Check
+               Swaps based on live /api/seat-status response.
+               States: loading | no-seat-id | run-fit-check | request-a-seat | seat-active | error
+               Spec: BLOCKER-06 — Studio Stateful Routing (May 1, 2026) -->
+          <div id="b06-stateful-cta" style="margin-top:1.25rem;" aria-live="polite" aria-atomic="true">
+            <!-- Loading state -->
+            <div id="b06-state-loading" style="display:flex; align-items:center; gap:0.5rem; color:var(--color-text-faint); font-size:var(--text-sm);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite" aria-hidden="true"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              Checking readiness…
+            </div>
+            <!-- No seat_id state -->
+            <div id="b06-state-no-seat" style="display:none; color:var(--color-text-faint); font-size:var(--text-sm);">Add <code>?seat_id=TUJ-XXXXXX</code> to the URL to activate your boarding panel.</div>
+            <!-- Run Fit Check CTA (Condition A: no fit check on record) -->
+            <div id="b06-state-fit-check" style="display:none;">
+              <a id="b06-btn-fit-check" class="mc-btn mc-btn-primary" href="#" style="gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Run Fit Check
+              </a>
+              <p style="margin-top:0.5rem; font-size:var(--text-xs); color:var(--color-text-faint);">No fit check on record — run the ATS analyzer to unlock your seat request.</p>
+            </div>
+            <!-- Request a Seat CTA (Condition B: fit check exists, seat not yet requested) -->
+            <div id="b06-state-request-seat" style="display:none;">
+              <a id="b06-btn-request-seat" class="mc-btn mc-btn-primary" href="#" style="gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.1a16 16 0 0 0 6 6l1.27-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Request a Seat
+              </a>
+              <p style="margin-top:0.5rem; font-size:var(--text-xs); color:var(--color-text-faint);">Fit check complete — you are cleared to request your seat.</p>
+            </div>
+            <!-- Seat active status indicator (Condition C: seat already requested/held/open) -->
+            <div id="b06-state-seat-active" style="display:none; display:flex; align-items:center; gap:0.5rem; padding:0.625rem 1rem; border-radius:var(--radius-full); background:rgba(88,199,215,0.08); border:1px solid rgba(88,199,215,0.2); font-size:var(--text-sm); color:var(--color-primary);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span id="b06-seat-status-label">Seat confirmed</span>
+            </div>
+            <!-- Error state -->
+            <div id="b06-state-error" style="display:none; color:var(--color-text-faint); font-size:var(--text-sm);">Unable to load readiness status — please refresh or check your seat ID.</div>
+          </div>
+          <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
           <!-- Scroll affordance: guides new users to the Studio tool below the lounge -->
           <p class="mc-scroll-hint" id="mcScrollHint" aria-hidden="true">
             <a href="#studio-main" style="color:var(--color-text-faint); font-size:var(--text-xs); letter-spacing:0.1em; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px;">
@@ -1874,6 +1912,108 @@ window.addEventListener('load', async () => {
     studioEl.href = seatId
       ? 'https://www.thispagedoesnotexist12345.com/Studio?seat_id=' + seatId + '&tuj_code=' + tujCode
       : 'https://www.thispagedoesnotexist12345.com/Studio';
+  }
+})();
+</script>
+
+<!-- BLOCKER-06: Stateful CTA routing — Request a Seat / Run Fit Check
+     Reads live /api/seat-status?seat_id= response and swaps the primary CTA.
+     Policy (locked May 1, 2026):
+       Condition A — resume_fit_check_status = not_started/unknown → Run Fit Check
+       Condition B — fit check exists, seat_status = pending/open → Request a Seat
+       Condition C — seat_status = approved/opened → status indicator (no CTA)
+     Fails open to error state on API timeout or missing seat_id.
+     Spec: BLOCKER-06 — Studio Stateful Routing -->
+<script>
+(function () {
+  'use strict';
+
+  var SEAT_STATUS_API = '/api/seat-status';
+  var FIT_CHECK_URL   = 'https://www.thispagedoesnotexist12345.tech/Dashboard'; // ATS analyzer entry
+  var SEAT_REQUEST_URL = 'https://www.thispagedoesnotexist12345.com/?view=seat-request'; // seat request flow
+  var FETCH_TIMEOUT_MS = 8000;
+
+  // Status label map for Condition C
+  var SEAT_STATUS_LABELS = {
+    approved: 'Seat held — awaiting activation',
+    opened:   'Seat confirmed — you are on board',
+    pending:  'Seat request received',
+  };
+
+  function showState(stateId) {
+    var ids = ['b06-state-loading','b06-state-no-seat','b06-state-fit-check','b06-state-request-seat','b06-state-seat-active','b06-state-error'];
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = (id === stateId) ? '' : 'none';
+    });
+    // Seat active uses flex
+    if (stateId === 'b06-state-seat-active') {
+      var el = document.getElementById('b06-state-seat-active');
+      if (el) el.style.display = 'flex';
+    }
+  }
+
+  function initStatefulCta() {
+    var params = new URLSearchParams(window.location.search);
+    var seatId = (params.get('seat_id') || '').replace(/ /g, '_').trim();
+    var tujCode = params.get('tuj_code') || '';
+
+    // No seat_id in URL — show prompt, hide loading
+    if (!seatId) {
+      showState('b06-state-no-seat');
+      return;
+    }
+
+    // Show loading while fetching
+    showState('b06-state-loading');
+
+    // Fetch live seat status with timeout
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, FETCH_TIMEOUT_MS) : null;
+
+    fetch(SEAT_STATUS_API + '?seat_id=' + encodeURIComponent(seatId), ctrl ? { signal: ctrl.signal } : {})
+      .then(function (res) {
+        if (timer) clearTimeout(timer);
+        if (!res.ok) throw new Error('API error: ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var fitStatus  = data.resume_fit_check_status || 'unknown';
+        var seatStatus = data.seat_status || data.gate_status || 'unknown';
+
+        // Condition C — seat already requested, held, or opened
+        if (seatStatus === 'opened' || seatStatus === 'approved') {
+          var label = SEAT_STATUS_LABELS[seatStatus] || 'Seat active';
+          var labelEl = document.getElementById('b06-seat-status-label');
+          if (labelEl) labelEl.textContent = label;
+          showState('b06-state-seat-active');
+          return;
+        }
+
+        // Condition A — no fit check on record → Run Fit Check
+        if (fitStatus === 'not_started' || fitStatus === 'unknown') {
+          var btn = document.getElementById('b06-btn-fit-check');
+          if (btn) btn.href = FIT_CHECK_URL + '?seat_id=' + encodeURIComponent(seatId) + '&tuj_code=' + encodeURIComponent(tujCode) + '&origin=studio-b06';
+          showState('b06-state-fit-check');
+          return;
+        }
+
+        // Condition B — fit check exists (in_progress or complete), seat not yet requested → Request a Seat
+        var reqBtn = document.getElementById('b06-btn-request-seat');
+        if (reqBtn) reqBtn.href = SEAT_REQUEST_URL + '&seat_id=' + encodeURIComponent(seatId) + '&tuj_code=' + encodeURIComponent(tujCode) + '&origin=studio-b06';
+        showState('b06-state-request-seat');
+      })
+      .catch(function () {
+        if (timer) clearTimeout(timer);
+        showState('b06-state-error');
+      });
+  }
+
+  // Run after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStatefulCta);
+  } else {
+    initStatefulCta();
   }
 })();
 </script>
