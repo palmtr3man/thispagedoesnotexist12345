@@ -97,3 +97,14 @@
   from = "/door"
   to = "/door.html"
   status = 200
+
+# BLOCKER-08: Alignment Loop — Notion ↔ SaaS Drift Detection + Repair
+# Webhook trigger: POST /api/alignment-loop with x-webhook-secret header
+# Cron trigger: every 4 hours via Netlify scheduled functions
+[[redirects]]
+  from = "/api/alignment-loop"
+  to = "/.netlify/functions/alignment-loop"
+  status = 200
+
+[functions."alignment-loop"]
+  schedule = "0 */4 * * *"
