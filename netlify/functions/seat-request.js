@@ -547,7 +547,7 @@ exports.handler = async function (event, context) {
       },
       body: JSON.stringify({
         from: { email: fromEmail },
-        subject: SUBJECT,
+        subject: SUBJECT_TEMPLATE(activeFlightCode),
         personalizations: [{
           to: [{ email: emailTrimmed }],
           dynamic_template_data: dynamicTemplateData
