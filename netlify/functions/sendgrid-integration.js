@@ -332,6 +332,15 @@ async function sendSeatConfirmation(seat) {
   const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
   const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
   const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
+
+  // F5-02 — Stateful Board Now CTA routing (PAL-15)
+  // is_returning is set by handleSeatOpened when Passenger.passport_completed_at is non-null.
+  // First-time passengers → /OnboardingPassport; returning passengers → /Studio.
+  // Param names match the SendGrid template tokens: seatid, tujcode (no underscore).
+  const isReturning   = !!seat.is_returning;
+  const boardNowUrl   = isReturning
+    ? `${siteUrl}/Studio?seatid=${encodeURIComponent(canonicalSeatId)}&tujcode=${encodeURIComponent(canonicalSeatId)}`
+    : `${siteUrl}/OnboardingPassport?seatid=${encodeURIComponent(canonicalSeatId)}&tujcode=${encodeURIComponent(canonicalSeatId)}`;
   const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
   const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech';
   const signupDate = seat.signup_date ||
@@ -348,6 +357,8 @@ async function sendSeatConfirmation(seat) {
     passport_url:        passportUrl,
     first_task_url:      firstTaskUrl,
     secondary_url:       secondaryUrl,
+    board_now_url:       boardNowUrl,       // F5-02: stateful Board Now CTA (first-time → OnboardingPassport, returning → Studio)
+    is_returning:        isReturning,       // F5-02: boolean flag for template conditional rendering
     platform_url:        mainSiteUrl,
     flight_code:         flightLabel,
     flight_id:           flight_id || flightLabel,
