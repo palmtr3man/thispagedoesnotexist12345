@@ -336,11 +336,14 @@ async function sendSeatConfirmation(seat) {
   // F5-02 — Stateful Board Now CTA routing (PAL-15)
   // is_returning is set by handleSeatOpened when Passenger.passport_completed_at is non-null.
   // First-time passengers → /OnboardingPassport; returning passengers → /Studio.
-  // Param names match the SendGrid template tokens: seatid, tujcode (no underscore).
+  // BUG-009 fix (May 3, 2026): use canonical seat_id/tuj_code (underscore form).
+  // The no-underscore form (seatid/tujcode) caused context loss for returning passengers
+  // because Studio/index.html reads params.get('seat_id') — not 'seatid'.
+  // OnboardingPassport.jsx already accepts both forms (F5-05 compat layer — lines 28-29).
   const isReturning   = !!seat.is_returning;
   const boardNowUrl   = isReturning
-    ? `${siteUrl}/Studio?seatid=${encodeURIComponent(canonicalSeatId)}&tujcode=${encodeURIComponent(canonicalSeatId)}`
-    : `${siteUrl}/OnboardingPassport?seatid=${encodeURIComponent(canonicalSeatId)}&tujcode=${encodeURIComponent(canonicalSeatId)}`;
+    ? `${siteUrl}/Studio?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(canonicalSeatId)}`
+    : `${siteUrl}/OnboardingPassport?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(canonicalSeatId)}`;
   const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
   const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech';
   const signupDate = seat.signup_date ||
