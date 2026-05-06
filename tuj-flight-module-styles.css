@@ -1,0 +1,144 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   TUJ ACTIVE-FLIGHT MODULE — New / Updated CSS Rules
+   Add these rules inside the existing <style> block in index.html,
+   after the existing .status-section and .badge rules.
+   These rules do NOT override existing rules — they extend them.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Flight Name Block ─────────────────────────────────────────────────── */
+
+.flight-name-block {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(46, 230, 214, 0.12);
+}
+
+/* Eyebrow label above the flight name */
+.flight-name-eyebrow {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(46, 230, 214, 0.55);
+  margin-bottom: 0.3rem;
+}
+
+/* Primary flight name — the human-facing identity */
+.flight-name-primary {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #2EE6D6;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+  line-height: 1.2;
+}
+
+/* Flight code row — secondary metadata */
+.flight-code-secondary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.flight-code-label {
+  opacity: 0.6;
+}
+
+/* Override the default badge color for the flight code — it is metadata, not status */
+.flight-code-secondary .badge--meta {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  letter-spacing: 0.08em;
+}
+
+/* ── Paired Date/Time Rows ─────────────────────────────────────────────── */
+
+/* Container for the two paired rows (Arrival + Departure) */
+.status-row--paired {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Each pair (label + two badges) */
+.status-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.status-pair-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* The two badges (date + time) side by side within a pair */
+.status-pair-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+/* Collapse to single column on narrow viewports */
+@media (max-width: 420px) {
+  .status-row--paired {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Status Strip Row ──────────────────────────────────────────────────── */
+
+/* Status + Loading Dock displayed side-by-side */
+.status-row--strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Secondary CTA: Book a Consultation ───────────────────────────────── */
+
+/* Wrapper — separated from primary CTA by top border */
+.secondary-cta-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(46, 230, 214, 0.08);
+}
+
+/* The button itself — visually muted, clearly subordinate to Request a Seat */
+.btn--secondary-cta {
+  font-size: 0.78rem !important;
+  padding: 0.4rem 0.9rem !important;
+  opacity: 0.55;
+  color: rgba(46, 230, 214, 0.7) !important;
+  border-color: rgba(46, 230, 214, 0.2) !important;
+  background: transparent !important;
+  letter-spacing: 0.03em;
+  transition: opacity 0.2s ease;
+}
+
+.btn--secondary-cta:hover {
+  opacity: 0.85;
+}
+
+/* When intake_mode=CALENDARJET, the consultation CTA becomes primary.
+   JS removes aria-disabled and restores href — this rule restores full opacity. */
+.btn--secondary-cta:not([aria-disabled="true"]):not([style*="pointer-events: none"]) {
+  opacity: 1;
+  font-size: 0.9rem !important;
+  padding: 0.6rem 1.2rem !important;
+  color: #2EE6D6 !important;
+  border-color: rgba(46, 230, 214, 0.5) !important;
+}

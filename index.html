@@ -172,6 +172,132 @@
       opacity: 0.7;
     }
 
+    /* ── Flight Name Block ─────────────────────────────────────────────────── */
+
+    .flight-name-block {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(46, 230, 214, 0.12);
+    }
+
+    .flight-name-eyebrow {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(46, 230, 214, 0.55);
+      margin-bottom: 0.3rem;
+    }
+
+    .flight-name-primary {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #2EE6D6;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.35rem;
+      line-height: 1.2;
+      text-transform: none;
+    }
+
+    .flight-code-secondary {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .flight-code-label {
+      opacity: 0.6;
+    }
+
+    .flight-code-secondary .badge--meta {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Paired Date/Time Rows ─────────────────────────────────────────────── */
+
+    .status-row--paired {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .status-pair {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .status-pair-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .status-pair-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+    }
+
+    @media (max-width: 420px) {
+      .status-row--paired {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Status Strip Row ──────────────────────────────────────────────────── */
+
+    .status-row--strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Secondary CTA: Book a Consultation ───────────────────────────────── */
+
+    .secondary-cta-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(46, 230, 214, 0.08);
+    }
+
+    .btn--secondary-cta {
+      font-size: 0.78rem !important;
+      padding: 0.4rem 0.9rem !important;
+      opacity: 0.55;
+      color: rgba(46, 230, 214, 0.7) !important;
+      border-color: rgba(46, 230, 214, 0.2) !important;
+      background: transparent !important;
+      letter-spacing: 0.03em;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn--secondary-cta:hover {
+      opacity: 0.85;
+    }
+
+    .btn--secondary-cta:not([aria-disabled="true"]):not([style*="pointer-events: none"]) {
+      opacity: 1;
+      font-size: 0.9rem !important;
+      padding: 0.6rem 1.2rem !important;
+      color: #2EE6D6 !important;
+      border-color: rgba(46, 230, 214, 0.5) !important;
+    }
+
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
@@ -1890,47 +2016,63 @@
 
     </div><!-- /#dashboard-view -->
 
-    <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
+    <!-- ACTIVE-FLIGHT STATUS SECTION — hierarchy upgrade: Name primary, Code secondary, paired dates -->
     <div class="status-section" id="loading-dock" data-show-state="landing departed">
       <div class="status-scanlines"></div>
 
-      <div class="status-title">
-        <span class="status-title-label">Flight:</span>
-        <span class="badge badge--flight" id="flight-number">Solo Flight 1 ✈️</span>
-      </div>
-
-      <div class="status-title">
-        <span class="status-title-label">Arrival Time:</span>
-        <span class="badge badge--arriving" id="arrival-time">
-          <span class="arriving-dot"></span>
-          <span id="arrival-text">8:34 AM ET</span>
+      <!-- PRIMARY: Flight Name (human-facing identity) -->
+      <!-- JS: #flight-name-primary ← status.flight_name → status.flight_label → 'Next Departure' -->
+      <div class="flight-name-block">
+        <span class="flight-name-eyebrow">✈️ Active Flight</span>
+        <h2 class="flight-name-primary" id="flight-name-primary">Solo Flight 1</h2>
+        <!-- SECONDARY: Flight Code (operational metadata) -->
+        <span class="flight-code-secondary">
+          <span class="flight-code-label">Flight Code</span>
+          <span class="badge badge--meta" id="flight-number">FL032126</span>
         </span>
       </div>
 
-      <div class="status-title">
-        <span class="status-title-label">Departure Time:</span>
-        <span class="badge badge--highlight" id="departure-time-badge">2:01 AM ET</span>
-
+      <!-- ARRIVAL + DEPARTURE: paired two-column layout -->
+      <div class="status-row status-row--paired">
+        <!-- Arrival: Date + Time -->
+        <div class="status-pair">
+          <span class="status-pair-label">Arrival</span>
+          <div class="status-pair-values">
+            <span class="badge badge--arriving" id="arrival-date">
+              <span class="arriving-dot"></span>
+              <span id="arrival-date-text">—</span>
+            </span>
+            <span class="badge badge--arriving" id="arrival-time">
+              <span class="arriving-dot"></span>
+              <span id="arrival-text">8:34 AM ET</span>
+            </span>
+          </div>
+        </div>
+        <!-- Departure: Date + Time -->
+        <div class="status-pair">
+          <span class="status-pair-label">Departure</span>
+          <div class="status-pair-values">
+            <span class="badge badge--arriving" id="departure-date">
+              <span class="arriving-dot"></span>April 3
+            </span>
+            <span class="badge badge--highlight" id="departure-time-badge">2:01 AM ET</span>
+          </div>
+        </div>
       </div>
 
-      <div class="status-title">
-        <span class="status-title-label">Departure Date:</span>
-        <span class="badge badge--arriving" id="departure-date">
-          <span class="arriving-dot"></span>April 3
-        </span>
-      </div>
-
-      <div class="status-title">
-        <span class="status-title-label">Status:</span>
-        <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
-          <span class="full-text">DELAYED</span>
-          <span class="short-text">DELAYED</span>
-        </span>
-      </div>
-
-      <div class="status-title">
-        <span class="status-title-label">Loading Dock:</span>
-        <span class="badge badge--status" id="dock-status">GATE OPEN</span>
+      <!-- STATUS + LOADING DOCK: side-by-side strip -->
+      <div class="status-row status-row--strip">
+        <div class="status-title">
+          <span class="status-title-label">Status:</span>
+          <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
+            <span class="full-text">DELAYED</span>
+            <span class="short-text">DELAYED</span>
+          </span>
+        </div>
+        <div class="status-title">
+          <span class="status-title-label">Loading Dock:</span>
+          <span class="badge badge--status" id="dock-status">GATE OPEN</span>
+        </div>
       </div>
 
       <!-- Countdown Timer -->
@@ -2120,15 +2262,14 @@
         <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(46, 230, 214, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
       </div>
 
-      <!-- Secondary CTA: Book a Consultation via CalendarJet (gate-closed / consultation flow only) -->
-      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.25rem;padding-top:1rem;border-top:1px solid rgba(46, 230, 214, 0.1);">
+      <!-- Secondary CTA: Book a Consultation — muted, subordinate to Request a Seat -->
+      <div class="secondary-cta-row">
         <a
           href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345"
-          class="btn"
+          class="btn btn--secondary-cta"
           target="_blank"
           rel="noopener noreferrer"
           data-umami-event="Book a Consultation Click"
-          style="font-size:0.8rem;padding:0.5rem 1rem;"
         >📅 Book a Consultation</a>
       </div>
 
@@ -2387,12 +2528,15 @@
         var status = cachedStatus || await fetchSeatStatus();
         if (!status) return; // fail open — leave DOM as-is if API is unreachable
 
-        // ── DOM refs ─────────────────────────────────────────────���───────────
-        var flightEl        = document.getElementById('flight-number');
+         // ── DOM refs ─────────────────────────────────────────────────────────
+        var flightNamePrimaryEl = document.getElementById('flight-name-primary'); // NEW: primary name heading
+        var flightCodeBadgeEl   = document.getElementById('flight-number');        // now: secondary code badge
+        var flightEl            = flightCodeBadgeEl;                               // legacy alias — kept for safety
         var dockEl          = document.getElementById('dock-status');
         var statusBadgeEl   = document.getElementById('dock-status-badge');
         var fullEl          = statusBadgeEl ? statusBadgeEl.querySelector('.full-text') : null;
         var shortEl         = statusBadgeEl ? statusBadgeEl.querySelector('.short-text') : null;
+        var arrivalDateTextEl = document.getElementById('arrival-date-text');      // NEW: arrival date
         var arrivalTextEl   = document.getElementById('arrival-text');
         var depTimeBadgeEl  = document.getElementById('departure-time-badge');
         var depDateEl       = document.getElementById('departure-date');
@@ -2414,13 +2558,30 @@
           }
         }
 
-        // ── 1. Flight label badge (#flight-number) ───────────────────────��
-        // Driven by Admin → NextFlightConfig → next_flight_number
-        if (flightEl) {
-          var label = status.flight_label && status.flight_label.trim()
-            ? status.flight_label.trim() + ' ✈️'
-            : 'Next Departure ✈️';
-          flightEl.textContent = label;
+          // ── 1. Flight identity: Name (primary) + Code (secondary) ───────────────────
+        // Naming guardrail: public header MUST use canonical passenger-facing name,
+        // not just the operational code or any stale internal label.
+        //
+        // Primary (#flight-name-primary): flight_name → flight_label → 'Next Departure'
+        // Secondary (#flight-number):     flight_code → flight_id → hidden
+        if (flightNamePrimaryEl) {
+          var flightName = (status.flight_name && status.flight_name.trim())
+            || (status.flight_label && status.flight_label.trim())
+            || 'Next Departure';
+          flightNamePrimaryEl.textContent = flightName;
+        }
+        if (flightCodeBadgeEl) {
+          var flightCode = (status.flight_code && status.flight_code.trim())
+            || (status.flight_id && status.flight_id.trim())
+            || '';
+          if (flightCode) {
+            flightCodeBadgeEl.textContent = flightCode;
+            var codeRow = flightCodeBadgeEl.closest('.flight-code-secondary');
+            if (codeRow) codeRow.style.display = '';
+          } else {
+            var codeRow = flightCodeBadgeEl.closest('.flight-code-secondary');
+            if (codeRow) codeRow.style.display = 'none';
+          }
         }
 
         // ── 2. Gate / status badge (#dock-status-badge) ───────────────────
@@ -2481,8 +2642,9 @@
         // no VIP flight label leaks into the UI and logs a discreet console note.
         if (status._vip_suppressed === true) {
           // gate_status is already 'closed' — fall through to normal closed rendering
-          // but clear any flight_label that might have been set before the guard ran.
+          // but clear any flight name/label that might have been set before the guard ran.
           status.flight_label = null;
+          status.flight_name  = null; // also clear new field to prevent name leakage
           console.info('[TUJ] VIP flight active — public gate showing closed state (F-VIP-01).');
           // Do NOT return early: let the normal 'closed' rendering path run so
           // the "Next Departure" badge (nextflightdeparturedate) still displays.
@@ -2520,12 +2682,18 @@
           document.body.classList.remove('gate-closed');
         }
 
-        // ── 5. Arrival time (#arrival-text) ───────────────────────────────
+        // ── 5. Arrival date (#arrival-date-text) + Arrival time (#arrival-text) ─────────
         // Driven by Admin → next_flight_arrival_date
         // Base44 emits the collapsed key (nextflightarrivaldate); accept both forms.
+        var arrivalRaw = status.nextflightarrivaldate || status.next_flight_arrival_date || null;
         if (arrivalTextEl) {
-          var arrivalTime = fmtTime(status.nextflightarrivaldate || status.next_flight_arrival_date);
+          var arrivalTime = fmtTime(arrivalRaw);
           arrivalTextEl.textContent = arrivalTime || '—';
+        }
+        // NEW: populate arrival date badge (previously missing from the DOM)
+        if (arrivalDateTextEl) {
+          var arrivalDate = fmtDate(arrivalRaw);
+          arrivalDateTextEl.textContent = arrivalDate || '—';
         }
 
         // ── 6. Departure time badge (#departure-time-badge) ───────────────
