@@ -15,6 +15,21 @@
  *   BASE44_USER_URL          — Base44 User record read endpoint (e.g. .../User)
  *                              Used to read passport_completed_at + highest_ats_score.
  *
+ * F-HIER-01: flight_code field
+ *   Sourced from three places in priority order:
+ *     1. data.flight_code     — Base44 NextFlightConfig field (add to schema; see below)
+ *     2. ACTIVE_FLIGHT_CODE   — Netlify env var (already in use for email tokens)
+ *     3. data.flight_id       — legacy operational ID from getCohortStatus
+ *   The resolved value is always normalised: spaces → underscores, trimmed.
+ *   Exposed as data.flight_code in the public payload.
+ *
+ *   Base44 NextFlightConfig schema addition (long-term):
+ *     Field name:  flight_code
+ *     Type:        Text (short string)
+ *     Description: Operational flight code shown as secondary metadata on the
+ *                  public window (e.g. "FL032126"). Separate from flight_label
+ *                  (the passenger-facing display name). Returned by getCohortStatus.
+ *
  * BLOCKER-05-FU: When seat_id is provided as a query param (?seat_id=TUJ-XXXXXX),
  * this function enriches the response with resume_fit_check_status for the Studio
  * Boarding Readiness Panel. The field is derived from the User record:
@@ -67,6 +82,32 @@ function deriveResumeFitCheckStatus(user) {
   return 'not_started';
 }
 
+/**
+ * resolveFlightCode(data) — F-HIER-01
+ *
+ * Returns the canonical operational flight code for the active flight.
+ * Priority:
+ *   1. data.flight_code     — Base44 NextFlightConfig field (future: add to schema)
+ *   2. ACTIVE_FLIGHT_CODE   — Netlify env var (already used for email tokens)
+ *   3. data.flight_id       — legacy operational ID from getCohortStatus
+ *   4. null                 — no code available; UI hides the secondary badge
+ *
+ * Normalisation: spaces replaced with underscores, trimmed.
+ * This matches the existing ACTIVE_FLIGHT_CODE convention ("FL 041926" → "FL_041926")
+ * but the raw value is also preserved for display — callers may choose to display
+ * the raw string or the normalised form. The normalised form is what is returned.
+ */
+function resolveFlightCode(data) {
+  const raw =
+    (data.flight_code && String(data.flight_code).trim()) ||
+    (process.env.ACTIVE_FLIGHT_CODE && String(process.env.ACTIVE_FLIGHT_CODE).trim()) ||
+    (data.flight_id && String(data.flight_id).trim()) ||
+    null;
+  if (!raw) return null;
+  // Normalise: replace spaces with underscores (matches ACTIVE_FLIGHT_CODE convention)
+  return raw.replace(/ /g, '_');
+}
+
 exports.handler = async function handler(event) {
   // ── Preflight ──────────────────────────────────────────────────────────────
   if ((event.httpMethod || '').toUpperCase() === 'OPTIONS') {
@@ -104,7 +145,13 @@ exports.handler = async function handler(event) {
       data.gate_status = publicGateState;
     }
 
-    // ── 4. BLOCKER-05-FU: resume_fit_check_status enrichment ──────────────
+    // ── 4. F-HIER-01: flight_code resolution ──────────────────────────────
+    // Resolves the operational flight code from Base44, env var, or flight_id fallback.
+    // Always overwrites data.flight_code so the public payload has a single canonical field.
+    // Returns null if no code is available — UI hides the secondary badge in that case.
+    data.flight_code = resolveFlightCode(data);
+
+    // ── 5. BLOCKER-05-FU: resume_fit_check_status enrichment ──────────────
     // Attempted only when seat_id is present and Base44 endpoints are configured.
     // Fails open to 'unknown' on any error — never blocks the primary response.
     const qp = event.queryStringParameters || {};
