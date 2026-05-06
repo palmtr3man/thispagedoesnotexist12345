@@ -1567,6 +1567,86 @@
       background: rgba(46, 230, 214,0.1);
       border-color: rgba(46, 230, 214,0.6);
     }
+
+    /* ── Segmentation fields: Career Stage + Current Goal (Beehiiv wiring) ── */
+    .seg-field-label {
+      display: block;
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+      text-align: left;
+      width: 100%;
+    }
+    .seg-field-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .tuj-select {
+      width: 100%;
+      padding: 0.6rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid rgba(46, 230, 214, 0.35);
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      letter-spacing: 0.02em;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .tuj-select:focus {
+      border-color: rgba(46, 230, 214, 0.8);
+      box-shadow: 0 0 8px rgba(46, 230, 214, 0.2);
+    }
+    .tuj-select option {
+      background: #0a0a0a;
+      color: #fff;
+    }
+    /* Current Goal multi-select chips */
+    .goal-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      width: 100%;
+    }
+    .goal-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 20px;
+      border: 1px solid rgba(46, 230, 214, 0.3);
+      background: rgba(0,0,0,0.5);
+      color: rgba(255,255,255,0.65);
+      font-size: 0.78rem;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      user-select: none;
+    }
+    .goal-chip:hover {
+      border-color: rgba(46, 230, 214, 0.6);
+      color: rgba(255,255,255,0.9);
+    }
+    .goal-chip.selected {
+      border-color: rgba(46, 230, 214, 0.9);
+      background: rgba(46, 230, 214, 0.12);
+      color: #2EE6D6;
+      box-shadow: 0 0 8px rgba(46, 230, 214, 0.2);
+    }
+    .goal-chip-check {
+      font-size: 0.7rem;
+      display: none;
+    }
+    .goal-chip.selected .goal-chip-check {
+      display: inline;
+    }
 </style>
 </head>
 <body class="black-glass" data-state="loading">
@@ -2210,6 +2290,40 @@
             onfocus="this.style.borderColor='rgba(46, 230, 214,0.8)'"
             onblur="this.style.borderColor='rgba(46, 230, 214,0.35)'"
           />
+
+          <!-- Career Stage dropdown (Beehiiv custom field: career_stage) -->
+          <div class="seg-field-wrap">
+            <span class="seg-field-label">Career Stage</span>
+            <select name="career_stage" id="career-stage-select" class="tuj-select">
+              <option value="" disabled selected>Select your career stage…</option>
+              <option value="Active Job Seeker">Active Job Seeker</option>
+              <option value="Passive Browser">Passive Browser</option>
+              <option value="Career Changer">Career Changer</option>
+              <option value="Recent Graduate">Recent Graduate</option>
+            </select>
+          </div>
+
+          <!-- Current Goal multi-select chips (Beehiiv custom field: current_goal) -->
+          <div class="seg-field-wrap">
+            <span class="seg-field-label">Current Goal <span style="color:rgba(255,255,255,0.3);font-size:0.58rem;">(select all that apply)</span></span>
+            <div class="goal-chips" id="goal-chips-group" role="group" aria-label="Current Goal">
+              <button type="button" class="goal-chip" data-goal="Resume Help" onclick="toggleGoalChip(this)">
+                <span class="goal-chip-check">✓</span>Resume Help
+              </button>
+              <button type="button" class="goal-chip" data-goal="Interview Prep" onclick="toggleGoalChip(this)">
+                <span class="goal-chip-check">✓</span>Interview Prep
+              </button>
+              <button type="button" class="goal-chip" data-goal="Job Search Strategy" onclick="toggleGoalChip(this)">
+                <span class="goal-chip-check">✓</span>Job Search Strategy
+              </button>
+              <button type="button" class="goal-chip" data-goal="Career Pivot" onclick="toggleGoalChip(this)">
+                <span class="goal-chip-check">✓</span>Career Pivot
+              </button>
+            </div>
+            <!-- Hidden input carries comma-joined selected goals for form serialisation -->
+            <input type="hidden" name="current_goal" id="current-goal-hidden" value="" />
+          </div>
+
           <span id="seat-form-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1em;"></span>
 
           <!-- Age confirmation checkbox -->
@@ -3367,6 +3481,18 @@
         });
       });
 
+      // ── Goal chip toggle helper (Beehiiv segmentation) ──────────────────
+      function toggleGoalChip(chip) {
+        chip.classList.toggle('selected');
+        var allChips = document.querySelectorAll('#goal-chips-group .goal-chip');
+        var selected = [];
+        allChips.forEach(function(c) {
+          if (c.classList.contains('selected')) selected.push(c.getAttribute('data-goal'));
+        });
+        var hiddenInput = document.getElementById('current-goal-hidden');
+        if (hiddenInput) hiddenInput.value = selected.join(',');
+      }
+
       // ── Wire seat-request form to return seat_id + trigger rerender ───────
       document.addEventListener('DOMContentLoaded', function () {
         var form = document.getElementById('seat-request-form');
@@ -3401,14 +3527,20 @@
           subBtn.disabled    = true;
           subBtn.textContent = '⏳ Submitting…';
 
+          // Collect segmentation fields (Beehiiv custom fields + tag routing)
+          var careerStageVal = (form.querySelector('select[name=career_stage]') || {}).value || '';
+          var currentGoalVal = (form.querySelector('input[name=current_goal]') || {}).value || '';
+
           fetch('/api/seat-request', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify(Object.assign({
-              name:      nameVal,
-              email:     emailVal,
-              age_token: _ageToken2,
-              source:    'landing'
+              name:         nameVal,
+              email:        emailVal,
+              age_token:    _ageToken2,
+              source:       'landing',
+              career_stage: careerStageVal || null,
+              current_goal: currentGoalVal || null
             }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
           })
           .then(function (r) { return r.json(); })
