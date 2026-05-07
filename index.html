@@ -382,6 +382,13 @@
       box-shadow: 0 0 12px rgba(46, 230, 214, 0.2);
     }
 
+    /* PAL-22: enforce visible navigation order even when the row wraps. */
+    .btn-row .btn-signal { order: 1; }
+    .btn-row .btn-studio { order: 2; }
+    .btn-row .btn-systems { order: 3; }
+    .btn-row .btn-mc { order: 4; }
+    .btn-row .btn[data-path="support"] { order: 5; }
+
     .btn-row-divider {
       display: flex;
       align-items: center;
