@@ -26,6 +26,8 @@
  *   SENDGRID_TEMPLATE_SPONSORED_APPROVED          → sponsored_approved_v1
  *   SENDGRID_TEMPLATE_VIP_BOARDING_PASS           → vip_boarding_pass_v1           (FL 042426 — d-1e5c7552460444028e37c0f935a9e32f)
  *   SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS   → vip_boarding_instructions_v1   (FL 042426 — d-54a2336a46134073b589ec5f698c11f3)
+ *   SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM           → alpha_seat_confirm_v1          (BEEHIIV-SEG — Active Job Seeker seat ID follow-up)
+ *   SENDGRID_TEMPLATE_PREBOARD_NURTURE             → preboard_nurture_v1            (BEEHIIV-SEG — Passive Browser pre-boarding nurture)
  *
  * Fallback IDs are the confirmed canonical values from the SendGrid Template
  * Registry (Notion). They exist so local dev without a .env file still resolves
@@ -69,6 +71,12 @@ const FALLBACKS = {
   // ── VIP path — LIVE (FL 042426 Birthday Flight, confirmed Apr 20, 2026) ─────
   vip_boarding_pass_v1:            'd-1e5c7552460444028e37c0f935a9e32f',  // FL 042426 Birthday Flight — confirmed Apr 20, 2026
   vip_boarding_instructions_v1:    'd-54a2336a46134073b589ec5f698c11f3',  // FL 042426 Birthday Flight — confirmed Apr 20, 2026
+  // ── Beehiiv Segmentation paths (BEEHIIV-SEG, 2026-05-06) ─────────────────
+  // IDs are placeholders — update after uploading templates to SendGrid dashboard.
+  // Set real d-... values via SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM and
+  // SENDGRID_TEMPLATE_PREBOARD_NURTURE env vars in Netlify (preferred over fallbacks).
+  alpha_seat_confirm_v1:           process.env.SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM  || '',  // Active Job Seeker — Seat ID / TUJ code follow-up
+  preboard_nurture_v1:             process.env.SENDGRID_TEMPLATE_PREBOARD_NURTURE    || '',  // Passive Browser — pre-boarding nurture track
 };
 
 // ---------------------------------------------------------------------------
@@ -109,6 +117,11 @@ const TEMPLATES = {
     process.env.SENDGRID_TEMPLATE_VIP_BOARDING_PASS          || FALLBACKS.vip_boarding_pass_v1,
   vip_boarding_instructions_v1:
     process.env.SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS  || FALLBACKS.vip_boarding_instructions_v1,
+  // ── Beehiiv Segmentation paths (BEEHIIV-SEG, 2026-05-06) ─────────────────
+  alpha_seat_confirm_v1:
+    process.env.SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM         || FALLBACKS.alpha_seat_confirm_v1,
+  preboard_nurture_v1:
+    process.env.SENDGRID_TEMPLATE_PREBOARD_NURTURE           || FALLBACKS.preboard_nurture_v1,
 };
 
 // ---------------------------------------------------------------------------

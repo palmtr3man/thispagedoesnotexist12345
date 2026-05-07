@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<!--
+  Template: alpha_seat_confirm_v1
+  SendGrid ID: (set after upload — update SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM in Netlify)
+  Purpose: Seat ID / TUJ code follow-up for Active Job Seekers
+           Fires from seat-request.js when career_stage = 'Active Job Seeker' AND seats are available.
+           Supplements the standard seat_request_acknowledgement_v1 — delivers the boarding code
+           prominently and routes the passenger directly to Mission Control.
+  Segment: Board-Ready (Career Stage = Active Job Seeker) → alpha passengers tag
+  Created: 2026-05-06 (BEEHIIV-SEG)
+
+  Dynamic variables:
+    {{first_name}}      — Passenger first name
+    {{full_name}}       — Passenger full name
+    {{seat_id}}         — Seat label (e.g. TUJ-XXXXXX) — also the TUJ code
+    {{tuj_code}}        — TUJ access code (same value as seat_id)
+    {{flight_code}}     — Active flight code (e.g. FL 042126)
+    {{passport_url}}    — Mission Control deep-link (?seat_id=TUJ-XXXXXX&tuj_code=TUJ-XXXXXX)
+    {{platform_url}}    — Base platform URL
+    {{career_stage}}    — "Active Job Seeker" (passed for template personalisation if needed)
+    {{unsubscribe_url}} — SendGrid unsubscribe token
+
+  Test data:
+    {
+      "first_name": "Jordan",
+      "full_name": "Jordan Rivera",
+      "seat_id": "TUJ-A7K3PQ",
+      "tuj_code": "TUJ-A7K3PQ",
+      "flight_code": "FL 042126",
+      "passport_url": "https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-A7K3PQ&tuj_code=TUJ-A7K3PQ",
+      "platform_url": "https://www.thispagedoesnotexist12345.com",
+      "career_stage": "Active Job Seeker"
+    }
+
+  Notes:
+    - career_stage = 'Active Job Seeker' routes here via seat-request.js BEEHIIV-SEG block
+    - 'alpha passengers' Beehiiv tag applied in the same request before this email fires
+    - BCC to support@thispagedoesnotexist12345.com per universal BCC rule
+    - ASM group: Transactional (SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL)
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Alpha Seat is Confirmed — The Ultimate Journey</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0A0A0A; font-family: 'Inter', Arial, sans-serif; color: #E0E0E0; padding: 40px 20px; }
+    .wrapper { max-width: 600px; margin: 0 auto; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 32px; }
+    .header .eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+    .header .logo { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; margin-bottom: 4px; }
+    .header .sub { font-size: 10px; letter-spacing: 1px; color: #555; margin-bottom: 16px; }
+    .header h1 { font-size: 26px; font-weight: 700; color: #FFFFFF; line-height: 1.25; }
+    .header .subtitle { font-size: 13px; color: #888; margin-top: 8px; }
+
+    /* Alpha badge strip */
+    .alpha-strip { background: linear-gradient(90deg, rgba(0,217,255,0.12) 0%, rgba(0,217,255,0.06) 100%); border: 1px solid rgba(0,217,255,0.3); border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .alpha-strip .label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; }
+    .alpha-strip .badge { background: rgba(0,217,255,0.15); border: 1px solid #00D9FF; border-radius: 20px; padding: 5px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; }
+
+    /* Main card */
+    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(0,217,255,0.2); border-radius: 16px; box-shadow: 0 8px 48px rgba(0,217,255,0.1); overflow: hidden; margin-bottom: 24px; }
+    .premium-bar { height: 3px; background: linear-gradient(90deg, #00D9FF 0%, #0099BB 50%, #00D9FF 100%); }
+
+    /* Card header */
+    .card-header { background: rgba(0,217,255,0.08); border-bottom: 1px solid rgba(0,217,255,0.15); padding: 20px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-header .airline { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; margin-bottom: 2px; }
+    .card-header .sub { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #444; margin-bottom: 6px; }
+    .card-header .flight { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+    .class-badge { background: rgba(0,217,255,0.15); border: 1px solid rgba(0,217,255,0.5); border-radius: 20px; padding: 6px 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; white-space: nowrap; }
+
+    /* Card body */
+    .card-body { padding: 28px; }
+    .field-row { display: flex; gap: 24px; margin-bottom: 24px; }
+    .field { flex: 1; }
+    .field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; display: block; margin-bottom: 4px; }
+    .field .value { font-size: 16px; font-weight: 600; color: #FFFFFF; }
+    .divider { border: none; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0; }
+
+    /* TUJ Code block — prominent display */
+    .code-block { background: rgba(0,217,255,0.06); border: 1px solid rgba(0,217,255,0.25); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; text-align: center; }
+    .code-block .code-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+    .code-block .code { font-size: 28px; font-weight: 700; color: #00D9FF; letter-spacing: 4px; }
+    .code-block .code-note { font-size: 11px; color: #555; margin-top: 6px; line-height: 1.5; }
+
+    /* Access list */
+    .access-section h3 { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+    .access-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #CCCCCC; line-height: 1.4; }
+    .access-item .dot { width: 6px; height: 6px; background: #00D9FF; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .access-item.highlight { color: #FFFFFF; font-weight: 600; }
+
+    /* Barcode strip */
+    .barcode-strip { background: rgba(0,0,0,0.3); border-top: 1px dashed rgba(255,255,255,0.08); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .barcode-strip .gate-info { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #444; }
+    .barcode-strip .seat-display { font-size: 13px; font-weight: 700; color: #00D9FF; letter-spacing: 2px; }
+
+    /* CTA */
+    .cta-block { text-align: center; margin: 32px 0 16px; }
+    .cta-btn-primary { display: inline-block; background: #00D9FF; color: #0A0A0A; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-decoration: none; padding: 14px 36px; border-radius: 8px; text-transform: uppercase; }
+    .cta-btn-secondary { display: inline-block; background: transparent; color: #00D9FF; font-weight: 600; font-size: 13px; letter-spacing: 1px; text-decoration: none; padding: 10px 28px; border-radius: 8px; border: 1px solid rgba(0,217,255,0.35); text-transform: uppercase; margin-top: 12px; }
+
+    /* Footer */
+    .footer { text-align: center; font-size: 11px; color: #333; margin-top: 32px; line-height: 1.8; }
+    .footer a { color: #00D9FF; text-decoration: none; }
+    .footer .tuj-footer { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+
+    @media (max-width: 480px) {
+      .field-row { flex-direction: column; gap: 16px; }
+      .card-header { flex-direction: column; gap: 12px; }
+      .alpha-strip { flex-direction: column; gap: 8px; text-align: center; }
+      body { padding: 20px 12px; }
+      .code-block .code { font-size: 22px; letter-spacing: 2px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="eyebrow">The Ultimate Journey</div>
+      <div class="logo">PageForward Airways</div>
+      <div class="sub">Alpha Cohort · Founding Passengers</div>
+      <h1>✈️ Your Alpha Seat is Confirmed</h1>
+      <div class="subtitle">You're on the manifest, {{first_name}}. Here's everything you need to board.</div>
+    </div>
+
+    <!-- ALPHA BADGE STRIP -->
+    <div class="alpha-strip">
+      <div class="label">Cohort Status</div>
+      <div class="badge">Alpha Passenger</div>
+    </div>
+
+    <!-- MAIN BOARDING CARD -->
+    <div class="card">
+      <div class="premium-bar"></div>
+
+      <div class="card-header">
+        <div>
+          <div class="airline">PageForward Airways</div>
+          <div class="sub">Powered by The Ultimate Journey</div>
+          <div class="flight">{{flight_code}}</div>
+        </div>
+        <div class="class-badge">Alpha Founding</div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Passenger fields -->
+        <div class="field-row">
+          <div class="field">
+            <label>Passenger</label>
+            <div class="value">{{first_name}}</div>
+          </div>
+          <div class="field">
+            <label>Destination</label>
+            <div class="value">Your Next Role</div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Career Stage</label>
+            <div class="value">Active Job Seeker</div>
+          </div>
+          <div class="field">
+            <label>Boarding Status</label>
+            <div class="value" style="color:#00D9FF;">Seat Confirmed</div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- TUJ Code — prominent -->
+        <div class="code-block">
+          <div class="code-label">Your TUJ Code &amp; Seat ID</div>
+          <div class="code">{{tuj_code}}</div>
+          <div class="code-note">
+            This is your permanent identifier throughout the flight.<br />
+            Keep it — every checkpoint, milestone, and unlock is tied to this code.
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- What's unlocked -->
+        <div class="access-section">
+          <h3>What's Unlocked for Alpha Passengers</h3>
+          <div class="access-item highlight"><span class="dot"></span>Priority access to the full TUJ career platform</div>
+          <div class="access-item"><span class="dot"></span>ATS Resume Scanner — see exactly how your resume reads to applicant tracking systems</div>
+          <div class="access-item"><span class="dot"></span>Job Search Strategy tools — pipeline tracker, JD library, application hub</div>
+          <div class="access-item"><span class="dot"></span>Cover Letter Studio — tailored letters generated from your resume + JD</div>
+          <div class="access-item"><span class="dot"></span>Direct line to the crew — founding passengers get early access to every new feature</div>
+        </div>
+
+      </div>
+
+      <!-- Barcode strip -->
+      <div class="barcode-strip">
+        <span class="gate-info">Gate: Mission Control &nbsp;|&nbsp; Flight: {{flight_code}} &nbsp;|&nbsp; Alpha Cohort</span>
+        <span class="seat-display">{{seat_id}}</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <div>
+        <a href="{{passport_url}}" class="cta-btn-primary">🚀 Open Mission Control</a>
+      </div>
+      <div>
+        <a href="{{platform_url}}" class="cta-btn-secondary">↗ View Platform</a>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="tuj-footer">The Ultimate Journey · PageForward Airways · Alpha Cohort</div>
+      You're receiving this because you requested an Alpha seat at The Ultimate Journey.<br />
+      <a href="{{platform_url}}">Platform</a>
+      &nbsp;·&nbsp;
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" style="color:#00D9FF;">Signal Newsletter</a>
+      &nbsp;·&nbsp;
+      <a href="{{unsubscribe_url}}" style="color:#555;">Unsubscribe</a><br /><br />
+      © 2026 The Ultimate Journey. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>
