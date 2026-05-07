@@ -170,7 +170,10 @@ exports.handler = async function handler(event) {
         if (seat) {
           // BLOCKER-06: expose the passenger's seat status for stateful CTA routing
           // Values: 'opened' | 'approved' | 'pending' | 'unknown'
-          seat_status = (seat.status && String(seat.status).toLowerCase()) || 'unknown';
+          const normalizedSeatStatus = (seat.status && String(seat.status).toLowerCase()) || 'unknown';
+          seat_status = ['opened', 'approved', 'pending'].includes(normalizedSeatStatus)
+            ? normalizedSeatStatus
+            : 'unknown';
 
           if (seat.user_id) {
             // Step B: fetch User record to read passport_completed_at + highest_ats_score
