@@ -158,21 +158,28 @@ exports.handler = async function handler(event) {
     let rawSeatId = (qp.seat_id || qp.id || '').replace(/ /g, '_').trim();
 
     let resume_fit_check_status = 'unknown';
+    let seat_status = 'unknown'; // BLOCKER-06: passenger's individual seat state
 
     if (rawSeatId && SEAT_ID_REGEX.test(rawSeatId)) {
       const base44SeatUrl = process.env.BASE44_SEAT_URL;
       const base44UserUrl = process.env.BASE44_USER_URL;
 
       if (base44SeatUrl && base44UserUrl) {
-        // Step A: fetch Seat record to get user_id
+        // Step A: fetch Seat record to get user_id + seat status
         const seat = await fetchBase44Record(base44SeatUrl, rawSeatId);
-        if (seat && seat.user_id) {
-          // Step B: fetch User record to read passport_completed_at + highest_ats_score
-          const user = await fetchBase44Record(base44UserUrl, seat.user_id);
-          resume_fit_check_status = deriveResumeFitCheckStatus(user);
-        } else if (seat) {
-          // Seat found but user_id not present — treat as not_started
-          resume_fit_check_status = 'not_started';
+        if (seat) {
+          // BLOCKER-06: expose the passenger's seat status for stateful CTA routing
+          // Values: 'opened' | 'approved' | 'pending' | 'unknown'
+          seat_status = (seat.status && String(seat.status).toLowerCase()) || 'unknown';
+
+          if (seat.user_id) {
+            // Step B: fetch User record to read passport_completed_at + highest_ats_score
+            const user = await fetchBase44Record(base44UserUrl, seat.user_id);
+            resume_fit_check_status = deriveResumeFitCheckStatus(user);
+          } else {
+            // Seat found but user_id not present — treat as not_started
+            resume_fit_check_status = 'not_started';
+          }
         }
         // Seat lookup failed entirely → stays 'unknown' (fail-open)
       }
@@ -180,6 +187,7 @@ exports.handler = async function handler(event) {
     }
 
     data.resume_fit_check_status = resume_fit_check_status;
+    data.seat_status = seat_status; // BLOCKER-06: passenger seat state for CTA routing
 
     return {
       statusCode: 200,
