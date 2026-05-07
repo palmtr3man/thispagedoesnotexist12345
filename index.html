@@ -353,10 +353,12 @@
 
     .btn-row {
       display: flex;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: stretch;
       justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
+      max-width: 460px;
+      margin: 0 auto 1rem;
     }
 
     .btn {
@@ -382,7 +384,12 @@
       box-shadow: 0 0 12px rgba(46, 230, 214, 0.2);
     }
 
-    /* PAL-22: enforce visible navigation order even when the row wraps. */
+    /* PAL-22 Phase 3: enforce vertical navigation order. */
+    .btn-row .btn {
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
     .btn-row .btn-signal { order: 1; }
     .btn-row .btn-studio { order: 2; }
     .btn-row .btn-systems { order: 3; }
