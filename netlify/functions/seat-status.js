@@ -131,12 +131,10 @@ exports.handler = async function handler(event) {
     // ── 2. ALPHA_MODE override ─────────────────────────────────────────────
     const alphaModeEnv = String(process.env.ALPHA_MODE || '').toLowerCase();
     if (alphaModeEnv === 'false') {
+      // Preserve the passenger-facing flight label from the upstream source.
+      // ALPHA_MODE only controls whether public intake is enabled; it must not
+      // rename the active flight to a generic Beta label.
       data.alpha_mode = false;
-      if (typeof data.flight_label === 'string' && /alpha/i.test(data.flight_label)) {
-        data.flight_label = data.flight_label.replace(/alpha/i, 'Beta');
-      } else {
-        data.flight_label = 'Beta Flight';
-      }
     }
 
     // ── 3. PUBLIC_GATE_STATE operator override ─────────────────────────────
