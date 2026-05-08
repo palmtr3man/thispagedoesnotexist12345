@@ -2159,6 +2159,11 @@
       <div id="countdown-container" style="margin-top:1rem;margin-bottom:0.25rem;">
         <div class="countdown-wrap" id="countdown-wrap">
           <div class="countdown-unit">
+            <span class="countdown-value" id="cd-days">00</span>
+            <span class="countdown-label">Days</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
             <span class="countdown-value" id="cd-hours">00</span>
             <span class="countdown-label">Hours</span>
           </div>
@@ -2593,6 +2598,45 @@
       }
 
       /**
+       * Convert Base44's timezone-less Eastern wall-clock timestamps into real dates.
+       * This keeps the public/main arrival display aligned with Command Center.
+       */
+      function parseEasternWallDateTime(value) {
+        if (!value || typeof value !== 'string') return null;
+        if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return null;
+        var match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (!match) return null;
+        var localUtcMs = Date.UTC(
+          Number(match[1]),
+          Number(match[2]) - 1,
+          Number(match[3]),
+          Number(match[4]),
+          Number(match[5]),
+          Number(match[6] || 0)
+        );
+        var probe = new Date(localUtcMs);
+        var parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York',
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false
+        }).formatToParts(probe).reduce(function (acc, part) {
+          acc[part.type] = part.value;
+          return acc;
+        }, {});
+        var zonedUtcMs = Date.UTC(
+          Number(parts.year),
+          Number(parts.month) - 1,
+          Number(parts.day),
+          Number(parts.hour),
+          Number(parts.minute),
+          Number(parts.second)
+        );
+        var offsetMinutes = (zonedUtcMs - localUtcMs) / 60000;
+        return new Date(localUtcMs - offsetMinutes * 60000);
+      }
+
+      /**
        * Format an ISO timestamp to a short date string ("April 15").
        */
       function fmtDate(iso) {
@@ -2800,13 +2844,14 @@
         // Driven by Admin → next_flight_arrival_date
         // Base44 emits the collapsed key (nextflightarrivaldate); accept both forms.
         var arrivalRaw = status.nextflightarrivaldate || status.next_flight_arrival_date || null;
+        var arrivalForDisplay = parseEasternWallDateTime(arrivalRaw) || arrivalRaw;
         if (arrivalTextEl) {
-          var arrivalTime = fmtTime(arrivalRaw);
+          var arrivalTime = fmtTime(arrivalForDisplay);
           arrivalTextEl.textContent = arrivalTime || '—';
         }
         // NEW: populate arrival date badge (previously missing from the DOM)
         if (arrivalDateTextEl) {
-          var arrivalDate = fmtDate(arrivalRaw);
+          var arrivalDate = fmtDate(arrivalForDisplay);
           arrivalDateTextEl.textContent = arrivalDate || '—';
         }
 
@@ -2825,10 +2870,12 @@
         setDepartureDate(depDateText);
 
         // ── 8. Live countdown target ──────────────────────────────────────
-        // Expose the departure date for the countdown timer IIFE to pick up.
-        // If no departure date is set, the countdown stays hidden.
+        // Sync the public/main countdown to Command Center arrival time.
+        // Fall back to departure only if no arrival date has been configured.
         window.__seatStatusReady = {
+          arrivalDate:   arrivalRaw,
           departureDate: depDateRaw,
+          countdownDate: arrivalRaw || depDateRaw,
           gateOpen:      gateOpen,
         };
 
@@ -3636,10 +3683,11 @@
 
     // ── Live countdown timer — target driven by applySeatGate() ─────────────
     // Waits for window.__seatStatusReady to be populated by the IIFE above,
-    // then starts counting down to next_flight_departure_date.
+    // then starts counting down to the Command Center arrival target.
     (function () {
       var wrap      = document.getElementById('countdown-wrap');
       var departed  = document.getElementById('countdown-departed');
+      var cdDays    = document.getElementById('cd-days');
       var cdHours   = document.getElementById('cd-hours');
       var cdMinutes = document.getElementById('cd-minutes');
       var cdSeconds = document.getElementById('cd-seconds');
@@ -3647,6 +3695,47 @@
       var target    = null;
 
       function pad(n) { return String(n).padStart(2, '0'); }
+
+      function parseCountdownTarget(value) {
+        if (!value) return null;
+        if (typeof value !== 'string' || /[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) {
+          var direct = new Date(value);
+          return isNaN(direct.getTime()) ? null : direct;
+        }
+        var match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (!match) {
+          var fallback = new Date(value);
+          return isNaN(fallback.getTime()) ? null : fallback;
+        }
+        var localUtcMs = Date.UTC(
+          Number(match[1]),
+          Number(match[2]) - 1,
+          Number(match[3]),
+          Number(match[4]),
+          Number(match[5]),
+          Number(match[6] || 0)
+        );
+        var probe = new Date(localUtcMs);
+        var parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York',
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false
+        }).formatToParts(probe).reduce(function (acc, part) {
+          acc[part.type] = part.value;
+          return acc;
+        }, {});
+        var zonedUtcMs = Date.UTC(
+          Number(parts.year),
+          Number(parts.month) - 1,
+          Number(parts.day),
+          Number(parts.hour),
+          Number(parts.minute),
+          Number(parts.second)
+        );
+        var offsetMinutes = (zonedUtcMs - localUtcMs) / 60000;
+        return new Date(localUtcMs - offsetMinutes * 60000);
+      }
 
       function tick() {
         if (!target) { if (wrap) wrap.style.display = 'none'; return; }
@@ -3663,7 +3752,9 @@
         var totalSec = Math.floor(diff / 1000);
         var secs  = totalSec % 60;
         var mins  = Math.floor(totalSec / 60) % 60;
-        var hours = Math.floor(totalSec / 3600);
+        var hours = Math.floor(totalSec / 3600) % 24;
+        var days  = Math.floor(totalSec / 86400);
+        if (cdDays)    cdDays.textContent    = pad(days);
         if (cdHours)   cdHours.textContent   = pad(hours);
         if (cdMinutes) cdMinutes.textContent = pad(mins);
         if (cdSeconds) cdSeconds.textContent = pad(secs);
@@ -3675,14 +3766,15 @@
         if (rdy === null) return; // not yet populated
         clearInterval(pollInterval);
 
-        if (!rdy.departureDate) {
-          // No departure date set in Admin — hide countdown entirely
+        var countdownDate = rdy.countdownDate || rdy.arrivalDate || rdy.departureDate;
+        if (!countdownDate) {
+          // No arrival/departure date set in Admin — hide countdown entirely
           if (wrap) wrap.style.display = 'none';
           return;
         }
 
-        target = new Date(rdy.departureDate);
-        if (isNaN(target.getTime())) {
+        target = parseCountdownTarget(countdownDate);
+        if (!target) {
           if (wrap) wrap.style.display = 'none';
           return;
         }
