@@ -1327,6 +1327,35 @@
       .btn-row-waitlist { padding: 0 0; }
       .btn-waitlist { width: 100%; text-align: center; }
       .carousel-slide { padding: 1.25rem 1rem; }
+
+      /* Mobile countdown: prevent horizontal overflow/cropping on narrow phones. */
+      .countdown-wrap {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.35rem;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 1rem;
+        overflow: hidden;
+      }
+
+      .countdown-unit {
+        min-width: 0;
+      }
+
+      .countdown-value {
+        font-size: clamp(1.25rem, 9vw, 1.65rem);
+      }
+
+      .countdown-label {
+        font-size: clamp(0.46rem, 2.5vw, 0.56rem);
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+
+      .countdown-sep {
+        display: none;
+      }
     }
 
     .gate-locked-msg {
