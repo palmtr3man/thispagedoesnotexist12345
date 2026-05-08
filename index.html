@@ -2394,7 +2394,7 @@
 
       <!-- Gate-closed locked state (hidden when gate is open) -->
       <div class="gate-locked-msg" style="display:none">
-        🔒 Next Flight — Studio → Signal → Systems
+        🔒 Next Flight — Signal → Systems → Support
       </div>
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
@@ -2408,16 +2408,13 @@
     </div>
 
 
-    <!-- BLACK GLASS BUTTONS -->
+    <!-- BLACK GLASS BUTTONS — PAL-22: Signal-first conversion order (Signal > Studio > Systems > Mission Control > Support the Journey) -->
     <div class="btn-row" data-show-state="landing departed">
-      <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
       <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
+      <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
       <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
-      <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
-    </div>
-    <!-- MISSION CONTROL BUTTON — separate row, below Studio/Signal/Systems/Support -->
-    <div class="btn-row" data-show-state="landing departed" style="margin-top:-0.25rem;">
       <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
+      <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
     </div>
 
     <!-- PUZZLE PATH TRACKER -->
