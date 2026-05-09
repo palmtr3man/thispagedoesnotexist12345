@@ -24,6 +24,8 @@
  *   ALIGNMENT_CRON_SECRET        — Bearer token for scheduled cron invocations
  *   BASE44_SEAT_URL              — Base44 Seat entity read endpoint
  *   BASE44_USER_URL              — Base44 User entity read endpoint
+ *   BASE44_APPLICATION_URL       — Base44 Application entity endpoint for PAL-21 polling
+ *   NOTION_JD_PIPELINE_DB_ID     — Notion JD Pipeline Tracker DB for PAL-21 Application sync
  *   SUPABASE_URL                 — Supabase project URL
  *   SUPABASE_SERVICE_ROLE_KEY    — Supabase service role key
  *   NETLIFY_API_KEY              — Netlify personal access token
@@ -132,6 +134,233 @@ async function fetchBase44User(userId) {
   } catch (_) { return null; }
 }
 
+
+// ── PAL-21 Application lookup + JD Pipeline sync ──────────────────────────────
+
+const TUJ_APPLICATION_STAGE_TO_NOTION = {
+  'Saved': 'Saved',
+  'To apply': 'To apply',
+  'Applied': 'Applied',
+  'Screening': 'Screening',
+  'Interview Scheduled': 'Interview Scheduled',
+  'Interviewing': 'Interviewing',
+  'Offer': 'Offer',
+  'Rejected': 'Rejected',
+  'Archived': 'Archived',
+};
+
+function normalizeApplicationStatus(application = {}) {
+  if (application.pipeline_stage && TUJ_APPLICATION_STAGE_TO_NOTION[application.pipeline_stage]) {
+    return TUJ_APPLICATION_STAGE_TO_NOTION[application.pipeline_stage];
+  }
+
+  switch (String(application.status || '').toLowerCase()) {
+    case 'submitted':
+    case 'applied':
+      return 'Applied';
+    case 'screening':
+      return 'Screening';
+    case 'interview_scheduled':
+      return 'Interview Scheduled';
+    case 'interviewing':
+      return 'Interviewing';
+    case 'offered':
+    case 'offer':
+      return 'Offer';
+    case 'rejected':
+    case 'withdrawn':
+      return 'Rejected';
+    case 'archived':
+      return 'Archived';
+    case 'saved':
+    case 'draft':
+    default:
+      return 'Saved';
+  }
+}
+
+function applicationCompany(application = {}) {
+  return application.company_name || application.company || '';
+}
+
+function applicationRole(application = {}) {
+  return application.job_title || application.role || application.title || '';
+}
+
+function applicationSourceUrl(application = {}) {
+  return application.source || application.job_url || application.url || '';
+}
+
+function notionTextProperty(content) {
+  return content ? { rich_text: [{ text: { content: String(content).slice(0, 2000) } }] } : { rich_text: [] };
+}
+
+function notionTitleProperty(content) {
+  return { title: [{ text: { content: String(content || 'Untitled application').slice(0, 2000) } }] };
+}
+
+function notionStatusProperty(statusName) {
+  return { status: { name: statusName || 'Saved' } };
+}
+
+function notionDateProperty(value) {
+  if (!value) return { date: null };
+  const dateValue = String(value).includes('T') ? String(value).slice(0, 10) : String(value);
+  return { date: { start: dateValue } };
+}
+
+function buildNotionApplicationProperties(application) {
+  const company = applicationCompany(application);
+  const role = applicationRole(application);
+  const sourceUrl = applicationSourceUrl(application);
+  const status = normalizeApplicationStatus(application);
+  const properties = {
+    'Name': notionTitleProperty(company && role ? `${company} - ${role}` : (role || company || application.id)),
+    'Company': notionTextProperty(company),
+    'Job Title': notionTextProperty(role),
+    'Status': notionStatusProperty(status),
+    'Application Date': notionDateProperty(application.applied_date || application.applied_at),
+    'ATS Score': { number: typeof application.ats_score === 'number' ? application.ats_score : (typeof application.ats_compatibility === 'number' ? application.ats_compatibility : null) },
+    'Match Score': { number: typeof application.match_score === 'number' ? application.match_score : null },
+    'Match Notes': notionTextProperty(application.recommendations || application.match_notes || ''),
+  };
+  if (sourceUrl) properties['Job URL'] = { url: sourceUrl };
+  return properties;
+}
+
+async function fetchBase44Applications() {
+  if (!process.env.BASE44_APPLICATION_URL) return [];
+  try {
+    const res = await timedFetch(process.env.BASE44_APPLICATION_URL);
+    if (!res.ok) throw new Error(`Base44 Application query failed: ${res.status}`);
+    const data = await res.json();
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data.items)) return data.items;
+    if (Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (err) {
+    throw new Error(`Base44 Application fetch failed: ${err.message}`);
+  }
+}
+
+async function updateBase44Application(applicationId, fields) {
+  if (!process.env.BASE44_APPLICATION_URL || !applicationId) return false;
+  try {
+    const res = await timedFetch(`${process.env.BASE44_APPLICATION_URL}/${applicationId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
+    });
+    return res.ok;
+  } catch (_) { return false; }
+}
+
+async function queryNotionApplicationByFilter(filter) {
+  const dbId = process.env.NOTION_JD_PIPELINE_DB_ID;
+  if (!dbId) return null;
+  const res = await timedFetch(`https://api.notion.com/v1/databases/${dbId}/query`, {
+    method: 'POST',
+    headers: notionHeaders(),
+    body: JSON.stringify({ filter, page_size: 1 }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.results?.[0] || null;
+}
+
+async function findNotionApplication(application) {
+  if (application.notion_page_id) {
+    return { id: application.notion_page_id, matched_by: 'notion_page_id' };
+  }
+
+  const sourceUrl = applicationSourceUrl(application);
+  if (sourceUrl) {
+    const byUrl = await queryNotionApplicationByFilter({ property: 'Job URL', url: { equals: sourceUrl } });
+    if (byUrl) return { id: byUrl.id, matched_by: 'job_url' };
+  }
+
+
+  const company = applicationCompany(application);
+  const role = applicationRole(application);
+  if (company && role) {
+    const byCompanyRole = await queryNotionApplicationByFilter({
+      and: [
+        { property: 'Company', rich_text: { equals: company } },
+        { property: 'Job Title', rich_text: { equals: role } },
+      ],
+    });
+    if (byCompanyRole) return { id: byCompanyRole.id, matched_by: 'company_role' };
+  }
+
+  return null;
+}
+
+async function upsertNotionApplication(application) {
+  const dbId = process.env.NOTION_JD_PIPELINE_DB_ID;
+  if (!dbId) throw new Error('NOTION_JD_PIPELINE_DB_ID not configured');
+
+  const match = await findNotionApplication(application);
+  const properties = buildNotionApplicationProperties(application);
+
+  if (match?.id) {
+    const res = await timedFetch(`https://api.notion.com/v1/pages/${match.id}`, {
+      method: 'PATCH',
+      headers: notionHeaders(),
+      body: JSON.stringify({ properties }),
+    });
+    if (!res.ok) throw new Error(`Notion Application update failed: ${res.status}`);
+    return { page_id: match.id, action: 'updated', matched_by: match.matched_by };
+  }
+
+  const res = await timedFetch('https://api.notion.com/v1/pages', {
+    method: 'POST',
+    headers: notionHeaders(),
+    body: JSON.stringify({ parent: { database_id: dbId }, properties }),
+  });
+  if (!res.ok) throw new Error(`Notion Application create failed: ${res.status}`);
+  const created = await res.json();
+  return { page_id: created.id, page_url: created.url, action: 'created', matched_by: 'created' };
+}
+
+async function syncApplicationsToNotion() {
+  const summary = { applications_scanned: 0, applications_synced: 0, applications_created: 0, application_errors: [] };
+
+  if (!process.env.BASE44_APPLICATION_URL || !process.env.NOTION_JD_PIPELINE_DB_ID) {
+    return summary;
+  }
+
+  const applications = await fetchBase44Applications();
+  summary.applications_scanned = applications.length;
+
+  for (const application of applications) {
+    try {
+      if (!application?.id) continue;
+      const result = await upsertNotionApplication(application);
+      summary.applications_synced++;
+      if (result.action === 'created') summary.applications_created++;
+      await updateBase44Application(application.id, {
+        notion_page_id: result.page_id,
+        source_notion_page_url: result.page_url || application.source_notion_page_url,
+        last_synced_to_notion: new Date().toISOString(),
+      });
+    } catch (err) {
+      summary.application_errors.push({ id: application?.id || 'unknown', error: err.message });
+      await writeDriftReport({
+        passenger_id: application?.passenger_id || application?.id || 'application',
+        field_name: 'application_notion_sync',
+        notion_value: 'sync_expected',
+        saas_value: err.message,
+        repair_action: 'manual',
+        source: 'application',
+        drift_type: 'pal21',
+      });
+    }
+  }
+
+  return summary;
+}
+
 // ── Supabase lookup ───────────────────────────────────────────────────────────
 
 async function fetchSupabaseSeatRequest(seatId) {
@@ -151,6 +380,7 @@ const REQUIRED_ENV_VARS = [
   'NOTION_SECRET', 'NOTION_SEAT_DB_ID', 'NOTION_DRIFT_REPORT_DB_ID',
   'ALIGNMENT_WEBHOOK_SECRET', 'ALIGNMENT_CRON_SECRET',
   'BASE44_SEAT_URL', 'BASE44_USER_URL',
+  'BASE44_APPLICATION_URL', 'NOTION_JD_PIPELINE_DB_ID',
   'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY',
   'NETLIFY_API_KEY', 'NETLIFY_SITE_ID',
 ];
@@ -261,7 +491,18 @@ async function autoRepairBase44Seat(seatId, field, notionValue) {
 // ── Core alignment logic ──────────────────────────────────────────────────────
 
 async function runAlignmentLoop() {
-  const results = { drifts_detected: 0, auto_repaired: 0, manual_review: 0, errors: [] };
+  const results = { drifts_detected: 0, auto_repaired: 0, manual_review: 0, errors: [], applications_scanned: 0, applications_synced: 0, applications_created: 0, application_errors: [] };
+
+  // 0. PAL-21 Application → Notion JD Pipeline sync (safe polling fallback)
+  try {
+    const appResults = await syncApplicationsToNotion();
+    results.applications_scanned = appResults.applications_scanned;
+    results.applications_synced = appResults.applications_synced;
+    results.applications_created = appResults.applications_created;
+    results.application_errors = appResults.application_errors;
+  } catch (err) {
+    results.errors.push(`Application sync failed: ${err.message}`);
+  }
 
   // 1. Netlify env var drift check (config scope)
   const envDrifts = checkNetlifyEnvDrift();

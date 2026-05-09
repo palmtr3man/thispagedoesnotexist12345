@@ -105,11 +105,11 @@
 
 # BLOCKER-08: Alignment Loop — Notion ↔ SaaS Drift Detection + Repair
 # Webhook trigger: POST /api/alignment-loop with x-webhook-secret header
-# Cron trigger: every 4 hours via Netlify scheduled functions
+# Cron trigger: every 5 minutes via Netlify scheduled functions for PAL-21 Application sync
 [[redirects]]
   from = "/api/alignment-loop"
   to = "/.netlify/functions/alignment-loop"
   status = 200
 
 [functions."alignment-loop"]
-  schedule = "0 */4 * * *"
+  schedule = "*/5 * * * *"
