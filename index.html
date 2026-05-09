@@ -353,10 +353,22 @@
 
     .btn-row {
       display: flex;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 0.75rem;
       justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
+      align-items: stretch;
+      max-width: 360px;
+      margin: 0 auto 1rem;
+    }
+    .btn-row .btn {
+      width: 100%;
+      text-align: left;
+    }
+    .btn-row .btn::before {
+      content: attr(data-nav-index) '. ';
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: 700;
+      margin-right: 0.35rem;
     }
 
     .btn {
@@ -2441,11 +2453,11 @@
 
     <!-- BLACK GLASS BUTTONS — PAL-22: Signal-first conversion order (Signal > Studio > Systems > Mission Control > Support the Journey) -->
     <div class="btn-row" data-show-state="landing departed">
-      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
-      <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
-      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
-      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
-      <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
+      <a href="https://newsletter.thispagedoesnotexist12345.us/?src=com_signal_nav" class="btn btn-signal" data-nav-index="1" data-path="signal" data-puzzle-ignore="true" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
+      <a href="/Studio" class="btn btn-studio" data-nav-index="2" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
+      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-nav-index="3" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
+      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-nav-index="4" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
+      <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-nav-index="5" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
     </div>
 
     <!-- PUZZLE PATH TRACKER -->
@@ -2576,6 +2588,7 @@
 
       document.querySelectorAll('.btn-row .btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
+          if (btn.dataset.puzzleIgnore === 'true') return;
           const path = btn.dataset.path;
           if (!path) return;
           localStorage.setItem('last-path', path);
