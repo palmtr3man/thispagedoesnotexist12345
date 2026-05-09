@@ -131,12 +131,10 @@ exports.handler = async function handler(event) {
     // ── 2. ALPHA_MODE override ─────────────────────────────────────────────
     const alphaModeEnv = String(process.env.ALPHA_MODE || '').toLowerCase();
     if (alphaModeEnv === 'false') {
+      // Preserve the passenger-facing flight label from the upstream source.
+      // ALPHA_MODE only controls whether public intake is enabled; it must not
+      // rename the active flight to a generic Beta label.
       data.alpha_mode = false;
-      if (typeof data.flight_label === 'string' && /alpha/i.test(data.flight_label)) {
-        data.flight_label = data.flight_label.replace(/alpha/i, 'Beta');
-      } else {
-        data.flight_label = 'Beta Flight';
-      }
     }
 
     // ── 3. PUBLIC_GATE_STATE operator override ─────────────────────────────
@@ -158,21 +156,29 @@ exports.handler = async function handler(event) {
     let rawSeatId = (qp.seat_id || qp.id || '').replace(/ /g, '_').trim();
 
     let resume_fit_check_status = 'unknown';
+    let seat_status = 'unknown';
 
     if (rawSeatId && SEAT_ID_REGEX.test(rawSeatId)) {
       const base44SeatUrl = process.env.BASE44_SEAT_URL;
       const base44UserUrl = process.env.BASE44_USER_URL;
 
       if (base44SeatUrl && base44UserUrl) {
-        // Step A: fetch Seat record to get user_id
+        // Step A: fetch Seat record to get user_id + seat status
         const seat = await fetchBase44Record(base44SeatUrl, rawSeatId);
-        if (seat && seat.user_id) {
-          // Step B: fetch User record to read passport_completed_at + highest_ats_score
-          const user = await fetchBase44Record(base44UserUrl, seat.user_id);
-          resume_fit_check_status = deriveResumeFitCheckStatus(user);
-        } else if (seat) {
-          // Seat found but user_id not present — treat as not_started
-          resume_fit_check_status = 'not_started';
+        if (seat) {
+          const normalizedSeatStatus = (seat.status && String(seat.status).toLowerCase()) || 'unknown';
+          seat_status = ['opened', 'approved', 'pending'].includes(normalizedSeatStatus)
+            ? normalizedSeatStatus
+            : 'unknown';
+
+          if (seat.user_id) {
+            // Step B: fetch User record to read passport_completed_at + highest_ats_score
+            const user = await fetchBase44Record(base44UserUrl, seat.user_id);
+            resume_fit_check_status = deriveResumeFitCheckStatus(user);
+          } else {
+            // Seat found but user_id not present — treat as not_started
+            resume_fit_check_status = 'not_started';
+          }
         }
         // Seat lookup failed entirely → stays 'unknown' (fail-open)
       }
@@ -180,6 +186,7 @@ exports.handler = async function handler(event) {
     }
 
     data.resume_fit_check_status = resume_fit_check_status;
+    data.seat_status = seat_status;
 
     return {
       statusCode: 200,
