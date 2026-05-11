@@ -44,16 +44,28 @@
 
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
 const LOOKUP_TIMEOUT_MS = 4000;
+const BASE44_APP_ID = '67912f60b0c40c4f1a48d1c7';
 
 /**
  * Fetch a single Base44 entity record by ID with a hard timeout.
  * Returns parsed JSON on success, null on any error (timeout, 4xx, 5xx, network).
  */
 function base44Headers() {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
   const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
   if (apiKey) headers.api_key = apiKey;
   return headers;
+}
+
+function normalizeBase44EntityUrl(rawUrl, entityName) {
+  const value = String(rawUrl || '').trim().replace(/\/$/, '');
+  if (!value) return value;
+  if (value.includes('api.base44.com/api/apps/')) return value;
+  if (value.includes('.base44.app/api/') || value.includes('app.base44.com/api/')) {
+    console.warn(`[seat-status] Normalizing app-domain Base44 ${entityName} URL to canonical entity API`);
+    return `https://api.base44.com/api/apps/${BASE44_APP_ID}/entities/${entityName}`;
+  }
+  return value;
 }
 
 async function fetchBase44Record(baseUrl, id) {
@@ -166,8 +178,8 @@ exports.handler = async function handler(event) {
     let seat_status = 'unknown';
 
     if (rawSeatId && SEAT_ID_REGEX.test(rawSeatId)) {
-      const base44SeatUrl = process.env.BASE44_SEAT_URL;
-      const base44UserUrl = process.env.BASE44_USER_URL;
+      const base44SeatUrl = normalizeBase44EntityUrl(process.env.BASE44_SEAT_URL, 'Seat');
+      const base44UserUrl = normalizeBase44EntityUrl(process.env.BASE44_USER_URL, 'User');
 
       if (base44SeatUrl && base44UserUrl) {
         // Step A: fetch Seat record to get user_id + seat status
