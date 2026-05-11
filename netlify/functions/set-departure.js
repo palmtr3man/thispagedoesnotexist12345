@@ -20,6 +20,13 @@
 
 const ALLOWED_ORIGIN = 'https://www.thispagedoesnotexist12345.com';
 
+function base44Headers() {
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (apiKey) headers.api_key = apiKey;
+  return headers;
+}
+
 /**
  * Build CORS headers. Only allow the .com origin.
  * For preflight OPTIONS requests, the origin check is enforced here.
@@ -105,7 +112,7 @@ exports.handler = async (event) => {
   try {
     const seatResp = await fetch(`${base44SeatUrl}/${seat_id}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: base44Headers()
     });
 
     if (!seatResp.ok) {

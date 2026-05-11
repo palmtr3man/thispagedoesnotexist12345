@@ -1021,17 +1021,47 @@ function hideStatus() {
 // ============================================================
 const BASE44_API = 'https://api.base44.com/api/apps/67912f60b0c40c4f1a48d1c7/entities/Resume';
 
+function isJwtFresh(token) {
+  try {
+    const parts = String(token || '').split('.');
+    if (parts.length !== 3) return true; // opaque token; let the API decide
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload.exp) return true;
+    return (payload.exp * 1000) > (Date.now() + 30000);
+  } catch (e) {
+    return true;
+  }
+}
+
+function clearBase44AuthTokens() {
+  ['base44_access_token', 'base44_token', 'auth_token', 'access_token', 'token'].forEach(function (key) {
+    try { localStorage.removeItem(key); } catch (e) {}
+    try { sessionStorage.removeItem(key); } catch (e) {}
+  });
+}
+
 function getAuthToken() {
-  const keys = ['base44_token', 'auth_token', 'access_token', 'token'];
+  const keys = ['base44_access_token', 'token', 'base44_token', 'auth_token', 'access_token'];
   for (const key of keys) {
     const val = localStorage.getItem(key);
-    if (val) return val;
+    if (val && isJwtFresh(val)) return val;
+    if (val && !isJwtFresh(val)) localStorage.removeItem(key);
   }
   for (const key of keys) {
     const val = sessionStorage.getItem(key);
-    if (val) return val;
+    if (val && isJwtFresh(val)) return val;
+    if (val && !isJwtFresh(val)) sessionStorage.removeItem(key);
   }
   return null;
+}
+
+function handleBase44AuthFailure(res) {
+  if (res && (res.status === 401 || res.status === 403)) {
+    clearBase44AuthTokens();
+    console.warn('[Base44] Auth token missing or stale; cleared local token cache. Re-open from the Base44 app or sign in again.');
+    return true;
+  }
+  return false;
 }
 
 async function loadResumeFromCareerNavigator(resumeId) {
@@ -1041,7 +1071,10 @@ async function loadResumeFromCareerNavigator(resumeId) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
     const res = await fetch(BASE44_API + '/' + resumeId, { headers });
-    if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+    if (!res.ok) {
+      handleBase44AuthFailure(res);
+      throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+    }
     const resume = await res.json();
     currentResumeData = resume;
     populateFormFromResume(resume);
@@ -1069,7 +1102,10 @@ async function saveBackToCareerNavigator() {
     const res = await fetch(BASE44_API + '/' + currentResumeId, {
       method: 'PUT', headers, body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+    if (!res.ok) {
+      handleBase44AuthFailure(res);
+      throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+    }
     hasUnsavedChanges = false;
     showStatus('success', 'Resume saved to Career Navigator successfully!');
     setTimeout(() => hideStatus(), 3000);
@@ -1640,8 +1676,12 @@ function loadLocalDraft() {
     var panel = document.getElementById('departureSelectorPanel');
     if (!panel) return;
     var token = (typeof getAuthToken === 'function') ? getAuthToken() : null;
+    if (!token) {
+      console.warn('[departure-selector] Base44 token missing; skipping direct seat hydration.');
+      return;
+    }
     var headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = 'Bearer ' + token;
+    headers['Authorization'] = 'Bearer ' + token;
     fetch(BASE44_SEAT_API + '/' + seatId, { headers: headers })
       .then(function (resp) {
         if (!resp.ok) return null;
@@ -1815,8 +1855,10 @@ window.addEventListener('load', async () => {
       // scheduled_departure_date not returned by /api/seat.
       // This is non-blocking UI hydration only. Do not replace with /api/seat/:id
       // without extending that endpoint's response schema.
-      fetch(BASE44_SEAT_API + '/' + rawId, { headers: { 'Content-Type': 'application/json' } })
-        .then(function (r) { return r.ok ? r.json() : null; })
+      var token = (typeof getAuthToken === 'function') ? getAuthToken() : null;
+      if (!token) return;
+      fetch(BASE44_SEAT_API + '/' + rawId, { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } })
+        .then(function (r) { if (!r.ok) { handleBase44AuthFailure(r); return null; } return r.json(); })
         .then(function (seat) {
           if (!seat) return;
           if (laneEl && seat.cabin_class)  laneEl.textContent = seat.cabin_class + ' · ' + (tujCode || rawId);

@@ -85,6 +85,13 @@ const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE
 const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL 042126'; // updated Apr 21, 2026 — Alpha Flight 1 rescheduled from FL 041926
 const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
 
+function base44Headers() {
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (apiKey) headers.api_key = apiKey;
+  return headers;
+}
+
 // --- Gate Contract constants ---
 const SEAT_ID_PREFIX = 'TUJ-';
 const SEAT_ID_CHARS  = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I ambiguity
@@ -870,7 +877,7 @@ exports.handler = async function (event, context) {
     try {
       const base44Response = await fetch(base44Url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: base44Headers(),
         body: JSON.stringify({
           name:    nameTrimmed,
           email:   emailTrimmed,

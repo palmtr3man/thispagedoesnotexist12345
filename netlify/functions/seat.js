@@ -52,13 +52,20 @@ const HEADERS = {
  * Fetch a Seat record from Base44 with a hard timeout.
  * Returns the parsed JSON body on success, or throws on error/timeout.
  */
+function base44Headers() {
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (apiKey) headers.api_key = apiKey;
+  return headers;
+}
+
 async function fetchSeatRecord(base44SeatUrl, seatId) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), VALIDATION_TIMEOUT_MS);
   try {
     const res = await fetch(`${base44SeatUrl}/${seatId}`, {
       method:  'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: base44Headers(),
       signal:  controller.signal,
     });
     clearTimeout(timer);
@@ -160,9 +167,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // Timeout or other upstream error → fail open
+    // Auth failures and other upstream errors → fail open, but log clearly for env/API-key repair.
     const isTimeout = err.name === 'AbortError';
-    console.warn(`[seat] ${seatId} validation ${isTimeout ? 'timed out' : 'errored'} — failing open:`, err.message);
+    const isAuthFailure = err.status === 401 || err.status === 403;
+    console.warn(`[seat] ${seatId} validation ${isTimeout ? 'timed out' : isAuthFailure ? 'auth failed' : 'errored'} — failing open:`, err.message);
     return {
       statusCode: 200,
       headers: HEADERS,

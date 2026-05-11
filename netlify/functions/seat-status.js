@@ -49,6 +49,13 @@ const LOOKUP_TIMEOUT_MS = 4000;
  * Fetch a single Base44 entity record by ID with a hard timeout.
  * Returns parsed JSON on success, null on any error (timeout, 4xx, 5xx, network).
  */
+function base44Headers() {
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (apiKey) headers.api_key = apiKey;
+  return headers;
+}
+
 async function fetchBase44Record(baseUrl, id) {
   if (!baseUrl || !id) return null;
   const controller = new AbortController();
@@ -56,7 +63,7 @@ async function fetchBase44Record(baseUrl, id) {
   try {
     const res = await fetch(`${baseUrl}/${id}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: base44Headers(),
       signal: controller.signal,
     });
     clearTimeout(timer);
