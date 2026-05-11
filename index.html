@@ -3579,7 +3579,9 @@
       });
 
       // ── Goal chip toggle helper (Beehiiv segmentation) ──────────────────
-      function toggleGoalChip(chip) {
+      // Exposed on window because the chip buttons use inline onclick handlers.
+      window.toggleGoalChip = function (chip) {
+        if (!chip) return;
         chip.classList.toggle('selected');
         var allChips = document.querySelectorAll('#goal-chips-group .goal-chip');
         var selected = [];
@@ -3588,7 +3590,7 @@
         });
         var hiddenInput = document.getElementById('current-goal-hidden');
         if (hiddenInput) hiddenInput.value = selected.join(',');
-      }
+      };
 
       // ── Wire seat-request form to return seat_id + trigger rerender ───────
       document.addEventListener('DOMContentLoaded', function () {
