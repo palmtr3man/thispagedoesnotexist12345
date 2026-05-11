@@ -362,13 +362,22 @@
     }
     .btn-row .btn {
       width: 100%;
-      text-align: left;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: 2.25rem minmax(0, 1fr) 2.25rem;
+      align-items: center;
+      text-align: center;
     }
     .btn-row .btn::before {
-      content: attr(data-nav-index) '. ';
+      content: attr(data-nav-index) '.';
+      grid-column: 1;
+      justify-self: start;
       color: rgba(255, 255, 255, 0.55);
       font-weight: 700;
-      margin-right: 0.35rem;
+    }
+    .btn-row .btn::after {
+      content: '';
+      grid-column: 3;
     }
 
     .btn {
