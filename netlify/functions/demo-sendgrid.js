@@ -17,7 +17,7 @@
  *   DEMO_SEAT_ID          default: TUJ-KC2222
  *   DEMO_FIRST_NAME       default: Kevin
  *   DEMO_LAST_NAME        default: Clark
- *   DEMO_FLIGHT_CODE      default: ACTIVE_FLIGHT_CODE || FL_051128
+ *   DEMO_FLIGHT_CODE      default: ACTIVE_FLIGHT_CODE || FL_051126
  *   SENDGRID_DEMO_DAILY_LIMIT default: 100
  */
 
@@ -185,7 +185,7 @@ exports.handler = async (event) => {
 
   const firstName = String(body.first_name || process.env.DEMO_FIRST_NAME || 'Kevin').trim() || 'Kevin';
   const lastName = String(body.last_name || process.env.DEMO_LAST_NAME || 'Clark').trim() || 'Clark';
-  const flightCode = String(body.flight_code || process.env.DEMO_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_CODE || 'FL_051128').trim();
+  const flightCode = String(body.flight_code || process.env.DEMO_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_CODE || 'FL_051126').trim();
   const siteUrl = String(process.env.SITE_URL || 'https://www.thispagedoesnotexist12345.com').replace(/\/$/, '');
   const dynamicData = buildDynamicData({ seatId, firstName, lastName, email: toEmail, flightCode, siteUrl });
 
