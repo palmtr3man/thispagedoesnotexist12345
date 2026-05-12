@@ -94,6 +94,12 @@
   to = "/.netlify/functions/waitlist-manifest"
   status = 200
 
+# Demo SendGrid fan-out — secured by x-admin-secret or x-demo-secret.
+[[redirects]]
+  from = "/api/demo-sendgrid"
+  to = "/.netlify/functions/demo-sendgrid"
+  status = 200
+
 # Passenger Door — BLOCKER-07: Newsletter Landing + TUJ Seat Gate + ResumeFitCheck
 # Receives passengers from the .us newsletter boarding_pass deep-link:
 #   https://www.thispagedoesnotexist12345.com/door?seat_id=TUJ-XXXXXX

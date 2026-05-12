@@ -41,6 +41,13 @@
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
 const VALIDATION_TIMEOUT_MS = 4000; // 4 s — fast enough for UX; generous enough for cold starts
 const BASE44_APP_ID = '67912f60b0c40c4f1a48d1c7';
+// Demo seats are allowed through Mission Control even when Base44 is missing
+// or the upstream Seat entity has not been provisioned yet. Keep this list
+// small and explicit; override in Netlify with DEMO_SEAT_IDS="TUJ-KC2222".
+const DEMO_SEAT_IDS = String(process.env.DEMO_SEAT_IDS || 'TUJ-KC2222')
+  .split(',')
+  .map((value) => value.trim().toUpperCase())
+  .filter(Boolean);
 
 const HEADERS = {
   'Access-Control-Allow-Origin':  '*',
@@ -104,6 +111,10 @@ function isSeatActive(seat) {
   return status === 'opened' || status === 'approved';
 }
 
+function isDemoSeat(seatId) {
+  return DEMO_SEAT_IDS.includes(String(seatId || '').trim().toUpperCase());
+}
+
 exports.handler = async (event) => {
   // ── Preflight ──────────────────────────────────────────────────────────────
   if (event.httpMethod === 'OPTIONS') {
@@ -135,6 +146,22 @@ exports.handler = async (event) => {
       statusCode: 400,
       headers: HEADERS,
       body: JSON.stringify({ valid: false, reason: 'invalid_format' }),
+    };
+  }
+
+  // ── Explicit demo-seat allowlist ──────────────────────────────────────────
+  if (isDemoSeat(seatId)) {
+    console.log(`[seat] ${seatId} validated via DEMO_SEAT_IDS allowlist`);
+    return {
+      statusCode: 200,
+      headers: HEADERS,
+      body: JSON.stringify({
+        valid: true,
+        seat_id: seatId,
+        status: 'opened',
+        demo: true,
+        source: 'DEMO_SEAT_IDS'
+      }),
     };
   }
 
