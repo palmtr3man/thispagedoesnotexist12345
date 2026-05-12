@@ -5,7 +5,7 @@
 [build.environment]
   # NOTION_SEAT_DB_ID and NOTION_DRIFT_REPORT_DB_ID are Notion database IDs, not secrets.
   # Omit from secrets scanning to prevent false-positive build failures.
-  SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID"
+  SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID,DEMO_SEAT_IDS,DEMO_SEAT_ID,DEMO_ACCOUNT_EMAIL,DEMO_FIRST_NAME,DEMO_LAST_NAME,DEMO_FLIGHT_CODE,SENDGRID_DEMO_DAILY_LIMIT"
 
 [functions]
   node_bundler = "esbuild"
