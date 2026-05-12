@@ -7,7 +7,7 @@
  * Query params:
  *   status  — optional filter: 'pending' | 'boarded' | 'denied' | 'waitlisted'
  *             If omitted, returns all rows (most recent 100).
- *   flight_id — optional cohort filter (default: FL041926)
+ *   flight_id — optional cohort filter (default: ACTIVE_FLIGHT_CODE, normalized with spaces replaced by underscores)
  *
  * Response:
  *   {
@@ -73,7 +73,9 @@ exports.handler = async function (event) {
 
   const qs         = event.queryStringParameters || {};
   const statusFilter = qs.status;
-  const flightId   = qs.flight_id || 'FL041926';
+  const flightId = String(qs.flight_id || process.env.ACTIVE_FLIGHT_CODE || 'FL_051126')
+    .trim()
+    .replace(/\s+/g, '_');
 
   // --- Fetch waitlist_submissions ---
   let submissions = [];
