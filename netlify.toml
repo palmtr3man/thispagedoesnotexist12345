@@ -113,3 +113,13 @@
 
 [functions."alignment-loop"]
   schedule = "*/5 * * * *"
+
+# signalwelcome_v1 — Beehiiv → SendGrid welcome runner for Gemini.
+# Scheduled polling is cohort-gated in code and sends only when at least 5 eligible active subscribers exist.
+[[redirects]]
+  from = "/api/signalwelcome-runner"
+  to = "/.netlify/functions/signalwelcome-runner"
+  status = 200
+
+[functions."signalwelcome-runner"]
+  schedule = "0 * * * *"
