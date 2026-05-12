@@ -10,7 +10,7 @@
 .flight-name-block {
   margin-bottom: 1.25rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(46, 230, 214, 0.12);
+  border-bottom: 1px solid rgba(251, 191, 36, 0.12);
 }
 
 /* Eyebrow label above the flight name */
@@ -19,7 +19,7 @@
   font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(46, 230, 214, 0.55);
+  color: rgba(251, 191, 36, 0.55);
   margin-bottom: 0.3rem;
 }
 
@@ -27,7 +27,7 @@
 .flight-name-primary {
   font-size: 1.55rem;
   font-weight: 700;
-  color: #2EE6D6;
+  color: #FBBF24;
   letter-spacing: 0.02em;
   margin-bottom: 0.35rem;
   line-height: 1.2;
@@ -114,7 +114,7 @@
   justify-content: center;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(46, 230, 214, 0.08);
+  border-top: 1px solid rgba(251, 191, 36, 0.08);
 }
 
 /* The button itself — visually muted, clearly subordinate to Request a Seat */
@@ -122,8 +122,8 @@
   font-size: 0.78rem !important;
   padding: 0.4rem 0.9rem !important;
   opacity: 0.55;
-  color: rgba(46, 230, 214, 0.7) !important;
-  border-color: rgba(46, 230, 214, 0.2) !important;
+  color: rgba(251, 191, 36, 0.7) !important;
+  border-color: rgba(251, 191, 36, 0.2) !important;
   background: transparent !important;
   letter-spacing: 0.03em;
   transition: opacity 0.2s ease;
@@ -139,6 +139,6 @@
   opacity: 1;
   font-size: 0.9rem !important;
   padding: 0.6rem 1.2rem !important;
-  color: #2EE6D6 !important;
-  border-color: rgba(46, 230, 214, 0.5) !important;
+  color: #FBBF24 !important;
+  border-color: rgba(251, 191, 36, 0.5) !important;
 }
