@@ -77,6 +77,25 @@ const TEMPLATE_SPONSORED_APPROVED           = TEMPLATES.sponsored_approved_v1;
 const TEMPLATE_VIP_BOARDING_PASS            = TEMPLATES.vip_boarding_pass_v1;
 const TEMPLATE_VIP_BOARDING_INSTRUCTIONS    = TEMPLATES.vip_boarding_instructions_v1;
 
+// SEC-11 — canonical Beehiiv wheels-up post URL derivation.
+// Example: toFlightIdSlug('FL 051126') === 'fl-051126'.
+function toFlightIdSlug(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^[-]+|[-]+$/g, '');
+}
+
+function buildWheelsUpUrl(flightIdOrDisplay) {
+  const slug = toFlightIdSlug(flightIdOrDisplay);
+  return slug
+    ? `https://newsletter.thispagedoesnotexist12345.us/p/flight-id-${slug}-is-wheels-up-youre-on-board`
+    : 'https://newsletter.thispagedoesnotexist12345.us/';
+}
+
 /**
  * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
  * Never logs request body, personalizations, or API key.
@@ -329,6 +348,7 @@ async function sendSeatConfirmation(seat) {
   const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
   const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
   const canonicalFlightId = (flight_id || flightLabel).replace(/ /g, '_'); // normalize spaces → underscores
+  const wheelsUpUrl = buildWheelsUpUrl(flight_id || flightLabel);
   const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
   const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
   const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
@@ -361,6 +381,7 @@ async function sendSeatConfirmation(seat) {
     first_task_url:      firstTaskUrl,
     secondary_url:       secondaryUrl,
     board_now_url:       boardNowUrl,       // F5-02: stateful Board Now CTA (first-time → OnboardingPassport, returning → Studio)
+    wheels_up_url:       wheelsUpUrl,        // SEC-11: canonical Beehiiv wheels-up post URL, derived from flight_id
     is_returning:        isReturning,       // F5-02: boolean flag for template conditional rendering
     platform_url:        mainSiteUrl,
     flight_code:         flightLabel,
