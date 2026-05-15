@@ -4003,7 +4003,7 @@
 
       // Show the panel only for Pilot KC
       function maybeShowPanel() {
-        var storedSeat = sessionStorage.getItem('tuj_seat_id') || '';
+        var storedSeat = sessionStorage.getItem('seat_id') || sessionStorage.getItem('tuj_seat_id') || '';
         var pilotToken = sessionStorage.getItem(PILOT_TOKEN_KEY) || '';
         if (storedSeat === PILOT_SEAT_ID && pilotToken) {
           section.style.display = '';
@@ -4024,7 +4024,7 @@
         var boardingType = typeSelect.value;
         var cabinClass   = classSelect.value;
         var pilotToken   = sessionStorage.getItem(PILOT_TOKEN_KEY) || '';
-        var seatId       = sessionStorage.getItem('tuj_seat_id') || '';
+        var seatId       = sessionStorage.getItem('seat_id') || sessionStorage.getItem('tuj_seat_id') || '';
 
         if (!boardingType || !cabinClass) {
           setStatus('Select both boarding type and cabin class before activating.', 'err');
@@ -4048,16 +4048,19 @@
             pilot_token:   pilotToken
           })
         })
-        .then(function (res) { return res.json().then(function (body) { return { status: res.status, body: body }; }); })
-        .then(function (r) {
-          if (r.body.ok) {
+        .then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (body) {
+            return { ok: res.ok, status: res.status, body: body };
+          });
+        })
+        .then(function (result) {
+          if (result.ok && result.body && result.body.ok) {
             setStatus('✔ Seat activated — ' + boardingType + ' / ' + cabinClass + '. Email sequence triggered.', 'ok');
             typeSelect.value  = '';
             classSelect.value = '';
             activateBtn.disabled = true;
           } else {
-            var msg = (r.body.error || 'Unknown error') + (r.status === 403 ? ' (auth)' : '');
-            setStatus('✖ ' + msg, 'err');
+            setStatus('Activation failed: ' + (result.body && result.body.error ? result.body.error : 'HTTP ' + result.status), 'err');
             activateBtn.disabled = false;
           }
         })
