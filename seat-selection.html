@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Select Your Seat — The Ultimate Journey</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070d;
+      --panel: rgba(255,255,255,0.08);
+      --line: rgba(255,255,255,0.18);
+      --text: #f8fbff;
+      --muted: #aeb8c8;
+      --open: #37e68a;
+      --held: #ffb84d;
+      --occupied: #ff5f70;
+      --you: #58c7d7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 0%, rgba(88,199,215,0.22), transparent 36%), radial-gradient(circle at 80% 20%, rgba(55,230,138,0.14), transparent 32%), var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    main {
+      width: min(920px, 100%);
+      border: 1px solid var(--line);
+      background: rgba(5,7,13,0.82);
+      backdrop-filter: blur(18px);
+      border-radius: 28px;
+      padding: clamp(24px, 4vw, 48px);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.42);
+    }
+    h1 { margin: 0 0 12px; font-size: clamp(2rem, 6vw, 4rem); letter-spacing: -0.055em; }
+    p { color: var(--muted); line-height: 1.65; max-width: 720px; }
+    .meta, .legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+    .pill { border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; color: var(--muted); background: var(--panel); font-size: 0.9rem; }
+    .legend .pill::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 999px; margin-right: 8px; vertical-align: 1px; background: currentColor; }
+    .legend .open { color: var(--open); }
+    .legend .held { color: var(--held); }
+    .legend .occupied { color: var(--occupied); }
+    .legend .you { color: var(--you); }
+    .seat-map {
+      display: grid;
+      grid-template-columns: 1fr 72px 1fr;
+      gap: 18px;
+      margin: 32px 0;
+      align-items: stretch;
+    }
+    .aisle { display: grid; place-items: center; color: var(--muted); border-inline: 1px dashed var(--line); min-height: 120px; letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.72rem; }
+    .seat-column { display: grid; gap: 16px; }
+    button.seat {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      min-height: 112px;
+      color: var(--text);
+      background: var(--panel);
+      text-align: left;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+    button.seat:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--open); background: rgba(55,230,138,0.12); }
+    button.seat:disabled { cursor: not-allowed; opacity: 0.82; }
+    .seat .number { display: block; font-size: 1.45rem; font-weight: 800; }
+    .seat .status { display: block; margin-top: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; }
+    .seat.open { border-color: rgba(55,230,138,0.48); }
+    .seat.held { border-color: rgba(255,184,77,0.48); }
+    .seat.occupied { border-color: rgba(255,95,112,0.48); }
+    .seat.you { border-color: rgba(88,199,215,0.8); background: rgba(88,199,215,0.16); }
+    .status-box { border: 1px solid var(--line); border-radius: 18px; padding: 16px; color: var(--muted); background: var(--panel); }
+    .status-box strong { color: var(--text); }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    .actions a, .actions button { border: 1px solid var(--line); border-radius: 999px; padding: 12px 16px; background: var(--panel); color: var(--text); text-decoration: none; font-weight: 700; }
+    .actions a.primary { background: linear-gradient(135deg, var(--you), var(--open)); color: #031015; border: none; }
+    @media (max-width: 720px) { .seat-map { grid-template-columns: 1fr; } .aisle { min-height: auto; padding: 12px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Select your seat.</h1>
+    <p>Choose an open seat for this flight. Your selection is confirmed server-side so the seat is bound to both your passenger record and the active flight before the next step unlocks.</p>
+
+    <div class="meta">
+      <span class="pill">Flight: <strong id="flight-label">Loading…</strong></span>
+      <span class="pill">Passenger: <strong id="passenger-label">Pending</strong></span>
+    </div>
+
+    <div class="legend" aria-label="Seat status legend">
+      <span class="pill open">Open</span>
+      <span class="pill held">Held</span>
+      <span class="pill occupied">Occupied</span>
+      <span class="pill you">You</span>
+    </div>
+
+    <section id="seat-map" class="seat-map" aria-live="polite"></section>
+
+    <div id="status" class="status-box">Loading available seats…</div>
+
+    <div class="actions">
+      <a id="continue-link" class="primary" href="/Studio" style="display:none;">Continue boarding</a>
+      <button id="reload-button" type="button">Reload seats</button>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var params = new URLSearchParams(window.location.search);
+      var flightId = (params.get('flight_id') || 'FL_051126').replace(/\s+/g, '_');
+      var passengerId = (params.get('passenger_id') || '').trim();
+      var passengerEmail = (params.get('passenger_email') || params.get('email') || '').trim().toLowerCase();
+      var origin = params.get('origin') || 'seat-selection-page';
+      var statusEl = document.getElementById('status');
+      var mapEl = document.getElementById('seat-map');
+      var continueLink = document.getElementById('continue-link');
+
+      document.getElementById('flight-label').textContent = flightId;
+      document.getElementById('passenger-label').textContent = passengerId || passengerEmail || 'Add passenger_id or passenger_email to the URL';
+      document.getElementById('reload-button').addEventListener('click', loadSeatMap);
+
+      function setStatus(message, strong) {
+        statusEl.innerHTML = strong ? '<strong>' + strong + '</strong> ' + message : message;
+      }
+
+      function seatLabel(seat) {
+        return seat.seat_number ? 'Seat ' + seat.seat_number : seat.seat_id;
+      }
+
+      function buildSeatButton(seat) {
+        var button = document.createElement('button');
+        button.className = 'seat ' + seat.status;
+        button.type = 'button';
+        button.disabled = !seat.selectable;
+        button.setAttribute('aria-label', seatLabel(seat) + ' ' + seat.status);
+        button.innerHTML = '<span class="number">' + seatLabel(seat) + '</span><span class="status">' + seat.status + '</span>';
+        if (seat.selectable) {
+          button.addEventListener('click', function () { claimSeat(seat, button); });
+        }
+        return button;
+      }
+
+      function renderSeats(seats) {
+        mapEl.innerHTML = '';
+        var left = document.createElement('div');
+        var right = document.createElement('div');
+        var aisle = document.createElement('div');
+        left.className = 'seat-column';
+        right.className = 'seat-column';
+        aisle.className = 'aisle';
+        aisle.textContent = 'Aisle';
+
+        seats.forEach(function (seat, index) {
+          (index % 2 === 0 ? left : right).appendChild(buildSeatButton(seat));
+        });
+
+        mapEl.appendChild(left);
+        mapEl.appendChild(aisle);
+        mapEl.appendChild(right);
+      }
+
+      function loadSeatMap() {
+        var query = new URLSearchParams({ flight_id: flightId });
+        if (passengerId) query.set('passenger_id', passengerId);
+        if (passengerEmail) query.set('passenger_email', passengerEmail);
+        setStatus('Loading available seats…');
+        return fetch('/api/seat-map?' + query.toString())
+          .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
+          .then(function (result) {
+            if (!result.ok || !result.body.ok) throw new Error(result.body.error || 'seat_map_failed');
+            renderSeats(result.body.seats || []);
+            if (result.body.has_selection) {
+              setStatus('Your seat is already selected for this flight.', 'Seat confirmed.');
+              continueLink.style.display = '';
+            } else if ((result.body.seats_open || 0) > 0) {
+              setStatus('Pick one of the open seats to bind it to your passenger record and flight.', 'Ready.');
+            } else {
+              setStatus('No seats are currently available for this flight.', 'Full.');
+            }
+          })
+          .catch(function (err) {
+            setStatus('Could not load the seat map: ' + err.message, 'Blocked.');
+          });
+      }
+
+      function claimSeat(seat, button) {
+        if (!passengerId && !passengerEmail) {
+          setStatus('A passenger_id or passenger_email is required in the URL before a seat can be selected.', 'Missing passenger identity.');
+          return;
+        }
+        button.disabled = true;
+        button.querySelector('.status').textContent = 'claiming';
+        return fetch('/api/seat-claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            seat_id: seat.seat_id,
+            flight_id: flightId,
+            passenger_id: passengerId,
+            passenger_email: passengerEmail,
+            expected_seat_number: seat.seat_number,
+            origin: origin
+          })
+        })
+          .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, status: res.status, body: body }; }); })
+          .then(function (result) {
+            if (!result.ok || !result.body.ok) throw new Error(result.body.reason || result.body.error || 'seat_claim_failed');
+            continueLink.href = '/Studio?seat_id=' + encodeURIComponent(result.body.seat_id) + '&flight_id=' + encodeURIComponent(result.body.flight_id);
+            continueLink.style.display = '';
+            setStatus('Seat ' + (result.body.seat_number || result.body.seat_id) + ' is now bound to flight ' + result.body.flight_id + ' and your passenger record.', 'Confirmed.');
+            return loadSeatMap();
+          })
+          .catch(function (err) {
+            button.disabled = false;
+            button.querySelector('.status').textContent = seat.status;
+            setStatus('That seat could not be claimed: ' + err.message, 'Blocked.');
+          });
+      }
+
+      loadSeatMap();
+    })();
+  </script>
+</body>
+</html>

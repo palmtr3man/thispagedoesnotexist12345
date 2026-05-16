@@ -37,6 +37,32 @@
   to = "/.netlify/functions/seat-request"
   status = 200
 
+[[redirects]]
+  from = "/api/seat-ready"
+  to = "/.netlify/functions/seat-ready"
+  status = 200
+
+[[redirects]]
+  from = "/api/seat-map"
+  to = "/.netlify/functions/seat-map"
+  status = 200
+
+[[redirects]]
+  from = "/api/seat-claim"
+  to = "/.netlify/functions/seat-claim"
+  status = 200
+
+[[redirects]]
+  from = "/api/mission-control-bind"
+  to = "/.netlify/functions/mission-control-bind"
+  status = 200
+
+# Passenger self-seat-selection entry point
+[[redirects]]
+  from = "/seat-selection"
+  to = "/seat-selection.html"
+  status = 200
+
 # Canonical entry point — /request-seat → seat request form
 [[redirects]]
   from = "/request-seat"

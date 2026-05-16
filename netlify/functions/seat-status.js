@@ -68,19 +68,30 @@ function normalizeBase44EntityUrl(rawUrl, entityName) {
   return value;
 }
 
-async function fetchBase44Record(baseUrl, id) {
+function pickEntityRecord(data) {
+  if (Array.isArray(data)) return data[0] || null;
+  if (Array.isArray(data?.items)) return data.items[0] || null;
+  if (Array.isArray(data?.data)) return data.data[0] || null;
+  if (Array.isArray(data?.results)) return data.results[0] || null;
+  return data || null;
+}
+
+async function fetchBase44Record(baseUrl, id, lookupField = 'id') {
   if (!baseUrl || !id) return null;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS);
   try {
-    const res = await fetch(`${baseUrl}/${id}`, {
+    const url = lookupField === 'id'
+      ? `${baseUrl}/${encodeURIComponent(id)}`
+      : `${baseUrl}?${encodeURIComponent(lookupField)}=${encodeURIComponent(id)}`;
+    const res = await fetch(url, {
       method: 'GET',
       headers: base44Headers(),
       signal: controller.signal,
     });
     clearTimeout(timer);
     if (!res.ok) return null;
-    return await res.json();
+    return pickEntityRecord(await res.json());
   } catch (_) {
     clearTimeout(timer);
     return null;
@@ -183,7 +194,7 @@ exports.handler = async function handler(event) {
 
       if (base44SeatUrl && base44UserUrl) {
         // Step A: fetch Seat record to get user_id + seat status
-        const seat = await fetchBase44Record(base44SeatUrl, rawSeatId);
+        const seat = await fetchBase44Record(base44SeatUrl, rawSeatId, 'tuj_code');
         if (seat) {
           const normalizedSeatStatus = (seat.status && String(seat.status).toLowerCase()) || 'unknown';
           seat_status = ['opened', 'approved', 'pending'].includes(normalizedSeatStatus)
