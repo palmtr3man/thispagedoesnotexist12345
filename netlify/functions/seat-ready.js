@@ -89,8 +89,13 @@ function seatFlight(seat) {
 
 function seatNumber(seat) {
   const raw = seat?.seat_number ?? seat?.seat ?? seat?.seat_index;
-  const num = Number(raw);
-  return Number.isFinite(num) ? num : null;
+  if (raw === null || raw === undefined || raw === '') return null;
+  const direct = Number(raw);
+  if (Number.isFinite(direct)) return direct;
+  const match = String(raw).trim().match(/(?:^|[^0-9])([0-9]+)$/);
+  if (!match) return null;
+  const parsed = Number(match[1]);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function isOpenLike(status) {
