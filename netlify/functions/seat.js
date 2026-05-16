@@ -71,11 +71,20 @@ function normalizeBase44EntityUrl(rawUrl, entityName) {
   return value;
 }
 
+function pickSeatRecord(data) {
+  if (Array.isArray(data)) return data[0] || null;
+  if (Array.isArray(data?.items)) return data.items[0] || null;
+  if (Array.isArray(data?.data)) return data.data[0] || null;
+  if (Array.isArray(data?.results)) return data.results[0] || null;
+  return data || null;
+}
+
 async function fetchSeatRecord(base44SeatUrl, seatId) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), VALIDATION_TIMEOUT_MS);
   try {
-    const res = await fetch(`${base44SeatUrl}/${seatId}`, {
+    const url = `${base44SeatUrl}?tuj_code=${encodeURIComponent(seatId)}`;
+    const res = await fetch(url, {
       method:  'GET',
       headers: base44Headers(),
       signal:  controller.signal,
@@ -86,7 +95,7 @@ async function fetchSeatRecord(base44SeatUrl, seatId) {
       err.status = res.status;
       throw err;
     }
-    return await res.json();
+    return pickSeatRecord(await res.json());
   } catch (err) {
     clearTimeout(timer);
     throw err;
@@ -152,6 +161,14 @@ exports.handler = async (event) => {
   // ── Fetch + validate against Base44 ──────────────────────────────────────
   try {
     const seat = await fetchSeatRecord(base44SeatUrl, seatId);
+    if (!seat) {
+      console.log(`[seat] ${seatId} not found in Base44`);
+      return {
+        statusCode: 200,
+        headers: HEADERS,
+        body: JSON.stringify({ valid: false, seat_id: seatId, reason: 'not_found' }),
+      };
+    }
     const active = isSeatActive(seat);
     if (active) {
       console.log(`[seat] ${seatId} validated — status: ${seat.status}`);
