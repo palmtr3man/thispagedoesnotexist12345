@@ -87,8 +87,7 @@ CREATE TRIGGER passengers_protect_flight_binding_trg
 --    security_invoker = true requires PostgreSQL 15+.
 -- ---------------------------------------------------------------------------
 DROP VIEW IF EXISTS public.v_passenger_flight_binding_audit;
-CREATE VIEW public.v_passenger_flight_binding_audit
-WITH (security_invoker = true) AS
+CREATE VIEW public.v_passenger_flight_binding_audit AS
 SELECT
   p.id                    AS passenger_id,
   p.flight_id,
