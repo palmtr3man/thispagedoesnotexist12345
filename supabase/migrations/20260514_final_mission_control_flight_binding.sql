@@ -6,6 +6,18 @@
 -- Rollback at bottom.
 
 -- ---------------------------------------------------------------------------
+-- 0. Flight binding columns
+--    These must exist before functions, triggers, and the audit view reference
+--    them. The guards make this safe for the live schema and for replay.
+-- ---------------------------------------------------------------------------
+ALTER TABLE public.passengers
+  ADD COLUMN IF NOT EXISTS flight_id UUID
+    REFERENCES public.flights (id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS flight_tag TEXT,
+  ADD COLUMN IF NOT EXISTS flight_binding_status TEXT DEFAULT 'unbound';
+
+-- ---------------------------------------------------------------------------
 -- 1. bind_subject_at_mission_control()
 --    Uses live PK: passengers.id (uuid).
 --    Targets FL051126 — update flight_code value for future flights.
@@ -54,7 +66,7 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
       IF NEW.flight_id IS NOT NULL
         OR NEW.flight_tag IS NOT NULL
-        OR NEW.flight_binding_status <> 'unbound' THEN
+        OR NEW.flight_binding_status IS DISTINCT FROM 'unbound' THEN
         RAISE EXCEPTION 'flight binding columns are restricted to admins';
       END IF;
     END IF;
@@ -109,3 +121,7 @@ GRANT SELECT ON public.v_passenger_flight_binding_audit TO "authenticated";
 -- DROP FUNCTION IF EXISTS public.passengers_protect_flight_binding_columns();
 -- DROP FUNCTION IF EXISTS public.bind_subject_at_mission_control(UUID);
 -- DROP VIEW IF EXISTS public.v_passenger_flight_binding_audit;
+-- ALTER TABLE public.passengers
+--   DROP COLUMN IF EXISTS flight_id,
+--   DROP COLUMN IF EXISTS flight_tag,
+--   DROP COLUMN IF EXISTS flight_binding_status;
