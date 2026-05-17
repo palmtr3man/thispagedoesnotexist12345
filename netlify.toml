@@ -6,6 +6,9 @@
   # NOTION_SEAT_DB_ID and NOTION_DRIFT_REPORT_DB_ID are Notion database IDs, not secrets.
   # Omit from secrets scanning to prevent false-positive build failures.
   SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID"
+  # Supabase migration SQL contains role/policy/RPC terms that can trigger Netlify secret-scan false positives.
+  # Keep scanning active elsewhere while excluding non-deployed database migration files.
+  SECRETS_SCAN_OMIT_PATHS = "supabase/migrations"
 
 [functions]
   node_bundler = "esbuild"
