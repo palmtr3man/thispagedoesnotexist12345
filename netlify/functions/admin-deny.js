@@ -38,7 +38,7 @@
  *
  * Additional required env vars (F143):
  *   BEEHIIV_API_KEY               — beehiiv API key for waitlist tag application
- *   BEEHIIV_PUB_ID                — beehiiv publication ID (default: pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf)
+ *   BEEHIIV_PUB_ID                — beehiiv publication ID (required for tag updates)
  */
 
 const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
@@ -52,8 +52,7 @@ const BCC_EMAIL        = 'support@thispagedoesnotexist12345.com';
 // Aligns with Phase 5 cohort-landing gate logic.
 const TERMINAL_JOURNEY_STATES = ['accepted', 'paused', 'withdrew', 'not_seeking'];
 
-// beehiiv defaults (mirrors seat-request.js)
-const BEEHIIV_PUB_ID_DEFAULT = 'pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf';
+// beehiiv — publication ID from Netlify env only (no hardcoded default)
 
 /**
  * Subscribe or re-activate an email in beehiiv and return the subscription ID.
@@ -320,8 +319,8 @@ exports.handler = async function (event) {
 
   // --- F143 §4 — Apply Beehiiv 'waitlist' tag on manual denial path ---
   const beehiivKey = process.env.BEEHIIV_API_KEY;
-  const beehiivPub = process.env.BEEHIIV_PUB_ID || BEEHIIV_PUB_ID_DEFAULT;
-  if (beehiivKey && emailSent) {
+  const beehiivPub = process.env.BEEHIIV_PUB_ID || '';
+  if (beehiivKey && beehiivPub && emailSent) {
     const denialSubId = await subscribeToBeehiiv(email, firstName, beehiivKey, beehiivPub);
     await applyBeehiivWaitlistTag(denialSubId, beehiivKey, beehiivPub);
   }

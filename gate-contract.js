@@ -81,10 +81,10 @@ export const GATE = {
   // --- beehiiv ---
 
   /**
-   * @type {string} Beehiiv publication ID for the Signal newsletter.
-   * Signal always resolves to https://newsletter.thispagedoesnotexist12345.us/
+   * @type {string} Beehiiv publication ID — set via Netlify BEEHIIV_PUB_ID (not hardcoded).
+   * Signal resolves to https://newsletter.thispagedoesnotexist12345.us/
    */
-  BEEHIIV_PUB_ID: 'pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf',
+  BEEHIIV_PUB_ID: '',
 
   // --- Age gate (Gate Contract §5) ---
 
