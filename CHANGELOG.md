@@ -181,5 +181,5 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Mission Control dashboard (authenticated view)
 - Studio, Signal, Systems, Support navigation
 - Age gate (Gate Contract §5, `MIN_AGE: 21`)
-- Beehiiv newsletter integration (`pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf`)
+- Beehiiv newsletter integration (publication ID set via env)
 - Umami analytics

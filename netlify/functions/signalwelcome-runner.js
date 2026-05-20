@@ -26,7 +26,7 @@
  *
  * Optional env vars:
  *   SENDGRID_TEMPLATE_WELCOME      default d-526fac7119804ef88b1099e45e3653ec
- *   BEEHIIV_PUB_ID                 default pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf
+ *   BEEHIIV_PUB_ID                 required (configured in Netlify env)
  *   SENDGRID_FROM_NAME             default Kevin
  *   SIGNALWELCOME_ENABLED          default true
  *   SIGNALWELCOME_DRY_RUN          default false
@@ -43,7 +43,6 @@ const HEADERS = {
   'Content-Type': 'application/json',
 };
 
-const DEFAULT_PUB_ID = 'pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf';
 const DEFAULT_TEMPLATE_ID = 'd-526fac7119804ef88b1099e45e3653ec';
 const DEFAULT_SENT_TAG = 'signalwelcome_v1_sent';
 const DEFAULT_COHORT_SIZE = 5;
@@ -92,8 +91,9 @@ function getFirstName(subscription) {
 
 async function beehiivFetch(path, options = {}) {
   const apiKey = process.env.BEEHIIV_API_KEY;
-  const pubId = process.env.BEEHIIV_PUB_ID || DEFAULT_PUB_ID;
+  const pubId = process.env.BEEHIIV_PUB_ID ? String(process.env.BEEHIIV_PUB_ID).trim() : '';
   if (!apiKey) throw new Error('BEEHIIV_API_KEY is not configured');
+  if (!pubId) throw new Error('BEEHIIV_PUB_ID is not configured');
   const url = `https://api.beehiiv.com/v2/publications/${pubId}${path}`;
   const res = await fetch(url, {
     ...options,
