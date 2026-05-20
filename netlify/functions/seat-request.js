@@ -16,7 +16,7 @@
  *   SIGNAL_URL               — Signal newsletter URL injected into email
  *   BASE44_SEAT_REQUEST_URL  — Base44 endpoint for seat-request writes (optional; skipped if unset)
  *   BEEHIIV_API_KEY          — beehiiv API key
- *   BEEHIIV_PUB_ID           — beehiiv Publication ID (default: pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf)
+ *   BEEHIIV_PUB_ID           — beehiiv Publication ID (required for auto-subscribe)
  *   SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM — (optional) Seat ID / TUJ code follow-up for Active Job Seekers
  *   SENDGRID_TEMPLATE_PREBOARD_NURTURE   — (optional) Pre-boarding nurture track for Passive Browsers
  *
@@ -81,7 +81,7 @@ const ASM_GROUPS_TO_DISPLAY  = ASM_MARKETING_GROUP_ID
   ? [ASM_GROUP_ID, ASM_MARKETING_GROUP_ID]
   : [ASM_GROUP_ID];
 const NOTION_API_VERSION = '2022-06-28';
-const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '5e6440af0ad94c6d89a8442ec2c528f3';
+const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '';
 const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL 042126'; // updated Apr 21, 2026 — Alpha Flight 1 rescheduled from FL 041926
 const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
 
@@ -97,9 +97,6 @@ const SEAT_ID_PREFIX = 'TUJ-';
 const SEAT_ID_CHARS  = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I ambiguity
 const SEAT_ID_LENGTH = 6;
 const MIN_AGE        = 21;
-
-// --- beehiiv defaults ---
-const BEEHIIV_PUB_ID_DEFAULT = 'pub_e3dd6c0b-979c-464c-a7ee-c146e912aadf';
 
 // --- Universal BCC (mirrors sendgrid-integration.js convention) ---
 const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
@@ -429,7 +426,7 @@ exports.handler = async function (event, context) {
   const signalUrl   = process.env.SIGNAL_URL          || 'https://newsletter.thispagedoesnotexist12345.us';
   const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.com';
   const beehiivKey  = process.env.BEEHIIV_API_KEY;
-  const beehiivPub  = process.env.BEEHIIV_PUB_ID || BEEHIIV_PUB_ID_DEFAULT;
+  const beehiivPub  = process.env.BEEHIIV_PUB_ID || '';
 
   // --- Segmentation template IDs (BEEHIIV-SEG) ---
   // Both are optional: if the env var is not set the conditional send is skipped gracefully.
@@ -756,10 +753,12 @@ exports.handler = async function (event, context) {
   // subscribeToBeehiiv now accepts segFields and pushes career_stage / current_goal as custom fields.
   // reactivate_existing: true ensures an existing subscriber's fields are updated on re-submit.
   let beehiivSubId = null;
-  if (beehiivKey) {
+  if (beehiivKey && beehiivPub) {
     beehiivSubId = await subscribeToBeehiiv(emailTrimmed, firstName, beehiivKey, beehiivPub, segFields);
-  } else {
+  } else if (!beehiivKey) {
     console.warn('[seat-request] BEEHIIV_API_KEY not set — skipping Signal auto-subscribe + tag wiring');
+  } else {
+    console.warn('[seat-request] BEEHIIV_PUB_ID not set — skipping Signal auto-subscribe + tag wiring');
   }
 
   // --- Beehiiv tag automation (BEEHIIV-SEG) ---
