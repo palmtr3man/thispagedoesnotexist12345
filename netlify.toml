@@ -3,13 +3,23 @@
   functions = "netlify/functions"
 
 [build.environment]
-  # NOTION_SEAT_DB_ID and NOTION_DRIFT_REPORT_DB_ID are Notion database IDs, not secrets.
-  # Omit from secrets scanning to prevent false-positive build failures.
-  SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID"
-  # Supabase migration SQL contains role/policy/RPC terms (service_role, etc.) that can trigger
-  # Netlify secret-scan false positives. Keep scanning active elsewhere while excluding
-  # non-deployed database migration files from the scan.
-  SECRETS_SCAN_OMIT_PATHS = "supabase/migrations"
+  # Netlify secret-scan exclusions.
+  #
+  # Real secrets (SENDGRID_API_KEY, BEEHIIV_API_KEY, SUPABASE_SERVICE_ROLE_KEY,
+  # ADMIN_SECRET, AGE_TOKEN_SECRET, ALIGNMENT_*_SECRET, BASE44APIKEY,
+  # BASE44_API_KEY, NOTION_API_KEY, NOTION_SECRET, NETLIFY_API_KEY, PILOT_TOKEN)
+  # are intentionally NOT listed here and remain scanned.
+  #
+  # The keys below are public, non-secret identifiers (template IDs, publication
+  # IDs, database IDs, URLs, flight codes, flags) that appear as defaults or
+  # documentation strings throughout the codebase and trigger false positives.
+  SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID,NOTION_JD_PIPELINE_DB_ID,NOTION_SEAT_REQUEST_DATABASE_ID,BEEHIIV_PUB_ID,ACTIVE_FLIGHT_CODE,SENDGRID_FROM_EMAIL,SENDGRID_FROM_NAME,SENDGRID_TEMPLATE_WELCOME,SENDGRID_TEMPLATE_SEAT_REQUEST,SENDGRID_TEMPLATE_INTERNAL_SIGNUP,SENDGRID_TEMPLATE_NEXT_FLIGHT_WAITLIST,SENDGRID_TEMPLATE_OPT_OUT_ACK,SENDGRID_TEMPLATE_ALPHA_ANNOUNCEMENT,SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM,SENDGRID_TEMPLATE_BOARDING_CONFIRMATION,SENDGRID_TEMPLATE_OFFER_CONGRATS,SENDGRID_TEMPLATE_EXEC_PREBOARD,SENDGRID_TEMPLATE_BOARDING_PASS_FREE,SENDGRID_TEMPLATE_BOARDING_PASS_PAID,SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_FREE,SENDGRID_TEMPLATE_BOARDING_INSTRUCTIONS_PAID,SENDGRID_TEMPLATE_VIP_BOARDING_PASS,SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS,SENDGRID_TEMPLATE_PREBOARD_NURTURE,SENDGRID_TEMPLATE_SPONSORED_APPROVED,SENDGRID_UNSUBSCRIBE_GROUP_MARKETING,SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL,SENDGRID_DEBUG,SENDGRID_STRICT_TEMPLATE_CHECK,SENDPILOT_API,PLATFORM_URL,SIGNAL_URL,PASSPORT_URL,SITE_URL,ADMIN_ORIGIN,NETLIFY_SITE_ID,SUPABASE_URL,BASE44_SEAT_REQUEST_URL,BASE44_COHORT_STATUS_URL,BASE44_SEAT_URL,BASE44_SEAT_LIST_URL,BASE44_SET_DEPARTURE_URL,BASE44_USER_URL,BASE44_APPLICATION_URL,BMAC_SUPPORT_URL,ALPHA_MODE,PUBLIC_GATE_STATE,SIGNALWELCOME_ENABLED,SIGNALWELCOME_DRY_RUN,SIGNALWELCOME_COHORT_SIZE,SIGNALWELCOME_DAILY_CAP,SIGNALWELCOME_SENT_TAG,SIGNALWELCOME_CANDIDATE_TAG"
+  # Paths excluded from secret scanning. All entries are either non-deployed
+  # historical artifacts (backups, snapshots, changelogs, the env template, the
+  # docs folder) or template-documentation HTML that references public
+  # SendGrid template IDs / Beehiiv pub IDs as illustrative payload examples.
+  # Active runtime code under netlify/functions remains scanned.
+  SECRETS_SCAN_OMIT_PATHS = "supabase/migrations,sendgrid-templates,index.html.backup,index.html.cyan-snapshot,CHANGELOG.md,.env.example,docs"
 
 [functions]
   node_bundler = "esbuild"
