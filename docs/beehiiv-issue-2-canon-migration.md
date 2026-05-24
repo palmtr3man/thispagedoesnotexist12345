@@ -60,3 +60,21 @@ Each invocation should insert one `beehiiv_sync_log` row at the beginning of pro
 ## Deployment Notes
 
 The migration file is `supabase/migrations/20260511_beehiiv_issue_2_canon.sql`. It is intentionally service-role-only under RLS, matching existing operational tables in this repository. Before a live Beehiiv sync is enabled, the runtime environment should define the Beehiiv API credentials and the sync endpoint should enforce an internal bearer token or webhook secret.
+
+## Runtime Endpoint
+
+Dry-run sync is exposed at `POST /api/beehiiv-sync` (Netlify function `netlify/functions/beehiiv-sync.js`).
+
+| Requirement | Value |
+|---|---|
+| Auth | `x-admin-secret: $ADMIN_SECRET` |
+| Default mode | `dry_run: true` when omitted |
+| Live writes | Require `dry_run: false` **and** `BEEHIIV_SYNC_LIVE_ENABLED=true` |
+
+### Base44 field mapping
+
+| Sync contract | Base44 / Supabase source |
+|---|---|
+| `flight_key` | `Flight.flight_code` / `seat_requests.flight_id` |
+| `flight_id` | `NextFlightConfig.next_flight_number` (display flight number, e.g. `FL 051126`) |
+| `cohort_id` | Logical cohort slug; falls back to `cohorts.flight_id = flight_key` when no UUID match |
