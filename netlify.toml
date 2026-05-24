@@ -124,5 +124,11 @@
   to = "/.netlify/functions/signalwelcome-runner"
   status = 200
 
+# Beehiiv Issue 2 — flight/cohort sync audit runner (dry_run by default)
+[[redirects]]
+  from = "/api/beehiiv-sync"
+  to = "/.netlify/functions/beehiiv-sync"
+  status = 200
+
 [functions."signalwelcome-runner"]
   schedule = "0 * * * *"
