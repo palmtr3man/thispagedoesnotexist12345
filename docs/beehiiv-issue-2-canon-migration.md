@@ -71,6 +71,8 @@ Dry-run sync is exposed at `POST /api/beehiiv-sync` (Netlify function `netlify/f
 | Default mode | `dry_run: true` when omitted |
 | Live writes | Require `dry_run: false` **and** `BEEHIIV_SYNC_LIVE_ENABLED=true` |
 
+Live mode PATCHes Beehiiv custom fields: `flight_id`, `flight_key`, `cohort_id`, `flight_tag`, and optional `segment_key`. Subscribers already carrying the target values are counted as skipped.
+
 ### Base44 field mapping
 
 | Sync contract | Base44 / Supabase source |

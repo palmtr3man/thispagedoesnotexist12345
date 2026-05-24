@@ -5,8 +5,8 @@
  * public.beehiiv_sync_log per invocation, and resolves cohort audience
  * against Supabase seat_requests + Beehiiv active subscribers.
  *
- * Phase 2 scope: dry_run by default. Live Beehiiv subscriber mutation is
- * gated behind dry_run=false AND BEEHIIV_SYNC_LIVE_ENABLED=true.
+ * Phase 2: dry_run by default. Live Beehiiv subscriber mutation requires
+ * dry_run=false AND BEEHIIV_SYNC_LIVE_ENABLED=true.
  *
  * Required env vars:
  *   ADMIN_SECRET                  — x-admin-secret for manual invocations
@@ -177,6 +177,92 @@ async function listActiveBeehiivSubscribers(limit = 250) {
   return Array.isArray(body.data) ? body.data : [];
 }
 
+function getCustomFieldValue(subscription, fieldName) {
+  const fields = subscription.custom_fields || [];
+  if (!Array.isArray(fields)) return null;
+  const target = fieldName.toLowerCase();
+  const hit = fields.find((field) => {
+    const name = String(field?.name || field?.key || field?.display || '').toLowerCase();
+    return name === target;
+  });
+  return hit?.value == null ? null : String(hit.value).trim();
+}
+
+function buildSyncCustomFields(input) {
+  const fields = [
+    { name: 'flight_id', value: input.flight_id },
+    { name: 'flight_key', value: input.flight_key },
+    { name: 'cohort_id', value: input.cohort_id },
+    { name: 'flight_tag', value: input.flight_key },
+  ];
+  if (input.segment_key) {
+    fields.push({ name: 'segment_key', value: input.segment_key });
+  }
+  return fields;
+}
+
+function subscriberAlreadySynced(subscription, input) {
+  const currentFlightId = getCustomFieldValue(subscription, 'flight_id');
+  const currentFlightKey = getCustomFieldValue(subscription, 'flight_key');
+  const currentCohortId = getCustomFieldValue(subscription, 'cohort_id');
+  return currentFlightId === input.flight_id
+    && currentFlightKey === input.flight_key
+    && currentCohortId === input.cohort_id;
+}
+
+async function patchBeehiivSubscriberByEmail(email, customFields) {
+  return beehiivFetch(`/subscriptions/by_email/${encodeURIComponent(email)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ custom_fields: customFields }),
+  });
+}
+
+async function applyBeehiivTag(subscriptionId, tag) {
+  if (!subscriptionId || !tag) return;
+  await beehiivFetch(`/subscriptions/${encodeURIComponent(subscriptionId)}/tags`, {
+    method: 'POST',
+    body: JSON.stringify({ tags: [tag] }),
+  });
+}
+
+async function runLiveBeehiivSync(matchedEntries, subscriberByEmail, input) {
+  const customFields = buildSyncCustomFields(input);
+  let updated = 0;
+  let failed = 0;
+  let skipped = 0;
+  const failures = [];
+
+  for (const entry of matchedEntries) {
+    const subscriber = subscriberByEmail.get(entry.email);
+    if (!subscriber) {
+      skipped += 1;
+      continue;
+    }
+
+    if (subscriberAlreadySynced(subscriber, input)) {
+      skipped += 1;
+      continue;
+    }
+
+    try {
+      await patchBeehiivSubscriberByEmail(entry.email, customFields);
+      if (input.segment_key && subscriber.id) {
+        await applyBeehiivTag(subscriber.id, input.segment_key);
+      }
+      updated += 1;
+    } catch (err) {
+      failed += 1;
+      failures.push({
+        seat_id: entry.seat_id,
+        email_domain: entry.email_domain,
+        error: err.message,
+      });
+    }
+  }
+
+  return { updated, failed, skipped, failures };
+}
+
 function buildAudiencePlan(seatRequests, beehiivSubscribers, segmentKey) {
   const subscriberByEmail = new Map();
   for (const sub of beehiivSubscribers) {
@@ -211,6 +297,7 @@ function buildAudiencePlan(seatRequests, beehiivSubscribers, segmentKey) {
 
     matched.push({
       seat_id: seat.seat_id,
+      email,
       email_domain: email.split('@')[1] || null,
       beehiiv_subscription_id: subscriber.id || null,
       status: seat.status,
@@ -218,7 +305,7 @@ function buildAudiencePlan(seatRequests, beehiivSubscribers, segmentKey) {
     });
   }
 
-  return { matched, skipped };
+  return { matched, skipped, subscriberByEmail };
 }
 
 exports.handler = async function handler(event) {
@@ -292,6 +379,7 @@ exports.handler = async function handler(event) {
     let status = 'completed';
     let updated = 0;
     let failed = 0;
+    let skipped = audience.skipped.length;
     let errorMessage = null;
     const metadata = {
       phase: 'beehiiv_issue_2',
@@ -300,7 +388,7 @@ exports.handler = async function handler(event) {
       cohort_lookup: cohortById ? 'id' : (cohortByFlight ? 'flight_key' : 'none'),
       seat_request_count: seatRequests.length,
       beehiiv_active_count: beehiivSubscribers.length,
-      matched_sample: audience.matched.slice(0, 10),
+      matched_sample: audience.matched.slice(0, 10).map(({ email, ...rest }) => rest),
       skipped_sample: audience.skipped.slice(0, 10),
       live_enabled: liveEnabled,
     };
@@ -310,8 +398,19 @@ exports.handler = async function handler(event) {
         status = 'skipped';
         metadata.skip_reason = 'live_sync_disabled';
       } else {
-        status = 'skipped';
-        metadata.skip_reason = 'live_mutation_not_implemented';
+        const liveResult = await runLiveBeehiivSync(
+          audience.matched,
+          audience.subscriberByEmail,
+          input,
+        );
+        updated = liveResult.updated;
+        failed = liveResult.failed;
+        skipped += liveResult.skipped;
+        metadata.live_failures = liveResult.failures.slice(0, 10);
+        status = failed > 0 && updated === 0 ? 'failed' : 'completed';
+        if (failed > 0) {
+          errorMessage = `${failed} subscriber update(s) failed`;
+        }
       }
     }
 
@@ -320,7 +419,7 @@ exports.handler = async function handler(event) {
       matched: audience.matched.length,
       updated,
       failed,
-      skipped: audience.skipped.length,
+      skipped,
       error_message: errorMessage,
       metadata,
       completed_at: new Date().toISOString(),
@@ -336,7 +435,7 @@ exports.handler = async function handler(event) {
         matched: audience.matched.length,
         updated,
         failed,
-        skipped: audience.skipped.length,
+        skipped,
       },
       metadata,
     });
