@@ -63,9 +63,9 @@
       padding: 1.5rem 0 2rem;
     }
 
-    /* Glass Runway / Neon Horizon Theme — Active: May 1, 2026 @ 12:34 PM EDT
-       Canonical palette: Deep Black #050814 / Midnight #0B1020 / Cyan/Teal Twinkle #2EE6D6 / Electric Cyan #29D9FF
-       Replaces: Bracket.Barbie (#FF1493 / #CCFF00) — retired May 1, 2026 */
+    /* Gold Signal / Correction Flight Theme — Active: May 11, 2026 @ 11:11 PM EDT
+       Campaign palette: Amber Gold #FBBF24 / Orange #F97316 / Yellow #FACC15
+       Purpose: public correction signal for the Macro C Grade while preserving TUJ master brand and flight systems. */
     body.black-glass {
       background: #0A0A0A;
     }
@@ -78,7 +78,7 @@
     }
 
     body.black-glass h1 {
-      color: #2EE6D6;
+      color: #FBBF24;
     }
 
     .container {
@@ -106,14 +106,32 @@
       font-size: 1.05rem;
       line-height: 1.65;
       color: rgba(255, 255, 255, 0.78);
-      margin-bottom: 1.75rem;
+      margin-bottom: 0.85rem;
       max-width: 520px;
+    }
+
+    .campaign-kicker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      margin: 0 auto 1.5rem;
+      padding: 0.45rem 0.85rem;
+      border: 1px solid rgba(249, 115, 22, 0.45);
+      border-radius: 999px;
+      color: #FACC15;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.14), rgba(249, 115, 22, 0.10));
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.16);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     /* Cyberpunk status section */
     .status-section {
       position: relative;
-      border: 1px solid rgba(46, 230, 214, 0.3);
+      border: 1px solid rgba(251, 191, 36, 0.3);
       border-radius: 8px;
       padding: 1.5rem;
       margin-bottom: 2rem;
@@ -128,8 +146,8 @@
         0deg,
         transparent,
         transparent 2px,
-        rgba(46, 230, 214, 0.02) 2px,
-        rgba(46, 230, 214, 0.02) 4px
+        rgba(251, 191, 36, 0.02) 2px,
+        rgba(251, 191, 36, 0.02) 4px
       );
       pointer-events: none;
     }
@@ -156,16 +174,16 @@
       padding: 0.15rem 0.55rem;
       border-radius: 999px;
       font-size: 0.75rem;
-      border: 1px solid rgba(46, 230, 214, 0.5);
-      background: rgba(46, 230, 214, 0.12);
-      color: #2EE6D6;
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      background: rgba(251, 191, 36, 0.12);
+      color: #FBBF24;
       white-space: nowrap;
     }
 
     .badge--highlight {
-      border-color: rgba(46, 230, 214, 0.6);
-      background: rgba(46, 230, 214, 0.15);
-      color: #2EE6D6;
+      border-color: rgba(251, 191, 36, 0.6);
+      background: rgba(251, 191, 36, 0.15);
+      color: #FBBF24;
     }
 
     .badge--meta {
@@ -177,7 +195,7 @@
     .flight-name-block {
       margin-bottom: 1.25rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(46, 230, 214, 0.12);
+      border-bottom: 1px solid rgba(251, 191, 36, 0.12);
     }
 
     .flight-name-eyebrow {
@@ -185,14 +203,14 @@
       font-size: 0.7rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(46, 230, 214, 0.55);
+      color: rgba(251, 191, 36, 0.55);
       margin-bottom: 0.3rem;
     }
 
     .flight-name-primary {
       font-size: 1.55rem;
       font-weight: 700;
-      color: #2EE6D6;
+      color: #FBBF24;
       letter-spacing: 0.02em;
       margin-bottom: 0.35rem;
       line-height: 1.2;
@@ -272,15 +290,15 @@
       justify-content: center;
       margin-top: 0.75rem;
       padding-top: 0.75rem;
-      border-top: 1px solid rgba(46, 230, 214, 0.08);
+      border-top: 1px solid rgba(251, 191, 36, 0.08);
     }
 
     .btn--secondary-cta {
       font-size: 0.78rem !important;
       padding: 0.4rem 0.9rem !important;
       opacity: 0.55;
-      color: rgba(46, 230, 214, 0.7) !important;
-      border-color: rgba(46, 230, 214, 0.2) !important;
+      color: rgba(251, 191, 36, 0.7) !important;
+      border-color: rgba(251, 191, 36, 0.2) !important;
       background: transparent !important;
       letter-spacing: 0.03em;
       transition: opacity 0.2s ease;
@@ -294,8 +312,8 @@
       opacity: 1;
       font-size: 0.9rem !important;
       padding: 0.6rem 1.2rem !important;
-      color: #2EE6D6 !important;
-      border-color: rgba(46, 230, 214, 0.5) !important;
+      color: #FBBF24 !important;
+      border-color: rgba(251, 191, 36, 0.5) !important;
     }
 
     @keyframes pulse {
@@ -315,13 +333,13 @@
     }
 
     .status-text .date {
-      color: #2EE6D6;
+      color: #FBBF24;
       opacity: 0.8;
     }
 
     /* Hoverable path keywords */
     .status-text .path {
-      color: #2EE6D6;
+      color: #FBBF24;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -336,14 +354,14 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: #2EE6D6;
+      background: #FBBF24;
       opacity: 0;
       transition: opacity 0.2s;
     }
 
     .status-text .path:hover {
       color: #fff;
-      text-shadow: 0 0 12px rgba(46, 230, 214, 0.9);
+      text-shadow: 0 0 12px rgba(251, 191, 36, 0.9);
       transform: scale(1.05);
     }
 
@@ -391,16 +409,16 @@
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(46, 230, 214, 0.25);
-      color: #2EE6D6;
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      color: #FBBF24;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
     .btn:hover {
       transform: translateY(-2px);
-      border-color: rgba(46, 230, 214, 0.6);
-      box-shadow: 0 0 12px rgba(46, 230, 214, 0.2);
+      border-color: rgba(251, 191, 36, 0.6);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
     }
 
     .btn-row-divider {
@@ -418,14 +436,14 @@
       flex: 1;
       max-width: 80px;
       height: 1px;
-      background: rgba(46, 230, 214, 0.4);
+      background: rgba(251, 191, 36, 0.4);
     }
 
     .btn-row-divider span {
       font-size: 0.65rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(46, 230, 214, 0.8);
+      color: rgba(251, 191, 36, 0.8);
     }
 
     .btn-row-waitlist {
@@ -444,8 +462,8 @@
       cursor: pointer;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(46, 230, 214, 0.25);
-      color: #2EE6D6;
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      color: #FBBF24;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
@@ -453,13 +471,13 @@
 
     .btn-waitlist:hover {
       transform: translateY(-2px);
-      border-color: rgba(46, 230, 214, 0.6);
-      box-shadow: 0 0 12px rgba(46, 230, 214, 0.2);
+      border-color: rgba(251, 191, 36, 0.6);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
     }
 
     .btn-waitlist.unlocked {
-      border-color: rgba(46, 230, 214, 0.8);
-      box-shadow: 0 0 16px rgba(46, 230, 214, 0.35);
+      border-color: rgba(251, 191, 36, 0.8);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
     }
 
     @keyframes pulse-green {
@@ -467,13 +485,13 @@
       50% { opacity: 0.4; transform: scale(1.5); }
     }
     @keyframes arriving-glow {
-      0%, 100% { box-shadow: 0 0 6px rgba(46, 230, 214, 0.4); }
-      50% { box-shadow: 0 0 14px rgba(46, 230, 214, 0.9); }
+      0%, 100% { box-shadow: 0 0 6px rgba(251, 191, 36, 0.4); }
+      50% { box-shadow: 0 0 14px rgba(251, 191, 36, 0.9); }
     }
     .badge--arriving {
-      background: rgba(46, 230, 214, 0.12);
-      color: #2EE6D6;
-      border: 1px solid rgba(46, 230, 214, 0.5);
+      background: rgba(251, 191, 36, 0.12);
+      color: #FBBF24;
+      border: 1px solid rgba(251, 191, 36, 0.5);
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -483,7 +501,7 @@
       display: inline-block;
       width: 8px;
       height: 8px;
-      background: #2EE6D6;
+      background: #FBBF24;
       border-radius: 50%;
       flex-shrink: 0;
       animation: pulse-green 1.2s ease-in-out infinite;
@@ -539,13 +557,13 @@
       max-width: 420px;
       width: 90%;
       background: rgba(10, 10, 10, 0.95);
-      border: 1px solid rgba(46, 230, 214, 0.35);
+      border: 1px solid rgba(251, 191, 36, 0.35);
       border-radius: 14px;
       padding: 2.5rem 2rem;
       text-align: center;
     }
     .age-gate-card h2 {
-      color: #2EE6D6;
+      color: #FBBF24;
       font-size: 1.4rem;
       margin-bottom: 0.5rem;
     }
@@ -574,7 +592,7 @@
     .age-gate-dob select,
     .age-gate-dob input[type=number] {
       background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(46, 230, 214,0.25);
+      border: 1px solid rgba(251, 191, 36,0.25);
       border-radius: 8px;
       color: #fff;
       font-size: 1rem;
@@ -588,7 +606,7 @@
     .age-gate-dob select:focus,
     .age-gate-dob input[type=number]:focus {
       outline: none;
-      border-color: rgba(46, 230, 214,0.6);
+      border-color: rgba(251, 191, 36,0.6);
     }
     /* hide number spinners */
     .age-gate-dob input[type=number]::-webkit-inner-spin-button,
@@ -612,14 +630,14 @@
       font-weight: 600;
       letter-spacing: 0.05em;
       cursor: pointer;
-      background: rgba(46, 230, 214, 0.12);
-      border: 1px solid rgba(46, 230, 214, 0.6);
-      color: #2EE6D6;
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.6);
+      color: #FBBF24;
       transition: background 0.2s, box-shadow 0.2s;
     }
     .age-gate-confirm:hover:not(:disabled) {
-      background: rgba(46, 230, 214, 0.2);
-      box-shadow: 0 0 14px rgba(46, 230, 214, 0.25);
+      background: rgba(251, 191, 36, 0.2);
+      box-shadow: 0 0 14px rgba(251, 191, 36, 0.25);
     }
     .age-gate-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
     .age-gate-deny {
@@ -640,7 +658,7 @@
       display: none;
       text-align: left;
       padding: 1.5rem;
-      border: 1px solid rgba(46, 230, 214, 0.25);
+      border: 1px solid rgba(251, 191, 36, 0.25);
       border-radius: 10px;
       background: rgba(0,0,0,0.45);
       margin-bottom: 1.5rem;
@@ -655,7 +673,7 @@
       flex-wrap: wrap;
     }
     .mc-title {
-      color: #2EE6D6;
+      color: #FBBF24;
       font-size: 1.2rem;
       letter-spacing: 0.05em;
       margin: 0 0 0.25rem;
@@ -676,13 +694,13 @@
     .mc-seat-label {
       font-size: 0.6rem;
       letter-spacing: 0.14em;
-      color: rgba(46, 230, 214,0.4);
+      color: rgba(251, 191, 36,0.4);
       text-transform: uppercase;
     }
     .mc-seat-id {
       font-size: 1rem;
       font-weight: 700;
-      color: #2EE6D6;
+      color: #FBBF24;
       letter-spacing: 0.1em;
       font-family: monospace;
     }
@@ -695,14 +713,14 @@
       gap: 0.6rem;
       padding: 0.75rem 1rem;
       margin-bottom: 1.5rem;
-      border: 1px solid rgba(46, 230, 214,0.18);
+      border: 1px solid rgba(251, 191, 36,0.18);
       border-radius: 6px;
-      background: rgba(46, 230, 214,0.04);
+      background: rgba(251, 191, 36,0.04);
       font-size: 0.82rem;
       letter-spacing: 0.04em;
     }
     #mc-gate-status .mc-gs-label {
-      color: rgba(46, 230, 214,0.5);
+      color: rgba(251, 191, 36,0.5);
       font-size: 0.6rem;
       text-transform: uppercase;
       letter-spacing: 0.14em;
@@ -710,15 +728,15 @@
       margin-bottom: 0.2rem;
     }
     #mc-gate-status .mc-gs-value {
-      color: #2EE6D6;
+      color: #FBBF24;
       font-weight: 600;
     }
     #mc-gate-status .mc-gs-cta {
       font-size: 0.75rem;
       padding: 0.3rem 0.75rem;
-      border: 1px solid rgba(46, 230, 214,0.35);
+      border: 1px solid rgba(251, 191, 36,0.35);
       border-radius: 4px;
-      color: #2EE6D6;
+      color: #FBBF24;
       background: transparent;
       cursor: pointer;
       text-decoration: none;
@@ -729,8 +747,8 @@
       transition: background 0.15s, border-color 0.15s;
     }
     #mc-gate-status .mc-gs-cta:hover {
-      background: rgba(46, 230, 214,0.1);
-      border-color: rgba(46, 230, 214,0.6);
+      background: rgba(251, 191, 36,0.1);
+      border-color: rgba(251, 191, 36,0.6);
     }
     #mc-gate-status .mc-gs-cta[data-action='none'] {
       display: none;
@@ -743,17 +761,17 @@
       gap: 0.6rem;
       margin-top: 0.75rem;
       padding-top: 0.75rem;
-      border-top: 1px solid rgba(46, 230, 214,0.1);
+      border-top: 1px solid rgba(251, 191, 36,0.1);
     }
     .mc-status-card {
       background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(46, 230, 214,0.15);
+      border: 1px solid rgba(251, 191, 36,0.15);
       border-radius: 8px;
       padding: 0.65rem 0.75rem;
     }
     .mc-status-label {
       font-size: 0.65rem;
-      color: rgba(46, 230, 214,0.5);
+      color: rgba(251, 191, 36,0.5);
       text-transform: uppercase;
       letter-spacing: 0.07em;
       margin-bottom: 0.25rem;
@@ -772,7 +790,7 @@
     .mc-section {
       margin-bottom: 1.75rem;
       padding-bottom: 1.5rem;
-      border-bottom: 1px solid rgba(46, 230, 214,0.1);
+      border-bottom: 1px solid rgba(251, 191, 36,0.1);
     }
     .mc-section:last-child { border-bottom: none; margin-bottom: 0; }
     .mc-section-header {
@@ -786,7 +804,7 @@
       font-size: 0.82rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(46, 230, 214,0.7);
+      color: rgba(251, 191, 36,0.7);
       margin: 0 0 0.5rem;
     }
     .mc-section-desc {
@@ -797,12 +815,12 @@
     }
     .mc-section-link {
       font-size: 0.75rem;
-      color: rgba(46, 230, 214,0.55);
+      color: rgba(251, 191, 36,0.55);
       text-decoration: none;
       letter-spacing: 0.04em;
       white-space: nowrap;
     }
-    .mc-section-link:hover { color: #2EE6D6; }
+    .mc-section-link:hover { color: #FBBF24; }
 
     /* ── Mission Control: Boarding Steps ─────────────────────────────────── */
     .boarding-steps {
@@ -819,28 +837,28 @@
       gap: 0.75rem;
       padding: 0.7rem 0.85rem;
       border-radius: 8px;
-      border: 1px solid rgba(46, 230, 214,0.12);
+      border: 1px solid rgba(251, 191, 36,0.12);
       background: rgba(0,0,0,0.3);
       transition: border-color 0.2s, background 0.2s;
     }
     .boarding-step:hover {
-      border-color: rgba(46, 230, 214,0.28);
-      background: rgba(46, 230, 214,0.03);
+      border-color: rgba(251, 191, 36,0.28);
+      background: rgba(251, 191, 36,0.03);
     }
     .boarding-step.done {
-      border-color: rgba(46, 230, 214,0.4);
-      background: rgba(46, 230, 214,0.05);
+      border-color: rgba(251, 191, 36,0.4);
+      background: rgba(251, 191, 36,0.05);
     }
     .bstep-num {
       font-size: 0.65rem;
       font-family: monospace;
-      color: rgba(46, 230, 214,0.35);
+      color: rgba(251, 191, 36,0.35);
       letter-spacing: 0.06em;
       flex-shrink: 0;
       padding-top: 0.1rem;
       min-width: 1.5rem;
     }
-    .boarding-step.done .bstep-num { color: rgba(46, 230, 214,0.7); }
+    .boarding-step.done .bstep-num { color: rgba(251, 191, 36,0.7); }
     .bstep-body {
       flex: 1;
       display: flex;
@@ -852,7 +870,7 @@
       color: rgba(255,255,255,0.85);
       font-weight: 600;
     }
-    .boarding-step.done .bstep-name { color: #2EE6D6; }
+    .boarding-step.done .bstep-name { color: #FBBF24; }
     .bstep-desc {
       font-size: 0.76rem;
       color: rgba(255,255,255,0.4);
@@ -865,19 +883,19 @@
       margin-top: 0.45rem;
       font-size: 0.74rem;
       font-weight: 600;
-      color: #2EE6D6;
+      color: #FBBF24;
       text-decoration: none;
       letter-spacing: 0.04em;
-      border: 1px solid rgba(46, 230, 214,0.3);
+      border: 1px solid rgba(251, 191, 36,0.3);
       border-radius: 4px;
       padding: 0.2rem 0.6rem;
-      background: rgba(46, 230, 214,0.06);
+      background: rgba(251, 191, 36,0.06);
       transition: background 0.15s, border-color 0.15s, color 0.15s;
       width: fit-content;
     }
     .bstep-cta:hover {
-      background: rgba(46, 230, 214,0.14);
-      border-color: rgba(46, 230, 214,0.65);
+      background: rgba(251, 191, 36,0.14);
+      border-color: rgba(251, 191, 36,0.65);
       color: #fff;
     }
     .bstep-cta-arrow {
@@ -888,10 +906,10 @@
     .bstep-status {
       font-size: 0.9rem;
       flex-shrink: 0;
-      color: rgba(46, 230, 214,0.25);
+      color: rgba(251, 191, 36,0.25);
       padding-top: 0.1rem;
     }
-    .boarding-step.done .bstep-status { color: #2EE6D6; }
+    .boarding-step.done .bstep-status { color: #FBBF24; }
 
     /* ── Mission Control: Ecosystem Tiles ───────────────────────────────── */
     .mc-tiles {
@@ -905,22 +923,22 @@
       gap: 0.3rem;
       padding: 0.9rem;
       border-radius: 8px;
-      border: 1px solid rgba(46, 230, 214,0.2);
+      border: 1px solid rgba(251, 191, 36,0.2);
       background: rgba(0,0,0,0.35);
       text-decoration: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       position: relative;
     }
     .mc-tile:hover {
-      border-color: rgba(46, 230, 214,0.55);
-      background: rgba(46, 230, 214,0.06);
-      box-shadow: 0 0 12px rgba(46, 230, 214,0.12);
+      border-color: rgba(251, 191, 36,0.55);
+      background: rgba(251, 191, 36,0.06);
+      box-shadow: 0 0 12px rgba(251, 191, 36,0.12);
     }
     .mc-tile-icon { font-size: 1.2rem; }
     .mc-tile-name {
       font-size: 0.88rem;
       font-weight: 700;
-      color: #2EE6D6;
+      color: #FBBF24;
       letter-spacing: 0.03em;
     }
     .mc-tile-desc {
@@ -933,11 +951,11 @@
       top: 0.75rem;
       right: 0.85rem;
       font-size: 0.85rem;
-      color: rgba(46, 230, 214,0.3);
+      color: rgba(251, 191, 36,0.3);
       transition: color 0.2s, transform 0.2s;
     }
     .mc-tile:hover .mc-tile-arrow {
-      color: #2EE6D6;
+      color: #FBBF24;
       transform: translateX(3px);
     }
 
@@ -945,7 +963,7 @@
     .build-table-wrap {
       overflow-x: auto;
       border-radius: 8px;
-      border: 1px solid rgba(46, 230, 214,0.15);
+      border: 1px solid rgba(251, 191, 36,0.15);
       margin-bottom: 0.75rem;
     }
     .build-table {
@@ -954,18 +972,18 @@
       font-size: 0.78rem;
     }
     .build-table thead tr {
-      background: rgba(46, 230, 214,0.07);
+      background: rgba(251, 191, 36,0.07);
     }
     .build-table th {
       padding: 0.55rem 0.75rem;
       text-align: left;
-      color: rgba(46, 230, 214,0.6);
+      color: rgba(251, 191, 36,0.6);
       font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       font-size: 0.68rem;
       white-space: nowrap;
-      border-bottom: 1px solid rgba(46, 230, 214,0.12);
+      border-bottom: 1px solid rgba(251, 191, 36,0.12);
     }
     .build-table td {
       padding: 0.5rem 0.75rem;
@@ -974,7 +992,7 @@
       vertical-align: middle;
     }
     .build-table tbody tr:last-child td { border-bottom: none; }
-    .build-table tbody tr:hover td { background: rgba(46, 230, 214,0.04); }
+    .build-table tbody tr:hover td { background: rgba(251, 191, 36,0.04); }
     .build-row--empty td {
       text-align: center;
       padding: 1.25rem;
@@ -1014,17 +1032,17 @@
       font-size: 0.82rem;
       padding: 0.5rem 1rem;
       border-radius: 6px;
-      border: 1px solid rgba(46, 230, 214,0.3);
-      color: #2EE6D6;
+      border: 1px solid rgba(251, 191, 36,0.3);
+      color: #FBBF24;
       text-decoration: none;
       background: rgba(0,0,0,0.4);
       letter-spacing: 0.03em;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
     .mc-action-btn:hover {
-      border-color: rgba(46, 230, 214,0.7);
-      background: rgba(46, 230, 214,0.08);
-      box-shadow: 0 0 10px rgba(46, 230, 214,0.18);
+      border-color: rgba(251, 191, 36,0.7);
+      background: rgba(251, 191, 36,0.08);
+      box-shadow: 0 0 10px rgba(251, 191, 36,0.18);
     }
 
     /* ── Mission Control: Seat Activation Panel (Pilot only) ──────────────── */
@@ -1039,7 +1057,7 @@
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.08em;
-      color: #2EE6D6;
+      color: #FBBF24;
       text-transform: uppercase;
       margin-bottom: 0.7rem;
     }
@@ -1081,7 +1099,7 @@
       padding: 0.46rem 1.1rem;
       border-radius: 6px;
       border: 1px solid rgba(255,20,147,0.45);
-      color: #2EE6D6;
+      color: #FBBF24;
       background: rgba(255,20,147,0.07);
       cursor: pointer;
       letter-spacing: 0.04em;
@@ -1103,7 +1121,7 @@
       color: rgba(255,255,255,0.5);
       letter-spacing: 0.03em;
     }
-    .mc-activate-status.ok  { color: #2EE6D6; }
+    .mc-activate-status.ok  { color: #FBBF24; }
     .mc-activate-status.err { color: #FF4D4D; }
 
     /* ── Mission Control: Responsive ─────────────────────────────────────────────────────── */
@@ -1160,7 +1178,7 @@
     .age-check {
       width: 100%;
       padding: 0.85rem 0.9rem;
-      border: 1px solid rgba(46, 230, 214, 0.35);
+      border: 1px solid rgba(251, 191, 36, 0.35);
       border-radius: 8px;
       background: rgba(0, 0, 0, 0.4);
       color: #fff;
@@ -1172,12 +1190,12 @@
       transition: border-color 0.2s;
     }
     .age-check:has(input:checked) {
-      border-color: rgba(46, 230, 214, 0.7);
+      border-color: rgba(251, 191, 36, 0.7);
     }
     .age-check input[type='checkbox'] {
       margin-top: 0.15rem;
       flex-shrink: 0;
-      accent-color: #2EE6D6;
+      accent-color: #FBBF24;
       width: 15px;
       height: 15px;
       cursor: pointer;
@@ -1190,13 +1208,13 @@
     /* Welcome Aboard banner (shown once on ?status=boarded) */
     #welcome-aboard-banner {
       display: none;
-      background: rgba(46, 230, 214,0.1);
-      border: 1px solid rgba(46, 230, 214,0.4);
+      background: rgba(251, 191, 36,0.1);
+      border: 1px solid rgba(251, 191, 36,0.4);
       border-radius: 8px;
       padding: 0.75rem 1rem;
       margin-bottom: 1rem;
       font-size: 0.88rem;
-      color: #2EE6D6;
+      color: #FBBF24;
       letter-spacing: 0.03em;
     }
 
@@ -1208,7 +1226,7 @@
     .carousel {
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(46, 230, 214, 0.2);
+      border: 1px solid rgba(251, 191, 36, 0.2);
       border-radius: 10px;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
@@ -1235,7 +1253,7 @@
     .carousel-slide h3 {
       font-size: 1rem;
       font-weight: 700;
-      color: #2EE6D6;
+      color: #FBBF24;
       margin-bottom: 0.6rem;
       letter-spacing: 0.02em;
     }
@@ -1257,15 +1275,15 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: rgba(46, 230, 214, 0.25);
-      border: 1px solid rgba(46, 230, 214, 0.4);
+      background: rgba(251, 191, 36, 0.25);
+      border: 1px solid rgba(251, 191, 36, 0.4);
       cursor: pointer;
       transition: background 0.25s, box-shadow 0.25s;
     }
 
     .carousel-dot.active {
-      background: #2EE6D6;
-      box-shadow: 0 0 6px rgba(46, 230, 214, 0.6);
+      background: #FBBF24;
+      box-shadow: 0 0 6px rgba(251, 191, 36, 0.6);
     }
 
     .puzzle-tracker {
@@ -1281,7 +1299,7 @@
       font-size: 0.65rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(46, 230, 214, 0.3);
+      color: rgba(251, 191, 36, 0.3);
     }
 
     .puzzle-diamonds {
@@ -1293,17 +1311,17 @@
 
     .puzzle-diamond {
       font-size: 1.1rem;
-      color: rgba(46, 230, 214, 0.2);
+      color: rgba(251, 191, 36, 0.2);
       transition: color 0.35s ease, text-shadow 0.35s ease;
     }
 
     .puzzle-diamond.lit {
-      color: #2EE6D6;
-      text-shadow: 0 0 8px rgba(46, 230, 214, 0.7), 0 0 16px rgba(46, 230, 214, 0.4);
+      color: #FBBF24;
+      text-shadow: 0 0 8px rgba(251, 191, 36, 0.7), 0 0 16px rgba(251, 191, 36, 0.4);
     }
 
     /* St. Patrick's Day Theme (March 17 only) */
-    .st-patricks { --accent: #29D9FF; }
+    .st-patricks { --accent: #FACC15; }
 
     .st-patricks .btn,
     .st-patricks .btn-waitlist,
@@ -1313,30 +1331,30 @@
     .st-patricks .carousel-slide h3,
     .st-patricks .puzzle-label,
     .st-patricks .puzzle-diamond.lit {
-      border-color: #29D9FF;
-      color: #29D9FF;
+      border-color: #FACC15;
+      color: #FACC15;
       text-shadow: none;
     }
 
-    .st-patricks h1 { color: #29D9FF; }
+    .st-patricks h1 { color: #FACC15; }
 
     .st-patricks .badge {
       border-color: rgba(46, 139, 58, 0.5);
       background: rgba(46, 139, 58, 0.12);
-      color: #29D9FF;
+      color: #FACC15;
     }
 
     .st-patricks .badge--highlight {
       border-color: rgba(46, 139, 58, 0.6);
       background: rgba(46, 139, 58, 0.15);
-      color: #29D9FF;
+      color: #FACC15;
     }
 
     .st-patricks .btn-waitlist.unlocked {
       box-shadow: 0 0 16px rgba(46, 139, 58, 0.4);
     }
 
-    footer .st-patricks-accent { color: #29D9FF; }
+    footer .st-patricks-accent { color: #FACC15; }
 
     @media (max-width: 480px) {
       .container { width: 95%; padding: 2rem 1.25rem; }
@@ -1387,8 +1405,8 @@
       font-weight: 600;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(46, 230, 214, 0.15);
-      color: rgba(46, 230, 214, 0.4);
+      border: 1px solid rgba(251, 191, 36, 0.15);
+      color: rgba(251, 191, 36, 0.4);
       text-align: center;
       cursor: default;
       margin-bottom: 1rem;
@@ -1398,7 +1416,7 @@
       display: none;
       padding: 1.5rem;
       border-radius: 10px;
-      border: 1px solid rgba(46, 230, 214, 0.25);
+      border: 1px solid rgba(251, 191, 36, 0.25);
       background: rgba(0, 0, 0, 0.5);
       text-align: center;
       margin-bottom: 1rem;
@@ -1422,7 +1440,7 @@
     .countdown-value {
       font-size: 1.6rem;
       font-weight: 700;
-      color: #2EE6D6;
+      color: #FBBF24;
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
@@ -1431,20 +1449,20 @@
       font-size: 0.6rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(46, 230, 214, 0.5);
+      color: rgba(251, 191, 36, 0.5);
       margin-top: 0.2rem;
     }
 
     .countdown-sep {
       font-size: 1.4rem;
-      color: rgba(46, 230, 214, 0.4);
+      color: rgba(251, 191, 36, 0.4);
       align-self: flex-start;
       padding-top: 0.1rem;
     }
 
     .countdown-departed {
       font-size: 0.85rem;
-      color: rgba(46, 230, 214, 0.5);
+      color: rgba(251, 191, 36, 0.5);
       letter-spacing: 0.06em;
       text-transform: uppercase;
       margin: 0.75rem 0 0.25rem;
@@ -1481,17 +1499,17 @@
       font-weight: 600;
       letter-spacing: 0.04em;
       cursor: pointer;
-      background: rgba(46, 230, 214, 0.08);
-      border: 1px solid rgba(46, 230, 214, 0.3);
-      color: rgba(46, 230, 214, 0.85);
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      color: rgba(251, 191, 36, 0.85);
       transition: background 0.2s, border-color 0.2s, color 0.2s;
       text-decoration: none;
       margin-top: 0.75rem;
     }
     #info-btn:hover {
-      background: rgba(46, 230, 214, 0.15);
-      border-color: rgba(46, 230, 214, 0.6);
-      color: #2EE6D6;
+      background: rgba(251, 191, 36, 0.15);
+      border-color: rgba(251, 191, 36, 0.6);
+      color: #FBBF24;
     }
     #info-modal-overlay {
       display: none;
@@ -1510,7 +1528,7 @@
       max-width: 480px;
       width: 100%;
       background: rgba(10, 10, 10, 0.97);
-      border: 1px solid rgba(46, 230, 214, 0.35);
+      border: 1px solid rgba(251, 191, 36, 0.35);
       border-radius: 16px;
       padding: 2rem 1.75rem 1.75rem;
       text-align: left;
@@ -1534,13 +1552,13 @@
     }
     .info-modal-close:hover { color: #fff; background: rgba(255,255,255,0.08); }
     .info-modal-card h2 {
-      color: #2EE6D6;
+      color: #FBBF24;
       font-size: 1.25rem;
       margin-bottom: 0.35rem;
     }
     .info-modal-card .info-modal-tagline {
       font-size: 0.8rem;
-      color: rgba(46, 230, 214,0.55);
+      color: rgba(251, 191, 36,0.55);
       letter-spacing: 0.06em;
       text-transform: uppercase;
       margin-bottom: 1.25rem;
@@ -1552,7 +1570,7 @@
       font-size: 0.78rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: rgba(46, 230, 214,0.7);
+      color: rgba(251, 191, 36,0.7);
       margin-bottom: 0.4rem;
     }
     .info-modal-section p {
@@ -1606,16 +1624,16 @@
     }
     .info-modal-links a {
       font-size: 0.82rem;
-      color: #2EE6D6;
+      color: #FBBF24;
       text-decoration: none;
-      border: 1px solid rgba(46, 230, 214,0.3);
+      border: 1px solid rgba(251, 191, 36,0.3);
       border-radius: 6px;
       padding: 0.35rem 0.75rem;
       transition: background 0.2s, border-color 0.2s;
     }
     .info-modal-links a:hover {
-      background: rgba(46, 230, 214,0.1);
-      border-color: rgba(46, 230, 214,0.6);
+      background: rgba(251, 191, 36,0.1);
+      border-color: rgba(251, 191, 36,0.6);
     }
 
     /* ── Segmentation fields: Career Stage + Current Goal (Beehiiv wiring) ── */
@@ -1639,7 +1657,7 @@
       width: 100%;
       padding: 0.6rem 0.9rem;
       border-radius: 6px;
-      border: 1px solid rgba(46, 230, 214, 0.35);
+      border: 1px solid rgba(251, 191, 36, 0.35);
       background: rgba(0,0,0,0.55);
       color: #fff;
       font-size: 0.9rem;
@@ -1651,8 +1669,8 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     .tuj-select:focus {
-      border-color: rgba(46, 230, 214, 0.8);
-      box-shadow: 0 0 8px rgba(46, 230, 214, 0.2);
+      border-color: rgba(251, 191, 36, 0.8);
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
     }
     .tuj-select option {
       background: #0a0a0a;
@@ -1671,7 +1689,7 @@
       gap: 0.3rem;
       padding: 0.3rem 0.65rem;
       border-radius: 20px;
-      border: 1px solid rgba(46, 230, 214, 0.3);
+      border: 1px solid rgba(251, 191, 36, 0.3);
       background: rgba(0,0,0,0.5);
       color: rgba(255,255,255,0.65);
       font-size: 0.78rem;
@@ -1681,14 +1699,14 @@
       user-select: none;
     }
     .goal-chip:hover {
-      border-color: rgba(46, 230, 214, 0.6);
+      border-color: rgba(251, 191, 36, 0.6);
       color: rgba(255,255,255,0.9);
     }
     .goal-chip.selected {
-      border-color: rgba(46, 230, 214, 0.9);
-      background: rgba(46, 230, 214, 0.12);
-      color: #2EE6D6;
-      box-shadow: 0 0 8px rgba(46, 230, 214, 0.2);
+      border-color: rgba(251, 191, 36, 0.9);
+      background: rgba(251, 191, 36, 0.12);
+      color: #FBBF24;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
     }
     .goal-chip-check {
       font-size: 0.7rem;
@@ -1702,11 +1720,13 @@
 <body class="black-glass" data-state="loading">
   <div class="container">
     <h1 data-show-state="landing departed">🚀 The Ultimate Journey</h1>
-    <p class="subtitle" data-show-state="landing departed">Career Optimization Platform</p>
+    <p class="subtitle" data-show-state="landing departed">The Correction Flight</p>
 
     <!-- Static lede — 10-second clarity fix (Apr 12, 2026) -->
     <!-- Answers "what is this and why should I care?" without relying on the carousel. -->
-    <p class="lede" data-show-state="landing departed">A focused career program that maps your experience to what the market is actually hiring for — one cohort, five seats, full-system support from resume to offer.</p>
+    <p class="lede" data-show-state="landing departed">Gold Signal active — amber systems online while the Macro C signal is corrected in public. One cohort, five seats, full-system support from resume to offer.</p>
+
+    <div class="campaign-kicker" data-show-state="landing departed">The Ultimate Journey: The Correction Flight</div>
 
     <!-- BLOCKER-01: Info button — triggers What is TUJ modal -->
     <div data-show-state="landing departed" style="text-align:center;margin-bottom:0.5rem;">
@@ -1720,8 +1740,8 @@
       <div class="carousel" id="mainCarousel">
         <div class="carousel-track" id="carouselTrack">
           <div class="carousel-slide">
-            <h3>Your career has a flight plan.</h3>
-            <p>The Ultimate Journey runs one focused cohort through the full system — mapping your experience to what the market is actually hiring for.</p>
+            <h3>The Correction Flight is active.</h3>
+            <p>The Ultimate Journey is correcting the Macro C signal in public: amber systems online, Gold Signal forward, and every fix logged to the flight path.</p>
           </div>
           <div class="carousel-slide">
             <h3>Built for the overlooked operator.</h3>
@@ -1732,8 +1752,8 @@
             <p>PageForward Airways is carrying 5 passengers on this flight through the TUJ system. Every outcome is logged to the manifest and shared in the newsletter.</p>
           </div>
           <div class="carousel-slide">
-            <h3>Gate open. Then wheels up.</h3>
-            <p>Every bug, fix, and passenger milestone is recorded. When this flight departs, the gate closes until the next cohort is scheduled.</p>
+            <h3>Gold Signal. Then wheels up.</h3>
+            <p>Every bug, fix, and passenger milestone is recorded. The correction is visible, the signal stays warm, and the next move is logged before departure.</p>
           </div>
         </div>
       </div>
@@ -1750,11 +1770,11 @@
       <div class="info-modal-card">
         <button class="info-modal-close" id="info-modal-close" aria-label="Close">&times;</button>
         <h2 id="info-modal-title">✈️ What is The Ultimate Journey?</h2>
-        <p class="info-modal-tagline">PageForward Airways &mdash; FL 041926 &mdash; Alpha Flight 1</p>
+        <p class="info-modal-tagline">PageForward Airways &mdash; Gold Signal &mdash; The Correction Flight</p>
 
         <div class="info-modal-section">
           <h3>The Mission</h3>
-          <p>The Ultimate Journey is a focused career optimization program — one cohort, five seats, full-system support from resume to offer. We map your experience to what the market is actually hiring for, then work the system until you land.</p>
+          <p>The Ultimate Journey is a focused career optimization program — one cohort, five seats, full-system support from resume to offer. The Correction Flight makes the current Macro C signal visible as a public repair path, then works the system until passengers land.</p>
         </div>
 
         <div class="info-modal-section">
@@ -1823,7 +1843,7 @@
     <!-- ── Seat ID Entry Modal (shown when ?mission-control without valid seat_id) ── -->
     <div id="seat-id-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="sig-title" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
       <div class="age-gate-card" style="max-width:380px;">
-        <h2 id="sig-title" style="color:#2EE6D6;font-size:1.25rem;margin-bottom:0.5rem;">❖ Mission Control</h2>
+        <h2 id="sig-title" style="color:#FBBF24;font-size:1.25rem;margin-bottom:0.5rem;">❖ Mission Control</h2>
         <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:1.25rem;line-height:1.6;">Enter your Seat ID to access your dashboard.<br><span style="font-size:0.78rem;opacity:0.6;">Your ID was included in your boarding confirmation email.</span></p>
         <input
           id="sig-input"
@@ -1832,10 +1852,10 @@
           maxlength="10"
           autocomplete="off"
           spellcheck="false"
-          style="width:100%;padding:0.65rem 0.9rem;border-radius:8px;border:1px solid rgba(46, 230, 214,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:1rem;font-family:monospace;letter-spacing:0.1em;text-transform:uppercase;outline:none;box-sizing:border-box;margin-bottom:0.5rem;"
+          style="width:100%;padding:0.65rem 0.9rem;border-radius:8px;border:1px solid rgba(251, 191, 36,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:1rem;font-family:monospace;letter-spacing:0.1em;text-transform:uppercase;outline:none;box-sizing:border-box;margin-bottom:0.5rem;"
           oninput="this.value=this.value.toUpperCase();"
-          onfocus="this.style.borderColor='rgba(46, 230, 214,0.8)'"
-          onblur="this.style.borderColor='rgba(46, 230, 214,0.35)'"
+          onfocus="this.style.borderColor='rgba(251, 191, 36,0.8)'"
+          onblur="this.style.borderColor='rgba(251, 191, 36,0.35)'"
         />
         <div id="sig-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1.2em;margin-bottom:0.5rem;line-height:1.5;"></div>
         <div class="age-gate-actions">
@@ -2073,11 +2093,11 @@
           </table>
         </div>
         <div class="build-status-key">
-          <span class="build-key-item"><span class="build-dot" style="background:#29D9FF"></span>Researching</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#FACC15"></span>Researching</span>
           <span class="build-key-item"><span class="build-dot" style="background:#F5A623"></span>Applied</span>
           <span class="build-key-item"><span class="build-dot" style="background:#F8A100"></span>In Review</span>
-          <span class="build-key-item"><span class="build-dot" style="background:#2EE6D6"></span>Interview</span>
-          <span class="build-key-item"><span class="build-dot" style="background:#29D9FF"></span>Offer</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#FBBF24"></span>Interview</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#FACC15"></span>Offer</span>
           <span class="build-key-item"><span class="build-dot" style="background:#ff4444"></span>Closed</span>
         </div>
       </div>
@@ -2156,7 +2176,7 @@
       <!-- JS: #flight-name-primary ← status.flight_name → status.flight_label → 'Next Departure' -->
       <div class="flight-name-block">
         <span class="flight-name-eyebrow">✈️ Active Flight</span>
-        <h2 class="flight-name-primary" id="flight-name-primary">Solo Flight 1</h2>
+        <h2 class="flight-name-primary" id="flight-name-primary">The Correction Flight</h2>
         <!-- SECONDARY: Flight Code (operational metadata) -->
         <span class="flight-code-secondary">
           <span class="flight-code-label">Flight Code</span>
@@ -2241,7 +2261,7 @@
       >
         That Seat ID wasn’t found on this flight.
         Check your boarding confirmation email, or
-        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#2EE6D6;text-decoration:underline;">join Signal</a>
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#FBBF24;text-decoration:underline;">join Signal</a>
         to stay on the manifest.
       </div>
 
@@ -2333,9 +2353,9 @@
             placeholder="Your name"
             autocomplete="name"
             required
-            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(46, 230, 214,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
-            onfocus="this.style.borderColor='rgba(46, 230, 214,0.8)'"
-            onblur="this.style.borderColor='rgba(46, 230, 214,0.35)'"
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(251, 191, 36,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(251, 191, 36,0.8)'"
+            onblur="this.style.borderColor='rgba(251, 191, 36,0.35)'"
           />
           <input
             name="email"
@@ -2343,9 +2363,9 @@
             placeholder="Your email"
             autocomplete="email"
             required
-            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(46, 230, 214,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
-            onfocus="this.style.borderColor='rgba(46, 230, 214,0.8)'"
-            onblur="this.style.borderColor='rgba(46, 230, 214,0.35)'"
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(251, 191, 36,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(251, 191, 36,0.8)'"
+            onblur="this.style.borderColor='rgba(251, 191, 36,0.35)'"
           />
 
           <!-- Career Stage dropdown (Beehiiv custom field: career_stage) -->
@@ -2392,7 +2412,7 @@
           <div style="display:flex;gap:0.5rem;width:100%;">
             <button
               type="button"
-              style="flex:0 0 auto;padding:0.6rem 1rem;border-radius:6px;border:1px solid rgba(46, 230, 214,0.25);background:rgba(0,0,0,0.4);color:rgba(46, 230, 214,0.6);font-size:0.85rem;cursor:pointer;"
+              style="flex:0 0 auto;padding:0.6rem 1rem;border-radius:6px;border:1px solid rgba(251, 191, 36,0.25);background:rgba(0,0,0,0.4);color:rgba(251, 191, 36,0.6);font-size:0.85rem;cursor:pointer;"
               onclick="(function(){
                 document.getElementById('seat-request-form').style.display = 'none';
                 document.getElementById('waitlistBtn').style.display = '';
@@ -2411,14 +2431,14 @@
         <!-- Step 3a: Confirmation — seat reserved (hidden until successful submit) -->
         <div
           id="seat-request-confirm"
-          style="display:none;font-size:0.9rem;color:#2EE6D6;letter-spacing:0.03em;padding:0.5rem 0;"
+          style="display:none;font-size:0.9rem;color:#FBBF24;letter-spacing:0.03em;padding:0.5rem 0;"
         >
           ✅ Your seat request has been received. Check your inbox for the next steps.
         </div>
 
         <!-- Step 3b: Waitlist confirmation — cohort full (F143) -->
         <div id="seat-request-waitlisted" style="display:none;padding:1rem 0;">
-          <p style="font-size:1rem;color:#2EE6D6;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">You're on the next flight.</p>
+          <p style="font-size:1rem;color:#FBBF24;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">You're on the next flight.</p>
           <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:1rem;">All 5 seats on this flight are full.<br>We'll notify you the moment a seat opens — passengers graduate when they land an offer.</p>
           <a href="/ResumeFitCheck" class="btn-waitlist unlocked" style="display:inline-block;">▶ While you wait, run an ATS check</a>
         </div>
@@ -2430,7 +2450,7 @@
         </div>
 
         <!-- seat-count span appended here by applySeatGate() -->
-        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(46, 230, 214, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
+        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(251, 191, 36, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
       </div>
 
       <!-- Secondary CTA: Book a Consultation — muted, subordinate to Request a Seat -->
@@ -2451,7 +2471,7 @@
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
       <div class="gate-closed-reveal" style="display:none">
-        <h3 style="color:#2EE6D6;margin-bottom:0.5rem">Next cohort assembling.</h3>
+        <h3 style="color:#FBBF24;margin-bottom:0.5rem">Next cohort assembling.</h3>
         <p style="opacity:0.8;margin-bottom:1.25rem">Stay on the manifest — you'll be first to know when the gate opens.</p>
         <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-waitlist" target="_blank" rel="noopener noreferrer">
           📡 Join Signal — Stay on the manifest
@@ -2486,17 +2506,17 @@
 
     <!-- NEXT STEP GUIDANCE -->
     <div class="btn-row-waitlist" data-show-state="landing departed" style="display: block; text-align: center; margin-bottom: 2rem;">
-      <p style="font-size: 0.85rem; color: rgba(46, 230, 214, 0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
+      <p style="font-size: 0.85rem; color: rgba(251, 191, 36, 0.7); margin: 0;">Gold Signal active: use the <strong>Request a Seat</strong> button above to board The Correction Flight.</p>
     </div>
 
     <!-- Option B: About / Footer Links -->
-    <section data-show-state="landing departed" style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(46, 230, 214,0.1); font-size:0.8rem;">
-      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(46, 230, 214,0.6); text-decoration:none; margin:0 0.75rem;">About / Field Guide</a>
-      <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(46, 230, 214,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
-      <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(46, 230, 214,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
+    <section data-show-state="landing departed" style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(251, 191, 36,0.1); font-size:0.8rem;">
+      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(251, 191, 36,0.6); text-decoration:none; margin:0 0.75rem;">About / Field Guide</a>
+      <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(251, 191, 36,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
+      <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(251, 191, 36,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
     </section>
     <footer data-show-state="landing departed">
-      &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
+      &copy; 2026 The Ultimate Journey | <span id="theme-status">Gold Signal Theme Active</span>
     </footer>
   </div>
 
@@ -2808,8 +2828,8 @@
             statusBadgeEl.style.background  = 'rgba(255,68,68,0.15)';
           } else if (nextFlightStatus === 'BOARDING_SOON') {
             statusBadgeEl.style.color       = 'rgb(255, 20, 147)';
-            statusBadgeEl.style.borderColor = 'rgba(46, 230, 214,0.6)';
-            statusBadgeEl.style.background  = 'rgba(46, 230, 214,0.12)';
+            statusBadgeEl.style.borderColor = 'rgba(251, 191, 36,0.6)';
+            statusBadgeEl.style.background  = 'rgba(251, 191, 36,0.12)';
           } else {
             // SCHEDULED — neutral
             statusBadgeEl.style.color       = '';
@@ -3062,7 +3082,7 @@
           if (existing) existing.remove();
           var seatInfo = document.createElement('span');
           seatInfo.id = 'cta-seat-count';
-          seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(46, 230, 214,0.7);letter-spacing:0.03em;';
+          seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(251, 191, 36,0.7);letter-spacing:0.03em;';
           seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining — next departure';
           var ctaWrapper = document.getElementById('cta-wrapper');
           if (ctaWrapper) {
@@ -3896,7 +3916,7 @@
           var val = (sigInput ? sigInput.value.trim().toUpperCase() : '');
           if (!SEAT_REGEX.test(val)) {
             if (sigError) {
-              sigError.innerHTML = 'That code doesn\'t match a seat on this flight. If you haven\'t boarded yet, <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#2EE6D6;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+              sigError.innerHTML = 'That code doesn\'t match a seat on this flight. If you haven\'t boarded yet, <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#FBBF24;text-decoration:underline;">join Signal</a> to stay on the manifest.';
             }
             if (sigInput) sigInput.focus();
             return;
@@ -3919,7 +3939,7 @@
                 sigConfirm.disabled = false;
                 sigConfirm.textContent = 'Access Mission Control';
                 if (sigError) {
-                  sigError.innerHTML = 'That Seat ID wasn\'t found on this flight. Double-check your boarding email, or <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#2EE6D6;text-decoration:underline;">join Signal</a> to stay on the manifest.';
+                  sigError.innerHTML = 'That Seat ID wasn\'t found on this flight. Double-check your boarding email, or <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#FBBF24;text-decoration:underline;">join Signal</a> to stay on the manifest.';
                 }
                 if (sigInput) sigInput.focus();
                 return;
@@ -4143,7 +4163,7 @@
       var raf;
       var particles = [];
       var PARTICLE_COUNT = 55;
-      // Match site accent: #2EE6D6 = rgb(255, 20, 147)
+      // Match site accent: #FBBF24 = rgb(255, 20, 147)
       var ACCENT = { r: 0, g: 217, b: 255 };
 
       function resize() {
