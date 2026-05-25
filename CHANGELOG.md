@@ -57,7 +57,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Notes
 - In-app confirmation state (`#seat-request-waitlisted`) and form submission handler were already correct — no changes to `index.html`.
-- Template ID `d-52c178a809f94a82a3bf8cd6ebd435e9` (set Apr 1, 2026) is the live canonical ID; Notion spec draft shows an earlier ID (`d-54d82aa3007c43e0bd22a5a5ae8c36c4`) from Mar 23, 2026 — codebase value retained.
+- Template ID for `next_flight_waitlist_v1` (set Apr 1, 2026) is the live canonical ID; Notion spec draft shows an earlier ID from Mar 23, 2026 — codebase value retained in `sendgrid-templates.js`.
 
 ---
 
@@ -181,5 +181,5 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Mission Control dashboard (authenticated view)
 - Studio, Signal, Systems, Support navigation
 - Age gate (Gate Contract §5, `MIN_AGE: 21`)
-- Beehiiv newsletter integration (publication ID set via env)
+- Beehiiv newsletter integration (`BEEHIIV_PUB_ID` Netlify env)
 - Umami analytics

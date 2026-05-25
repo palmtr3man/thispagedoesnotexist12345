@@ -17,7 +17,12 @@ export const GATE = {
   VALIDATE_SEAT: '/api/seat',          // GET /api/seat/:id (Base44 — pending credits)
 
   // --- beehiiv ---
-  BEEHIIV_PUB_ID: 'your-beehiiv-publication-id-here',
+
+  /**
+   * @type {string} Beehiiv publication ID — set via Netlify BEEHIIV_PUB_ID (not hardcoded).
+   * Signal resolves to https://newsletter.thispagedoesnotexist12345.us/
+   */
+  BEEHIIV_PUB_ID: '',
 
   // --- Age gate (Gate Contract §5) ---
   MIN_AGE: 21,

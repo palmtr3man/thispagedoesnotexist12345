@@ -25,8 +25,8 @@
  *   SENDGRID_FROM_EMAIL
  *
  * Optional env vars:
- *   SENDGRID_TEMPLATE_WELCOME      default d-526fac7119804ef88b1099e45e3653ec
- *   BEEHIIV_PUB_ID                 required (configured in Netlify env)
+ *   SENDGRID_TEMPLATE_WELCOME      — SendGrid dynamic template ID (required)
+ *   BEEHIIV_PUB_ID                 — beehiiv publication ID (required)
  *   SENDGRID_FROM_NAME             default Kevin
  *   SIGNALWELCOME_ENABLED          default true
  *   SIGNALWELCOME_DRY_RUN          default false
@@ -43,7 +43,6 @@ const HEADERS = {
   'Content-Type': 'application/json',
 };
 
-const DEFAULT_TEMPLATE_ID = 'd-526fac7119804ef88b1099e45e3653ec';
 const DEFAULT_SENT_TAG = 'signalwelcome_v1_sent';
 const DEFAULT_COHORT_SIZE = 5;
 const DEFAULT_DAILY_CAP = 100;
@@ -91,7 +90,8 @@ function getFirstName(subscription) {
 
 async function beehiivFetch(path, options = {}) {
   const apiKey = process.env.BEEHIIV_API_KEY;
-  const pubId = process.env.BEEHIIV_PUB_ID ? String(process.env.BEEHIIV_PUB_ID).trim() : '';
+  const pubId = process.env.BEEHIIV_PUB_ID;
+  if (!pubId) throw new Error('BEEHIIV_PUB_ID is not configured');
   if (!apiKey) throw new Error('BEEHIIV_API_KEY is not configured');
   if (!pubId) throw new Error('BEEHIIV_PUB_ID is not configured');
   const url = `https://api.beehiiv.com/v2/publications/${pubId}${path}`;
@@ -128,9 +128,10 @@ async function sendSignalWelcome(subscription) {
   const apiKey = process.env.SENDGRID_API_KEY;
   const fromEmail = process.env.SENDGRID_FROM_EMAIL;
   const fromName = process.env.SENDGRID_FROM_NAME || 'Kevin';
-  const templateId = process.env.SENDGRID_TEMPLATE_WELCOME || DEFAULT_TEMPLATE_ID;
+  const templateId = process.env.SENDGRID_TEMPLATE_WELCOME;
   if (!apiKey) throw new Error('SENDGRID_API_KEY is not configured');
   if (!fromEmail) throw new Error('SENDGRID_FROM_EMAIL is not configured');
+  if (!templateId) throw new Error('SENDGRID_TEMPLATE_WELCOME is not configured');
   const email = getEmail(subscription);
   if (!email) throw new Error(`Subscription ${subscription.id || 'unknown'} has no email`);
   const firstName = getFirstName(subscription);
@@ -253,7 +254,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         ok: true,
         template: 'signalwelcome_v1',
-        template_id: process.env.SENDGRID_TEMPLATE_WELCOME || DEFAULT_TEMPLATE_ID,
+        template_id: process.env.SENDGRID_TEMPLATE_WELCOME || null,
         flight_code: 'FL_051126',
         flight_label: 'Gemini ♊',
         dry_run: dryRun,
