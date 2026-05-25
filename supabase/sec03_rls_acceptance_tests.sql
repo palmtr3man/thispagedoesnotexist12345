@@ -76,18 +76,24 @@ CREATE OR REPLACE FUNCTION pg_temp.sec03_set_auth(p_role text, p_sub uuid, p_is_
 RETURNS void
 LANGUAGE plpgsql
 AS $$
+DECLARE
+  claims jsonb;
 BEGIN
   EXECUTE format('SET LOCAL ROLE %I', p_role);
-  PERFORM set_config(
-    'request.jwt.claims',
-    jsonb_build_object(
-      'sub', p_sub::text,
-      'role', p_role,
-      'app_metadata', jsonb_build_object('role', CASE WHEN p_is_admin THEN 'admin' ELSE 'user' END),
-      'user_metadata', jsonb_build_object('role', CASE WHEN p_is_admin THEN 'admin' ELSE 'user' END)
-    )::text,
-    true
+  claims := jsonb_build_object(
+    'sub', p_sub::text,
+    'role', p_role,
+    'app_metadata', jsonb_build_object('role', CASE WHEN p_is_admin THEN 'admin' ELSE 'user' END),
+    'user_metadata', jsonb_build_object('role', CASE WHEN p_is_admin THEN 'admin' ELSE 'user' END)
   );
+
+  -- Supabase auth.uid() reads request.jwt.claim.sub in many SQL contexts, while
+  -- some local/test harnesses inspect the aggregate request.jwt.claims payload.
+  -- Set both forms so the scaffold validates the same owner predicates that the
+  -- SEC-02 migration installs with auth.uid().
+  PERFORM set_config('request.jwt.claims', claims::text, true);
+  PERFORM set_config('request.jwt.claim.sub', p_sub::text, true);
+  PERFORM set_config('request.jwt.claim.role', p_role, true);
 END;
 $$;
 
@@ -105,16 +111,36 @@ EXCEPTION WHEN insufficient_privilege THEN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION pg_temp.sec03_count_owner_rows(p_table regclass, p_owner_col text, p_owner uuid)
+RETURNS integer
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_count integer;
+BEGIN
+  EXECUTE format('SELECT count(*) FROM %s WHERE %I = $1', p_table, p_owner_col) INTO v_count USING p_owner;
+  RETURN v_count;
+EXCEPTION WHEN insufficient_privilege THEN
+  RETURN 0;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION pg_temp.sec03_try_insert_owner_row(p_table regclass, p_owner_col text, p_owner uuid)
-RETURNS boolean
+RETURNS text
 LANGUAGE plpgsql
 AS $$
 BEGIN
   EXECUTE format('INSERT INTO %s (%I) VALUES ($1)', p_table, p_owner_col) USING p_owner;
-  RETURN true;
+  RETURN 'inserted';
 EXCEPTION
-  WHEN insufficient_privilege OR check_violation OR not_null_violation OR undefined_column THEN
-    RETURN false;
+  WHEN insufficient_privilege THEN
+    RETURN 'rls_denied:' || SQLERRM;
+  WHEN check_violation THEN
+    RETURN 'check_denied:' || SQLERRM;
+  WHEN not_null_violation OR undefined_column THEN
+    RETURN 'fixture_shape_error:' || SQLERRM;
+  WHEN others THEN
+    RETURN 'unexpected_error:' || SQLSTATE || ':' || SQLERRM;
 END;
 $$;
 
@@ -177,6 +203,8 @@ DECLARE
   t regclass;
   owner_col text;
   cross_count integer;
+  user_a_fixture_count integer;
+  user_b_fixture_count integer;
 BEGIN
   SELECT * INTO cfg FROM sec03_config LIMIT 1;
   FOREACH target IN ARRAY ARRAY[cfg.resume_table, cfg.application_table, cfg.subscription_table] LOOP
@@ -190,11 +218,18 @@ BEGIN
     );
     IF owner_col IS NULL THEN CONTINUE; END IF;
 
-    PERFORM pg_temp.sec03_set_auth('authenticated', cfg.user_a_id, false);
-    PERFORM pg_temp.sec03_try_insert_owner_row(t, owner_col, cfg.user_a_id);
-
-    PERFORM pg_temp.sec03_set_auth('authenticated', cfg.user_b_id, false);
-    PERFORM pg_temp.sec03_try_insert_owner_row(t, owner_col, cfg.user_b_id);
+    -- Fixture rows must already exist. Do not create minimalist rows here: real
+    -- tables often have additional NOT NULL columns, and swallowing those errors
+    -- would let cross-user denial pass because no rows were actually present.
+    PERFORM pg_temp.sec03_set_auth('service_role', cfg.admin_id, true);
+    user_a_fixture_count := pg_temp.sec03_count_owner_rows(t, owner_col, cfg.user_a_id);
+    user_b_fixture_count := pg_temp.sec03_count_owner_rows(t, owner_col, cfg.user_b_id);
+    PERFORM pg_temp.sec03_assert(
+      format('fixture rows exist for both users: %s', target),
+      user_a_fixture_count > 0 AND user_b_fixture_count > 0,
+      format('User A fixture rows: %s; User B fixture rows: %s. Seed real rows before running SEC-03.', user_a_fixture_count, user_b_fixture_count)
+    );
+    IF user_a_fixture_count = 0 OR user_b_fixture_count = 0 THEN CONTINUE; END IF;
 
     PERFORM pg_temp.sec03_set_auth('authenticated', cfg.user_a_id, false);
     EXECUTE format('SELECT count(*) FROM %s WHERE %I = $1', t, owner_col) INTO cross_count USING cfg.user_b_id;
@@ -221,7 +256,7 @@ DECLARE
   target text;
   t regclass;
   owner_col text;
-  spoof_succeeded boolean;
+  spoof_result text;
 BEGIN
   SELECT * INTO cfg FROM sec03_config LIMIT 1;
   FOREACH target IN ARRAY ARRAY[cfg.resume_table, cfg.application_table, cfg.subscription_table] LOOP
@@ -230,11 +265,11 @@ BEGIN
     owner_col := pg_temp.sec03_table_has_owner_column(t);
     IF owner_col IS NULL THEN CONTINUE; END IF;
     PERFORM pg_temp.sec03_set_auth('authenticated', cfg.user_a_id, false);
-    spoof_succeeded := pg_temp.sec03_try_insert_owner_row(t, owner_col, cfg.user_b_id);
+    spoof_result := pg_temp.sec03_try_insert_owner_row(t, owner_col, cfg.user_b_id);
     PERFORM pg_temp.sec03_assert(
       format('WITH CHECK blocks owner spoof insert: %s', target),
-      spoof_succeeded = false,
-      'Authenticated User A must not be able to insert a row owned by User B.'
+      spoof_result LIKE 'rls_denied:%' OR spoof_result LIKE 'check_denied:%',
+      format('Expected RLS/WITH CHECK denial, got: %s', spoof_result)
     );
   END LOOP;
 END $$;
@@ -291,7 +326,7 @@ DO $$
 DECLARE
   cfg sec03_config%ROWTYPE;
   t regclass;
-  insert_succeeded boolean;
+  insert_result text;
   owner_col text;
 BEGIN
   SELECT * INTO cfg FROM sec03_config LIMIT 1;
@@ -299,11 +334,11 @@ BEGIN
   IF t IS NOT NULL THEN
     owner_col := COALESCE(pg_temp.sec03_table_has_owner_column(t), 'user_id');
     PERFORM pg_temp.sec03_set_auth('anon', cfg.user_a_id, false);
-    insert_succeeded := pg_temp.sec03_try_insert_owner_row(t, owner_col, cfg.user_a_id);
+    insert_result := pg_temp.sec03_try_insert_owner_row(t, owner_col, cfg.user_a_id);
     PERFORM pg_temp.sec03_assert(
       'public cannot write LoadingDockMessage',
-      insert_succeeded = false,
-      'Anon role must not be able to INSERT LoadingDockMessage rows.'
+      insert_result LIKE 'rls_denied:%' OR insert_result LIKE 'check_denied:%',
+      format('Expected RLS/WITH CHECK denial for anon insert, got: %s', insert_result)
     );
   END IF;
 END $$;
