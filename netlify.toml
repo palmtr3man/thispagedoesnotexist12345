@@ -40,17 +40,6 @@
   to = "/.netlify/functions/seat-request"
   status = 200
 
-[[redirects]]
-  from = "/api/seat-ready"
-  to = "/.netlify/functions/seat-ready"
-  status = 200
-
-# Canonical entry point — /request-seat → seat request form
-[[redirects]]
-  from = "/request-seat"
-  to = "/#seat-request-form"
-  status = 301
-
 # One Page Studio — serve /Studio from the Studio subfolder
 [[redirects]]
   from = "/ResumeOnePageStudio"
@@ -65,70 +54,127 @@
   force = true
 
 [[redirects]]
+  from = "/request-seat"
+  to = "/request-seat.html"
+  status = 200
+
+[[redirects]]
+  from = "/request-seat/"
+  to = "/request-seat.html"
+  status = 200
+
+[[redirects]]
+  from = "/OnboardingPassport"
+  to = "/onboardingpassport/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/OnboardingPassport/*"
+  to = "/onboardingpassport/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
   status = 200
 
 [[redirects]]
-  from = "/api/verify-age"
-  to = "/.netlify/functions/verify-age"
+  from = "/Dashboard"
+  to = "/?status=boarded"
   status = 200
+  force = true
 
 [[redirects]]
-  from = "/api/seat/:id"
-  to = "/.netlify/functions/seat?id=:id"
+  from = "/Dashboard/*"
+  to = "/?status=boarded"
   status = 200
+  force = true
 
 [[redirects]]
-  from = "/api/seat"
-  to = "/.netlify/functions/seat"
+  from = "/dashboard"
+  to = "/?status=boarded"
   status = 200
-
-
-# Admin Tower — BLOCKER-03: Approve/Deny Flow
-# Secured by x-admin-secret header (ADMIN_SECRET env var)
-[[redirects]]
-  from = "/api/admin-approve"
-  to = "/.netlify/functions/admin-approve"
-  status = 200
+  force = true
 
 [[redirects]]
-  from = "/api/admin-deny"
-  to = "/.netlify/functions/admin-deny"
+  from = "/dashboard/*"
+  to = "/?status=boarded"
   status = 200
+  force = true
 
 [[redirects]]
-  from = "/api/waitlist-manifest"
-  to = "/.netlify/functions/waitlist-manifest"
+  from = "/Passengers"
+  to = "/"
   status = 200
+  force = true
 
-# Passenger Door — BLOCKER-07: Newsletter Landing + TUJ Seat Gate + ResumeFitCheck
-# Receives passengers from the .us newsletter boarding_pass deep-link:
-#   https://www.thispagedoesnotexist12345.com/door?seat_id=TUJ-XXXXXX
-# Validates seat_id via /api/seat, then routes to Base44 ResumeFitCheck.
 [[redirects]]
-  from = "/door"
-  to = "/door.html"
+  from = "/Passengers/*"
+  to = "/"
   status = 200
+  force = true
 
-# BLOCKER-08: Alignment Loop — Notion ↔ SaaS Drift Detection + Repair
-# Webhook trigger: POST /api/alignment-loop with x-webhook-secret header
-# Cron trigger: every 5 minutes via Netlify scheduled functions for PAL-21 Application sync
 [[redirects]]
-  from = "/api/alignment-loop"
-  to = "/.netlify/functions/alignment-loop"
+  from = "/FlightLog"
+  to = "/"
   status = 200
+  force = true
 
-[functions."alignment-loop"]
-  schedule = "*/5 * * * *"
-
-# signalwelcome_v1 — Beehiiv → SendGrid welcome runner for Gemini.
-# Scheduled polling is cohort-gated in code and sends only when at least 5 eligible active subscribers exist.
 [[redirects]]
-  from = "/api/signalwelcome-runner"
-  to = "/.netlify/functions/signalwelcome-runner"
+  from = "/FlightLog/*"
+  to = "/"
   status = 200
+  force = true
 
+[[redirects]]
+  from = "/Applications"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/Applications/*"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/InterviewsAndFollowUps"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/InterviewsAndFollowUps/*"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/CommandCenter"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/CommandCenter/*"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/Studio"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/Studio/*"
+  to = "/"
+  status = 200
+  force = true
 # Beehiiv Issue 2 — flight/cohort sync audit runner (dry_run by default)
 [[redirects]]
   from = "/api/beehiiv-sync"

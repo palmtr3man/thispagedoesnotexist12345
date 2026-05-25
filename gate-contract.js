@@ -1,82 +1,20 @@
 /**
- * @fileoverview gate-contract.js — Shared Interface Constants
- * The Ultimate Journey · .com ⊓ .tech
+ * gate-contract.js — Shared Interface Constants
+ * The Ultimate Journey · .com ∓ .tech
  *
  * Single source of truth for gate state, seat identity, and API paths.
  * Both the .com landing/dashboard repo and the .tech boarding app must
  * import from this module — neither repo should hardcode these values.
  *
- * @version 1d
- * @since   2026-03-27
- * @updated 2026-04-12
- */
-
-/**
- * @typedef {'open' | 'closed' | 'departed'} GateStatus
- * The three possible gate states returned by /api/seat-status.
- */
-
-/**
- * @typedef {'SCHEDULED' | 'BOARDING_SOON' | 'DEPARTED'} FlightStatus
- * Admin-controlled flight display status stored in NextFlightConfig.
- */
-
-/**
- * @typedef {'SENDGRID' | 'CALENDARJET' | 'CONSTANTCONTACT'} IntakeMode
- * Passenger intake channel. Controls which CTA steps are shown in the
- * boarding sequence (e.g. Step 05 consultation CTA is CALENDARJET-only).
- */
-
-/**
- * @typedef {'departed' | 'dashboard' | 'landing'} ViewState
- * The three views the .com landing page can render, as resolved by resolveState().
- */
-
-/**
- * @typedef {Object} SeatRequestPayload
- * @property {string}  name          - Passenger full name (trimmed).
- * @property {string}  email         - Passenger email address.
- * @property {boolean} age_confirmed - Must be true; enforces MIN_AGE gate.
- * @property {string}  [source]      - Optional intake source tag.
- */
-
-/**
- * @typedef {Object} SeatRequestResponse
- * @property {boolean} ok           - True if seat was successfully reserved OR waitlisted.
- * @property {string}  [seat_id]    - Assigned seat ID (e.g. "TUJ-AB1234") on success (status: 'confirmed').
- * @property {boolean} [waitlisted] - True when the cohort is full and the passenger is on the next-flight waitlist (F143).
- * @property {boolean} [duplicate]  - True when a seat request already exists for this email.
- * @property {string}  [status]     - 'confirmed' | 'waitlisted' — machine-readable status.
- * @property {string}  [message]    - Human-readable status message.
- * @property {string}  [error]      - Error message on failure.
- */
-
-/**
- * GATE — Shared interface constants for The Ultimate Journey gate system.
- *
- * Import this object wherever gate state, seat identity, or API paths are
- * needed. Do not hardcode any of these values in application code.
- *
- * @namespace GATE
+ * Gate Contract v1.0 · March 27, 2026
  */
 
 export const GATE = {
   // --- API paths ---
-
-  /** @type {string} Base URL for all TUJ API calls. */
   API_BASE:      'https://www.thispagedoesnotexist12345.com',
-
-  /** @type {string} GET endpoint — returns gate status + flight metadata. */
   SEAT_STATUS:   '/api/seat-status',
-
-  /** @type {string} POST endpoint — submits a new seat request. */
   REQUEST_SEAT:  '/api/seat-request',
-
-  /**
-   * @type {string} GET /api/seat/:id — validates a seat ID against Base44.
-   * Netlify function live as of Apr 14, 2026 (commit 6b0c83c). Scenario A confirmed.
-   */
-  VALIDATE_SEAT: '/api/seat',
+  VALIDATE_SEAT: '/api/seat',          // GET /api/seat/:id (Base44 — pending credits)
 
   // --- beehiiv ---
 
@@ -87,175 +25,108 @@ export const GATE = {
   BEEHIIV_PUB_ID: '',
 
   // --- Age gate (Gate Contract §5) ---
-
-  /**
-   * @type {number} Minimum passenger age. DOB must confirm age >= MIN_AGE.
-   * Enforced on both .com and .tech surfaces.
-   */
   MIN_AGE: 21,
 
   // --- Seat identity (Gate Contract §3) ---
-
-  /** @type {number} Maximum seats per flight cohort. */
   MAX_SEATS:      5,
-
-  /** @type {string} Prefix for all seat IDs (e.g. "TUJ-AB1234"). */
   SEAT_ID_PREFIX: 'TUJ-',
-
-  /**
-   * @type {RegExp} Validation regex for seat IDs.
-   * Matches "TUJ-" followed by exactly 6 uppercase alphanumeric characters
-   * (excluding 0, 1, O, I to avoid visual ambiguity).
-   */
   SEAT_ID_REGEX:  /^TUJ-[A-Z2-9]{6}$/,
-
-  /**
-   * @type {string} sessionStorage key used to persist the seat ID across
-   * page navigations within the same browser session.
-   */
   SESSION_KEY:    'seat_id',
+  TUJ_KEY:        'tuj_code',
 
   // --- Intake modes ---
-
-  /**
-   * @type {IntakeMode[]} Supported passenger intake channels.
-   * The active mode is set via the INTAKE_MODE Netlify environment variable.
-   */
   INTAKE_MODES: ['SENDGRID', 'CALENDARJET', 'CONSTANTCONTACT'],
 
   // --- Gate status values ---
-
-  /**
-   * @type {{ OPEN: GateStatus, CLOSED: GateStatus, DEPARTED: GateStatus }}
-   * Canonical gate status string constants. Use these instead of raw strings.
-   */
   GATE_STATUS: {
-    /** Gate is open — seat requests are accepted. */
-    OPEN:     'open',
-    /** Gate is closed — seat requests are blocked; landing page shows hold state. */
-    CLOSED:   'closed',
-    /** Flight has departed — all surfaces show the departed/waitlist view. */
-    DEPARTED: 'departed'
+    OPEN:          'open',
+    CLOSED:        'closed',
+    DEPARTED:      'departed',
+    LEVEL_LOUNGE:  'lounge'
+  },
+
+  // --- Funnel stage values ---
+  FUNNEL_STAGE: {
+    REQUESTED:     'requested',
+    LEVEL_LOUNGE:  'level_lounge',
+    BOARDING:      'boarding',
+    DEPARTED:      'departed'
   },
 
   // --- Flight status values ---
-
-  /**
-   * @type {{ SCHEDULED: FlightStatus, BOARDING_SOON: FlightStatus, DEPARTED: FlightStatus }}
-   * Admin-controlled display status stored in the NextFlightConfig entity.
-   * Drives countdown timer, departure badges, and boarding state UI.
-   */
   FLIGHT_STATUS: {
-    /** Flight is scheduled — countdown timer active. */
     SCHEDULED:     'SCHEDULED',
-    /** Flight is boarding soon — boarding badges shown. */
     BOARDING_SOON: 'BOARDING_SOON',
-    /** Flight has departed — triggers departed view on all surfaces. */
-    DEPARTED:      'DEPARTED'
+    DEPARTED:      'DEPARTED',
+    LEVEL_LOUNGE:  'LEVEL_LOUNGE'
   }
 };
 
 /**
  * resolveState() — Two-State Machine (.com)
  *
- * Fetches the current gate status from GATE.SEAT_STATUS and reads the seat ID
- * from sessionStorage (or the seat_id URL parameter), then returns the
- * appropriate view for the .com landing page to render.
- *
+ * Reads gate status + sessionStorage seat_id and returns the view to render.
  * Call this on DOMContentLoaded on the .com landing page.
  *
- * Resolution logic:
- * 1. If the flight has departed → 'departed'
- * 2. If a valid seat ID is present in sessionStorage or URL AND is confirmed
- *    active by /api/seat → 'dashboard'
- * 3. Otherwise → 'landing'
+ * Returns one of: 'departed' | 'lounge' | 'dashboard' | 'landing'
  *
- * Seat validation contract (GATE.VALIDATE_SEAT):
- * - valid: true  → seat confirmed; persists to sessionStorage; returns 'dashboard'.
- * - valid: false → seat invalid/inactive; clears sessionStorage; returns 'landing'.
- * - fetch error  → fail-open; persists to sessionStorage; returns 'dashboard'.
- *   Rationale: a transient upstream outage must not lock out confirmed passengers.
- * - GATE.VALIDATE_SEAT not configured → skips API call; falls back to regex-only.
- *
- * On any gate-status fetch error, defaults to 'landing' and logs the error.
- *
- * @async
- * @param {{ skipSeatValidation?: boolean }} [opts]
- *   Pass `{ skipSeatValidation: true }` to bypass the /api/seat call (e.g. for
- *   unit tests or environments where the function is not deployed).
- * @returns {Promise<ViewState>} The view to render.
- *
- * @example
- * import { resolveState } from '/gate-contract.js';
- * const view = await resolveState();
- * if (view === 'dashboard')     renderDashboard();
- * else if (view === 'departed') renderDeparted();
- * else                          renderLanding();
+ * Usage:
+ *   import { resolveState } from '/gate-contract.js';
+ *   const view = await resolveState();
+ *   if (view === 'dashboard') renderDashboard();
+ *   else if (view === 'departed') renderDeparted();
+ *   else renderLanding();
  */
-export async function resolveState(opts = {}) {
+export async function resolveState() {
   try {
-    const res    = await fetch(GATE.SEAT_STATUS);
+    const seatStatusUrl = new URL(GATE.SEAT_STATUS, location.origin);
+    seatStatusUrl.searchParams.set('_ts', String(Date.now()));
+    const res    = await fetch(seatStatusUrl.toString(), { cache: 'no-store' });
     const status = await res.json();
 
     const departed = status.nextflightstatus === GATE.FLIGHT_STATUS.DEPARTED
                   || status.gate_status      === GATE.GATE_STATUS.DEPARTED;
 
+    const lounge = status.nextflightstatus === GATE.FLIGHT_STATUS.LEVEL_LOUNGE
+                || status.next_flight_status === GATE.FLIGHT_STATUS.LEVEL_LOUNGE
+                || status.gate_status === GATE.GATE_STATUS.LEVEL_LOUNGE
+                || status.funnel_stage === GATE.FUNNEL_STAGE.LEVEL_LOUNGE
+                || status.validation_stage === GATE.FUNNEL_STAGE.LEVEL_LOUNGE
+                || status.seat_stage === GATE.FUNNEL_STAGE.LEVEL_LOUNGE
+                || status.level_lounge === true;
+
     if (departed) return 'departed';
+    if (lounge) return 'lounge';
 
-    // Prefer URL param over sessionStorage so a fresh deep-link always wins.
-    const rawId = new URLSearchParams(location.search).get('seat_id')
-               || sessionStorage.getItem(GATE.SESSION_KEY);
+    const params = new URLSearchParams(location.search);
+    const urlSeatId = params.get('seat_id');
+    const urlTujCode = params.get('tuj_code');
+    const sessionSeatId = sessionStorage.getItem(GATE.SESSION_KEY);
+    const sessionTujCode = sessionStorage.getItem(GATE.TUJ_KEY);
 
-    if (!rawId || !GATE.SEAT_ID_REGEX.test(rawId)) {
-      return 'landing';
-    }
-
-    // Persist immediately so the session survives a hard refresh mid-flight.
-    sessionStorage.setItem(GATE.SESSION_KEY, rawId);
-
-    // ── Server-side seat validation ─────────────────────────────────────────
-    // Skip if caller opts out (tests / non-Netlify environments).
-    if (!opts.skipSeatValidation) {
-      try {
-        const SEAT_VALIDATION_TIMEOUT_MS = 4000;
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), SEAT_VALIDATION_TIMEOUT_MS);
-        const seatRes = await fetch(
-          `${GATE.VALIDATE_SEAT}?id=${encodeURIComponent(rawId)}`,
-          { signal: controller.signal }
-        );
-        clearTimeout(timer);
-
-        if (seatRes.status === 400) {
-          // Malformed id (shouldn't happen after regex check, but be safe)
-          console.warn('[gate-contract] resolveState: 400 from /api/seat for', rawId);
-          sessionStorage.removeItem(GATE.SESSION_KEY);
-          return 'landing';
-        }
-
-        if (seatRes.ok) {
-          const seatData = await seatRes.json();
-          if (seatData.valid === false) {
-            console.warn('[gate-contract] resolveState: seat invalid —', rawId, 'reason:', seatData.reason || 'unknown');
-            sessionStorage.removeItem(GATE.SESSION_KEY);
-            return 'landing';
-          }
-          // valid: true (or _unchecked fail-open) — fall through to 'dashboard'
-        }
-        // Non-2xx other than 400 → fail open (fall through to 'dashboard')
-      } catch (seatErr) {
-        // Network error or AbortError (timeout) → fail open
-        const isTimeout = seatErr.name === 'AbortError';
-        console.warn(
-          '[gate-contract] resolveState: seat validation',
-          isTimeout ? 'timed out' : 'errored',
-          '— failing open for', rawId
-        );
-        // Fall through to 'dashboard'
+    let seatId = '';
+    if (urlSeatId && GATE.SEAT_ID_REGEX.test(urlSeatId)) {
+      seatId = urlSeatId;
+      sessionStorage.setItem(GATE.SESSION_KEY, urlSeatId);
+      if (urlTujCode) sessionStorage.setItem(GATE.TUJ_KEY, urlTujCode);
+    } else if (urlTujCode) {
+      sessionStorage.setItem(GATE.TUJ_KEY, urlTujCode);
+      if (sessionTujCode && sessionTujCode === urlTujCode && sessionSeatId && GATE.SEAT_ID_REGEX.test(sessionSeatId)) {
+        seatId = sessionSeatId;
+      } else {
+        sessionStorage.removeItem(GATE.SESSION_KEY);
+        seatId = '';
       }
+    } else if (sessionSeatId && GATE.SEAT_ID_REGEX.test(sessionSeatId)) {
+      seatId = sessionSeatId;
     }
 
-    return 'dashboard';
+    if (seatId) {
+      sessionStorage.setItem(GATE.SESSION_KEY, seatId);
+      return 'dashboard';
+    }
+
+    return 'landing';
   } catch (err) {
     console.error('[gate-contract] resolveState error — defaulting to landing:', err);
     return 'landing';
@@ -265,81 +136,58 @@ export async function resolveState(opts = {}) {
 /**
  * requestSeat(payload) — Seat Request Helper
  *
- * POSTs a seat request to GATE.REQUEST_SEAT and returns the parsed JSON
- * response. On success, automatically persists the returned seat_id to
- * sessionStorage so subsequent calls to resolveState() render the dashboard.
+ * POSTs to /api/seat-request and returns the parsed response.
+ * Caller is responsible for rendering success/error UI.
  *
- * The caller is responsible for rendering success/error UI.
- *
- * @async
- * @param {SeatRequestPayload} payload - Passenger intake data.
- * @returns {Promise<SeatRequestResponse>} Parsed API response.
- *
- * @example
- * import { requestSeat } from '/gate-contract.js';
- * const result = await requestSeat({
- *   name: 'Jo Ann Smith', email: 'jo@example.com', age_confirmed: true
- * });
- * if (result.ok) console.log('Seat reserved:', result.seat_id);
+ * @param {{ name: string, email: string, age_confirmed: boolean, source?: string }} payload
+ * @returns {Promise<{ ok: boolean, seat_id?: string, status?: string, error?: string }>}
  */
+async function readJsonResponse(res) {
+  const text = await res.text();
+  if (!text || !text.trim()) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
+function normalizeBoardingType(boardingType) {
+  // Future cabin-selection flows (for example, a BMAC checkout callback)
+  // should pass the chosen cabin tier here; alpha cohorts default to first_class.
+  const value = String(boardingType || 'first_class').trim().toLowerCase();
+  return value || 'first_class';
+}
+
 export async function requestSeat(payload) {
+  const tujCode = (payload && payload.tuj_code) || sessionStorage.getItem(GATE.TUJ_KEY) || new URLSearchParams(location.search).get('tuj_code') || '';
+  const resolvedFlightCode = String((payload && payload.flight_code) || (payload && payload.flight_id) || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || '').trim();
+  const resolvedCabinClass = String((payload && payload.cabin_class) || (payload && payload.cabin) || (payload && payload.boarding_type) || '').trim().toLowerCase();
+  const cabinClass = resolvedCabinClass === 'first' || resolvedCabinClass === 'first_class' || resolvedCabinClass === 'paid' || resolvedCabinClass === 'vip'
+    ? 'First'
+    : (resolvedCabinClass === 'sponsored' ? 'Sponsored' : 'Economy');
+  const requestBody = {
+    ...payload,
+    flight_code: (payload && payload.flight_code) || resolvedFlightCode,
+    flight_id: (payload && payload.flight_id) || resolvedFlightCode,
+    cabin_class: (payload && payload.cabin_class) || cabinClass,
+    seats_reserved: (payload && payload.seats_reserved) || 'F5-04',
+    boarding_type: normalizeBoardingType(payload && payload.boarding_type),
+    tuj_code: tujCode
+  };
   const res  = await fetch(GATE.REQUEST_SEAT, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
+    body:    JSON.stringify(requestBody)
   });
-  const data = await res.json();
+  const data = await readJsonResponse(res);
 
   if (data.ok && data.seat_id) {
-    // Store seat_id in sessionStorage immediately
+    // Store seat_id and any returned tuj_code in sessionStorage immediately
     sessionStorage.setItem(GATE.SESSION_KEY, data.seat_id);
+    if (requestBody.tuj_code) sessionStorage.setItem(GATE.TUJ_KEY, requestBody.tuj_code);
+    if (data.tuj_code) sessionStorage.setItem(GATE.TUJ_KEY, data.tuj_code);
   }
 
   return data;
-}
-
-/**
- * resolveSeatId() — Session Seat ID Reader
- *
- * Returns the seat_id stored in sessionStorage by a prior requestSeat() call,
- * or null if no seat is active in the current session.
- *
- * Use this to read the passenger's seat identifier without triggering a full
- * resolveState() round-trip (e.g., for deep-link construction or API calls
- * that require seat_id as a query parameter).
- *
- * @since   v1b (2026-03-29)
- * @returns {string|null} The seat_id string, or null if not present.
- *
- * @example
- * import { resolveSeatId } from '/gate-contract.js';
- * const id = resolveSeatId();
- * if (id) window.location.href = `/Tower?seat_id=${id}`;
- */
-export function resolveSeatId() {
-  return sessionStorage.getItem(GATE.SESSION_KEY) || null;
-}
-
-/**
- * verifyAgeToken() — Age Confirmation Token Validator
- *
- * Checks whether the passenger has confirmed they are 18+ by reading the
- * age_confirmed flag stored in sessionStorage during the intake flow.
- *
- * Returns true only if the flag is explicitly set to the string 'true'.
- * Any other value (missing, 'false', malformed) returns false.
- *
- * This is a client-side convenience check only. The authoritative age
- * confirmation is validated server-side in seat-request.js before any
- * seat is reserved.
- *
- * @since   v1b (2026-03-29)
- * @returns {boolean} True if age has been confirmed in this session.
- *
- * @example
- * import { verifyAgeToken } from '/gate-contract.js';
- * if (!verifyAgeToken()) showAgeGate();
- */
-export function verifyAgeToken() {
-  return sessionStorage.getItem('age_confirmed') === 'true';
 }

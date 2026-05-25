@@ -1,192 +1,207 @@
 /**
- * F-190 — handleSeatOpened / sendSeatConfirmation
+ * #116 — handleSeatOpened / sendSeatConfirmation
  * Netlify Function: sendgrid-integration
  *
- * Triggered when a Seat entity is activated (admin opens a Seat record in Base44).
- * Dispatches the correct email sequence based on boarding_type and cabin_class:
+ * Triggered when a Seat entity is activated (admin approves a SeatRequest).
+ * Dispatches the boarding sequence in order based on boarding_type:
+ *   - Alpha / default: alphaflightannouncement_v1 → boarding_confirmation_v1
+ *   - Bracket.Barbie / VIP cohort: vip_boarding_pass_v1 → vip_boarding_instructions_v1
  *
- *   boarding_type = "executive_pre"
- *     → exec_preboard_opentowork_v1  (single send; no boarding_confirmation stamp)
+ * After both sends confirm 2xx, stamps boarding_confirmation_sent_at on the
+ * Seat record via the Base44 API. Idempotency guard: will not overwrite if
+ * the field is already set (guards against retry double-stamps).
  *
- *   boarding_type = "vip"
- *     1. vip_boarding_pass_v1          (FL 042426 Birthday Flight — live, confirmed Apr 20, 2026)
- *     2. vip_boarding_instructions_v1  (FL 042426 Birthday Flight — live, confirmed Apr 20, 2026)
- *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
- *
- *   boarding_type = "sponsored"
- *     → sponsored_approved_v1  (single send; stamps boarding_confirmation_sent_at)
- *
- *   boarding_type = "standard" | "beta" | anything else (F-190 dual-tier boarding sequence)
- *     1. boarding_pass_paid_v1   (if cabin_class === 'First')
- *        boarding_pass_free_v1   (all other cabin_class values)
- *     2. boarding_instructions_paid_v1   (if cabin_class === 'First')
- *        boarding_instructions_free_v1   (all other cabin_class values)
- *     After both confirm 2xx, stamps boarding_confirmation_sent_at on the Seat record.
- *
- * boarding_type enum (Mission Control Seat Activation Panel — Apr 20, 2026):
- *   executive_pre | vip | sponsored | standard | beta
- *
- * Provider: SendGrid only (AutoSend retired Apr 12, 2026 — F-190 Phase 2).
- *
- * Idempotency guard: will not overwrite boarding_confirmation_sent_at if already set.
  * All sends BCC support@thispagedoesnotexist12345.com per universal BCC rule.
- *
- * Required env vars:
- *   SENDGRID_API_KEY              — SendGrid API key
- *   SENDGRID_FROM_EMAIL           — Sender address (default: noreply@thispagedoesnotexist12345.com)
- *   BASE44_SEAT_URL               — Base44 Seat record read/update endpoint
- *   SITE_URL                      — Base URL for CTA deep-links (default: https://thispagedoesnotexist12345.com)
- *   SENDGRID_DEBUG                — Set to "true" to emit structured JSON observability logs
- *   SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL — ASM group ID (default: 33047)
- *   SENDGRID_UNSUBSCRIBE_GROUP_MARKETING     — ASM marketing group ID (optional)
- *
- * Spec references:
- *   - F-190 — AutoSend / SendGrid Parallel Alignment (Phase 2: AutoSend retired Apr 12, 2026)
- *   - F152  — SendGrid Unsubscribe Group Wiring + Preference Center
- *   - Feature 101 — Fix 1: passport_url with ?seat_id= appended
- *   - Feature 144 — Fix 2: first_task_url / secondary_url with ?seat_id= appended
- *   - Base44 Seat entity: cabin_class enum ('First' | 'Sponsored' | 'Economy')
  */
-
-const { TEMPLATES, assertTemplates, templateKeyForId } = require('./sendgrid-templates');
 
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
-const BCC_EMAIL        = 'support@thispagedoesnotexist12345.com';
-const FUNCTION_NAME    = process.env.AWS_LAMBDA_FUNCTION_NAME || 'sendgrid-integration';
-const STAGE            = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
+const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
+const MAIN_SITE_URL = 'https://www.thispagedoesnotexist12345.com';
+const CANONICAL_FIRST_TIME_PATH = '/OnboardingPassport';
+const CANONICAL_RETURN_PATH = '/';
 
-// SendGrid template IDs — sourced from sendgrid-templates.js (do not hardcode d-... here)
-assertTemplates([
-  'boarding_pass_free_v1',
-  'boarding_pass_paid_v1',
-  'boarding_instructions_free_v1',
-  'boarding_instructions_paid_v1',
-  'exec_preboard_opentowork_v1',
-  'sponsored_approved_v1',
-  'vip_boarding_pass_v1',           // FL 042426 Birthday Flight — live, confirmed Apr 20, 2026
-  'vip_boarding_instructions_v1',   // FL 042426 Birthday Flight — live, confirmed Apr 20, 2026
-]);
+const TEMPLATE_ENV = {
+  alphaAnnouncement: 'SENDGRID_TEMPLATE_ALPHA_FLIGHT_ANNOUNCEMENT',
+  boardingConfirmation: 'SENDGRID_TEMPLATE_BOARDING_CONFIRMATION',
+  vipBoardingPass: 'SENDGRID_TEMPLATE_VIP_BOARDING_PASS',
+  vipBoardingInstructions: 'SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS'
+};
 
-const TEMPLATE_BOARDING_PASS_FREE           = TEMPLATES.boarding_pass_free_v1;
-const TEMPLATE_BOARDING_PASS_PAID           = TEMPLATES.boarding_pass_paid_v1;
-const TEMPLATE_BOARDING_INSTRUCTIONS_FREE   = TEMPLATES.boarding_instructions_free_v1;
-const TEMPLATE_BOARDING_INSTRUCTIONS_PAID   = TEMPLATES.boarding_instructions_paid_v1;
-const TEMPLATE_EXEC_PREBOARD                = TEMPLATES.exec_preboard_opentowork_v1;
-const TEMPLATE_SPONSORED_APPROVED           = TEMPLATES.sponsored_approved_v1;
-// VIP templates — live (FL 042426 Birthday Flight, confirmed Apr 20, 2026)
-const TEMPLATE_VIP_BOARDING_PASS            = TEMPLATES.vip_boarding_pass_v1;
-const TEMPLATE_VIP_BOARDING_INSTRUCTIONS    = TEMPLATES.vip_boarding_instructions_v1;
+const DEFAULT_FLIGHT_DETAILS = {
+  alpha: {
+    flightCode: process.env.ACTIVE_FLIGHT_CODE || '',
+    departureDate: process.env.ACTIVE_FLIGHT_DEPARTURE_DATE || ''
+  },
+  vip: {
+    flightCode: process.env.ACTIVE_FLIGHT_CODE || '',
+    departureDate: process.env.ACTIVE_FLIGHT_DEPARTURE_DATE || ''
+  }
+};
 
-// SEC-11 — canonical Beehiiv wheels-up post URL derivation.
-// Example: toFlightIdSlug('FL 051126') === 'fl-051126'.
-function toFlightIdSlug(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/[_\s]+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
-    .replace(/-+/g, '-')
-    .replace(/^[-]+|[-]+$/g, '');
+function getTrimmedEnv(name) {
+  const value = process.env[name];
+  return value ? String(value).trim() : '';
 }
 
-function buildWheelsUpUrl(flightIdOrDisplay) {
-  const slug = toFlightIdSlug(flightIdOrDisplay);
-  return slug
-    ? `https://newsletter.thispagedoesnotexist12345.us/p/flight-id-${slug}-is-wheels-up-youre-on-board`
-    : 'https://newsletter.thispagedoesnotexist12345.us/';
+function getTemplateIds(boardingType) {
+  const keys = boardingType === 'vip'
+    ? ['vipBoardingPass', 'vipBoardingInstructions']
+    : ['alphaAnnouncement', 'boardingConfirmation'];
+
+  const templateIds = {};
+  const missing = [];
+
+  for (const key of keys) {
+    const envName = TEMPLATE_ENV[key];
+    const value = getTrimmedEnv(envName);
+    if (!value) missing.push(envName);
+    templateIds[key] = value;
+  }
+
+  return { templateIds, missing };
 }
 
-/**
- * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
- * Never logs request body, personalizations, or API key.
- */
-function sgLog(fields) {
-  if (process.env.SENDGRID_DEBUG !== 'true') return;
-  console.log(JSON.stringify({ event: 'tuj_email_send', function: FUNCTION_NAME, stage: STAGE, ...fields }));
+function resolveSeatId(seat) {
+  return seat.id || seat.seat_id || seat.tuj_code || '';
 }
 
-/**
- * Build a correlation_id from available identifiers.
- * Omits any segment that is null/undefined rather than inventing data.
- */
-function buildCorrelationId({ flightId, passengerId, requestId } = {}) {
-  const parts = [];
-  if (flightId)    parts.push(`fl_${flightId}`);
-  if (passengerId) parts.push(`psg_${passengerId}`);
-  if (requestId)   parts.push(`req_${requestId}`);
-  return parts.length ? parts.join('__') : undefined;
+function resolveSeatRecordId(seat) {
+  return seat.id || seat.seat_id || seat.record_id || seat.seat_record_id || '';
+}
+
+function resolveTujCode(seat, seatId) {
+  return seat.tuj_code || seat.seat_id || seatId || '';
+}
+
+function resolveRecipient(seat) {
+  return seat.user_email || seat.passenger_email || seat.email || '';
+}
+
+function resolveFirstName(seat) {
+  return seat.first_name || seat.passenger_first_name || (seat.name ? String(seat.name).trim().split(/\s+/)[0] : '');
+}
+
+function resolveLastName(seat) {
+  return seat.last_name || seat.passenger_last_name || (seat.name ? String(seat.name).trim().split(/\s+/).slice(1).join(' ') : '');
+}
+
+function resolveBoardingType(seat) {
+  return String(seat.boarding_type || 'first_class').trim().toLowerCase();
+}
+
+const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || '').trim();
+
+function normalizeFlightCode(value, fallback) {
+  const rawValue = String(value || '').trim();
+  if (!rawValue) return fallback;
+  if (/^FL(?:[_\s-]?VIP)?[_\s-]?042426$/i.test(rawValue)) return CANONICAL_FLIGHT_ID;
+  return rawValue;
+}
+
+function resolveFlightCode(seat, isVipBoarding) {
+  const source = seat.flight_code || seat.flight_id || seat.flight_label || seat.flight_number || '';
+  return normalizeFlightCode(source, DEFAULT_FLIGHT_DETAILS[isVipBoarding ? 'vip' : 'alpha'].flightCode || '');
+}
+
+function resolveCabinClass(seat, isVipBoarding) {
+  const rawValue = String(seat.cabin_class || seat.cabin || seat.passenger_cabin_class || seat.cabin_type || seat.boarding_type || '').trim().toLowerCase();
+  if (rawValue === 'first' || rawValue === 'first_class' || rawValue === 'paid' || rawValue === 'vip') return 'First';
+  if (rawValue === 'sponsored') return 'Sponsored';
+  if (rawValue === 'economy' || rawValue === 'free' || rawValue === 'standard' || rawValue === 'alpha') return 'Economy';
+  return isVipBoarding ? 'First' : 'Economy';
+}
+
+function resolveDepartureDate(seat, isVipBoarding) {
+  return seat.departure_date || seat.scheduled_departure_date || DEFAULT_FLIGHT_DETAILS[isVipBoarding ? 'vip' : 'alpha'].departureDate || '';
+}
+
+function resolveSeatsAvailable(seat) {
+  const value = seat.seats_available ?? seat.remaining_seats ?? seat.available_seats ?? 1;
+  return typeof value === 'number' ? value : String(value);
+}
+
+function buildAlphaDynamicData(seat) {
+  const seatId = resolveSeatId(seat);
+  const seatRecordId = resolveSeatRecordId(seat);
+  const tujCode = resolveTujCode(seat, seatId);
+  const canonicalSeatId = tujCode || seatId;
+
+  return {
+    first_name: resolveFirstName(seat),
+    last_name: resolveLastName(seat),
+    user_email: resolveRecipient(seat),
+    seat_id: seatId,
+    tuj_code: tujCode,
+    flight_code: resolveFlightCode(seat, false),
+    flight_id: resolveFlightCode(seat, false),
+    cabin_class: resolveCabinClass(seat, false),
+    departure_date: resolveDepartureDate(seat, false),
+    first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
+    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(resolveFlightCode(seat, false))}`,
+    unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
+    boarding_type: 'alpha',
+    seats_reserved: 'F5-04'
+  };
+}
+
+function buildVipDynamicData(seat) {
+  const seatId = resolveSeatId(seat);
+  const tujCode = resolveTujCode(seat, seatId);
+  const canonicalSeatId = tujCode || seatId;
+
+  return {
+    first_name: resolveFirstName(seat),
+    last_name: resolveLastName(seat),
+    user_email: resolveRecipient(seat),
+    seat_id: seatId,
+    tuj_code: tujCode,
+    flight_code: resolveFlightCode(seat, true),
+    flight_id: resolveFlightCode(seat, true),
+    cabin_class: resolveCabinClass(seat, true),
+    departure_date: resolveDepartureDate(seat, true),
+    seats_available: resolveSeatsAvailable(seat),
+    first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
+    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(resolveFlightCode(seat, true))}`,
+    unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
+    boarding_type: 'vip',
+    seats_reserved: 'F5-04',
+    newsletter_brand: 'Bracket.Barbie',
+    newsletter_promo: 'Bracket.Barbie newsletter promotion'
+  };
 }
 
 /**
  * Send a single SendGrid dynamic template email.
  * Returns true on 2xx, false otherwise.
- * Uses a 10s timeout to prevent indefinite hangs.
  */
-async function sendViaSendGrid(apiKey, fromEmail, toEmail, templateId, dynamicData, logCtx = {}) {
-  const templateKey = templateKeyForId(templateId);
-  // F152 — ASM unsubscribe group wiring
-  const asmGroupId          = parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10);
-  const asmMarketingGroupId = process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING
-    ? parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING, 10)
-    : null;
-  const asmGroupsToDisplay  = asmMarketingGroupId
-    ? [asmGroupId, asmMarketingGroupId]
-    : [asmGroupId];
+async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData) {
   const payload = {
     from: { email: fromEmail },
     personalizations: [{
-      to:  [{ email: toEmail }],
+      to: [{ email: toEmail }],
       bcc: [{ email: BCC_EMAIL }],
       dynamic_template_data: dynamicData
     }],
-    template_id: templateId,
-    asm: { group_id: asmGroupId, groups_to_display: asmGroupsToDisplay }
+    template_id: templateId
   };
-  const t0 = Date.now();
-  let sgStatus;
-  try {
-    const response = await fetch(SENDGRID_API_URL, {
-      method: 'POST',
-      signal: AbortSignal.timeout(10000), // 10s — prevent indefinite hang
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    sgStatus = response.status;
-    const ok = response.ok || response.status === 202;
-    const elapsed_ms = Date.now() - t0;
-    sgLog({
-      ...logCtx,
-      provider:             'sendgrid',
-      template_key:         templateKey,
-      sendgrid_template_id: templateId,
-      status:               sgStatus,
-      elapsed_ms,
-      ok,
-    });
-    if (ok) {
-      console.log(`[sendgrid-integration] SendGrid: ${templateKey} sent to ${toEmail} — status ${sgStatus}`);
-      return true;
-    }
-    const errorText = await response.text();
-    console.error(`[sendgrid-integration] SendGrid: ${templateKey} failed for ${toEmail} — status ${sgStatus}:`, errorText);
-    return false;
-  } catch (err) {
-    const elapsed_ms = Date.now() - t0;
-    sgLog({
-      ...logCtx,
-      provider:      'sendgrid',
-      template_key:  templateKey,
-      ok:            false,
-      elapsed_ms,
-      error_name:    err?.name,
-      error_message: err?.message,
-    });
-    console.error(`[sendgrid-integration] SendGrid: ${templateKey} unexpected error for ${toEmail}:`, err);
-    return false;
+
+  const response = await fetch(SENDGRID_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (response.ok || response.status === 202) {
+    console.log(`[sendgrid-integration] Template ${templateId} sent to ${toEmail} — status ${response.status}`);
+    return true;
   }
+
+  const errorText = await response.text();
+  console.error(`[sendgrid-integration] Template ${templateId} failed for ${toEmail} — status ${response.status}:`, errorText);
+  return false;
 }
 
 /**
@@ -213,298 +228,89 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
 /**
  * sendSeatConfirmation — core boarding sequence dispatcher.
  *
- * Routes to the correct email sequence based on seat.boarding_type and seat.cabin_class:
- *   - "executive_pre" → exec_preboard_opentowork_v1 (single send)
- *   - default         → boarding_pass + boarding_instructions (dual-tier)
- *
- * Tier determination uses seat.cabin_class (Base44 canonical field):
- *   cabin_class === 'First' → paid templates
- *   all other values        → free templates
- *
- * For the default sequence: if both sends return 2xx, stamps
- * boarding_confirmation_sent_at on the Seat record. Idempotent: skips
- * the stamp if boarding_confirmation_sent_at is already set.
- *
- * @param {object} seat - Seat entity record from Base44
- * @param {string} seat.id                          - Seat record ID
- * @param {string} seat.user_email                  - Passenger email
- * @param {string} seat.first_name                  - Passenger first name
- * @param {string} seat.last_name                   - Passenger last name
- * @param {string} [seat.cabin_class]               - 'First' | 'Sponsored' | 'Economy' (tier field)
- * @param {string} [seat.boarding_type]             - "executive_pre" routes to exec_preboard template
- * @param {string} [seat.pid]                       - Passenger ID string (exec_preboard template)
- * @param {string} [seat.tuj_code]                  - TUJ code — canonical seat ID for CTA URLs (e.g. TUJ-KC2222)
- * @param {string} [seat.flight_id]                 - Flight ID (for correlation)
- * @param {string} [seat.passenger_id]              - Passenger ID (for correlation)
- * @param {string} [seat.request_id]                - Request ID (for correlation)
- * @param {string|null} seat.boarding_confirmation_sent_at - Idempotency check
+ * Fires the appropriate boarding sequence in order. If both sends return 2xx,
+ * stamps boarding_confirmation_sent_at on the Seat record. Idempotent:
+ * skips the stamp if boarding_confirmation_sent_at is already set.
  */
 async function sendSeatConfirmation(seat) {
-  const sendgridKey   = process.env.SENDGRID_API_KEY;
-  const fromEmail     = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
   const base44SeatUrl = process.env.BASE44_SEAT_URL;
-  const siteUrl       = (process.env.SITE_URL || 'https://thispagedoesnotexist12345.com').replace(/\/$/, '');
 
-  if (!sendgridKey) {
+  if (!apiKey) {
     console.error('[sendgrid-integration] SENDGRID_API_KEY is not set — aborting');
     return { success: false, error: 'SENDGRID_API_KEY not configured' };
   }
 
-  const {
-    id: seatId,
-    user_email,
-    first_name,
-    last_name,
-    cabin_class,
-    boarding_type,
-    pid,
-    tuj_code,
-    flight_id,
-    passenger_id,
-    request_id,
-    boarding_confirmation_sent_at,
-    exec_preboard_sent_at,
-    flight_display_name
-  } = seat;
+  const seatId = resolveSeatId(seat);
+  const tujCode = resolveTujCode(seat, seatId);
+  const recipientEmail = resolveRecipient(seat);
+  const firstName = resolveFirstName(seat);
+  const lastName = resolveLastName(seat);
+  const boardingType = resolveBoardingType(seat);
+  const isVipBoarding = boardingType.includes('vip');
+  const { boarding_confirmation_sent_at, boarding_confirmation_dispatch_started_at } = seat;
 
-  // Validate required fields
-  if (!user_email || !first_name || !last_name) {
-    console.error(`[sendgrid-integration] Seat ${seatId} missing required fields (user_email, first_name, last_name) — aborting`);
+  if (!seatId || !tujCode || !recipientEmail || !firstName || !lastName) {
+    console.error(`[sendgrid-integration] Seat ${seatId || tujCode || 'unknown'} missing required fields (recipientEmail, firstName, lastName, tuj_code) — aborting`);
     return { success: false, error: 'Missing required seat fields' };
   }
 
-  // F-190 Post-Apr-12 Hardening (86agrt0g5): boarding_type is required.
-  // If absent, abort immediately — do NOT silently fall through to the default boarding sequence.
-  // An exec_pre seat missing boarding_type would otherwise receive the standard boarding emails,
-  // which is a silent misroute with no error logged. Operator must set boarding_type via Tower
-  // before triggering handleSeatOpened.
-  if (!boarding_type) {
-    const msg = `Seat ${seatId} missing boarding_type — aborting to prevent misroute. Set boarding_type via Tower before triggering handleSeatOpened.`;
-    console.error(`[sendgrid-integration] ${msg}`, JSON.stringify({ seat_id: seatId, correlation_id: buildCorrelationId({ flightId: flight_id, passengerId: passenger_id, requestId: request_id }) }));
-    return { success: false, error: 'boarding_type is required — set via Tower before triggering handleSeatOpened' };
-  }
-
-  // Idempotency guard — executive_pre path: skip if already stamped
-  if (boarding_type === 'executive_pre' && exec_preboard_sent_at) {
-    console.log(`[sendgrid-integration] Seat ${seatId} already has exec_preboard_sent_at (${exec_preboard_sent_at}) — skipping send`);
+  if (boarding_confirmation_sent_at || boarding_confirmation_dispatch_started_at) {
+    const marker = boarding_confirmation_sent_at
+      ? `boarding_confirmation_sent_at (${boarding_confirmation_sent_at})`
+      : `boarding_confirmation_dispatch_started_at (${boarding_confirmation_dispatch_started_at})`;
+    console.log(`[sendgrid-integration] Seat ${seatId} already has ${marker} — skipping send`);
     return { success: true, skipped: true };
   }
 
-  // Idempotency guard — default path: skip if already stamped
-  if (boarding_confirmation_sent_at && boarding_type !== 'executive_pre') {
-    console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boarding_confirmation_sent_at}) — skipping send`);
-    return { success: true, skipped: true };
+  if (base44SeatUrl && seatId) {
+    const claimed = await updateSeatRecord(base44SeatUrl, seatId, {
+      boarding_confirmation_dispatch_started_at: new Date().toISOString(),
+      boarding_confirmation_dispatch_state: 'in_progress',
+      tuj_code: tujCode,
+      flight_id: resolveFlightCode(seat, isVipBoarding),
+      seats_reserved: 'F5-04'
+    });
+
+    if (!claimed) {
+      return { success: false, error: 'Failed to claim boarding confirmation dispatch lock' };
+    }
   }
 
-  const correlation_id = buildCorrelationId({ flightId: flight_id, passengerId: passenger_id, requestId: request_id });
-  const logCtx = {
-    correlation_id,
-    seat_id:       seatId,
-    cabin_class:   cabin_class || 'unknown',
-    boarding_type: boarding_type || 'default',
-    flight_id:     flight_id    || undefined,
-    passenger_id:  passenger_id || undefined,
-    request_id:    request_id   || undefined
-  };
-
-  // ── Executive Pre-Board path ───────────────────────────────────────────────
-  if (boarding_type === 'executive_pre') {
-    console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=executive_pre, routing to exec_preboard_opentowork_v1`);
-    // Validate pid and tuj_code — both are required template variables.
-    // Whitespace-only values are treated as missing to prevent blank placeholder renders.
-    const pidTrim  = pid      && pid.trim();
-    const tujTrim  = tuj_code && tuj_code.trim();
-    if (!pidTrim || !tujTrim) {
-      const missing = [!pidTrim && 'pid', !tujTrim && 'tuj_code'].filter(Boolean).join(', ');
-      console.error(`[sendgrid-integration] Seat ${seatId} — exec_preboard_opentowork_v1 aborted: missing required fields: ${missing}`);
-      return { success: false, error: `exec_preboard_opentowork_v1 requires non-empty: ${missing}` };
-    }
-    const execDynamicData = { first_name, last_name, user_email, pid: pidTrim, tuj_code: tujTrim };
-    const execSent = await sendViaSendGrid(sendgridKey, fromEmail, user_email, TEMPLATE_EXEC_PREBOARD, execDynamicData, logCtx);
-    if (!execSent) {
-      console.error(`[sendgrid-integration] exec_preboard_opentowork_v1 failed for seat ${seatId}`);
-      return { success: false, error: 'exec_preboard_opentowork_v1 send failed' };
-    }
-    // Send confirmed 2xx — stamp exec_preboard_sent_at for idempotency.
-    // A failed stamp write is treated as a hard failure: returning success here
-    // would allow a duplicate trigger to re-send the template (no guard to stop it).
-    if (base44SeatUrl && seatId) {
-      const stamped = await updateSeatRecord(base44SeatUrl, seatId, {
-        exec_preboard_sent_at: new Date().toISOString()
-      });
-      if (!stamped) {
-        console.error(`[sendgrid-integration] Seat ${seatId} — exec_preboard_sent_at stamp failed; returning error to prevent duplicate sends`);
-        return { success: false, error: 'exec_preboard_sent_at stamp write failed' };
-      }
-    } else {
-      console.warn('[sendgrid-integration] BASE44_SEAT_URL not set — exec_preboard_sent_at stamp skipped');
-    }
-    return { success: true };
+  const { templateIds, missing } = getTemplateIds(isVipBoarding);
+  if (missing.length) {
+    console.error(`[sendgrid-integration] Missing SendGrid template env vars: ${missing.join(', ')}`);
+    return { success: false, error: `Missing template env vars: ${missing.join(', ')}` };
   }
 
-  // ── Shared payload construction (used by VIP, sponsored, and standard paths) ──
-  // Fix (Apr 25, 2026): moved above VIP/sponsored blocks to resolve TDZ — dynamicData
-  // was declared at line ~417 but referenced at line ~339 inside the VIP block.
-  const flightLabel   = flight_display_name || flight_id || 'TUJ FLIGHT';
-  const canonicalSeatId = tuj_code || seatId || '';  // prefer TUJ code for CTA URLs; fall back to UUID
-  const canonicalFlightId = (flight_id || flightLabel).replace(/ /g, '_'); // normalize spaces → underscores
-  const wheelsUpUrl = buildWheelsUpUrl(flight_id || flightLabel);
-  const passportUrl   = `${siteUrl}/?seat_id=${canonicalSeatId}`;
-  const firstTaskUrl  = `${siteUrl}/ResumeFitCheck?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
-  const secondaryUrl  = `${siteUrl}/OnboardingPassport?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}`;
+  const dynamicData = isVipBoarding ? buildVipDynamicData(seat) : buildAlphaDynamicData(seat);
+  const sequence = isVipBoarding
+    ? [
+        { label: 'vip_boarding_pass_v1', templateId: templateIds.vipBoardingPass },
+        { label: 'vip_boarding_instructions_v1', templateId: templateIds.vipBoardingInstructions }
+      ]
+    : [
+        { label: 'alphaflightannouncement_v1', templateId: templateIds.alphaAnnouncement },
+        { label: 'boarding_confirmation_v1', templateId: templateIds.boardingConfirmation }
+      ];
 
-  // F5-02 — Stateful Board Now CTA routing (PAL-15)
-  // is_returning is set by handleSeatOpened when Passenger.passport_completed_at is non-null.
-  // First-time passengers → /OnboardingPassport; returning passengers → /Studio.
-  // BUG-009 fix (May 3, 2026): use canonical seat_id/tuj_code (underscore form).
-  // The no-underscore form (seatid/tujcode) caused context loss for returning passengers
-  // because Studio/index.html reads params.get('seat_id') — not 'seatid'.
-  // OnboardingPassport.jsx already accepts both forms (F5-05 compat layer — lines 28-29).
-  const isReturning   = !!seat.is_returning;
-  const boardNowUrl   = isReturning
-    ? `${siteUrl}/Studio?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(canonicalSeatId)}`
-    : `${siteUrl}/OnboardingPassport?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(canonicalSeatId)}`;
-  const mainSiteUrl   = 'https://www.thispagedoesnotexist12345.com';
-  const platformTechUrl = 'https://www.thispagedoesnotexist12345.tech';
-  const signupDate = seat.signup_date ||
-    new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  const dynamicData = {
-    first_name,
-    last_name,
-    user_email,
-    seat_id:             canonicalSeatId,
-    seatreference:       canonicalSeatId,
-    tuj_code:            canonicalSeatId,
-    cabin_class:         cabin_class || 'Economy',
-    signup_date:         signupDate,
-    passport_url:        passportUrl,
-    first_task_url:      firstTaskUrl,
-    secondary_url:       secondaryUrl,
-    board_now_url:       boardNowUrl,       // F5-02: stateful Board Now CTA (first-time → OnboardingPassport, returning → Studio)
-    wheels_up_url:       wheelsUpUrl,        // SEC-11: canonical Beehiiv wheels-up post URL, derived from flight_id
-    is_returning:        isReturning,       // F5-02: boolean flag for template conditional rendering
-    platform_url:        mainSiteUrl,
-    flight_code:         flightLabel,
-    flight_id:           flight_id || flightLabel,
-    flight_display_name: flightLabel,
-    mission_passengers:   `${platformTechUrl}/Passengers?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_flight_log:   `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_applications: `${platformTechUrl}/Applications?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_reminders:    `${platformTechUrl}/FlightLog?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}&view=reminders`,
-    mission_interviews:   `${platformTechUrl}/InterviewsAndFollowUps?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_dashboard:    `${platformTechUrl}/Dashboard?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_command:      `${platformTechUrl}/CommandCenter?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    mission_studio:       `${mainSiteUrl}/Studio?seat_id=${canonicalSeatId}&tuj_code=${canonicalSeatId}&flight_id=${canonicalFlightId}`,
-    seats_available:      seat.seats_available ?? seat.seats_reserved ?? 1,
-    passenger_name:       `${first_name} ${last_name}`.trim(),
-    departure_airport:    seat.departure_airport || '',
-    arrival_airport:      seat.arrival_airport   || 'Destination: Career Clarity',
-    departure_time:       seat.departure_time || '',
-    boarding_group:       seat.boarding_group    || 'VIP — Group 1',
-    seat_assignment:      canonicalSeatId,
-    gate:                 seat.gate              || 'Gate A1 — Bracket.Barbie Lounge',
-    boarding_open_time:   seat.boarding_open_time  || '',
-    boarding_close_time:  seat.boarding_close_time || '',
-  };
-
-  // ── VIP path ───────────────────────────────────────────────────────────────
-  // Routes to vip_boarding_pass_v1 + vip_boarding_instructions_v1.
-  // STUB: templates are pending creation in SendGrid. If either template ID is
-  // null (not yet registered), the send is aborted with a clear error so the
-  // operator knows to create the templates before activating a VIP seat.
-  if (boarding_type === 'vip') {
-    console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=vip, routing to VIP dual-send sequence`);
-    if (!TEMPLATE_VIP_BOARDING_PASS || !TEMPLATE_VIP_BOARDING_INSTRUCTIONS) {
-      console.error(`[sendgrid-integration] Seat ${seatId} — VIP templates not yet registered in sendgrid-templates.js. Create vip_boarding_pass_v1 and vip_boarding_instructions_v1 in SendGrid and add their IDs to the registry before activating a VIP seat.`);
-      return { success: false, error: 'vip_boarding_pass_v1 and vip_boarding_instructions_v1 templates are not yet registered. Create them in SendGrid and add IDs to sendgrid-templates.js.' };
+  for (const step of sequence) {
+    const sent = await sendTemplate(apiKey, fromEmail, recipientEmail, step.templateId, dynamicData);
+    if (!sent) {
+      console.error(`[sendgrid-integration] ${step.label} failed for seat ${seatId} — aborting sequence`);
+      return { success: false, error: `${step.label} send failed` };
     }
-    const vipPassSent = await sendViaSendGrid(
-      sendgridKey, fromEmail, user_email,
-      TEMPLATE_VIP_BOARDING_PASS, dynamicData,
-      { ...logCtx, template_key: 'vip_boarding_pass_v1' }
-    );
-    if (!vipPassSent) {
-      console.error(`[sendgrid-integration] vip_boarding_pass_v1 send failed for seat ${seatId} — aborting sequence`);
-      return { success: false, error: 'vip_boarding_pass_v1 send failed' };
-    }
-    const vipInstructionsSent = await sendViaSendGrid(
-      sendgridKey, fromEmail, user_email,
-      TEMPLATE_VIP_BOARDING_INSTRUCTIONS, dynamicData,
-      { ...logCtx, template_key: 'vip_boarding_instructions_v1' }
-    );
-    if (!vipInstructionsSent) {
-      console.error(`[sendgrid-integration] vip_boarding_instructions_v1 send failed for seat ${seatId} — boarding_pass already sent, stamp withheld`);
-      return { success: false, error: 'vip_boarding_instructions_v1 send failed' };
-    }
-    if (base44SeatUrl && seatId) {
-      await updateSeatRecord(base44SeatUrl, seatId, {
-        boarding_confirmation_sent_at: new Date().toISOString()
-      });
-    }
-    return { success: true };
   }
 
-  // ── Sponsored path ─────────────────────────────────────────────────────────
-  // Routes to sponsored_approved_v1 (single send).
-  // Stamps boarding_confirmation_sent_at after confirmed 2xx.
-  if (boarding_type === 'sponsored') {
-    console.log(`[sendgrid-integration] Seat ${seatId} — boarding_type=sponsored, routing to sponsored_approved_v1`);
-    const sponsoredSent = await sendViaSendGrid(
-      sendgridKey, fromEmail, user_email,
-      TEMPLATE_SPONSORED_APPROVED, dynamicData,
-      { ...logCtx, template_key: 'sponsored_approved_v1' }
-    );
-    if (!sponsoredSent) {
-      console.error(`[sendgrid-integration] sponsored_approved_v1 send failed for seat ${seatId}`);
-      return { success: false, error: 'sponsored_approved_v1 send failed' };
-    }
-    if (base44SeatUrl && seatId) {
-      await updateSeatRecord(base44SeatUrl, seatId, {
-        boarding_confirmation_sent_at: new Date().toISOString()
-      });
-    }
-    return { success: true };
-  }
-
-  // ── F-190 Dual-Tier Boarding Sequence (standard | beta | fallback) ─────────
-  // Tier determination: cabin_class === 'First' → paid; all other values → free
-  // (Base44 canonical field is cabin_class, NOT tier or cabin_tier)
-  // NOTE: dynamicData is constructed above (moved Apr 25, 2026 to fix TDZ for VIP path)
-  const isPaid = cabin_class === 'First';
-  console.log(`[sendgrid-integration] Seat ${seatId} — cabin_class=${cabin_class || 'undefined'} → ${isPaid ? 'PAID' : 'FREE'} boarding sequence`);
-
-  // Select templates based on tier
-  const boardingPassTemplateId        = isPaid ? TEMPLATE_BOARDING_PASS_PAID        : TEMPLATE_BOARDING_PASS_FREE;
-  const boardingInstructionsTemplateId = isPaid ? TEMPLATE_BOARDING_INSTRUCTIONS_PAID : TEMPLATE_BOARDING_INSTRUCTIONS_FREE;
-  const passTierKey         = `boarding_pass_${isPaid ? 'paid' : 'free'}_v1`;
-  const instructionsTierKey = `boarding_instructions_${isPaid ? 'paid' : 'free'}_v1`;
-
-  // Send 1: boarding_pass (paid or free)
-  const passSent = await sendViaSendGrid(
-    sendgridKey, fromEmail, user_email,
-    boardingPassTemplateId, dynamicData,
-    { ...logCtx, template_key: passTierKey }
-  );
-  if (!passSent) {
-    console.error(`[sendgrid-integration] ${passTierKey} send failed for seat ${seatId} — aborting sequence`);
-    return { success: false, error: `${passTierKey} send failed` };
-  }
-
-  // Send 2: boarding_instructions (paid or free)
-  const instructionsSent = await sendViaSendGrid(
-    sendgridKey, fromEmail, user_email,
-    boardingInstructionsTemplateId, dynamicData,
-    { ...logCtx, template_key: instructionsTierKey }
-  );
-  if (!instructionsSent) {
-    console.error(`[sendgrid-integration] ${instructionsTierKey} send failed for seat ${seatId} — boarding_pass already sent, stamp withheld`);
-    return { success: false, error: `${instructionsTierKey} send failed` };
-  }
-
-  // Both sends confirmed 2xx — stamp boarding_confirmation_sent_at
   if (base44SeatUrl && seatId) {
     await updateSeatRecord(base44SeatUrl, seatId, {
-      boarding_confirmation_sent_at: new Date().toISOString()
+      boarding_confirmation_sent_at: new Date().toISOString(),
+      boarding_confirmation_dispatch_started_at: boarding_confirmation_dispatch_started_at || new Date().toISOString(),
+      boarding_confirmation_dispatch_state: 'sent',
+      tuj_code: tujCode,
+      flight_id: resolveFlightCode(seat, isVipBoarding),
+      seats_reserved: 'F5-04'
     });
   } else {
     console.warn('[sendgrid-integration] BASE44_SEAT_URL not set — boarding_confirmation_sent_at stamp skipped');
@@ -521,10 +327,10 @@ async function sendSeatConfirmation(seat) {
  */
 exports.handler = async (event) => {
   const headers = {
-    'Access-Control-Allow-Origin':  '*',
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type':                 'application/json'
+    'Content-Type': 'application/json'
   };
 
   if (event.httpMethod === 'OPTIONS') {
@@ -542,23 +348,29 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Invalid JSON body' }) };
   }
 
-  if (!seat || !seat.id) {
-    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Missing seat.id in request body' }) };
+  if (!seat || (!seat.id && !seat.seat_id && !seat.tuj_code)) {
+    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Missing seat.id or tuj_code in request body' }) };
   }
 
   const result = await sendSeatConfirmation(seat);
 
   if (!result.success) {
-    return { statusCode: 502, headers, body: JSON.stringify({ ok: false, error: result.error }) };
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ ok: false, error: result.error })
+    };
   }
 
-  return { statusCode: 200, headers, body: JSON.stringify({ ok: true, skipped: result.skipped || false }) };
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({ ok: true, skipped: result.skipped || false })
+  };
 };
 
-// Export for testing
 if (typeof module !== 'undefined' && module.exports) {
   module.exports.sendSeatConfirmation = sendSeatConfirmation;
-  module.exports.sendViaSendGrid      = sendViaSendGrid;
-  module.exports.updateSeatRecord     = updateSeatRecord;
-  module.exports.buildCorrelationId   = buildCorrelationId;
+  module.exports.sendTemplate = sendTemplate;
+  module.exports.updateSeatRecord = updateSeatRecord;
 }

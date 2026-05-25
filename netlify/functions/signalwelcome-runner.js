@@ -93,6 +93,7 @@ async function beehiivFetch(path, options = {}) {
   const pubId = process.env.BEEHIIV_PUB_ID;
   if (!pubId) throw new Error('BEEHIIV_PUB_ID is not configured');
   if (!apiKey) throw new Error('BEEHIIV_API_KEY is not configured');
+  if (!pubId) throw new Error('BEEHIIV_PUB_ID is not configured');
   const url = `https://api.beehiiv.com/v2/publications/${pubId}${path}`;
   const res = await fetch(url, {
     ...options,
