@@ -127,6 +127,29 @@ function resolveFlightCode(data) {
   return raw.replace(/ /g, '_');
 }
 
+function resolveProgramMode(rawMode) {
+  const normalized = String(rawMode || '').trim();
+  return normalized
+    ? normalized.toUpperCase().replace(/[\s-]+/g, '_')
+    : 'AWAITING_CLEARANCE';
+}
+
+function getProgramModeMeta(programMode) {
+  return {
+    label: programMode.replace(/_/g, ' '),
+    variant: programMode === 'AWAITING_CLEARANCE' ? 'neutral' : 'active',
+  };
+}
+
+function ensureStableModeFields(data) {
+  const programMode = resolveProgramMode(data.program_mode || data.programMode);
+  const modeMeta = getProgramModeMeta(programMode);
+
+  data.program_mode = data.program_mode || programMode;
+  data.mode = data.mode || modeMeta.label;
+  data.mode_variant = data.mode_variant || modeMeta.variant;
+}
+
 exports.handler = async function handler(event) {
   // ── Preflight ──────────────────────────────────────────────────────────────
   if ((event.httpMethod || '').toUpperCase() === 'OPTIONS') {
@@ -167,6 +190,11 @@ exports.handler = async function handler(event) {
     // Always overwrites data.flight_code so the public payload has a single canonical field.
     // Returns null if no code is available — UI hides the secondary badge in that case.
     data.flight_code = resolveFlightCode(data);
+
+    // ── 4b. Stable mode fields ─────────────────────────────────────────────
+    // Keep /api/seat-status schema stable even while the upstream Base44
+    // getCohortStatus deployment is catching up to the merged schema change.
+    ensureStableModeFields(data);
 
     // ── 5. BLOCKER-05-FU: resume_fit_check_status enrichment ──────────────
     // Attempted only when seat_id is present and Base44 endpoints are configured.

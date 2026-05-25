@@ -63,9 +63,7 @@
       padding: 1.5rem 0 2rem;
     }
 
-    /* Gold Signal / Correction Flight Theme — Active: May 11, 2026 @ 11:11 PM EDT
-       Campaign palette: Amber Gold #FBBF24 / Orange #F97316 / Yellow #FACC15
-       Purpose: public correction signal for the Macro C Grade while preserving TUJ master brand and flight systems. */
+    /* Black Glass Theme */
     body.black-glass {
       background: #0A0A0A;
     }
@@ -78,7 +76,7 @@
     }
 
     body.black-glass h1 {
-      color: #FBBF24;
+      color: #7c9fff;
     }
 
     .container {
@@ -99,39 +97,13 @@
       font-size: 1rem;
       opacity: 1;
       color: #ffffff;
-      margin-bottom: 0.75rem;
-    }
-
-    .lede {
-      font-size: 1.05rem;
-      line-height: 1.65;
-      color: rgba(255, 255, 255, 0.78);
-      margin-bottom: 0.85rem;
-      max-width: 520px;
-    }
-
-    .campaign-kicker {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      margin: 0 auto 1.5rem;
-      padding: 0.45rem 0.85rem;
-      border: 1px solid rgba(249, 115, 22, 0.45);
-      border-radius: 999px;
-      color: #FACC15;
-      background: linear-gradient(135deg, rgba(251, 191, 36, 0.14), rgba(249, 115, 22, 0.10));
-      box-shadow: 0 0 18px rgba(251, 191, 36, 0.16);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      margin-bottom: 2rem;
     }
 
     /* Cyberpunk status section */
     .status-section {
       position: relative;
-      border: 1px solid rgba(251, 191, 36, 0.3);
+      border: 1px solid rgba(124, 159, 255, 0.3);
       border-radius: 8px;
       padding: 1.5rem;
       margin-bottom: 2rem;
@@ -146,8 +118,8 @@
         0deg,
         transparent,
         transparent 2px,
-        rgba(251, 191, 36, 0.02) 2px,
-        rgba(251, 191, 36, 0.02) 4px
+        rgba(124, 159, 255, 0.02) 2px,
+        rgba(124, 159, 255, 0.02) 4px
       );
       pointer-events: none;
     }
@@ -174,146 +146,20 @@
       padding: 0.15rem 0.55rem;
       border-radius: 999px;
       font-size: 0.75rem;
-      border: 1px solid rgba(251, 191, 36, 0.5);
-      background: rgba(251, 191, 36, 0.12);
-      color: #FBBF24;
+      border: 1px solid rgba(124, 159, 255, 0.5);
+      background: rgba(124, 159, 255, 0.12);
+      color: #7c9fff;
       white-space: nowrap;
     }
 
     .badge--highlight {
-      border-color: rgba(251, 191, 36, 0.6);
-      background: rgba(251, 191, 36, 0.15);
-      color: #FBBF24;
+      border-color: rgba(124, 159, 255, 0.6);
+      background: rgba(124, 159, 255, 0.15);
+      color: #7c9fff;
     }
 
     .badge--meta {
       opacity: 0.7;
-    }
-
-    /* ── Flight Name Block ─────────────────────────────────────────────────── */
-
-    .flight-name-block {
-      margin-bottom: 1.25rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(251, 191, 36, 0.12);
-    }
-
-    .flight-name-eyebrow {
-      display: block;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(251, 191, 36, 0.55);
-      margin-bottom: 0.3rem;
-    }
-
-    .flight-name-primary {
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: #FBBF24;
-      letter-spacing: 0.02em;
-      margin-bottom: 0.35rem;
-      line-height: 1.2;
-      text-transform: none;
-    }
-
-    .flight-code-secondary {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.72rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.35);
-    }
-
-    .flight-code-label {
-      opacity: 0.6;
-    }
-
-    .flight-code-secondary .badge--meta {
-      font-size: 0.7rem;
-      color: rgba(255, 255, 255, 0.4);
-      border-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      letter-spacing: 0.08em;
-    }
-
-    /* ── Paired Date/Time Rows ─────────────────────────────────────────────── */
-
-    .status-row--paired {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .status-pair {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .status-pair-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .status-pair-values {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      align-items: center;
-    }
-
-    @media (max-width: 420px) {
-      .status-row--paired {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* ── Status Strip Row ──────────────────────────────────────────────────── */
-
-    .status-row--strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-bottom: 0.5rem;
-    }
-
-    /* ── Secondary CTA: Book a Consultation ───────────────────────────────── */
-
-    .secondary-cta-row {
-      display: flex;
-      justify-content: center;
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid rgba(251, 191, 36, 0.08);
-    }
-
-    .btn--secondary-cta {
-      font-size: 0.78rem !important;
-      padding: 0.4rem 0.9rem !important;
-      opacity: 0.55;
-      color: rgba(251, 191, 36, 0.7) !important;
-      border-color: rgba(251, 191, 36, 0.2) !important;
-      background: transparent !important;
-      letter-spacing: 0.03em;
-      transition: opacity 0.2s ease;
-    }
-
-    .btn--secondary-cta:hover {
-      opacity: 0.85;
-    }
-
-    .btn--secondary-cta:not([aria-disabled="true"]):not([style*="pointer-events: none"]) {
-      opacity: 1;
-      font-size: 0.9rem !important;
-      padding: 0.6rem 1.2rem !important;
-      color: #FBBF24 !important;
-      border-color: rgba(251, 191, 36, 0.5) !important;
     }
 
     @keyframes pulse {
@@ -333,13 +179,13 @@
     }
 
     .status-text .date {
-      color: #FBBF24;
+      color: #7c9fff;
       opacity: 0.8;
     }
 
     /* Hoverable path keywords */
     .status-text .path {
-      color: #FBBF24;
+      color: #7c9fff;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -354,14 +200,14 @@
       left: 0;
       right: 0;
       height: 1px;
-      background: #FBBF24;
+      background: #7c9fff;
       opacity: 0;
       transition: opacity 0.2s;
     }
 
     .status-text .path:hover {
       color: #fff;
-      text-shadow: 0 0 12px rgba(251, 191, 36, 0.9);
+      text-shadow: 0 0 12px rgba(124, 159, 255, 0.9);
       transform: scale(1.05);
     }
 
@@ -371,31 +217,10 @@
 
     .btn-row {
       display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+      gap: 1rem;
       justify-content: center;
-      align-items: stretch;
-      max-width: 360px;
-      margin: 0 auto 1rem;
-    }
-    .btn-row .btn {
-      width: 100%;
-      box-sizing: border-box;
-      display: grid;
-      grid-template-columns: 2.25rem minmax(0, 1fr) 2.25rem;
-      align-items: center;
-      text-align: center;
-    }
-    .btn-row .btn::before {
-      content: attr(data-nav-index) '.';
-      grid-column: 1;
-      justify-self: start;
-      color: rgba(255, 255, 255, 0.55);
-      font-weight: 700;
-    }
-    .btn-row .btn::after {
-      content: '';
-      grid-column: 3;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
     }
 
     .btn {
@@ -409,16 +234,16 @@
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(251, 191, 36, 0.25);
-      color: #FBBF24;
+      border: 1px solid rgba(124, 159, 255, 0.25);
+      color: #7c9fff;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
     .btn:hover {
       transform: translateY(-2px);
-      border-color: rgba(251, 191, 36, 0.6);
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
+      border-color: rgba(124, 159, 255, 0.6);
+      box-shadow: 0 0 12px rgba(124, 159, 255, 0.2);
     }
 
     .btn-row-divider {
@@ -436,14 +261,14 @@
       flex: 1;
       max-width: 80px;
       height: 1px;
-      background: rgba(251, 191, 36, 0.4);
+      background: rgba(124, 159, 255, 0.4);
     }
 
     .btn-row-divider span {
       font-size: 0.65rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: rgba(251, 191, 36, 0.8);
+      color: rgba(124, 159, 255, 0.8);
     }
 
     .btn-row-waitlist {
@@ -462,8 +287,8 @@
       cursor: pointer;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(251, 191, 36, 0.25);
-      color: #FBBF24;
+      border: 1px solid rgba(124, 159, 255, 0.25);
+      color: #7c9fff;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
@@ -471,13 +296,13 @@
 
     .btn-waitlist:hover {
       transform: translateY(-2px);
-      border-color: rgba(251, 191, 36, 0.6);
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
+      border-color: rgba(124, 159, 255, 0.6);
+      box-shadow: 0 0 12px rgba(124, 159, 255, 0.2);
     }
 
     .btn-waitlist.unlocked {
-      border-color: rgba(251, 191, 36, 0.8);
-      box-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
+      border-color: rgba(124, 159, 255, 0.8);
+      box-shadow: 0 0 16px rgba(124, 159, 255, 0.35);
     }
 
     @keyframes pulse-green {
@@ -485,13 +310,13 @@
       50% { opacity: 0.4; transform: scale(1.5); }
     }
     @keyframes arriving-glow {
-      0%, 100% { box-shadow: 0 0 6px rgba(251, 191, 36, 0.4); }
-      50% { box-shadow: 0 0 14px rgba(251, 191, 36, 0.9); }
+      0%, 100% { box-shadow: 0 0 6px rgba(0, 255, 100, 0.4); }
+      50% { box-shadow: 0 0 14px rgba(0, 255, 100, 0.9); }
     }
     .badge--arriving {
-      background: rgba(251, 191, 36, 0.12);
-      color: #FBBF24;
-      border: 1px solid rgba(251, 191, 36, 0.5);
+      background: rgba(0, 255, 100, 0.12);
+      color: #7c9fff;
+      border: 1px solid rgba(0, 255, 100, 0.5);
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -501,7 +326,7 @@
       display: inline-block;
       width: 8px;
       height: 8px;
-      background: #FBBF24;
+      background: #7c9fff;
       border-radius: 50%;
       flex-shrink: 0;
       animation: pulse-green 1.2s ease-in-out infinite;
@@ -531,10 +356,12 @@
     [data-show-state] { display: none !important; }
     body[data-state='loading']   [data-show-state~='loading']   { display: revert !important; }
     body[data-state='landing']   [data-show-state~='landing']   { display: revert !important; }
+    body[data-state='lounge']    [data-show-state~='lounge']    { display: revert !important; }
     body[data-state='dashboard'] [data-show-state~='dashboard'] { display: revert !important; }
     body[data-state='departed']  [data-show-state~='departed']  { display: revert !important; }
     /* Elements that show in multiple states */
     body[data-state='landing']   [data-show-state~='any']       { display: revert !important; }
+    body[data-state='lounge']    [data-show-state~='any']       { display: revert !important; }
     body[data-state='dashboard'] [data-show-state~='any']       { display: revert !important; }
     body[data-state='departed']  [data-show-state~='any']       { display: revert !important; }
 
@@ -557,66 +384,21 @@
       max-width: 420px;
       width: 90%;
       background: rgba(10, 10, 10, 0.95);
-      border: 1px solid rgba(251, 191, 36, 0.35);
+      border: 1px solid rgba(124, 159, 255, 0.35);
       border-radius: 14px;
       padding: 2.5rem 2rem;
       text-align: center;
     }
     .age-gate-card h2 {
-      color: #FBBF24;
+      color: #7c9fff;
       font-size: 1.4rem;
       margin-bottom: 0.5rem;
     }
     .age-gate-card p {
       font-size: 0.9rem;
       color: rgba(255,255,255,0.7);
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.75rem;
       line-height: 1.6;
-    }
-    /* DOB input grid (4-P2) */
-    .age-gate-dob {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1.4fr;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-    }
-    .age-gate-dob-field { display: flex; flex-direction: column; }
-    .age-gate-dob label {
-      display: block;
-      font-size: 0.62rem;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.3rem;
-    }
-    .age-gate-dob select,
-    .age-gate-dob input[type=number] {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(251, 191, 36,0.25);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1rem;
-      padding: 0.55rem 0.4rem;
-      text-align: center;
-      width: 100%;
-      box-sizing: border-box;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .age-gate-dob select:focus,
-    .age-gate-dob input[type=number]:focus {
-      outline: none;
-      border-color: rgba(251, 191, 36,0.6);
-    }
-    /* hide number spinners */
-    .age-gate-dob input[type=number]::-webkit-inner-spin-button,
-    .age-gate-dob input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-    .age-gate-dob input[type=number] { -moz-appearance: textfield; }
-    #age-gate-error {
-      font-size: 0.8rem;
-      color: #ff6b6b;
-      min-height: 1.2em;
-      margin-bottom: 0.5rem;
     }
     .age-gate-actions {
       display: flex;
@@ -630,16 +412,15 @@
       font-weight: 600;
       letter-spacing: 0.05em;
       cursor: pointer;
-      background: rgba(251, 191, 36, 0.12);
-      border: 1px solid rgba(251, 191, 36, 0.6);
-      color: #FBBF24;
+      background: rgba(124, 159, 255, 0.12);
+      border: 1px solid rgba(124, 159, 255, 0.6);
+      color: #7c9fff;
       transition: background 0.2s, box-shadow 0.2s;
     }
-    .age-gate-confirm:hover:not(:disabled) {
-      background: rgba(251, 191, 36, 0.2);
-      box-shadow: 0 0 14px rgba(251, 191, 36, 0.25);
+    .age-gate-confirm:hover {
+      background: rgba(124, 159, 255, 0.2);
+      box-shadow: 0 0 14px rgba(124, 159, 255, 0.25);
     }
-    .age-gate-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
     .age-gate-deny {
       font-size: 0.8rem;
       color: rgba(255,255,255,0.35);
@@ -658,7 +439,7 @@
       display: none;
       text-align: left;
       padding: 1.5rem;
-      border: 1px solid rgba(251, 191, 36, 0.25);
+      border: 1px solid rgba(124, 159, 255, 0.25);
       border-radius: 10px;
       background: rgba(0,0,0,0.45);
       margin-bottom: 1.5rem;
@@ -673,7 +454,7 @@
       flex-wrap: wrap;
     }
     .mc-title {
-      color: #FBBF24;
+      color: #7c9fff;
       font-size: 1.2rem;
       letter-spacing: 0.05em;
       margin: 0 0 0.25rem;
@@ -694,103 +475,22 @@
     .mc-seat-label {
       font-size: 0.6rem;
       letter-spacing: 0.14em;
-      color: rgba(251, 191, 36,0.4);
+      color: rgba(168,196,0,0.4);
       text-transform: uppercase;
     }
     .mc-seat-id {
       font-size: 1rem;
       font-weight: 700;
-      color: #FBBF24;
+      color: #7c9fff;
       letter-spacing: 0.1em;
       font-family: monospace;
-    }
-
-    /* ── Mission Control: Gate Status / Seat Counter (4-P3) ───────────────── */
-    #mc-gate-status {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.6rem;
-      padding: 0.75rem 1rem;
-      margin-bottom: 1.5rem;
-      border: 1px solid rgba(251, 191, 36,0.18);
-      border-radius: 6px;
-      background: rgba(251, 191, 36,0.04);
-      font-size: 0.82rem;
-      letter-spacing: 0.04em;
-    }
-    #mc-gate-status .mc-gs-label {
-      color: rgba(251, 191, 36,0.5);
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      display: block;
-      margin-bottom: 0.2rem;
-    }
-    #mc-gate-status .mc-gs-value {
-      color: #FBBF24;
-      font-weight: 600;
-    }
-    #mc-gate-status .mc-gs-cta {
-      font-size: 0.75rem;
-      padding: 0.3rem 0.75rem;
-      border: 1px solid rgba(251, 191, 36,0.35);
-      border-radius: 4px;
-      color: #FBBF24;
-      background: transparent;
-      cursor: pointer;
-      text-decoration: none;
-      white-space: normal;
-      width: 100%;
-      text-align: center;
-      box-sizing: border-box;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    #mc-gate-status .mc-gs-cta:hover {
-      background: rgba(251, 191, 36,0.1);
-      border-color: rgba(251, 191, 36,0.6);
-    }
-    #mc-gate-status .mc-gs-cta[data-action='none'] {
-      display: none;
-    }
-
-    /* ── Mission Control: Status Strip ─────────────────────────────────── */
-    .mc-status-strip {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.6rem;
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid rgba(251, 191, 36,0.1);
-    }
-    .mc-status-card {
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(251, 191, 36,0.15);
-      border-radius: 8px;
-      padding: 0.65rem 0.75rem;
-    }
-    .mc-status-label {
-      font-size: 0.65rem;
-      color: rgba(251, 191, 36,0.5);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 0.25rem;
-    }
-    .mc-status-value {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.85);
-      line-height: 1.3;
-    }
-    @media (max-width: 480px) {
-      .mc-status-strip { grid-template-columns: 1fr; }
     }
 
     /* ── Mission Control: Sections ───────────────────────────────────────── */
     .mc-section {
       margin-bottom: 1.75rem;
       padding-bottom: 1.5rem;
-      border-bottom: 1px solid rgba(251, 191, 36,0.1);
+      border-bottom: 1px solid rgba(168,196,0,0.1);
     }
     .mc-section:last-child { border-bottom: none; margin-bottom: 0; }
     .mc-section-header {
@@ -804,7 +504,7 @@
       font-size: 0.82rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(251, 191, 36,0.7);
+      color: rgba(168,196,0,0.7);
       margin: 0 0 0.5rem;
     }
     .mc-section-desc {
@@ -815,14 +515,14 @@
     }
     .mc-section-link {
       font-size: 0.75rem;
-      color: rgba(251, 191, 36,0.55);
+      color: rgba(168,196,0,0.55);
       text-decoration: none;
       letter-spacing: 0.04em;
       white-space: nowrap;
     }
-    .mc-section-link:hover { color: #FBBF24; }
+    .mc-section-link:hover { color: #7c9fff; }
 
-    /* ── Mission Control: Boarding Steps ─────────────────────────────────── */
+    /* ── Mission Control: Boarding Steps ─────────���───────────────────────── */
     .boarding-steps {
       list-style: none;
       margin: 0;
@@ -837,28 +537,24 @@
       gap: 0.75rem;
       padding: 0.7rem 0.85rem;
       border-radius: 8px;
-      border: 1px solid rgba(251, 191, 36,0.12);
+      border: 1px solid rgba(168,196,0,0.12);
       background: rgba(0,0,0,0.3);
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .boarding-step:hover {
-      border-color: rgba(251, 191, 36,0.28);
-      background: rgba(251, 191, 36,0.03);
+      transition: border-color 0.2s;
     }
     .boarding-step.done {
-      border-color: rgba(251, 191, 36,0.4);
-      background: rgba(251, 191, 36,0.05);
+      border-color: rgba(168,196,0,0.4);
+      background: rgba(168,196,0,0.05);
     }
     .bstep-num {
       font-size: 0.65rem;
       font-family: monospace;
-      color: rgba(251, 191, 36,0.35);
+      color: rgba(168,196,0,0.35);
       letter-spacing: 0.06em;
       flex-shrink: 0;
       padding-top: 0.1rem;
       min-width: 1.5rem;
     }
-    .boarding-step.done .bstep-num { color: rgba(251, 191, 36,0.7); }
+    .boarding-step.done .bstep-num { color: rgba(168,196,0,0.7); }
     .bstep-body {
       flex: 1;
       display: flex;
@@ -870,46 +566,19 @@
       color: rgba(255,255,255,0.85);
       font-weight: 600;
     }
-    .boarding-step.done .bstep-name { color: #FBBF24; }
+    .boarding-step.done .bstep-name { color: #7c9fff; }
     .bstep-desc {
       font-size: 0.76rem;
       color: rgba(255,255,255,0.4);
       line-height: 1.4;
     }
-    .bstep-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      margin-top: 0.45rem;
-      font-size: 0.74rem;
-      font-weight: 600;
-      color: #FBBF24;
-      text-decoration: none;
-      letter-spacing: 0.04em;
-      border: 1px solid rgba(251, 191, 36,0.3);
-      border-radius: 4px;
-      padding: 0.2rem 0.6rem;
-      background: rgba(251, 191, 36,0.06);
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-      width: fit-content;
-    }
-    .bstep-cta:hover {
-      background: rgba(251, 191, 36,0.14);
-      border-color: rgba(251, 191, 36,0.65);
-      color: #fff;
-    }
-    .bstep-cta-arrow {
-      font-size: 0.8rem;
-      transition: transform 0.15s;
-    }
-    .bstep-cta:hover .bstep-cta-arrow { transform: translateX(3px); }
     .bstep-status {
       font-size: 0.9rem;
       flex-shrink: 0;
-      color: rgba(251, 191, 36,0.25);
+      color: rgba(168,196,0,0.25);
       padding-top: 0.1rem;
     }
-    .boarding-step.done .bstep-status { color: #FBBF24; }
+    .boarding-step.done .bstep-status { color: #7c9fff; }
 
     /* ── Mission Control: Ecosystem Tiles ───────────────────────────────── */
     .mc-tiles {
@@ -923,22 +592,22 @@
       gap: 0.3rem;
       padding: 0.9rem;
       border-radius: 8px;
-      border: 1px solid rgba(251, 191, 36,0.2);
+      border: 1px solid rgba(168,196,0,0.2);
       background: rgba(0,0,0,0.35);
       text-decoration: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       position: relative;
     }
     .mc-tile:hover {
-      border-color: rgba(251, 191, 36,0.55);
-      background: rgba(251, 191, 36,0.06);
-      box-shadow: 0 0 12px rgba(251, 191, 36,0.12);
+      border-color: rgba(168,196,0,0.55);
+      background: rgba(168,196,0,0.06);
+      box-shadow: 0 0 12px rgba(168,196,0,0.12);
     }
     .mc-tile-icon { font-size: 1.2rem; }
     .mc-tile-name {
       font-size: 0.88rem;
       font-weight: 700;
-      color: #FBBF24;
+      color: #7c9fff;
       letter-spacing: 0.03em;
     }
     .mc-tile-desc {
@@ -951,11 +620,11 @@
       top: 0.75rem;
       right: 0.85rem;
       font-size: 0.85rem;
-      color: rgba(251, 191, 36,0.3);
+      color: rgba(168,196,0,0.3);
       transition: color 0.2s, transform 0.2s;
     }
     .mc-tile:hover .mc-tile-arrow {
-      color: #FBBF24;
+      color: #7c9fff;
       transform: translateX(3px);
     }
 
@@ -963,7 +632,7 @@
     .build-table-wrap {
       overflow-x: auto;
       border-radius: 8px;
-      border: 1px solid rgba(251, 191, 36,0.15);
+      border: 1px solid rgba(168,196,0,0.15);
       margin-bottom: 0.75rem;
     }
     .build-table {
@@ -972,18 +641,18 @@
       font-size: 0.78rem;
     }
     .build-table thead tr {
-      background: rgba(251, 191, 36,0.07);
+      background: rgba(168,196,0,0.07);
     }
     .build-table th {
       padding: 0.55rem 0.75rem;
       text-align: left;
-      color: rgba(251, 191, 36,0.6);
+      color: rgba(168,196,0,0.6);
       font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       font-size: 0.68rem;
       white-space: nowrap;
-      border-bottom: 1px solid rgba(251, 191, 36,0.12);
+      border-bottom: 1px solid rgba(168,196,0,0.12);
     }
     .build-table td {
       padding: 0.5rem 0.75rem;
@@ -992,7 +661,7 @@
       vertical-align: middle;
     }
     .build-table tbody tr:last-child td { border-bottom: none; }
-    .build-table tbody tr:hover td { background: rgba(251, 191, 36,0.04); }
+    .build-table tbody tr:hover td { background: rgba(168,196,0,0.04); }
     .build-row--empty td {
       text-align: center;
       padding: 1.25rem;
@@ -1026,120 +695,150 @@
     .mc-actions {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
       gap: 0.6rem;
     }
     .mc-action-btn {
       font-size: 0.82rem;
       padding: 0.5rem 1rem;
       border-radius: 6px;
-      border: 1px solid rgba(251, 191, 36,0.3);
-      color: #FBBF24;
+      border: 1px solid rgba(168,196,0,0.3);
+      color: #7c9fff;
       text-decoration: none;
       background: rgba(0,0,0,0.4);
       letter-spacing: 0.03em;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
     .mc-action-btn:hover {
-      border-color: rgba(251, 191, 36,0.7);
-      background: rgba(251, 191, 36,0.08);
-      box-shadow: 0 0 10px rgba(251, 191, 36,0.18);
+      border-color: rgba(168,196,0,0.7);
+      background: rgba(168,196,0,0.08);
+      box-shadow: 0 0 10px rgba(168,196,0,0.18);
     }
 
-    /* ── Mission Control: Seat Activation Panel (Pilot only) ──────────────── */
-    .mc-activate-panel {
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,20,147,0.18);
-      border-radius: 10px;
-      padding: 1.1rem 1.2rem 1rem;
-      margin-top: 0.25rem;
-    }
-    .mc-activate-panel-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: #FBBF24;
-      text-transform: uppercase;
-      margin-bottom: 0.7rem;
-    }
-    .mc-activate-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      align-items: flex-end;
-      margin-bottom: 0.6rem;
-    }
-    .mc-activate-field {
+    .mc-hero {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
-      flex: 1;
-      min-width: 120px;
+      align-items: center;
+      text-align: center;
+      gap: 0.8rem;
+      margin-bottom: 1.4rem;
+      animation: dashRise 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
-    .mc-activate-label {
+    .mc-hero-kicker {
       font-size: 0.68rem;
-      letter-spacing: 0.06em;
-      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
+      color: rgba(168,196,0,0.45);
     }
-    .mc-activate-select {
-      background: rgba(0,0,0,0.55);
-      border: 1px solid rgba(255,20,147,0.25);
-      border-radius: 6px;
-      color: #fff;
-      font-size: 0.82rem;
-      padding: 0.42rem 0.65rem;
-      outline: none;
-      cursor: pointer;
-      transition: border-color 0.2s;
+    .mc-nav-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
     }
-    .mc-activate-select:focus { border-color: rgba(255,20,147,0.6); }
-    .mc-activate-btn {
-      font-size: 0.82rem;
-      font-weight: 700;
-      padding: 0.46rem 1.1rem;
-      border-radius: 6px;
-      border: 1px solid rgba(255,20,147,0.45);
-      color: #FBBF24;
-      background: rgba(255,20,147,0.07);
-      cursor: pointer;
+    .mc-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.8rem;
+      padding: 0.7rem 1.1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(124, 159, 255, 0.2);
+      background: rgba(0, 0, 0, 0.38);
+      color: #dff5ff;
+      text-decoration: none;
+      font-size: 0.92rem;
       letter-spacing: 0.04em;
-      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-      white-space: nowrap;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, opacity 180ms ease, background 180ms ease;
     }
-    .mc-activate-btn:hover {
-      border-color: rgba(255,20,147,0.75);
-      background: rgba(255,20,147,0.13);
-      box-shadow: 0 0 10px rgba(255,20,147,0.2);
+    .mc-nav-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 18px rgba(124, 159, 255, 0.12);
+      border-color: rgba(124, 159, 255, 0.4);
     }
-    .mc-activate-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    .mc-nav-btn--primary {
+      min-width: min(100%, 18rem);
+      padding: 0.95rem 1.5rem;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #f2fbff;
+      border-color: rgba(124, 159, 255, 0.32);
+      background: linear-gradient(180deg, rgba(18, 28, 16, 0.95), rgba(8, 12, 10, 0.96));
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.32), 0 0 26px rgba(124, 159, 255, 0.12);
     }
-    .mc-activate-status {
-      font-size: 0.74rem;
-      min-height: 1.1em;
-      color: rgba(255,255,255,0.5);
+    .mc-nav-btn--secondary {
+      opacity: 0.8;
+      font-size: 0.86rem;
+      padding-inline: 1rem;
+    }
+    .mc-nav-btn--secondary:hover {
+      opacity: 1;
+    }
+    .mc-nav-btn--hero {
+      animation: heroPulse 7s ease-in-out infinite;
+    }
+    .mc-hero-copy {
+      max-width: 42rem;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: rgba(237, 247, 255, 0.62);
+      margin: 0;
+    }
+    .mc-seat-badge--hero {
+      align-items: center;
+      margin-top: 0.1rem;
+    }
+    .mc-section--paths {
+      text-align: center;
+      animation: dashRise 780ms cubic-bezier(0.22, 1, 0.36, 1) 90ms both;
+    }
+    .mc-support-link {
+      display: inline-block;
+      margin-top: 0.85rem;
+      font-size: 0.8rem;
+      color: rgba(237, 247, 255, 0.52);
+      text-decoration: none;
       letter-spacing: 0.03em;
+      opacity: 0.78;
+      transition: opacity 180ms ease, color 180ms ease, transform 180ms ease;
+      animation: dashRise 820ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both;
     }
-    .mc-activate-status.ok  { color: #FBBF24; }
-    .mc-activate-status.err { color: #FF4D4D; }
+    .mc-support-link:hover {
+      opacity: 1;
+      color: rgba(237, 247, 255, 0.72);
+      transform: translateY(-1px);
+    }
+    .puzzle-tracker#puzzleTrackerDashboard {
+      margin-top: 1rem;
+      margin-bottom: 0;
+    }
 
-    /* ── Mission Control: Responsive ─────────────────────────────────────────────────────── */
+    @keyframes heroPulse {
+      0%, 100% { box-shadow: 0 18px 30px rgba(0, 0, 0, 0.32), 0 0 26px rgba(124, 159, 255, 0.12); transform: translateY(0); }
+      50% { box-shadow: 0 22px 36px rgba(0, 0, 0, 0.36), 0 0 34px rgba(124, 159, 255, 0.18); transform: translateY(-1px); }
+    }
+
+    @keyframes dashRise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Mission Control: Responsive ─────────────────────────────────────── */
     @media (max-width: 400px) {
       .mc-tiles { grid-template-columns: 1fr; }
       .mc-header { flex-direction: column; }
       .mc-seat-badge { align-items: flex-start; }
     }
     /* ── Smooth state transitions ─────────────────────────────────────────── */
-    /* All direct children of .container (except overlays + carousel) slide+fade on state change */
-    .container > :not(#age-gate-overlay):not(#dashboard-view):not(.carousel-wrap) {
+    /* All direct children of .container (except overlays) slide+fade on state change */
+    .container > :not(#age-gate-overlay):not(#dashboard-view) {
       will-change: transform, opacity, filter;
       transition: opacity 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1), filter 420ms ease;
-    }
-    /* Carousel-wrap fades with state but never translates — keeps slide math clean */
-    .container > .carousel-wrap {
-      transition: opacity 420ms ease;
-      will-change: opacity;
     }
 
     /* Dashboard starts invisible and shifted down — CSS drives the animation */
@@ -1152,7 +851,7 @@
     }
 
     /* In dashboard state: landing content slides up + fades out */
-    body[data-state='dashboard'] .container > :not(#age-gate-overlay):not(#dashboard-view):not(.carousel-wrap) {
+    body[data-state='dashboard'] .container > :not(#age-gate-overlay):not(#dashboard-view) {
       opacity: 0;
       transform: translateY(-18px);
       filter: blur(4px);
@@ -1169,8 +868,7 @@
     }
 
     /* Suppress transitions during the loading flash to avoid jank */
-    /* Exclude .carousel-wrap and .carousel-track so slide animation is never killed */
-    body[data-state='loading'] .container > :not(.carousel-wrap) {
+    body[data-state='loading'] .container > * {
       transition: none !important;
     }
 
@@ -1178,7 +876,7 @@
     .age-check {
       width: 100%;
       padding: 0.85rem 0.9rem;
-      border: 1px solid rgba(251, 191, 36, 0.35);
+      border: 1px solid rgba(124, 159, 255, 0.35);
       border-radius: 8px;
       background: rgba(0, 0, 0, 0.4);
       color: #fff;
@@ -1190,12 +888,12 @@
       transition: border-color 0.2s;
     }
     .age-check:has(input:checked) {
-      border-color: rgba(251, 191, 36, 0.7);
+      border-color: rgba(124, 159, 255, 0.7);
     }
     .age-check input[type='checkbox'] {
       margin-top: 0.15rem;
       flex-shrink: 0;
-      accent-color: #FBBF24;
+      accent-color: #7c9fff;
       width: 15px;
       height: 15px;
       cursor: pointer;
@@ -1208,13 +906,13 @@
     /* Welcome Aboard banner (shown once on ?status=boarded) */
     #welcome-aboard-banner {
       display: none;
-      background: rgba(251, 191, 36,0.1);
-      border: 1px solid rgba(251, 191, 36,0.4);
+      background: rgba(168,196,0,0.1);
+      border: 1px solid rgba(168,196,0,0.4);
       border-radius: 8px;
       padding: 0.75rem 1rem;
       margin-bottom: 1rem;
       font-size: 0.88rem;
-      color: #FBBF24;
+      color: #7c9fff;
       letter-spacing: 0.03em;
     }
 
@@ -1226,7 +924,7 @@
     .carousel {
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(251, 191, 36, 0.2);
+      border: 1px solid rgba(124, 159, 255, 0.2);
       border-radius: 10px;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
@@ -1253,7 +951,7 @@
     .carousel-slide h3 {
       font-size: 1rem;
       font-weight: 700;
-      color: #FBBF24;
+      color: #7c9fff;
       margin-bottom: 0.6rem;
       letter-spacing: 0.02em;
     }
@@ -1275,15 +973,15 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: rgba(251, 191, 36, 0.25);
-      border: 1px solid rgba(251, 191, 36, 0.4);
+      background: rgba(124, 159, 255, 0.25);
+      border: 1px solid rgba(124, 159, 255, 0.4);
       cursor: pointer;
       transition: background 0.25s, box-shadow 0.25s;
     }
 
     .carousel-dot.active {
-      background: #FBBF24;
-      box-shadow: 0 0 6px rgba(251, 191, 36, 0.6);
+      background: #7c9fff;
+      box-shadow: 0 0 6px rgba(124, 159, 255, 0.6);
     }
 
     .puzzle-tracker {
@@ -1292,36 +990,34 @@
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 1.25rem;
-      width: 100%;
     }
 
     .puzzle-label {
       font-size: 0.65rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(251, 191, 36, 0.3);
+      color: rgba(124, 159, 255, 0.3);
     }
 
     .puzzle-diamonds {
       display: flex;
       gap: 1rem;
       align-items: center;
-      justify-content: center;
     }
 
     .puzzle-diamond {
       font-size: 1.1rem;
-      color: rgba(251, 191, 36, 0.2);
+      color: rgba(124, 159, 255, 0.2);
       transition: color 0.35s ease, text-shadow 0.35s ease;
     }
 
     .puzzle-diamond.lit {
-      color: #FBBF24;
-      text-shadow: 0 0 8px rgba(251, 191, 36, 0.7), 0 0 16px rgba(251, 191, 36, 0.4);
+      color: #7c9fff;
+      text-shadow: 0 0 8px rgba(124, 159, 255, 0.7), 0 0 16px rgba(124, 159, 255, 0.4);
     }
 
     /* St. Patrick's Day Theme (March 17 only) */
-    .st-patricks { --accent: #FACC15; }
+    .st-patricks { --accent: #2E8B3A; }
 
     .st-patricks .btn,
     .st-patricks .btn-waitlist,
@@ -1331,30 +1027,30 @@
     .st-patricks .carousel-slide h3,
     .st-patricks .puzzle-label,
     .st-patricks .puzzle-diamond.lit {
-      border-color: #FACC15;
-      color: #FACC15;
+      border-color: #2E8B3A;
+      color: #2E8B3A;
       text-shadow: none;
     }
 
-    .st-patricks h1 { color: #FACC15; }
+    .st-patricks h1 { color: #2E8B3A; }
 
     .st-patricks .badge {
       border-color: rgba(46, 139, 58, 0.5);
       background: rgba(46, 139, 58, 0.12);
-      color: #FACC15;
+      color: #2E8B3A;
     }
 
     .st-patricks .badge--highlight {
       border-color: rgba(46, 139, 58, 0.6);
       background: rgba(46, 139, 58, 0.15);
-      color: #FACC15;
+      color: #2E8B3A;
     }
 
     .st-patricks .btn-waitlist.unlocked {
       box-shadow: 0 0 16px rgba(46, 139, 58, 0.4);
     }
 
-    footer .st-patricks-accent { color: #FACC15; }
+    footer .st-patricks-accent { color: #2E8B3A; }
 
     @media (max-width: 480px) {
       .container { width: 95%; padding: 2rem 1.25rem; }
@@ -1366,35 +1062,6 @@
       .btn-row-waitlist { padding: 0 0; }
       .btn-waitlist { width: 100%; text-align: center; }
       .carousel-slide { padding: 1.25rem 1rem; }
-
-      /* Mobile countdown: prevent horizontal overflow/cropping on narrow phones. */
-      .countdown-wrap {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0.35rem;
-        width: 100%;
-        max-width: 100%;
-        margin-top: 1rem;
-        overflow: hidden;
-      }
-
-      .countdown-unit {
-        min-width: 0;
-      }
-
-      .countdown-value {
-        font-size: clamp(1.25rem, 9vw, 1.65rem);
-      }
-
-      .countdown-label {
-        font-size: clamp(0.46rem, 2.5vw, 0.56rem);
-        letter-spacing: 0.05em;
-        white-space: nowrap;
-      }
-
-      .countdown-sep {
-        display: none;
-      }
     }
 
     .gate-locked-msg {
@@ -1405,8 +1072,8 @@
       font-weight: 600;
       letter-spacing: 0.05em;
       background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(251, 191, 36, 0.15);
-      color: rgba(251, 191, 36, 0.4);
+      border: 1px solid rgba(124, 159, 255, 0.15);
+      color: rgba(124, 159, 255, 0.4);
       text-align: center;
       cursor: default;
       margin-bottom: 1rem;
@@ -1416,7 +1083,7 @@
       display: none;
       padding: 1.5rem;
       border-radius: 10px;
-      border: 1px solid rgba(251, 191, 36, 0.25);
+      border: 1px solid rgba(124, 159, 255, 0.25);
       background: rgba(0, 0, 0, 0.5);
       text-align: center;
       margin-bottom: 1rem;
@@ -1440,7 +1107,7 @@
     .countdown-value {
       font-size: 1.6rem;
       font-weight: 700;
-      color: #FBBF24;
+      color: #7c9fff;
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
@@ -1449,20 +1116,20 @@
       font-size: 0.6rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(251, 191, 36, 0.5);
+      color: rgba(124, 159, 255, 0.5);
       margin-top: 0.2rem;
     }
 
     .countdown-sep {
       font-size: 1.4rem;
-      color: rgba(251, 191, 36, 0.4);
+      color: rgba(124, 159, 255, 0.4);
       align-self: flex-start;
       padding-top: 0.1rem;
     }
 
     .countdown-departed {
       font-size: 0.85rem;
-      color: rgba(251, 191, 36, 0.5);
+      color: rgba(124, 159, 255, 0.5);
       letter-spacing: 0.06em;
       text-transform: uppercase;
       margin: 0.75rem 0 0.25rem;
@@ -1488,260 +1155,471 @@
       z-index: 1;
     }
 
-    /* ── BLOCKER-01: Info Modal — What is TUJ Explainer + Alpha Disclaimer ── */
-    #info-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      background: rgba(251, 191, 36, 0.08);
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      color: rgba(251, 191, 36, 0.85);
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-      text-decoration: none;
-      margin-top: 0.75rem;
-    }
-    #info-btn:hover {
-      background: rgba(251, 191, 36, 0.15);
-      border-color: rgba(251, 191, 36, 0.6);
-      color: #FBBF24;
-    }
-    #info-modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: rgba(0, 0, 0, 0.88);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-    #info-modal-overlay.active { display: flex; }
-    .info-modal-card {
-      max-width: 480px;
-      width: 100%;
-      background: rgba(10, 10, 10, 0.97);
-      border: 1px solid rgba(251, 191, 36, 0.35);
-      border-radius: 16px;
-      padding: 2rem 1.75rem 1.75rem;
-      text-align: left;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .info-modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.4);
-      font-size: 1.25rem;
-      cursor: pointer;
-      line-height: 1;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
-      transition: color 0.2s, background 0.2s;
-    }
-    .info-modal-close:hover { color: #fff; background: rgba(255,255,255,0.08); }
-    .info-modal-card h2 {
-      color: #FBBF24;
-      font-size: 1.25rem;
-      margin-bottom: 0.35rem;
-    }
-    .info-modal-card .info-modal-tagline {
-      font-size: 0.8rem;
-      color: rgba(251, 191, 36,0.55);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 1.25rem;
-    }
-    .info-modal-section {
-      margin-bottom: 1.1rem;
-    }
-    .info-modal-section h3 {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: rgba(251, 191, 36,0.7);
-      margin-bottom: 0.4rem;
-    }
-    .info-modal-section p {
-      font-size: 0.88rem;
-      color: rgba(255,255,255,0.75);
-      line-height: 1.65;
-      margin: 0;
-    }
-    .info-modal-steps {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-    .info-modal-steps li {
-      font-size: 0.87rem;
-      color: rgba(255,255,255,0.75);
-      line-height: 1.55;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-    .info-modal-steps li .step-icon { flex-shrink: 0; }
-    .info-modal-disclaimer {
-      background: rgba(255, 180, 0, 0.07);
-      border: 1px solid rgba(255, 180, 0, 0.25);
-      border-radius: 10px;
-      padding: 0.85rem 1rem;
-      margin-bottom: 1.1rem;
-    }
-    .info-modal-disclaimer h3 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: rgba(255, 180, 0, 0.8);
-      margin-bottom: 0.35rem;
-    }
-    .info-modal-disclaimer p {
-      font-size: 0.84rem;
-      color: rgba(255,255,255,0.65);
-      line-height: 1.6;
-      margin: 0;
-    }
-    .info-modal-links {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-top: 1.25rem;
-    }
-    .info-modal-links a {
-      font-size: 0.82rem;
-      color: #FBBF24;
-      text-decoration: none;
-      border: 1px solid rgba(251, 191, 36,0.3);
-      border-radius: 6px;
-      padding: 0.35rem 0.75rem;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .info-modal-links a:hover {
-      background: rgba(251, 191, 36,0.1);
-      border-color: rgba(251, 191, 36,0.6);
+
+    /* ── TUJ Mission Control v2 reskin ─────────────────────────────────── */
+    :root {
+      --tuj-bg: #060b12;
+      --tuj-panel: rgba(9, 16, 27, 0.78);
+      --tuj-panel-strong: rgba(12, 20, 34, 0.92);
+      --tuj-line: rgba(126, 214, 255, 0.14);
+      --tuj-line-strong: rgba(126, 214, 255, 0.24);
+      --tuj-glow: rgba(124, 159, 255, 0.14);
+      --tuj-glow-strong: rgba(124, 159, 255, 0.24);
+      --tuj-accent: #8fd3ff;
+      --tuj-accent-2: #c4dbff;
+      --tuj-text: #edf7ff;
+      --tuj-muted: rgba(237, 247, 255, 0.66);
+      --tuj-muted-2: rgba(237, 247, 255, 0.44);
+      --tuj-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
     }
 
-    /* ── Segmentation fields: Career Stage + Current Goal (Beehiiv wiring) ── */
-    .seg-field-label {
-      display: block;
-      font-size: 0.62rem;
-      color: rgba(255,255,255,0.45);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.3rem;
-      text-align: left;
-      width: 100%;
+    body {
+      background:
+        radial-gradient(circle at 20% 15%, rgba(43, 97, 140, 0.24), transparent 28%),
+        radial-gradient(circle at 80% 12%, rgba(61, 145, 190, 0.18), transparent 22%),
+        radial-gradient(circle at 50% 0%, rgba(172, 230, 255, 0.08), transparent 42%),
+        linear-gradient(180deg, #03070d 0%, #060b12 54%, #02050a 100%);
+      color: var(--tuj-text);
+      font-family: Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 0 2.5rem;
+      overflow-x: hidden;
     }
-    .seg-field-wrap {
-      width: 100%;
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 100% 4rem, 4rem 100%;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), transparent 85%);
+      opacity: 0.45;
+      z-index: 0;
+    }
+
+    body.black-glass .container {
+      background: linear-gradient(180deg, rgba(10, 18, 30, 0.94), rgba(7, 13, 22, 0.88));
+      border: 1px solid rgba(124, 159, 255, 0.16);
+      box-shadow: var(--tuj-shadow), 0 0 0 1px rgba(255,255,255,0.03) inset, 0 0 60px rgba(124, 159, 255, 0.06);
+      backdrop-filter: blur(18px) saturate(145%);
+      -webkit-backdrop-filter: blur(18px) saturate(145%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.black-glass .container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124, 159, 255, 0.08), transparent 28%, transparent 72%, rgba(196, 219, 255, 0.05));
+      pointer-events: none;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.02em;
+      color: var(--tuj-text);
+      text-shadow: 0 0 18px rgba(124, 159, 255, 0.14);
+    }
+
+    .brand-lockup {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
-    }
-    .tuj-select {
-      width: 100%;
-      padding: 0.6rem 0.9rem;
-      border-radius: 6px;
-      border: 1px solid rgba(251, 191, 36, 0.35);
-      background: rgba(0,0,0,0.55);
-      color: #fff;
-      font-size: 0.9rem;
-      outline: none;
-      letter-spacing: 0.02em;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .tuj-select:focus {
-      border-color: rgba(251, 191, 36, 0.8);
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
-    }
-    .tuj-select option {
-      background: #0a0a0a;
-      color: #fff;
-    }
-    /* Current Goal multi-select chips */
-    .goal-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      width: 100%;
-    }
-    .goal-chip {
-      display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
-      padding: 0.3rem 0.65rem;
-      border-radius: 20px;
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      background: rgba(0,0,0,0.5);
-      color: rgba(255,255,255,0.65);
-      font-size: 0.78rem;
+      gap: 0.65rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .brand-logo {
+      width: min(100%, 860px);
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 0 22px rgba(124, 159, 255, 0.18));
+    }
+
+    .subtitle {
+      color: var(--tuj-muted);
+      margin-bottom: 1.75rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+
+    .status-section,
+    #dashboard-view,
+    .carousel,
+    .age-gate-card,
+    .gate-closed-reveal {
+      background: linear-gradient(180deg, rgba(12, 20, 34, 0.86), rgba(8, 14, 24, 0.9));
+      border: 1px solid rgba(124, 159, 255, 0.14);
+      box-shadow: 0 20px 55px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    }
+
+    .status-section {
+      border-radius: 18px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .mission-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .mission-card {
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(14, 22, 36, 0.95), rgba(7, 12, 20, 0.95));
+      border: 1px solid rgba(124, 159, 255, 0.18);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 12px 24px rgba(0,0,0,0.22);
+      min-height: 6rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.45rem;
+    }
+
+    .mission-card-label {
+      font-size: 0.66rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(124, 159, 255, 0.62);
+    }
+
+    .mission-card-value {
+      font-size: 0.98rem;
+      line-height: 1.5;
+      color: var(--tuj-text);
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .status-title {
+      padding: 0.2rem 0;
+      gap: 0.6rem;
+    }
+
+    .status-title-label {
+      color: var(--tuj-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+    }
+
+    .badge,
+    .btn,
+    .btn-waitlist,
+    .mc-action-btn,
+    .mc-section-link,
+    .mc-tile,
+    .carousel-dot,
+    .age-gate-confirm,
+    .age-gate-deny,
+    .boarding-step,
+    .build-table-wrap,
+    .build-table th,
+    .build-table td {
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease, opacity 180ms ease;
+    }
+
+    .badge {
+      border-radius: 999px;
+      border: 1px solid rgba(124, 159, 255, 0.22);
+      background: rgba(124, 159, 255, 0.08);
+      color: var(--tuj-text);
       letter-spacing: 0.03em;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, color 0.2s;
-      user-select: none;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset;
     }
-    .goal-chip:hover {
-      border-color: rgba(251, 191, 36, 0.6);
-      color: rgba(255,255,255,0.9);
+
+    .badge--highlight {
+      background: rgba(124, 159, 255, 0.12);
+      border-color: rgba(124, 159, 255, 0.3);
+      color: #dff5ff;
     }
-    .goal-chip.selected {
-      border-color: rgba(251, 191, 36, 0.9);
-      background: rgba(251, 191, 36, 0.12);
-      color: #FBBF24;
-      box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+
+    .badge--arriving {
+      background: rgba(196, 219, 255, 0.1);
+      border-color: rgba(196, 219, 255, 0.28);
+      color: #d9ffb9;
+      box-shadow: 0 0 20px rgba(196, 219, 255, 0.08);
     }
-    .goal-chip-check {
-      font-size: 0.7rem;
-      display: none;
+
+    .btn,
+    .btn-waitlist,
+    .mc-action-btn,
+    .mc-tile,
+    .age-gate-confirm {
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(13, 21, 35, 0.95), rgba(8, 13, 22, 0.95));
+      border-color: rgba(124, 159, 255, 0.18);
+      color: var(--tuj-text);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.24);
     }
-    .goal-chip.selected .goal-chip-check {
-      display: inline;
+
+    .btn:hover,
+    .btn-waitlist:hover,
+    .mc-action-btn:hover,
+    .mc-tile:hover,
+    .age-gate-confirm:hover,
+    .carousel-dot:hover {
+      transform: translateY(-1px);
+      border-color: rgba(124, 159, 255, 0.42);
+      box-shadow: 0 16px 28px rgba(0,0,0,0.28), 0 0 22px rgba(124, 159, 255, 0.12);
     }
-</style>
+
+    .btn,
+    .btn-waitlist,
+    .mc-action-btn {
+      color: #dff5ff;
+    }
+
+    .mc-header,
+    .mc-section,
+    .mc-tiles,
+    .boarding-step,
+    .build-table-wrap,
+    .carousel-slide,
+    .age-gate-card,
+    .gate-closed-reveal,
+    .status-title,
+    .puzzle-tracker,
+    .btn-row,
+    .btn-row-divider,
+    .btn-row-waitlist,
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    #dashboard-view {
+      border-radius: 18px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mc-title,
+    .mc-section-title,
+    .mc-tile-name,
+    .build-table th,
+    .countdown-value,
+    .puzzle-diamond.lit,
+    .status-text .path,
+    .mc-seat-id,
+    .carousel-slide h3 {
+      color: #d9f2ff;
+    }
+
+    .mc-subtitle,
+    .mc-section-desc,
+    .mc-tile-desc,
+    .bstep-desc,
+    .build-table td,
+    .carousel-slide p,
+    footer,
+    .countdown-label,
+    .gate-locked-msg,
+    .puzzle-label {
+      color: var(--tuj-muted);
+    }
+
+    .mc-title,
+    .mc-section-title {
+      letter-spacing: 0.12em;
+    }
+
+    .mc-section {
+      border-bottom-color: rgba(124, 159, 255, 0.12);
+    }
+
+    .boarding-step,
+    .mc-tile,
+    .build-table-wrap,
+    .carousel,
+    .age-check,
+    .gate-closed-reveal,
+    .gate-locked-msg {
+      border-color: rgba(124, 159, 255, 0.16);
+      background: rgba(8, 14, 24, 0.72);
+    }
+
+    .boarding-step.done {
+      border-color: rgba(196, 219, 255, 0.28);
+      background: rgba(196, 219, 255, 0.05);
+    }
+
+    .mc-tile-arrow,
+    .mc-section-link,
+    .mc-seat-label,
+    .build-status-key,
+    .countdown-sep {
+      color: rgba(124, 159, 255, 0.55);
+    }
+
+    .build-table thead tr {
+      background: rgba(124, 159, 255, 0.08);
+    }
+
+    .build-table th,
+    .build-table td {
+      border-bottom-color: rgba(124, 159, 255, 0.08);
+    }
+
+    .carousel-track {
+      transition-duration: 0.38s;
+    }
+
+    .carousel-slide h3 {
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.9rem;
+    }
+
+    .carousel-slide p {
+      line-height: 1.75;
+    }
+
+    .countdown-value {
+      text-shadow: 0 0 12px rgba(124, 159, 255, 0.12);
+    }
+
+    .age-gate-card h2 {
+      color: #dff5ff;
+      letter-spacing: 0.03em;
+    }
+
+    .age-gate-card p {
+      color: var(--tuj-muted);
+    }
+
+    .age-gate-deny {
+      color: rgba(237, 247, 255, 0.4);
+    }
+
+    .gate-closed-reveal h3,
+    .gate-locked-msg,
+    .countdown-departed {
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    footer {
+      opacity: 0.55;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 760px) {
+      .mission-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .mission-card {
+        min-height: 0;
+      }
+
+      .mc-hero {
+        margin-bottom: 1.1rem;
+      }
+      .mc-nav-row {
+        gap: 0.55rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .mc-nav-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .mc-nav-btn,
+      .mc-nav-btn--primary,
+      .mc-nav-btn--secondary {
+        width: 100%;
+        min-width: 0;
+      }
+      .mc-support-link {
+        width: 100%;
+        text-align: center;
+      }
+      .puzzle-tracker#puzzleTrackerDashboard {
+        width: 100%;
+      }
+    }
+
+  </style>
 </head>
 <body class="black-glass" data-state="loading">
   <div class="container">
-    <h1 data-show-state="landing departed">🚀 The Ultimate Journey</h1>
-    <p class="subtitle" data-show-state="landing departed">The Correction Flight</p>
-
-    <!-- Static lede — 10-second clarity fix (Apr 12, 2026) -->
-    <!-- Answers "what is this and why should I care?" without relying on the carousel. -->
-    <p class="lede" data-show-state="landing departed">Gold Signal active — amber systems online while the Macro C signal is corrected in public. One cohort, five seats, full-system support from resume to offer.</p>
-
-    <div class="campaign-kicker" data-show-state="landing departed">The Ultimate Journey: The Correction Flight</div>
-
-    <!-- BLOCKER-01: Info button — triggers What is TUJ modal -->
-    <div data-show-state="landing departed" style="text-align:center;margin-bottom:0.5rem;">
-      <button id="info-btn" aria-haspopup="dialog" aria-controls="info-modal-overlay" data-umami-event="Info Modal Open">
-        ℹ️ What is TUJ?
-      </button>
+    <div class="brand-lockup" aria-label="The Ultimate Journey logo">
+      <svg class="brand-logo" viewBox="0 0 980 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="brandTitle brandDesc">
+        <title id="brandTitle">The Ultimate Journey · Mission Control</title>
+        <desc id="brandDesc">Dark navy banner with a stylized airplane, runway, and flight data lines.</desc>
+        <defs>
+          <linearGradient id="brandBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06101f"/>
+            <stop offset="55%" stop-color="#0a1730"/>
+            <stop offset="100%" stop-color="#03070d"/>
+          </linearGradient>
+          <linearGradient id="brandRunway" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffd67d" stop-opacity="0.55"/>
+            <stop offset="50%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#7c9fff" stop-opacity="0.7"/>
+          </linearGradient>
+          <linearGradient id="brandGold" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e7c05b"/>
+            <stop offset="100%" stop-color="#fff1bf"/>
+          </linearGradient>
+          <linearGradient id="brandBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#7c9fff" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#d8e4ff" stop-opacity="0.95"/>
+          </linearGradient>
+          <filter id="brandGlow" x="-25%" y="-25%" width="150%" height="150%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <rect x="0" y="0" width="980" height="260" rx="28" fill="url(#brandBg)"/>
+        <rect x="18" y="18" width="944" height="224" rx="22" fill="none" stroke="rgba(124,159,255,0.18)"/>
+        <g opacity="0.95">
+          <path d="M48 210 L192 178 L342 142 L514 126 L940 210" fill="none" stroke="url(#brandRunway)" stroke-width="4.2" stroke-linecap="round"/>
+          <path d="M68 206 L68 176 M118 196 L118 164 M168 186 L168 152 M218 176 L218 144 M268 166 L268 136 M318 156 L318 128 M368 146 L368 122" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M660 150 L710 138 L752 146 L790 118 L830 130 L868 102" fill="none" stroke="url(#brandBlue)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#brandGlow)"/>
+          <circle cx="710" cy="138" r="4.2" fill="#7c9fff"/>
+          <circle cx="790" cy="118" r="4.2" fill="#7c9fff"/>
+          <circle cx="868" cy="102" r="4.2" fill="#ffffff"/>
+          <path d="M442 72 l48 -12 120 8 -48 16 42 24 -30 8 -31 -14 -62 28 -16 -18 32 -18 -24 -12 -31 10 z" fill="#f7fbff" filter="url(#brandGlow)"/>
+          <path d="M458 93 L393 124 382 118 447 78 z" fill="#f2f7ff"/>
+          <path d="M452 81 L529 56 548 61 479 96 z" fill="url(#brandGold)"/>
+          <path d="M489 101 L563 125 545 130 479 111 z" fill="url(#brandGold)"/>
+          <path d="M523 88 L539 102 523 118 512 103 z" fill="#ffffff"/>
+          <circle cx="556" cy="62" r="3.5" fill="#ffd67d"/>
+          <circle cx="548" cy="129" r="3.5" fill="#ffd67d"/>
+        </g>
+        <g filter="url(#brandGlow)">
+          <text x="82" y="110" fill="#f7fbff" font-size="54" font-weight="800" letter-spacing="0.02em" font-family="Inter, Segoe UI, system-ui, sans-serif">The Ultimate Journey</text>
+          <text x="82" y="154" fill="#e7c05b" font-size="28" font-weight="700" letter-spacing="0.24em" font-family="Inter, Segoe UI, system-ui, sans-serif">Mission Control</text>
+          <text x="82" y="190" fill="#d8e4ff" font-size="14" font-weight="600" letter-spacing="0.28em" font-family="Inter, Segoe UI, system-ui, sans-serif">Current Flight // Mission Control</text>
+        </g>
+      </svg>
     </div>
+    <p class="subtitle">Mission Control landing experience</p>
 
     <!-- CAROUSEL -->
-    <div class="carousel-wrap" data-show-state="landing departed">
+    <div class="carousel-wrap">
       <div class="carousel" id="mainCarousel">
         <div class="carousel-track" id="carouselTrack">
           <div class="carousel-slide">
-            <h3>The Correction Flight is active.</h3>
-            <p>The Ultimate Journey is correcting the Macro C signal in public: amber systems online, Gold Signal forward, and every fix logged to the flight path.</p>
+            <h3>Your career has a flight plan.</h3>
+            <p>The Ultimate Journey runs one focused cohort through the full system — mapping your experience to what the market is actually hiring for.</p>
           </div>
           <div class="carousel-slide">
             <h3>Built for the overlooked operator.</h3>
@@ -1749,11 +1627,11 @@
           </div>
           <div class="carousel-slide">
             <h3>One flight. Five seats.</h3>
-            <p>PageForward Airways is carrying 5 passengers on this flight through the TUJ system. Every outcome is logged to the manifest and shared in the newsletter.</p>
+            <p>The flight is carrying 5 passengers through the TUJ system. Every outcome is logged to the manifest and shared in the Mission Control landing experience.</p>
           </div>
           <div class="carousel-slide">
-            <h3>Gold Signal. Then wheels up.</h3>
-            <p>Every bug, fix, and passenger milestone is recorded. The correction is visible, the signal stays warm, and the next move is logged before departure.</p>
+            <h3>Gate open. Then wheels up.</h3>
+            <p>Every bug, fix, and passenger milestone is recorded. When this flight departs, the gate closes until the next cohort is scheduled.</p>
           </div>
         </div>
       </div>
@@ -1765,102 +1643,14 @@
       </div>
     </div>
 
-    <!-- ── BLOCKER-01: Info Modal — What is TUJ Explainer + Alpha Disclaimer ── -->
-    <div id="info-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="info-modal-title" aria-hidden="true">
-      <div class="info-modal-card">
-        <button class="info-modal-close" id="info-modal-close" aria-label="Close">&times;</button>
-        <h2 id="info-modal-title">✈️ What is The Ultimate Journey?</h2>
-        <p class="info-modal-tagline">PageForward Airways &mdash; Gold Signal &mdash; The Correction Flight</p>
-
-        <div class="info-modal-section">
-          <h3>The Mission</h3>
-          <p>The Ultimate Journey is a focused career optimization program — one cohort, five seats, full-system support from resume to offer. The Correction Flight makes the current Macro C signal visible as a public repair path, then works the system until passengers land.</p>
-        </div>
-
-        <div class="info-modal-section">
-          <h3>What &ldquo;Request a Seat&rdquo; Means</h3>
-          <p>Requesting a seat puts you on the flight manifest. There are exactly 5 seats on this flight. Once the tower reviews your request and confirms your seat, you receive a boarding pass and access to the full TUJ system.</p>
-        </div>
-
-        <div class="info-modal-section">
-          <h3>What Happens After Boarding</h3>
-          <ul class="info-modal-steps">
-            <li><span class="step-icon">🎫</span> Boarding pass issued &rarr; you land in the Studio</li>
-            <li><span class="step-icon">📄</span> Upload your resume + paste a job description</li>
-            <li><span class="step-icon">🎯</span> Run Resume Fit Check &rarr; ATS score + gap analysis</li>
-            <li><span class="step-icon">✏️</span> Tailor your resume variant in One Page Studio</li>
-            <li><span class="step-icon">🚀</span> Apply, track, and close in the Application Hub</li>
-          </ul>
-        </div>
-
-        <div class="info-modal-disclaimer">
-          <h3>⚠️ Alpha Disclaimer</h3>
-          <p>This is a <strong>family alpha</strong> — a private, invite-only test flight with 5 seats. The system is live but not public. Bugs will happen. Your feedback shapes what gets built next. This is not a course, a subscription, or a product launch. It is a working flight.</p>
-        </div>
-
-        <div class="info-modal-links">
-          <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" data-umami-event="Info Modal — Signal Link">📡 Signal Newsletter</a>
-          <a href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer" data-umami-event="Info Modal — Support Link">📅 Book a Consultation</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Age Gate Overlay (4-P2: Option C — DOB collection + age_token) ── -->
+    <!-- ── Age Gate Overlay (controlled by window.__TUJ.showAgeGate) ─────── -->
     <div id="age-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
       <div class="age-gate-card">
-        <h2 id="age-gate-title">✈️ Passenger Verification</h2>
-        <p>The Ultimate Journey is designed for career-focused adults. Please confirm your date of birth to continue boarding.</p>
-        <div class="age-gate-dob">
-          <div class="age-gate-dob-field">
-            <label for="ag-month">Month</label>
-            <select id="ag-month" aria-label="Birth month">
-              <option value="">MM</option>
-              <option value="1">01</option><option value="2">02</option>
-              <option value="3">03</option><option value="4">04</option>
-              <option value="5">05</option><option value="6">06</option>
-              <option value="7">07</option><option value="8">08</option>
-              <option value="9">09</option><option value="10">10</option>
-              <option value="11">11</option><option value="12">12</option>
-            </select>
-          </div>
-          <div class="age-gate-dob-field">
-            <label for="ag-day">Day</label>
-            <select id="ag-day" aria-label="Birth day"><option value="">DD</option></select>
-          </div>
-          <div class="age-gate-dob-field">
-            <label for="ag-year">Year</label>
-            <input id="ag-year" type="number" placeholder="YYYY" min="1900" max="2099" aria-label="Birth year" />
-          </div>
-        </div>
-        <div id="age-gate-error" role="alert"></div>
+        <h2 id="age-gate-title">✈️ Age Verification</h2>
+        <p>The Ultimate Journey platform is intended for passengers <strong>21 years of age or older</strong>. Please confirm your age to continue.</p>
         <div class="age-gate-actions">
-          <button class="age-gate-confirm" id="age-gate-confirm-btn" disabled>Verify Age &amp; Continue</button>
+          <button class="age-gate-confirm" id="age-gate-confirm-btn">I confirm I am 21 or older — Let me board</button>
           <button class="age-gate-deny" id="age-gate-deny-btn">I cannot confirm — take me back</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Seat ID Entry Modal (shown when ?mission-control without valid seat_id) ── -->
-    <div id="seat-id-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="sig-title" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
-      <div class="age-gate-card" style="max-width:380px;">
-        <h2 id="sig-title" style="color:#FBBF24;font-size:1.25rem;margin-bottom:0.5rem;">❖ Mission Control</h2>
-        <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:1.25rem;line-height:1.6;">Enter your Seat ID to access your dashboard.<br><span style="font-size:0.78rem;opacity:0.6;">Your ID was included in your boarding confirmation email.</span></p>
-        <input
-          id="sig-input"
-          type="text"
-          placeholder="TUJ-XXXXXX"
-          maxlength="10"
-          autocomplete="off"
-          spellcheck="false"
-          style="width:100%;padding:0.65rem 0.9rem;border-radius:8px;border:1px solid rgba(251, 191, 36,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:1rem;font-family:monospace;letter-spacing:0.1em;text-transform:uppercase;outline:none;box-sizing:border-box;margin-bottom:0.5rem;"
-          oninput="this.value=this.value.toUpperCase();"
-          onfocus="this.style.borderColor='rgba(251, 191, 36,0.8)'"
-          onblur="this.style.borderColor='rgba(251, 191, 36,0.35)'"
-        />
-        <div id="sig-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1.2em;margin-bottom:0.5rem;line-height:1.5;"></div>
-        <div class="age-gate-actions">
-          <button class="age-gate-confirm" id="sig-confirm-btn">Access Mission Control</button>
-          <button class="age-gate-deny" id="sig-cancel-btn">Cancel</button>
         </div>
       </div>
     </div>
@@ -1873,194 +1663,104 @@
         🎉 Welcome Aboard — your seat is confirmed. Check your inbox for your boarding pass.
       </div>
 
-      <!-- ── Header row: title + seat badge ───────────────────────────────────── -->
-      <div class="mc-header">
-        <div>
-          <h2 class="mc-title">❖ Mission Control</h2>
-          <p class="mc-subtitle">Your career optimization platform is active.</p>
-        </div>
-        <div class="mc-seat-badge">
+      <div class="mc-hero">
+        <div class="mc-hero-kicker">Path activation complete</div>
+        <a class="mc-nav-btn mc-nav-btn--primary mc-nav-btn--hero" href="https://www.thispagedoesnotexist12345.com/" target="_blank" rel="noopener noreferrer">❖ Mission Control</a>
+        <p class="mc-hero-copy">Your seat is confirmed. Mission Control is now the centered launch point for the next leg of the journey.</p>
+        <div class="mc-seat-badge mc-seat-badge--hero">
           <span class="mc-seat-label">SEAT</span>
           <span id="dashboard-seat-id" class="mc-seat-id">—</span>
         </div>
       </div>
 
-      <!-- ── Gate Status / Seat Counter (4-P3) ─────────────────────────────────────────── -->
-      <!-- Driven by resolveGateState() in the TUJ State Machine (below).
-           JS populates #mc-gs-count-value and #mc-gs-cta on every rerender(). -->
-      <div id="mc-gate-status">
-        <div>
-          <span class="mc-gs-label">Gate Status</span>
-          <span id="mc-gs-count-value" class="mc-gs-value">Loading…</span>
-        </div>
-        <a id="mc-gs-cta" class="mc-gs-cta" href="#seat-request-form" data-action="none">Request seat</a>
-      </div>
-
-
-      <!-- ── Status Strip — tokenized: STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE ── -->
-      <!-- JS defaults shown when no seat_id present; URL params + seat record override on load. -->
-      <div class="mc-status-strip" id="mcStatusStrip">
-        <div class="mc-status-card">
-          <div class="mc-status-label">Current lane</div>
-          <div class="mc-status-value" id="mcStatusLane">Boarding</div>
-        </div>
-        <div class="mc-status-card">
-          <div class="mc-status-label">Visible operators</div>
-          <div class="mc-status-value" id="mcStatusOperators">5 active</div>
-        </div>
-        <div class="mc-status-card">
-          <div class="mc-status-label">Clearest next move</div>
-          <div class="mc-status-value" id="mcStatusNextMove">Review signal path</div>
-        </div>
-      </div>
-
-      <!-- ── Section 1: 8-Step Boarding Sequence ─────────────────────────────────────────── -->
+      <!-- ── Section 1: 8-Step Boarding Sequence ──────────────────────────── -->
       <div class="mc-section">
         <h3 class="mc-section-title">📍 Boarding Sequence</h3>
         <p class="mc-section-desc">Eight steps. Complete them in order. Each one compounds the last.</p>
         <ol class="boarding-steps">
-
-          <!-- Step 1: Subscribe to Signal — already done on boarding -->
-          <li class="boarding-step done" id="bstep-1">
+          <li class="boarding-step" id="bstep-1">
             <span class="bstep-num">01</span>
             <div class="bstep-body">
               <span class="bstep-name">Subscribe to Signal</span>
               <span class="bstep-desc">Your mission brief arrives via newsletter. Issue #001 is your first brief.</span>
-              <a class="bstep-cta" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">
-                Open Signal <span class="bstep-cta-arrow">→</span>
-              </a>
             </div>
             <span class="bstep-status" data-step="1">✔</span>
           </li>
-
-          <!-- Step 2: Complete Your Profile — opens Systems / OnboardingPassport -->
           <li class="boarding-step" id="bstep-2">
             <span class="bstep-num">02</span>
             <div class="bstep-body">
               <span class="bstep-name">Complete Your Profile</span>
               <span class="bstep-desc">Set your headline, target titles, and location in your passenger record.</span>
-              <a class="bstep-cta" id="bstep-2-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
-                Open Systems — Passenger Record <span class="bstep-cta-arrow">→</span>
-              </a>
             </div>
             <span class="bstep-status" data-step="2">○</span>
           </li>
-
-          <!-- Step 3: Link Resume to Studio -->
           <li class="boarding-step" id="bstep-3">
             <span class="bstep-num">03</span>
             <div class="bstep-body">
               <span class="bstep-name">Link Your Resume to Studio</span>
               <span class="bstep-desc">Upload or build your one-page resume in the AI Resume Builder.</span>
-              <a class="bstep-cta" href="/Studio" target="_blank" rel="noopener noreferrer">
-                Open Studio <span class="bstep-cta-arrow">→</span>
-              </a>
             </div>
             <span class="bstep-status" data-step="3">○</span>
           </li>
-
-          <!-- Step 4: Optimize LinkedIn -->
           <li class="boarding-step" id="bstep-4">
             <span class="bstep-num">04</span>
             <div class="bstep-body">
               <span class="bstep-name">Optimize LinkedIn</span>
               <span class="bstep-desc">Headline, About, and Skills aligned with your target titles.</span>
-              <a class="bstep-cta" href="https://www.linkedin.com/in/me" target="_blank" rel="noopener noreferrer">
-                Open LinkedIn Profile <span class="bstep-cta-arrow">→</span>
-              </a>
             </div>
             <span class="bstep-status" data-step="4">○</span>
           </li>
-
-          <!-- Step 5: Book a Consultation -->
-          <!-- CalendarJet CTA is hidden by default; shown only when intake_mode=CALENDARJET -->
           <li class="boarding-step" id="bstep-5">
             <span class="bstep-num">05</span>
             <div class="bstep-body">
               <span class="bstep-name">Book a Consultation</span>
-              <span class="bstep-desc" id="bstep-5-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
-              <a class="bstep-cta" id="bstep-5-cta" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer" style="display:none;">
-                Book 30-Min Session <span class="bstep-cta-arrow">→</span>
-              </a>
+              <span class="bstep-desc">30-minute strategy session. Reply to your Welcome email to schedule.</span>
             </div>
             <span class="bstep-status" data-step="5">○</span>
           </li>
-
-          <!-- Step 6: Add 5 Target Companies -->
           <li class="boarding-step" id="bstep-6">
             <span class="bstep-num">06</span>
             <div class="bstep-body">
               <span class="bstep-name">Add 5 Target Companies</span>
               <span class="bstep-desc">Research and log your first five target companies in The Build.</span>
-              <a class="bstep-cta" id="bstep-6-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
-                Open The Build <span class="bstep-cta-arrow">→</span>
-              </a>
             </div>
             <span class="bstep-status" data-step="6">○</span>
           </li>
-
-          <!-- Step 7: Submit 3 Applications -->
           <li class="boarding-step" id="bstep-7">
             <span class="bstep-num">07</span>
             <div class="bstep-body">
               <span class="bstep-name">Submit 3 Applications</span>
               <span class="bstep-desc">Apply to three roles. Log each one in The Build pipeline.</span>
-              <a class="bstep-cta" id="bstep-7-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
-                Log Applications in The Build <span class="bstep-cta-arrow">→</span>
-              </a>
             </div>
             <span class="bstep-status" data-step="7">○</span>
           </li>
-
-          <!-- Step 8: Set Follow-Up Reminders -->
           <li class="boarding-step" id="bstep-8">
             <span class="bstep-num">08</span>
             <div class="bstep-body">
               <span class="bstep-name">Set Follow-Up Reminders</span>
-              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission in The Build.</span>
-              <a class="bstep-cta" id="bstep-8-cta" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
-                Open The Build — Set Reminders <span class="bstep-cta-arrow">→</span>
-              </a>
+              <span class="bstep-desc">No application goes cold. Set a 5-day follow-up for every submission.</span>
             </div>
             <span class="bstep-status" data-step="8">○</span>
           </li>
-
         </ol>
       </div>
 
-      <!-- ── Section 2: Ecosystem Tiles ─────────────────────────────────────── -->
-      <div class="mc-section">
+      <!-- ── Section 2: Path Activation ─────────────────────────────────────── -->
+      <div class="mc-section mc-section--paths">
         <h3 class="mc-section-title">📡 Your Paths</h3>
-        <div class="mc-tiles">
-
-          <a class="mc-tile" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">
-            <span class="mc-tile-icon">📡</span>
-            <span class="mc-tile-name">Signal</span>
-            <span class="mc-tile-desc">Weekly mission briefs — strategy, tools, and field intelligence</span>
-            <span class="mc-tile-arrow">→</span>
-          </a>
-
-          <a class="mc-tile" href="/Studio" target="_blank" rel="noopener noreferrer">
-            <span class="mc-tile-icon">📄</span>
-            <span class="mc-tile-name">Studio</span>
-            <span class="mc-tile-desc">AI Resume Builder — ATS-optimized, one-page, PDF export</span>
-            <span class="mc-tile-arrow">→</span>
-          </a>
-
-          <a class="mc-tile" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">
-            <span class="mc-tile-icon">⚙️</span>
-            <span class="mc-tile-name">Systems</span>
-            <span class="mc-tile-desc">Onboarding passport, boarding documents, and job tracker</span>
-            <span class="mc-tile-arrow">→</span>
-          </a>
-
-          <a class="mc-tile" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">
-            <span class="mc-tile-icon">🗺️</span>
-            <span class="mc-tile-name">Field Guide</span>
-            <span class="mc-tile-desc">Career field guide — subscriber access only</span>
-            <span class="mc-tile-arrow">→</span>
-          </a>
-
+        <div class="mc-nav-row" aria-label="Path activation buttons">
+          <a class="mc-nav-btn mc-nav-btn--secondary" href="/Studio" target="_blank" rel="noopener noreferrer">📄 Studio</a>
+          <a class="mc-nav-btn mc-nav-btn--secondary" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">📡 Signal</a>
+          <a class="mc-nav-btn mc-nav-btn--secondary" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">⚙️ Systems</a>
+        </div>
+        <a class="mc-support-link" href="https://www.buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer">Support the Journey ☕</a>
+        <div class="puzzle-tracker" id="puzzleTrackerDashboard">
+          <span class="puzzle-label">Paths Activated</span>
+          <div class="puzzle-diamonds">
+            <span class="puzzle-diamond" id="diamond-signal-dashboard" title="Signal">✦</span>
+            <span class="puzzle-diamond" id="diamond-systems-dashboard" title="Systems">✦</span>
+            <span class="puzzle-diamond" id="diamond-support-dashboard" title="Support">✦</span>
+          </div>
         </div>
       </div>
 
@@ -2093,59 +1793,21 @@
           </table>
         </div>
         <div class="build-status-key">
-          <span class="build-key-item"><span class="build-dot" style="background:#FACC15"></span>Researching</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#4A90D9"></span>Researching</span>
           <span class="build-key-item"><span class="build-dot" style="background:#F5A623"></span>Applied</span>
           <span class="build-key-item"><span class="build-dot" style="background:#F8A100"></span>In Review</span>
-          <span class="build-key-item"><span class="build-dot" style="background:#FBBF24"></span>Interview</span>
-          <span class="build-key-item"><span class="build-dot" style="background:#FACC15"></span>Offer</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#7c9fff"></span>Interview</span>
+          <span class="build-key-item"><span class="build-dot" style="background:#7ED321"></span>Offer</span>
           <span class="build-key-item"><span class="build-dot" style="background:#ff4444"></span>Closed</span>
         </div>
       </div>
 
-      <!-- ── Section: Seat Activation Panel (Pilot only — hidden for passengers) ── -->
-      <div class="mc-section" id="mc-seat-activate-section" style="display:none;">
-        <h3 class="mc-section-title">&#10022; Seat Activation</h3>
-        <p class="mc-section-desc" style="margin-bottom:0.75rem;">Select the boarding type and cabin class for this flight, then activate to trigger the email sequence.</p>
-        <div class="mc-activate-panel">
-          <div class="mc-activate-panel-title">&#9632; Activate Seat</div>
-          <div class="mc-activate-row">
-            <div class="mc-activate-field">
-              <label class="mc-activate-label" for="mc-boarding-type">Boarding Type</label>
-              <select class="mc-activate-select" id="mc-boarding-type">
-                <option value="">-- Select --</option>
-                <option value="executive_pre">executive_pre &mdash; Exec Pre-Board (Pilot KC only)</option>
-                <option value="standard">standard &mdash; Standard Dual-Tier</option>
-                <option value="vip">vip &mdash; VIP Flight (FL 042426)</option>
-                <option value="beta">beta &mdash; Beta Flight (FL 050526)</option>
-                <option value="sponsored">sponsored &mdash; Sponsored Access</option>
-              </select>
-            </div>
-            <div class="mc-activate-field">
-              <label class="mc-activate-label" for="mc-cabin-class">Cabin Class</label>
-              <select class="mc-activate-select" id="mc-cabin-class">
-                <option value="">-- Select --</option>
-                <option value="First">First &mdash; Paid tier</option>
-                <option value="Sponsored">Sponsored &mdash; Sponsored tier</option>
-                <option value="Economy">Economy &mdash; Free tier</option>
-              </select>
-            </div>
-          </div>
-          <div class="mc-activate-row" style="margin-bottom:0.4rem;">
-            <button class="mc-activate-btn" id="mc-activate-btn" disabled>Activate Seat</button>
-          </div>
-          <div class="mc-activate-status" id="mc-activate-status"></div>
-        </div>
-      </div>
-
-      <!-- ── Section 4: Quick Actions ────────────────────────────────────────────────── -->
+      <!-- ── Section 4: Quick Actions ───────────────────────────────────────── -->
       <div class="mc-section mc-section--actions">
         <h3 class="mc-section-title">⚡ Quick Actions</h3>
         <div class="mc-actions">
           <a class="mc-action-btn" href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345" target="_blank" rel="noopener noreferrer">
             📅 Book a Consultation
-          </a>
-          <a class="mc-action-btn" href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer">
-            ☕ Support the Journey
           </a>
           <a class="mc-action-btn" href="https://www.linkedin.com/in/kclark27" target="_blank" rel="noopener noreferrer">
             🔗 LinkedIn
@@ -2153,88 +1815,69 @@
         </div>
       </div>
 
-      <!-- ── Dashboard footer nav ──────────────────────────────────────────── -->
-      <div class="mc-section" style="border-bottom:none;margin-bottom:0;padding-bottom:0;padding-top:0.5rem;">
-        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;">
-          <a class="mc-action-btn" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">📡 Signal</a>
-          <a class="mc-action-btn" href="/Studio" target="_blank" rel="noopener noreferrer">📄 Studio</a>
-          <a class="mc-action-btn" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">⚙️ Systems</a>
-          <a class="mc-action-btn" href="/?seat_id=">❖ Mission Control</a>
-          <a class="mc-action-btn" href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer">☕ Support the Journey</a>
-          <a class="mc-action-btn" href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer">📚 Resources</a>
-        </div>
-        <p style="font-size:0.7rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:0.75rem;letter-spacing:0.04em;">&copy; 2026 The Ultimate Journey</p>
-      </div>
-
     </div><!-- /#dashboard-view -->
 
-    <!-- ACTIVE-FLIGHT STATUS SECTION — hierarchy upgrade: Name primary, Code secondary, paired dates -->
-    <div class="status-section" id="loading-dock" data-show-state="landing departed">
+    <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
+    <div class="status-section" id="loading-dock">
       <div class="status-scanlines"></div>
 
-      <!-- PRIMARY: Flight Name (human-facing identity) -->
-      <!-- JS: #flight-name-primary ← status.flight_name → status.flight_label → 'Next Departure' -->
-      <div class="flight-name-block">
-        <span class="flight-name-eyebrow">✈️ Active Flight</span>
-        <h2 class="flight-name-primary" id="flight-name-primary">The Correction Flight</h2>
-        <!-- SECONDARY: Flight Code (operational metadata) -->
-        <span class="flight-code-secondary">
-          <span class="flight-code-label">Flight Code</span>
-          <span class="badge badge--meta" id="flight-number">—</span>
+      <div class="mission-strip" aria-label="Mission Control status strip">
+        <div class="mission-card">
+          <span class="mission-card-label">STATUS_LANE</span>
+          <span class="mission-card-value" id="status-lane-token">—</span>
+        </div>
+        <div class="mission-card">
+          <span class="mission-card-label">STATUS_OPERATORS</span>
+          <span class="mission-card-value" id="status-operators-token">—</span>
+        </div>
+        <div class="mission-card">
+          <span class="mission-card-label">STATUS_NEXT_MOVE</span>
+          <span class="mission-card-value" id="status-next-move-token">—</span>
+        </div>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Flight:</span>
+        <span class="badge badge--flight" id="flight-number">Next Departure ✈️</span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Arrival Time:</span>
+        <span class="badge badge--arriving" id="arrival-time">
+          <span class="arriving-dot"></span>
+          <span id="arrival-text">8:34 AM ET</span>
         </span>
       </div>
 
-      <!-- ARRIVAL + DEPARTURE: paired two-column layout -->
-      <div class="status-row status-row--paired">
-        <!-- Arrival: Date + Time -->
-        <div class="status-pair">
-          <span class="status-pair-label">Arrival</span>
-          <div class="status-pair-values">
-            <span class="badge badge--arriving" id="arrival-date">
-              <span class="arriving-dot"></span>
-              <span id="arrival-date-text">—</span>
-            </span>
-            <span class="badge badge--arriving" id="arrival-time">
-              <span class="arriving-dot"></span>
-              <span id="arrival-text">8:34 AM ET</span>
-            </span>
-          </div>
-        </div>
-        <!-- Departure: Date + Time -->
-        <div class="status-pair">
-          <span class="status-pair-label">Departure</span>
-          <div class="status-pair-values">
-            <span class="badge badge--arriving" id="departure-date">
-              <span class="arriving-dot"></span>April 3
-            </span>
-            <span class="badge badge--highlight" id="departure-time-badge">2:01 AM ET</span>
-          </div>
-        </div>
+      <div class="status-title">
+        <span class="status-title-label">Departure Time:</span>
+        <span class="badge badge--highlight" id="departure-time-badge">2:22 PM ET</span>
+
       </div>
 
-      <!-- STATUS + LOADING DOCK: side-by-side strip -->
-      <div class="status-row status-row--strip">
-        <div class="status-title">
-          <span class="status-title-label">Status:</span>
-          <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
-            <span class="full-text">DELAYED</span>
-            <span class="short-text">DELAYED</span>
-          </span>
-        </div>
-        <div class="status-title">
-          <span class="status-title-label">Loading Dock:</span>
-          <span class="badge badge--status" id="dock-status">GATE OPEN</span>
-        </div>
+      <div class="status-title">
+        <span class="status-title-label">Departure Date:</span>
+        <span class="badge badge--arriving" id="departure-date">
+          <span class="arriving-dot"></span>Next Departure
+        </span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Status:</span>
+        <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
+          <span class="full-text">DELAYED</span>
+          <span class="short-text">DELAYED</span>
+        </span>
+      </div>
+
+      <div class="status-title">
+        <span class="status-title-label">Loading Dock:</span>
+        <span class="badge badge--status" id="dock-status">GATE OPEN</span>
       </div>
 
       <!-- Countdown Timer -->
       <div id="countdown-container" style="margin-top:1rem;margin-bottom:0.25rem;">
         <div class="countdown-wrap" id="countdown-wrap">
-          <div class="countdown-unit">
-            <span class="countdown-value" id="cd-days">00</span>
-            <span class="countdown-label">Days</span>
-          </div>
-          <span class="countdown-sep">:</span>
           <div class="countdown-unit">
             <span class="countdown-value" id="cd-hours">00</span>
             <span class="countdown-label">Hours</span>
@@ -2251,18 +1894,6 @@
           </div>
         </div>
         <div class="countdown-departed" id="countdown-departed" style="display:none;">✈️ Wheels Up — Flight Departed</div>
-      </div>
-
-      <!-- Seat ID invalid recovery notice (shown by rerender() when seat_id is rejected) -->
-      <div
-        id="seat-invalid-notice"
-        data-show-state="landing"
-        style="display:none;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.35);border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.55;text-align:center;margin-bottom:0.75rem;"
-      >
-        That Seat ID wasn’t found on this flight.
-        Check your boarding confirmation email, or
-        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#FBBF24;text-decoration:underline;">join Signal</a>
-        to stay on the manifest.
       </div>
 
       <!-- F148: Primary CTA → POST /api/seat-request -->
@@ -2311,26 +1942,20 @@
             errEl.textContent = '';
             if (!name)  { errEl.textContent = 'Name is required.'; return; }
             if (!email) { errEl.textContent = 'Email is required.'; return; }
-            var _ageToken = sessionStorage.getItem('tuj_age_token') || null;
-            if (!_ageToken) {
-              errEl.textContent = 'Age verification required. Please complete the passenger verification step first.';
-              return;
-            }
             subBtn.disabled = true;
             subBtn.textContent = '⏳ Submitting…';
             fetch('/api/seat-request', {
               method: 'POST',
               headers: {'Content-Type':'application/json'},
-              body: JSON.stringify(Object.assign({ name: name, email: email, age_token: _ageToken, source: 'landing' }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
+              body: JSON.stringify({ name: name, email: email, boarding_type: (((new URLSearchParams(location.search).get('boarding_type') || new URLSearchParams(location.search).get('cohort') || new URLSearchParams(location.search).get('seat_type') || '').trim().toLowerCase() === 'vip' || (new URLSearchParams(location.search).get('boarding_type') || new URLSearchParams(location.search).get('cohort') || new URLSearchParams(location.search).get('seat_type') || '').trim().toLowerCase() === 'bracketbarbie') ? 'vip' : 'first_class'), source: 'landing', flight_code: (window.__TUJ && typeof window.__TUJ.getFlightCode === 'function' ? window.__TUJ.getFlightCode() : (new URLSearchParams(location.search).get('flight_code') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || '')), flight_id: (window.__TUJ && typeof window.__TUJ.getFlightCode === 'function' ? window.__TUJ.getFlightCode() : (new URLSearchParams(location.search).get('flight_id') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_id') || '')), cabin_class: ((((new URLSearchParams(location.search).get('boarding_type') || new URLSearchParams(location.search).get('cohort') || new URLSearchParams(location.search).get('seat_type') || '').trim().toLowerCase() === 'vip' || (new URLSearchParams(location.search).get('boarding_type') || new URLSearchParams(location.search).get('cohort') || new URLSearchParams(location.search).get('seat_type') || '').trim().toLowerCase() === 'bracketbarbie') ? 'First' : 'Economy')), seats_reserved: 'F5-04', tuj_code: (window.__TUJ && typeof window.__TUJ.getTujCode === 'function' ? window.__TUJ.getTujCode() : (new URLSearchParams(location.search).get('tuj_code') || sessionStorage.getItem('tuj_code') || '')) })
             })
-            .then(function(r){ return r.json(); })
+            .then(async function(r){
+              var text = await r.text();
+              try { return text && text.trim() ? JSON.parse(text) : {}; } catch (e) { return {}; }
+            })
             .then(function(d){
-              if (d.waitlisted) {
-                // F143: Cohort full — show "You're on the next flight" state
-                form.style.display = 'none';
-                var wlConf = document.getElementById('seat-request-waitlisted');
-                if (wlConf) wlConf.style.display = 'block';
-              } else if (d.ok) {
+              if (d && d.tuj_code) sessionStorage.setItem('tuj_code', d.tuj_code);
+              if (d.ok) {
                 form.style.display = 'none';
                 var conf = document.getElementById('seat-request-confirm');
                 conf.style.display = 'block';
@@ -2353,9 +1978,9 @@
             placeholder="Your name"
             autocomplete="name"
             required
-            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(251, 191, 36,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
-            onfocus="this.style.borderColor='rgba(251, 191, 36,0.8)'"
-            onblur="this.style.borderColor='rgba(251, 191, 36,0.35)'"
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(168,196,0,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
+            onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
           />
           <input
             name="email"
@@ -2363,44 +1988,22 @@
             placeholder="Your email"
             autocomplete="email"
             required
-            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(251, 191, 36,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
-            onfocus="this.style.borderColor='rgba(251, 191, 36,0.8)'"
-            onblur="this.style.borderColor='rgba(251, 191, 36,0.35)'"
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(168,196,0,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
+            onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
           />
-
-          <!-- Career Stage dropdown (Beehiiv custom field: career_stage) -->
-          <div class="seg-field-wrap">
-            <span class="seg-field-label">Career Stage</span>
-            <select name="career_stage" id="career-stage-select" class="tuj-select">
-              <option value="" disabled selected>Select your career stage…</option>
-              <option value="Active Job Seeker">Active Job Seeker</option>
-              <option value="Passive Browser">Passive Browser</option>
-              <option value="Career Changer">Career Changer</option>
-              <option value="Recent Graduate">Recent Graduate</option>
-            </select>
-          </div>
-
-          <!-- Current Goal multi-select chips (Beehiiv custom field: current_goal) -->
-          <div class="seg-field-wrap">
-            <span class="seg-field-label">Current Goal <span style="color:rgba(255,255,255,0.3);font-size:0.58rem;">(select all that apply)</span></span>
-            <div class="goal-chips" id="goal-chips-group" role="group" aria-label="Current Goal">
-              <button type="button" class="goal-chip" data-goal="Resume Help" onclick="toggleGoalChip(this)">
-                <span class="goal-chip-check">✓</span>Resume Help
-              </button>
-              <button type="button" class="goal-chip" data-goal="Interview Prep" onclick="toggleGoalChip(this)">
-                <span class="goal-chip-check">✓</span>Interview Prep
-              </button>
-              <button type="button" class="goal-chip" data-goal="Job Search Strategy" onclick="toggleGoalChip(this)">
-                <span class="goal-chip-check">✓</span>Job Search Strategy
-              </button>
-              <button type="button" class="goal-chip" data-goal="Career Pivot" onclick="toggleGoalChip(this)">
-                <span class="goal-chip-check">✓</span>Career Pivot
-              </button>
-            </div>
-            <!-- Hidden input carries comma-joined selected goals for form serialisation -->
-            <input type="hidden" name="current_goal" id="current-goal-hidden" value="" />
-          </div>
-
+          <label id="vip-seat-choice" style="display:none;flex-direction:column;gap:0.35rem;width:100%;color:rgba(255,255,255,0.8);font-size:0.85rem;">
+            Choose your seat
+            <input
+              name="seat_label"
+              type="text"
+              placeholder="Enter your preferred seat label"
+              autocomplete="off"
+              style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(168,196,0,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+              onfocus="this.style.borderColor='rgba(168,196,0,0.8)'"
+              onblur="this.style.borderColor='rgba(168,196,0,0.35)'"
+            />
+          </label>
           <span id="seat-form-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1em;"></span>
 
           <!-- Age confirmation checkbox -->
@@ -2412,7 +2015,7 @@
           <div style="display:flex;gap:0.5rem;width:100%;">
             <button
               type="button"
-              style="flex:0 0 auto;padding:0.6rem 1rem;border-radius:6px;border:1px solid rgba(251, 191, 36,0.25);background:rgba(0,0,0,0.4);color:rgba(251, 191, 36,0.6);font-size:0.85rem;cursor:pointer;"
+              style="flex:0 0 auto;padding:0.6rem 1rem;border-radius:6px;border:1px solid rgba(168,196,0,0.25);background:rgba(0,0,0,0.4);color:rgba(168,196,0,0.6);font-size:0.85rem;cursor:pointer;"
               onclick="(function(){
                 document.getElementById('seat-request-form').style.display = 'none';
                 document.getElementById('waitlistBtn').style.display = '';
@@ -2428,50 +2031,38 @@
           </div>
         </form>
 
-        <!-- Step 3a: Confirmation — seat reserved (hidden until successful submit) -->
+        <!-- Step 3: Confirmation (hidden until successful submit) -->
         <div
           id="seat-request-confirm"
-          style="display:none;font-size:0.9rem;color:#FBBF24;letter-spacing:0.03em;padding:0.5rem 0;"
+          style="display:none;font-size:0.9rem;color:#7c9fff;letter-spacing:0.03em;padding:0.5rem 0;"
         >
           ✅ Your seat request has been received. Check your inbox for the next steps.
         </div>
 
-        <!-- Step 3b: Waitlist confirmation — cohort full (F143) -->
-        <div id="seat-request-waitlisted" style="display:none;padding:1rem 0;">
-          <p style="font-size:1rem;color:#FBBF24;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">You're on the next flight.</p>
-          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:1rem;">All 5 seats on this flight are full.<br>We'll notify you the moment a seat opens — passengers graduate when they land an offer.</p>
-          <a href="/ResumeFitCheck" class="btn-waitlist unlocked" style="display:inline-block;">▶ While you wait, run an ATS check</a>
-        </div>
-
-        <!-- Step 3c: Hold state — operator-paused intake (hold_mode=true) -->
-        <div id="seat-request-hold" style="display:none;padding:1rem 0;">
-          <p style="font-size:1rem;color:#ffd740;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">⏸ Boarding is temporarily paused.</p>
-          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;">We're preparing for the next flight. Check back soon — the gate will reopen shortly.</p>
-        </div>
-
         <!-- seat-count span appended here by applySeatGate() -->
-        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(251, 191, 36, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
+        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(124, 159, 255, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
       </div>
 
-      <!-- Secondary CTA: Book a Consultation — muted, subordinate to Request a Seat -->
-      <div class="secondary-cta-row">
+      <!-- Secondary CTA: Book a Consultation via CalendarJet (gate-closed / consultation flow only) -->
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.25rem;padding-top:1rem;border-top:1px solid rgba(124, 159, 255, 0.1);">
         <a
           href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345"
-          class="btn btn--secondary-cta"
+          class="btn"
           target="_blank"
           rel="noopener noreferrer"
           data-umami-event="Book a Consultation Click"
+          style="font-size:0.8rem;padding:0.5rem 1rem;"
         >📅 Book a Consultation</a>
       </div>
 
       <!-- Gate-closed locked state (hidden when gate is open) -->
       <div class="gate-locked-msg" style="display:none">
-        🔒 Next Flight — Signal → Systems → Support
+        🔒 Next Flight — Studio → Signal → Systems
       </div>
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
       <div class="gate-closed-reveal" style="display:none">
-        <h3 style="color:#FBBF24;margin-bottom:0.5rem">Next cohort assembling.</h3>
+        <h3 style="color:#7c9fff;margin-bottom:0.5rem">Next cohort assembling.</h3>
         <p style="opacity:0.8;margin-bottom:1.25rem">Stay on the manifest — you'll be first to know when the gate opens.</p>
         <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-waitlist" target="_blank" rel="noopener noreferrer">
           📡 Join Signal — Stay on the manifest
@@ -2480,17 +2071,16 @@
     </div>
 
 
-    <!-- BLACK GLASS BUTTONS — PAL-22: Signal-first conversion order (Signal > Studio > Systems > Mission Control > Support the Journey) -->
-    <div class="btn-row" data-show-state="landing departed">
-      <a href="https://newsletter.thispagedoesnotexist12345.us/?src=com_signal_nav" class="btn btn-signal" data-nav-index="1" data-path="signal" data-puzzle-ignore="true" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
-      <a href="/Studio" class="btn btn-studio" data-nav-index="2" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
-      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-nav-index="3" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
-      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-nav-index="4" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
-      <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-nav-index="5" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">☕ Support the Journey</a>
+    <!-- BLACK GLASS BUTTONS -->
+    <div class="btn-row">
+      <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
+      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
+      <a href="https://www.buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
     </div>
 
     <!-- PUZZLE PATH TRACKER -->
-    <div class="puzzle-tracker" id="puzzleTracker" data-show-state="landing departed">
+    <div class="puzzle-tracker" id="puzzleTracker">
       <span class="puzzle-label">Paths Activated</span>
       <div class="puzzle-diamonds">
         <span class="puzzle-diamond" id="diamond-signal" title="Signal">✦</span>
@@ -2500,93 +2090,182 @@
     </div>
 
     <!-- Divider -->
-    <div class="btn-row-divider" data-show-state="landing departed">
+    <div class="btn-row-divider">
       <span>next step</span>
     </div>
 
     <!-- NEXT STEP GUIDANCE -->
-    <div class="btn-row-waitlist" data-show-state="landing departed" style="display: block; text-align: center; margin-bottom: 2rem;">
-      <p style="font-size: 0.85rem; color: rgba(251, 191, 36, 0.7); margin: 0;">Gold Signal active: use the <strong>Request a Seat</strong> button above to board The Correction Flight.</p>
+    <div class="btn-row-waitlist" style="display: block; text-align: center; margin-bottom: 2rem;">
+      <p style="font-size: 0.85rem; color: rgba(124, 159, 255, 0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
     </div>
 
     <!-- Option B: About / Footer Links -->
-    <section data-show-state="landing departed" style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(251, 191, 36,0.1); font-size:0.8rem;">
-      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(251, 191, 36,0.6); text-decoration:none; margin:0 0.75rem;">About / Field Guide</a>
-      <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(251, 191, 36,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
-      <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(251, 191, 36,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
+    <section style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(168,196,0,0.1); font-size:0.8rem;">
+      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">About / Resources</a>
+      <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
+      <a href="https://www.buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
     </section>
-    <footer data-show-state="landing departed">
-      &copy; 2026 The Ultimate Journey | <span id="theme-status">Gold Signal Theme Active</span>
+    <footer>
+      &copy; 2026 The Ultimate Journey | <span id="theme-status">Mission Control Dark Theme Active</span>
     </footer>
   </div>
 
-    <script>
-    // Carousel logic — init is deferred until after the TUJ state machine's
-    // initial rerender() settles, so the loading-state transition-none rule
-    // never suppresses the slide animation on first paint.
-    (function() {
-      function initCarousel() {
-        const track = document.getElementById('carouselTrack');
-        const dots = document.querySelectorAll('.carousel-dot');
-        const carousel = document.getElementById('mainCarousel');
-        if (!track || !carousel) return;
-        let current = 0;
-        const total = track.children.length || 4;
-        let autoTimer;
-        let touchStartX = 0;
-        let touchDeltaX = 0;
-        let isDragging = false;
-        function goTo(index) {
-          current = (index + total) % total;
-          track.style.transform = 'translateX(-' + (current * 100) + '%)';
-          dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+  <script>
+
+    (function () {
+      var TUJ_TOKEN_DEFAULTS = {
+        STATUS_LANE: 'Executive Preboard',
+        STATUS_OPERATORS: '5 active across ramp',
+        STATUS_NEXT_MOVE: 'Secure seat and review signal path'
+      };
+
+      function getQueryValue(key) {
+        var params = new URLSearchParams(window.location.search);
+        var value = params.get(key);
+        return value && value.trim() ? value.trim() : '';
+      }
+
+      function getPreservedSeatId() {
+        var params = new URLSearchParams(window.location.search);
+        var urlSeatId = params.get('seat_id') || '';
+        var urlTujCode = params.get('tuj_code') || '';
+        var sessionSeatId = sessionStorage.getItem('seat_id') || '';
+        var sessionTujCode = sessionStorage.getItem('tuj_code') || '';
+        if (urlSeatId && /^TUJ-[A-Z2-9]{6}$/.test(urlSeatId)) {
+          sessionStorage.setItem('seat_id', urlSeatId);
+          if (urlTujCode) sessionStorage.setItem('tuj_code', urlTujCode);
+          return urlSeatId;
         }
-        function startAuto() {
-          clearInterval(autoTimer);
-          autoTimer = setInterval(function() { goTo(current + 1); }, 4000);
-        }
-        dots.forEach(function(dot) {
-          dot.addEventListener('click', function() {
-            goTo(parseInt(dot.dataset.index));
-            startAuto();
-          });
-        });
-        carousel.addEventListener('touchstart', function(e) {
-          touchStartX = e.touches[0].clientX;
-          isDragging = true;
-          clearInterval(autoTimer);
-        }, { passive: true });
-        carousel.addEventListener('touchmove', function(e) {
-          if (!isDragging) return;
-          touchDeltaX = e.touches[0].clientX - touchStartX;
-        }, { passive: true });
-        carousel.addEventListener('touchend', function() {
-          if (Math.abs(touchDeltaX) > 40) {
-            goTo(touchDeltaX < 0 ? current + 1 : current - 1);
+        if (urlTujCode) {
+          sessionStorage.setItem('tuj_code', urlTujCode);
+          if (!sessionTujCode || sessionTujCode !== urlTujCode) {
+            sessionStorage.removeItem('seat_id');
+            return '';
           }
-          touchDeltaX = 0;
-          isDragging = false;
+        }
+        return /^TUJ-[A-Z2-9]{6}$/.test(sessionSeatId) ? sessionSeatId : '';
+      }
+
+      function getPreservedTujCode() {
+        var params = new URLSearchParams(window.location.search);
+        var urlTujCode = params.get('tuj_code') || '';
+        if (urlTujCode) {
+          sessionStorage.setItem('tuj_code', urlTujCode);
+          return urlTujCode;
+        }
+        return sessionStorage.getItem('tuj_code') || '';
+      }
+
+      function resolveToken(name) {
+        var override = getQueryValue(name);
+        if (override) return override;
+        return TUJ_TOKEN_DEFAULTS[name] || '';
+      }
+
+      function syncMissionStatusStrip() {
+        var laneEl = document.getElementById('status-lane-token');
+        var opsEl = document.getElementById('status-operators-token');
+        var nextEl = document.getElementById('status-next-move-token');
+        if (laneEl) laneEl.textContent = resolveToken('STATUS_LANE');
+        if (opsEl) opsEl.textContent = resolveToken('STATUS_OPERATORS');
+        if (nextEl) nextEl.textContent = resolveToken('STATUS_NEXT_MOVE');
+      }
+
+      function withTujParams(href) {
+        if (!href) return href;
+        if (/^(mailto:|tel:|sms:|javascript:|#)/i.test(href)) return href;
+        try {
+          var url = new URL(href, window.location.href);
+          var seatId = getPreservedSeatId();
+          var tujCode = getPreservedTujCode();
+          if (seatId) url.searchParams.set('seat_id', seatId);
+          if (tujCode) url.searchParams.set('tuj_code', tujCode);
+          return url.toString();
+        } catch (err) {
+          return href;
+        }
+      }
+
+      function hydrateCtas() {
+        document.querySelectorAll('a[href]').forEach(function (a) {
+          var baseHref = a.dataset.baseHref || a.getAttribute('href');
+          if (!baseHref) return;
+          a.dataset.baseHref = baseHref;
+          a.setAttribute('href', withTujParams(baseHref));
+        });
+      }
+
+      window.__TUJ = window.__TUJ || {};
+      window.__TUJ_TOKEN_CONFIG = TUJ_TOKEN_DEFAULTS;
+      window.__TUJ.syncMissionStatusStrip = syncMissionStatusStrip;
+      window.__TUJ.applyQueryParamsToCtas = hydrateCtas;
+      window.__TUJ.withTujParams = withTujParams;
+      window.__TUJ.getPreservedSeatId = getPreservedSeatId;
+      window.__TUJ.getPreservedTujCode = getPreservedTujCode;
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+          syncMissionStatusStrip();
+          hydrateCtas();
+        }, { once: true });
+      } else {
+        syncMissionStatusStrip();
+        hydrateCtas();
+      }
+    })();
+
+    // Carousel logic
+    (function() {
+      const track = document.getElementById('carouselTrack');
+      const dots = document.querySelectorAll('.carousel-dot');
+      const carousel = document.getElementById('mainCarousel');
+      let current = 0;
+      const total = 4;
+      let autoTimer;
+      let touchStartX = 0;
+      let touchDeltaX = 0;
+      let isDragging = false;
+
+      function goTo(index) {
+        current = (index + total) % total;
+        track.style.transform = 'translateX(-' + (current * 100) + '%)';
+        dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
+      }
+
+      function startAuto() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(function() { goTo(current + 1); }, 4000);
+      }
+
+      dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          goTo(parseInt(dot.dataset.index));
           startAuto();
         });
-        goTo(0);
-        startAuto();
-      }
-      // Wait for the TUJ state machine to complete its first rerender
-      // (typically 300-800ms for the /api/seat-status fetch) before starting
-      // the carousel, so the loading-state CSS never kills the slide transition.
-      // Falls back to 900ms if the state machine hasn't fired yet.
-      function waitForState() {
-        if (window.__TUJ && window.__TUJ.state && window.__TUJ.state !== 'loading') {
-          initCarousel();
-        } else {
-          setTimeout(initCarousel, 900);
+      });
+
+      carousel.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+        isDragging = true;
+        clearInterval(autoTimer);
+      }, { passive: true });
+
+      carousel.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        touchDeltaX = e.touches[0].clientX - touchStartX;
+      }, { passive: true });
+
+      carousel.addEventListener('touchend', function() {
+        if (Math.abs(touchDeltaX) > 40) {
+          goTo(touchDeltaX < 0 ? current + 1 : current - 1);
         }
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', waitForState);
-      } else {
-        waitForState();
-      }
+        touchDeltaX = 0;
+        isDragging = false;
+        startAuto();
+      });
+
+      goTo(0);
+      startAuto();
     })();
 
     // Puzzle tracker + Waitlist unlock
@@ -2617,7 +2296,6 @@
 
       document.querySelectorAll('.btn-row .btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
-          if (btn.dataset.puzzleIgnore === 'true') return;
           const path = btn.dataset.path;
           if (!path) return;
           localStorage.setItem('last-path', path);
@@ -2668,45 +2346,6 @@
       }
 
       /**
-       * Convert Base44's timezone-less Eastern wall-clock timestamps into real dates.
-       * This keeps the public/main arrival display aligned with Command Center.
-       */
-      function parseEasternWallDateTime(value) {
-        if (!value || typeof value !== 'string') return null;
-        if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) return null;
-        var match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
-        if (!match) return null;
-        var localUtcMs = Date.UTC(
-          Number(match[1]),
-          Number(match[2]) - 1,
-          Number(match[3]),
-          Number(match[4]),
-          Number(match[5]),
-          Number(match[6] || 0)
-        );
-        var probe = new Date(localUtcMs);
-        var parts = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'America/New_York',
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit', second: '2-digit',
-          hour12: false
-        }).formatToParts(probe).reduce(function (acc, part) {
-          acc[part.type] = part.value;
-          return acc;
-        }, {});
-        var zonedUtcMs = Date.UTC(
-          Number(parts.year),
-          Number(parts.month) - 1,
-          Number(parts.day),
-          Number(parts.hour),
-          Number(parts.minute),
-          Number(parts.second)
-        );
-        var offsetMinutes = (zonedUtcMs - localUtcMs) / 60000;
-        return new Date(localUtcMs - offsetMinutes * 60000);
-      }
-
-      /**
        * Format an ISO timestamp to a short date string ("April 15").
        */
       function fmtDate(iso) {
@@ -2725,6 +2364,7 @@
       function statusLabels(nextFlightStatus) {
         switch (nextFlightStatus) {
           case 'BOARDING_SOON': return { full: 'BOARDING SOON', short: 'BOARDING' };
+          case 'LEVEL_LOUNGE':  return { full: 'LEVEL LOUNGE',  short: 'LOUNGE' };
           case 'DEPARTED':      return { full: 'DEPARTED',      short: 'DEPARTED' };
           case 'SCHEDULED':
           default:              return { full: 'SCHEDULED',     short: 'SCHED' };
@@ -2735,7 +2375,7 @@
 
       async function fetchSeatStatus() {
         try {
-          var res = await fetch('/api/seat-status');
+          var res = await fetch('/api/seat-status?t=' + Date.now(), { cache: 'no-store' });
           if (!res.ok) return null;
           return await res.json();
         } catch (e) {
@@ -2756,15 +2396,12 @@
         var status = cachedStatus || await fetchSeatStatus();
         if (!status) return; // fail open — leave DOM as-is if API is unreachable
 
-         // ── DOM refs ─────────────────────────────────────────────────────────
-        var flightNamePrimaryEl = document.getElementById('flight-name-primary'); // NEW: primary name heading
-        var flightCodeBadgeEl   = document.getElementById('flight-number');        // now: secondary code badge
-        var flightEl            = flightCodeBadgeEl;                               // legacy alias — kept for safety
+        // ── DOM refs ─────────────────────────────────────────────���───────────
+        var flightEl        = document.getElementById('flight-number');
         var dockEl          = document.getElementById('dock-status');
         var statusBadgeEl   = document.getElementById('dock-status-badge');
         var fullEl          = statusBadgeEl ? statusBadgeEl.querySelector('.full-text') : null;
         var shortEl         = statusBadgeEl ? statusBadgeEl.querySelector('.short-text') : null;
-        var arrivalDateTextEl = document.getElementById('arrival-date-text');      // NEW: arrival date
         var arrivalTextEl   = document.getElementById('arrival-text');
         var depTimeBadgeEl  = document.getElementById('departure-time-badge');
         var depDateEl       = document.getElementById('departure-date');
@@ -2786,30 +2423,13 @@
           }
         }
 
-          // ── 1. Flight identity: Name (primary) + Code (secondary) ───────────────────
-        // Naming guardrail: public header MUST use canonical passenger-facing name,
-        // not just the operational code or any stale internal label.
-        //
-        // Primary (#flight-name-primary): flight_name → flight_label → 'Next Departure'
-        // Secondary (#flight-number):     flight_code → flight_id → hidden
-        if (flightNamePrimaryEl) {
-          var flightName = (status.flight_name && status.flight_name.trim())
-            || (status.flight_label && status.flight_label.trim())
-            || 'Next Departure';
-          flightNamePrimaryEl.textContent = flightName;
-        }
-        if (flightCodeBadgeEl) {
-          var flightCode = (status.flight_code && status.flight_code.trim())
-            || (status.flight_id && status.flight_id.trim())
-            || '';
-          if (flightCode) {
-            flightCodeBadgeEl.textContent = flightCode;
-            var codeRow = flightCodeBadgeEl.closest('.flight-code-secondary');
-            if (codeRow) codeRow.style.display = '';
-          } else {
-            var codeRow = flightCodeBadgeEl.closest('.flight-code-secondary');
-            if (codeRow) codeRow.style.display = 'none';
-          }
+        // ── 1. Flight label badge (#flight-number) ───────────────────────��
+        // Driven by Admin → NextFlightConfig → next_flight_number
+        if (flightEl) {
+          var label = status.flight_label && status.flight_label.trim()
+            ? status.flight_label.trim() + ' ✈️'
+            : 'Next Departure ✈️';
+          flightEl.textContent = label;
         }
 
         // ── 2. Gate / status badge (#dock-status-badge) ───────────────────
@@ -2827,9 +2447,9 @@
             statusBadgeEl.style.borderColor = 'rgba(255,68,68,0.6)';
             statusBadgeEl.style.background  = 'rgba(255,68,68,0.15)';
           } else if (nextFlightStatus === 'BOARDING_SOON') {
-            statusBadgeEl.style.color       = 'rgb(255, 20, 147)';
-            statusBadgeEl.style.borderColor = 'rgba(251, 191, 36,0.6)';
-            statusBadgeEl.style.background  = 'rgba(251, 191, 36,0.12)';
+            statusBadgeEl.style.color       = 'rgb(168,196,0)';
+            statusBadgeEl.style.borderColor = 'rgba(168,196,0,0.6)';
+            statusBadgeEl.style.background  = 'rgba(168,196,0,0.12)';
           } else {
             // SCHEDULED — neutral
             statusBadgeEl.style.color       = '';
@@ -2839,66 +2459,8 @@
         }
 
         // ── 3. Loading dock label (#dock-status) ──────────────────────────
-        // Driven by gate_status field (derived from PUBLIC_GATE_STATE override in seat-status.js)
-        // 'hold'     = gate is operator-paused; treat as closed for public display (QA #6 fix).
-        // 'conflict' = multiple active flights detected (QA #5 Layer 3); show safe fallback.
-        var gateStatusNorm = (status.gate_status || '').toLowerCase();
-
-        // QA #7 — UI guard: QA flight isolation violation.
-        // If the Netlify function returned gate_status: 'qa_isolation_violation' (HTTP 422),
-        // a QA flight is active on the public page. Surface a neutral holding state.
-        if (gateStatusNorm === 'qa_isolation_violation') {
-          if (dockEl) dockEl.textContent = 'GATE CLOSED';
-          if (waitlistBtn)     waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
-          if (calBtn) {
-            calBtn.removeAttribute('href');
-            calBtn.setAttribute('aria-disabled', 'true');
-            calBtn.setAttribute('tabindex', '-1');
-            calBtn.style.pointerEvents = 'none';
-            calBtn.style.opacity = '0.4';
-            calBtn.style.cursor = 'not-allowed';
-          }
-          console.warn('[TUJ] QA isolation violation: active flight is a QA flight. Check Supabase flights table and apply no_active_qa_flight index.');
-          return;
-        }
-
-        // F-VIP-01 — UI guard: VIP flight suppression (Layer 3 of 3).
-        // If the Netlify function returned HTTP 451 with _vip_suppressed: true,
-        // a VIP flight was active but has been withheld from public display.
-        // gate_status is already 'closed' in the payload; this guard ensures
-        // no VIP flight label leaks into the UI and logs a discreet console note.
-        if (status._vip_suppressed === true) {
-          // gate_status is already 'closed' — fall through to normal closed rendering
-          // but clear any flight name/label that might have been set before the guard ran.
-          status.flight_label = null;
-          status.flight_name  = null; // also clear new field to prevent name leakage
-          console.info('[TUJ] VIP flight active — public gate showing closed state (F-VIP-01).');
-          // Do NOT return early: let the normal 'closed' rendering path run so
-          // the "Next Departure" badge (nextflightdeparturedate) still displays.
-        }
-
-        // QA #5 — Layer 3: UI fallback for flight invariant conflict.
-        // If the Netlify function returned gate_status: 'conflict' (HTTP 409 body),
-        // surface a neutral holding state rather than showing potentially wrong seat data.
-        if (gateStatusNorm === 'conflict') {
-          if (dockEl) dockEl.textContent = 'GATE CLOSED';
-          if (waitlistBtn)     waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
-          if (calBtn) {
-            calBtn.removeAttribute('href');
-            calBtn.setAttribute('aria-disabled', 'true');
-            calBtn.setAttribute('tabindex', '-1');
-            calBtn.style.pointerEvents = 'none';
-            calBtn.style.opacity = '0.4';
-            calBtn.style.cursor = 'not-allowed';
-          }
-          // Log to console so operators can diagnose without exposing to users
-          console.warn('[TUJ] Gate conflict: multiple active flights detected. Check Supabase flights table.');
-          return;
-        }
-
-        var gateOpen = gateStatusNorm !== 'departed' && gateStatusNorm !== 'closed' && gateStatusNorm !== 'hold';
+        // Driven by gate_status field (derived from next_flight_status in Base44)
+        var gateOpen = status.gate_status !== 'departed' && status.gate_status !== 'closed';
         if (dockEl) {
           dockEl.textContent = gateOpen ? 'GATE OPEN' : 'GATE CLOSED';
         }
@@ -2910,19 +2472,12 @@
           document.body.classList.remove('gate-closed');
         }
 
-        // ── 5. Arrival date (#arrival-date-text) + Arrival time (#arrival-text) ─────────
+        // ── 5. Arrival time (#arrival-text) ───────────────────────────────
         // Driven by Admin → next_flight_arrival_date
         // Base44 emits the collapsed key (nextflightarrivaldate); accept both forms.
-        var arrivalRaw = status.nextflightarrivaldate || status.next_flight_arrival_date || null;
-        var arrivalForDisplay = parseEasternWallDateTime(arrivalRaw) || arrivalRaw;
         if (arrivalTextEl) {
-          var arrivalTime = fmtTime(arrivalForDisplay);
+          var arrivalTime = fmtTime(status.nextflightarrivaldate || status.next_flight_arrival_date);
           arrivalTextEl.textContent = arrivalTime || '—';
-        }
-        // NEW: populate arrival date badge (previously missing from the DOM)
-        if (arrivalDateTextEl) {
-          var arrivalDate = fmtDate(arrivalForDisplay);
-          arrivalDateTextEl.textContent = arrivalDate || '—';
         }
 
         // ── 6. Departure time badge (#departure-time-badge) ───────────────
@@ -2940,12 +2495,10 @@
         setDepartureDate(depDateText);
 
         // ── 8. Live countdown target ──────────────────────────────────────
-        // Sync the public/main countdown to Command Center arrival time.
-        // Fall back to departure only if no arrival date has been configured.
+        // Expose the departure date for the countdown timer IIFE to pick up.
+        // If no departure date is set, the countdown stays hidden.
         window.__seatStatusReady = {
-          arrivalDate:   arrivalRaw,
           departureDate: depDateRaw,
-          countdownDate: arrivalRaw || depDateRaw,
           gateOpen:      gateOpen,
         };
 
@@ -3003,22 +2556,6 @@
         // Gate is open from here down
         if (lockedMsg) lockedMsg.style.display = 'none';
 
-        // ── HOLD / CLOSED gate → suppress all seat CTAs (QA #6 fix) ──────
-        // When PUBLIC_GATE_STATE=hold or closed, hide seat request + waitlist CTAs.
-        if (gateStatusNorm === 'hold' || gateStatusNorm === 'closed') {
-          if (waitlistBtn)     waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
-          if (calBtn) {
-            calBtn.removeAttribute('href');
-            calBtn.setAttribute('aria-disabled', 'true');
-            calBtn.setAttribute('tabindex', '-1');
-            calBtn.style.pointerEvents = 'none';
-            calBtn.style.opacity = '0.4';
-            calBtn.style.cursor = 'not-allowed';
-          }
-          return;
-        }
-
         // Alpha mode off → hide the seat request button entirely
         if (!status.alpha_mode) {
           if (waitlistBtn) waitlistBtn.style.display = 'none';
@@ -3038,24 +2575,11 @@
         var intakeMode = status.intake_mode || 'SENDGRID';
         var calUrl = 'https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345';
 
-        // ── Step 05 boarding CTA: CalendarJet link only in CALENDARJET mode ──────
-        var bstep5Cta  = document.getElementById('bstep-5-cta');
-        var bstep5Desc = document.getElementById('bstep-5-desc');
-        if (intakeMode === 'CALENDARJET') {
-          // Show the booking link and update description
-          if (bstep5Cta)  bstep5Cta.style.display = '';
-          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Use the link below to schedule.';
-        } else {
-          // SENDGRID / CONSTANTCONTACT: no outbound link — reply to Welcome email
-          if (bstep5Cta)  bstep5Cta.style.display = 'none';
-          if (bstep5Desc) bstep5Desc.textContent = '30-minute strategy session. Reply to your Welcome email to schedule.';
-        }
-
         if (intakeMode === 'CALENDARJET') {
           // Hide the SendGrid seat request CTA; show the CalendarJet booking link
           if (waitlistBtn) waitlistBtn.style.display = 'none';
           if (calBtn) {
-            calBtn.setAttribute('href', calUrl);
+            calBtn.setAttribute('href', window.__TUJ && typeof window.__TUJ.withTujParams === 'function' ? window.__TUJ.withTujParams(calUrl) : calUrl);
             calBtn.removeAttribute('aria-disabled');
             calBtn.setAttribute('tabindex', '0');
             calBtn.style.pointerEvents = '';
@@ -3082,7 +2606,7 @@
           if (existing) existing.remove();
           var seatInfo = document.createElement('span');
           seatInfo.id = 'cta-seat-count';
-          seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(251, 191, 36,0.7);letter-spacing:0.03em;';
+          seatInfo.style.cssText = 'display:block;font-size:0.8rem;opacity:0.55;color:rgba(168,196,0,0.7);letter-spacing:0.03em;';
           seatInfo.textContent = status.seats_remaining + ' ' + seatWord + ' remaining — next departure';
           var ctaWrapper = document.getElementById('cta-wrapper');
           if (ctaWrapper) {
@@ -3108,6 +2632,7 @@
       // ── Constants ────────────────────────────────────────────────────────
       var AGE_KEY    = 'tuj_age_verified';   // localStorage — persistent
       var SEAT_KEY   = 'seat_id';            // sessionStorage — per-session
+      var TUJ_KEY    = 'tuj_code';
       var SEAT_REGEX = /^TUJ-[A-Z2-9]{6}$/;
       var MIN_AGE    = 21;
 
@@ -3116,85 +2641,58 @@
       var _status     = null;   // last fetched /api/seat-status payload
       var _seatId     = null;   // validated seat_id for this session
       var _ageGateCb  = null;   // pending callback after age confirm
-      // Capture ?seat_id= immediately on page load before validateSeatId may strip it.
-      // Used as seat_id_override in form submissions for pre-assigned cohort passengers.
-      var _seatIdOverride = new URLSearchParams(window.location.search).get('seat_id') || null;
 
       // ── Helpers ──────────────────────────────────────────────────────────
-
-      // getSeatIdRaw() — reads seat_id from URL or sessionStorage without validation.
-      // Returns the raw string if it matches the format regex, else null.
-      function getSeatIdRaw() {
-        var fromSession = sessionStorage.getItem(SEAT_KEY);
-        var fromUrl     = new URLSearchParams(location.search).get('seat_id');
-        var id = fromUrl || fromSession || null;
-        if (id && SEAT_REGEX.test(id)) return id;
-        return null;
+      function getTujCode() {
+        var params = new URLSearchParams(location.search);
+        var fromUrl = params.get('tuj_code');
+        if (fromUrl) {
+          sessionStorage.setItem(TUJ_KEY, fromUrl);
+          return fromUrl;
+        }
+        return sessionStorage.getItem(TUJ_KEY) || '';
       }
 
-      // validateSeatId(id) — async; calls /api/seat to confirm the seat is active.
-      // Resolution contract:
-      //   valid: true  → seat confirmed; persists to sessionStorage; returns id.
-      //   valid: false → seat invalid/inactive; clears sessionStorage; returns null.
-      //   fetch error  → fail-open; persists to sessionStorage; returns id.
-      //                  (preserves existing behaviour when Base44 is unreachable)
-      async function validateSeatId(id) {
-        if (!id) return null;
-        // Persist immediately so the session survives a hard refresh mid-flight.
-        sessionStorage.setItem(SEAT_KEY, id);
-        try {
-          var res = await fetch('/api/seat?id=' + encodeURIComponent(id));
-          if (!res.ok) {
-            // Non-2xx from our own function (e.g. 400 bad format) — treat as invalid.
-            if (res.status === 400) {
-              console.warn('[TUJ] seat validation: 400 bad format for', id);
-              sessionStorage.removeItem(SEAT_KEY);
-              return null;
-            }
-            // Any other non-2xx (5xx etc.) — fail open.
-            console.warn('[TUJ] seat validation: non-2xx (' + res.status + ') — failing open for', id);
-            return id;
-          }
-          var data = await res.json();
-          if (data.valid === false) {
-            console.warn('[TUJ] seat validation: invalid seat', id, '— reason:', data.reason || 'unknown');
+      function getSeatId() {
+        var params = new URLSearchParams(location.search);
+        var fromUrl = params.get('seat_id');
+        var fromSession = sessionStorage.getItem(SEAT_KEY);
+        var fromUrlTuj = params.get('tuj_code');
+        var storedTuj = sessionStorage.getItem(TUJ_KEY);
+
+        if (fromUrl && SEAT_REGEX.test(fromUrl)) {
+          sessionStorage.setItem(SEAT_KEY, fromUrl);
+          if (fromUrlTuj) sessionStorage.setItem(TUJ_KEY, fromUrlTuj);
+          return fromUrl;
+        }
+
+        if (fromUrlTuj) {
+          sessionStorage.setItem(TUJ_KEY, fromUrlTuj);
+          if (!storedTuj || storedTuj !== fromUrlTuj) {
             sessionStorage.removeItem(SEAT_KEY);
             return null;
           }
-          // valid: true (or _unchecked: true fail-open from function)
-          return id;
-        } catch (e) {
-          // Network error / timeout — fail open.
-          console.warn('[TUJ] seat validation: fetch error — failing open for', id, e);
-          return id;
         }
-      }
 
-      // getSeatId() — kept for legacy callers; synchronous read only (no API call).
-      function getSeatId() {
-        return getSeatIdRaw();
+        if (fromSession && SEAT_REGEX.test(fromSession)) {
+          return fromSession;
+        }
+
+        return null;
       }
 
       function isAgeVerified() {
         return localStorage.getItem(AGE_KEY) === '1';
       }
 
-      function hasValidAgeToken() {
-        return !!sessionStorage.getItem('tuj_age_token');
-      }
-
       function needsAgeGate() {
-        // Fix (Apr 19, 2026): localStorage flag persists across sessions but
-        // sessionStorage token is cleared on browser close. If the flag is set
-        // but the token is missing, show the gate again to re-issue a fresh
-        // signed token — prevents silent block on seat request submission.
-        return !isAgeVerified() || !hasValidAgeToken();
+        return !isAgeVerified();
       }
 
       // ── Core: fetch + resolve state ───────────────────────────────────────
       async function fetchStatus() {
         try {
-          var res = await fetch('/api/seat-status');
+          var res = await fetch('/api/seat-status?t=' + Date.now(), { cache: 'no-store' });
           if (!res.ok) return null;
           return await res.json();
         } catch (e) {
@@ -3203,11 +2701,24 @@
         }
       }
 
+      function isLevelLounge(status) {
+        if (!status) return false;
+        var nextFlightStatus = String(status.nextflightstatus || status.next_flight_status || '').toUpperCase();
+        var gateStatus = String(status.gate_status || '').toLowerCase();
+        var funnelStage = String(status.funnel_stage || status.validation_stage || status.seat_stage || '').toLowerCase();
+        return nextFlightStatus === 'LEVEL_LOUNGE'
+            || gateStatus === 'lounge'
+            || gateStatus === 'level_lounge'
+            || funnelStage === 'level_lounge'
+            || status.level_lounge === true;
+      }
+
       function computeState(status, seatId) {
         if (!status) return 'landing'; // fail open
         var departed = (status.nextflightstatus || status.next_flight_status) === 'DEPARTED'
                     || status.gate_status === 'departed';
         if (departed)        return 'departed';
+        if (isLevelLounge(status)) return 'lounge';
         if (seatId)          return 'dashboard';
         return 'landing';
       }
@@ -3232,59 +2743,6 @@
         dashboardView.style.display = visible ? 'block' : 'none';
       }
 
-      // ── Gate Status / Seat Counter helpers (4-P3) ───────────────────────────────
-      // resolveGateState(status) — maps raw /api/seat-status payload to
-      // a display descriptor consumed by updateGateStatusWidget().
-      // Returns: { label: string, cta: { text: string, action: string, href: string } }
-      function resolveGateState(status) {
-        // QA #2 fix: read capacity from live API response; fall back to 5 if absent.
-        // After Apr 16 Base44 patch, status.max_seats will reflect activeFlight.capacity.
-        var MAX = (status && typeof status.max_seats === 'number' && status.max_seats > 0)
-                  ? status.max_seats
-                  : 5;
-        if (!status) {
-          return { label: 'Status unavailable', cta: { text: '', action: 'none', href: '#' } };
-        }
-        var gateStatus = (status.gate_status || '').toLowerCase();
-        var departed   = (status.nextflightstatus || status.next_flight_status) === 'DEPARTED'
-                      || gateStatus === 'departed';
-        if (departed) {
-          return { label: 'Flight departed', cta: { text: '', action: 'none', href: '#' } };
-        }
-        if (gateStatus === 'closed') {
-          return { label: 'Flight full — all seats filled', cta: { text: '', action: 'none', href: '#' } };
-        }
-        // open or unknown — show live count
-        var openCount = typeof status.open_count === 'number' ? status.open_count
-                      : typeof status.seats_remaining === 'number' ? status.seats_remaining
-                      : null;
-        if (openCount === null) {
-          return { label: 'Seats coming soon', cta: { text: '', action: 'none', href: '#' } };
-        }
-        if (openCount <= 0) {
-          return { label: 'Flight full — all seats filled', cta: { text: '', action: 'none', href: '#' } };
-        }
-        var label = openCount + ' of ' + MAX + ' seat' + (MAX !== 1 ? 's' : '') + ' open';
-        return {
-          label: label,
-          cta: { text: 'Invite a crew member', action: 'invite', href: '#seat-request-form' }
-        };
-      }
-
-      // updateGateStatusWidget(status) — writes resolveGateState() output
-      // into #mc-gs-count-value and #mc-gs-cta.
-      function updateGateStatusWidget(status) {
-        var countEl = document.getElementById('mc-gs-count-value');
-        var ctaEl   = document.getElementById('mc-gs-cta');
-        var gs = resolveGateState(status);
-        if (countEl) countEl.textContent = gs.label;
-        if (ctaEl) {
-          ctaEl.textContent       = gs.cta.text;
-          ctaEl.setAttribute('data-action', gs.cta.action);
-          ctaEl.setAttribute('href', gs.cta.href);
-        }
-      }
-
       // ── Apply state to DOM ────────────────────────────────────────────────
       function applyState(state, status, seatId) {
         var previousState = _state;
@@ -3298,7 +2756,7 @@
         var dashboardView = document.getElementById('dashboard-view');
 
         if (dashboardView) {
-          if (state === 'dashboard') {
+          if (state === 'dashboard' || state === 'lounge') {
             setDashboardDisplay(true);
           } else if (previousState !== 'dashboard') {
             setDashboardDisplay(false);
@@ -3307,41 +2765,20 @@
 
         if (state === 'dashboard') {
           if (seatIdEl) seatIdEl.textContent = seatId || '';
-          // Wire seat_id into all .tech links so OnboardingPassport receives it
-          if (seatId) {
-            // Update Mission Control nav button href with seat_id
-            var mcNavBtn = document.getElementById('mc-nav-btn');
-            if (mcNavBtn) {
-              mcNavBtn.href = '/?seat_id=' + encodeURIComponent(seatId);
-            }
+          // Wire seat_id and tuj_code into all CTAs so the journey context survives navigation
+          if (typeof window.__TUJ.applyQueryParamsToCtas === 'function') {
+            window.__TUJ.applyQueryParamsToCtas();
           }
           if (seatId) {
             document.querySelectorAll('a[href*="thispagedoesnotexist12345.tech"]').forEach(function (a) {
               try {
                 var u = new URL(a.href);
                 u.searchParams.set('seat_id', seatId);
+                var tujCode = (window.__TUJ && typeof window.__TUJ.getTujCode === 'function' ? window.__TUJ.getTujCode() : (new URLSearchParams(location.search).get('tuj_code') || sessionStorage.getItem('tuj_code') || ''));
+                if (tujCode) u.searchParams.set('tuj_code', tujCode);
                 a.href = u.toString();
               } catch (e) { /* skip malformed hrefs */ }
             });
-            // Wire seat_id + tuj_code into all /Studio links (tile + boarding step 3)
-            var _tujCode = new URLSearchParams(location.search).get('tuj_code') || '';
-            document.querySelectorAll('a[href="/Studio"], a[href^="/Studio?"]').forEach(function (a) {
-              try {
-                var su = new URL(a.href, location.origin);
-                su.searchParams.set('seat_id', seatId);
-                if (_tujCode) su.searchParams.set('tuj_code', _tujCode);
-                a.href = su.toString();
-              } catch (e) { /* skip */ }
-            });
-            // Wire seat_id into CalendarJet consultation link in boarding steps
-            var calBoardingLink = document.getElementById('bstep-5-cta');
-            if (calBoardingLink) {
-              try {
-                var cu = new URL(calBoardingLink.href);
-                cu.searchParams.set('seat_id', seatId);
-                calBoardingLink.href = cu.toString();
-              } catch (e) { /* skip */ }
-            }
           }
           // Welcome Aboard banner: show once if ?status=boarded in URL
           if (waBanner) {
@@ -3356,51 +2793,14 @@
           if (waBanner) waBanner.style.display = 'none';
         }
 
-        // ── Gate Status / Seat Counter widget (4-P3) ─────────────────────────────────
-        // Driven entirely by resolveGateState() output — no raw API shapes in UI layer.
-        if (state === 'dashboard') {
-          updateGateStatusWidget(status);
-        }
-
-        // ── BLOCKER-06: Studio Stateful CTA — Swap Request a Seat / Run Fit Check ──────
-        // When a confirmed passenger enters dashboard state, the primary CTA swaps
-        // from "Request a Seat" to "Run Resume Fit Check" pointing to the Studio.
-        // When leaving dashboard state the Fit Check CTA is hidden and the Request
-        // a Seat button is restored (visibility managed by applySeatGate below).
-        (function () {
-          var waitlistBtnEl  = document.getElementById('waitlistBtn');
-          var ctaWrapperEl   = document.getElementById('cta-wrapper');
-          var fitCheckBtnId  = 'tuj-fitcheck-cta';
-          var existingFitBtn = document.getElementById(fitCheckBtnId);
-          if (state === 'dashboard' && seatId) {
-            // Hide the Request a Seat button — passenger already has a seat
-            if (waitlistBtnEl) waitlistBtnEl.style.display = 'none';
-            var fitUrl = 'https://theultimatejourney.base44.app/ResumeFitCheck?seat_id=' + encodeURIComponent(seatId);
-            if (!existingFitBtn && ctaWrapperEl) {
-              // First time: create and inject the Fit Check CTA
-              var fitBtn = document.createElement('a');
-              fitBtn.id        = fitCheckBtnId;
-              fitBtn.className = 'btn-waitlist unlocked';
-              fitBtn.setAttribute('data-umami-event', 'Run Fit Check Click');
-              fitBtn.setAttribute('target', '_blank');
-              fitBtn.setAttribute('rel', 'noopener noreferrer');
-              fitBtn.href      = fitUrl;
-              fitBtn.textContent = '\u25B6 Run Resume Fit Check';
-              fitBtn.style.textDecoration = 'none';
-              ctaWrapperEl.insertBefore(fitBtn, ctaWrapperEl.firstChild);
-            } else if (existingFitBtn) {
-              existingFitBtn.href         = fitUrl;
-              existingFitBtn.style.display = '';
-            }
-          } else {
-            // Non-dashboard state: hide Fit Check CTA
-            // waitlistBtn visibility is managed by applySeatGate() below
-            if (existingFitBtn) existingFitBtn.style.display = 'none';
-          }
-        })();
-
         // ── Hand off to window.__applySeatGate() for all badge/CTA logic ──────
         // Fire before the transition so badge text is correct when it fades in.
+        if (typeof window.__TUJ.syncMissionStatusStrip === 'function') {
+          window.__TUJ.syncMissionStatusStrip();
+        }
+        if (typeof window.__TUJ.applyQueryParamsToCtas === 'function') {
+          window.__TUJ.applyQueryParamsToCtas();
+        }
         if (typeof window.__applySeatGate === 'function') {
           window.__applySeatGate(status || null);
         }
@@ -3419,43 +2819,13 @@
         console.log('[TUJ] state =', state, '| seat_id =', seatId || 'none');
       }
 
-      // ── Public: rerender() ───────────────────────────────────────────────────────────────
+      // ── Public: rerender() ────���───────────────────────────────────────────
       async function rerender() {
-        // Preserve scroll position so the loading-state flash never resets the page
-        var savedScrollY = window.scrollY || window.pageYOffset || 0;
         document.body.setAttribute('data-state', 'loading');
-
-        // Fetch gate status and validate seat_id in parallel for speed.
-        var rawId = getSeatIdRaw();
-        var results = await Promise.all([
-          fetchStatus(),
-          validateSeatId(rawId)   // null if rawId is null; fail-open on error
-        ]);
-        _status = results[0];
-        _seatId = results[1];  // null means invalid/missing; non-null means confirmed
-
-        // If rawId was present but validateSeatId returned null, the seat was
-        // explicitly rejected. Strip it from the URL so a refresh doesn't re-trigger
-        // the validation loop, and surface a recovery notice.
-        if (rawId && !_seatId) {
-          var params = new URLSearchParams(location.search);
-          params.delete('seat_id');
-          var newSearch = params.toString();
-          history.replaceState({}, '', newSearch ? '?' + newSearch : location.pathname);
-          // Surface inline recovery notice (shown in landing state)
-          var noticeEl = document.getElementById('seat-invalid-notice');
-          if (noticeEl) noticeEl.style.display = 'block';
-        } else {
-          var noticeEl = document.getElementById('seat-invalid-notice');
-          if (noticeEl) noticeEl.style.display = 'none';
-        }
-
+        _status = await fetchStatus();
+        _seatId = getSeatId();
         var state = computeState(_status, _seatId);
         applyState(state, _status, _seatId);
-        // Restore scroll after the state transition fires (next rAF)
-        requestAnimationFrame(function () {
-          window.scrollTo(0, savedScrollY);
-        });
       }
 
       // ── Public: showAgeGate(onConfirm) ───────────────────────────────────
@@ -3471,88 +2841,18 @@
         if (overlay) overlay.classList.remove('active');
       }
 
-      // ── Age gate DOB wiring (4-P2: Option C) ─────────────────────────────
-      // Populates day dropdown, enables confirm when DOB is complete.
-      // On confirm: POSTs to /api/verify-age, stores signed age_token in sessionStorage.
+      // ── Age gate button wiring ────────────────────────────────────────────
       document.addEventListener('DOMContentLoaded', function () {
-        var monthSel    = document.getElementById('ag-month');
-        var daySel      = document.getElementById('ag-day');
-        var yearInput   = document.getElementById('ag-year');
-        var confirmBtn  = document.getElementById('age-gate-confirm-btn');
-        var denyBtn     = document.getElementById('age-gate-deny-btn');
-        var errorEl     = document.getElementById('age-gate-error');
-        var AGE_TOKEN_KEY = 'tuj_age_token'; // sessionStorage — signed token
-
-        function populateDays() {
-          var m = parseInt(monthSel ? monthSel.value : '', 10);
-          var y = parseInt(yearInput ? yearInput.value : '', 10);
-          var maxDay = (m && y && !isNaN(y)) ? new Date(y, m, 0).getDate()
-                     : m ? new Date(2000, m, 0).getDate() : 31;
-          var prev = daySel ? daySel.value : '';
-          if (daySel) {
-            daySel.innerHTML = '<option value="">DD</option>';
-            for (var d = 1; d <= maxDay; d++) {
-              var opt = document.createElement('option');
-              opt.value = d;
-              opt.textContent = String(d).padStart(2, '0');
-              daySel.appendChild(opt);
-            }
-            if (prev && parseInt(prev, 10) <= maxDay) daySel.value = prev;
-          }
-        }
-
-        function isComplete() {
-          return monthSel && monthSel.value &&
-                 daySel   && daySel.value &&
-                 yearInput && yearInput.value && yearInput.value.length === 4 &&
-                 !isNaN(parseInt(yearInput.value, 10));
-        }
-
-        function updateBtn() {
-          if (confirmBtn) confirmBtn.disabled = !isComplete();
-        }
-
-        if (monthSel)  monthSel.addEventListener('change', function () { populateDays(); updateBtn(); });
-        if (daySel)    daySel.addEventListener('change', updateBtn);
-        if (yearInput) {
-          yearInput.addEventListener('input', function () { populateDays(); updateBtn(); });
-        }
+        var confirmBtn = document.getElementById('age-gate-confirm-btn');
+        var denyBtn    = document.getElementById('age-gate-deny-btn');
 
         if (confirmBtn) {
-          confirmBtn.addEventListener('click', async function () {
-            if (!isComplete()) return;
-            if (errorEl) errorEl.textContent = '';
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = '⏳ Verifying…';
-            var m   = String(parseInt(monthSel.value, 10)).padStart(2, '0');
-            var d   = String(parseInt(daySel.value, 10)).padStart(2, '0');
-            var y   = yearInput.value.trim();
-            var dob = y + '-' + m + '-' + d;
-            try {
-              var res  = await fetch('/api/verify-age', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date_of_birth: dob })
-              });
-              var data = await res.json();
-              if (data.ok && data.age_token) {
-                sessionStorage.setItem(AGE_TOKEN_KEY, data.age_token);
-                localStorage.setItem(AGE_KEY, '1'); // backward compat
-                hideAgeGate();
-                if (typeof _ageGateCb === 'function') {
-                  _ageGateCb();
-                  _ageGateCb = null;
-                }
-              } else {
-                if (errorEl) errorEl.textContent = data.reason || 'Age verification failed. Please check your date of birth.';
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Verify Age & Continue';
-              }
-            } catch (err) {
-              console.error('[age-gate] verify-age error:', err);
-              if (errorEl) errorEl.textContent = 'Verification failed. Please check your connection and try again.';
-              confirmBtn.disabled = false;
-              confirmBtn.textContent = 'Verify Age & Continue';
+          confirmBtn.addEventListener('click', function () {
+            localStorage.setItem(AGE_KEY, '1');
+            hideAgeGate();
+            if (typeof _ageGateCb === 'function') {
+              _ageGateCb();
+              _ageGateCb = null;
             }
           });
         }
@@ -3598,20 +2898,6 @@
         });
       });
 
-      // ── Goal chip toggle helper (Beehiiv segmentation) ──────────────────
-      // Exposed on window because the chip buttons use inline onclick handlers.
-      window.toggleGoalChip = function (chip) {
-        if (!chip) return;
-        chip.classList.toggle('selected');
-        var allChips = document.querySelectorAll('#goal-chips-group .goal-chip');
-        var selected = [];
-        allChips.forEach(function(c) {
-          if (c.classList.contains('selected')) selected.push(c.getAttribute('data-goal'));
-        });
-        var hiddenInput = document.getElementById('current-goal-hidden');
-        if (hiddenInput) hiddenInput.value = selected.join(',');
-      };
-
       // ── Wire seat-request form to return seat_id + trigger rerender ───────
       document.addEventListener('DOMContentLoaded', function () {
         var form = document.getElementById('seat-request-form');
@@ -3619,6 +2905,25 @@
 
         var subBtn       = document.getElementById('seat-submit-btn');
         var ageCheckbox  = document.getElementById('age-confirmed');
+        var seatChoice   = document.getElementById('vip-seat-choice');
+
+        function getRequestedBoardingType() {
+          var params = new URLSearchParams(location.search);
+          return (params.get('boarding_type') || params.get('cohort') || params.get('seat_type') || '').trim().toLowerCase();
+        }
+
+        function isBracketBarbieCohort() {
+          var type = getRequestedBoardingType();
+          return type === 'vip' || type === 'bracketbarbie';
+        }
+
+        function refreshSeatChoiceField() {
+          if (seatChoice) seatChoice.style.display = isBracketBarbieCohort() ? 'flex' : 'none';
+          var seatInput = form.querySelector('input[name=seat_label]');
+          if (!isBracketBarbieCohort() && seatInput) seatInput.value = '';
+        }
+
+        refreshSeatChoiceField();
 
         // ── Enable / disable submit based on checkbox state ────────────────
         if (ageCheckbox && subBtn) {
@@ -3627,45 +2932,54 @@
           });
         }
 
-        // BLOCKER-04: Replace age_confirmed boolean with age_token (HMAC-signed from /api/verify-age).
-        // The age gate overlay stores the token in sessionStorage under 'tuj_age_token'.
+        // Replace inline onsubmit with a version that reads age_confirmed
+        // from the checkbox and handles the seat_id response.
         form.removeAttribute('onsubmit');
         form.addEventListener('submit', function (e) {
           e.preventDefault();
-          var nameVal  = form.querySelector('input[name=name]').value.trim();
-          var emailVal = form.querySelector('input[name=email]').value.trim();
-          var errEl    = document.getElementById('seat-form-error');
+          var nameVal      = form.querySelector('input[name=name]').value.trim();
+          var emailVal     = form.querySelector('input[name=email]').value.trim();
+          var seatLabelVal = (form.querySelector('input[name=seat_label]') || {}).value ? form.querySelector('input[name=seat_label]').value.trim() : '';
+          var ageConfirmed = ageCheckbox ? ageCheckbox.checked : false;
+          var errEl        = document.getElementById('seat-form-error');
+          var boardingType = isBracketBarbieCohort() ? 'vip' : 'first_class';
           errEl.textContent = '';
-          if (!nameVal)  { errEl.textContent = 'Name is required.';  return; }
-          if (!emailVal) { errEl.textContent = 'Email is required.'; return; }
-          var _ageToken2 = sessionStorage.getItem('tuj_age_token') || null;
-          if (!_ageToken2) {
-            errEl.textContent = 'Age verification required. Please complete the passenger verification step first.';
-            return;
-          }
+          if (!nameVal)      { errEl.textContent = 'Name is required.';  return; }
+          if (!emailVal)     { errEl.textContent = 'Email is required.'; return; }
+          if (!ageConfirmed) { errEl.textContent = 'Please confirm your age to continue.'; return; }
+          if (isBracketBarbieCohort() && !seatLabelVal) { errEl.textContent = 'Please choose your preferred seat label.'; return; }
           subBtn.disabled    = true;
           subBtn.textContent = '⏳ Submitting…';
 
-          // Collect segmentation fields (Beehiiv custom fields + tag routing)
-          var careerStageVal = (form.querySelector('select[name=career_stage]') || {}).value || '';
-          var currentGoalVal = (form.querySelector('input[name=current_goal]') || {}).value || '';
+          // Also store age verification in localStorage now that they've
+          // explicitly checked the box — dismisses the overlay gate too.
+          localStorage.setItem(AGE_KEY, '1');
 
           fetch('/api/seat-request', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(Object.assign({
-              name:         nameVal,
-              email:        emailVal,
-              age_token:    _ageToken2,
-              source:       'landing',
-              career_stage: careerStageVal || null,
-              current_goal: currentGoalVal || null
-            }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
+            body:    JSON.stringify({
+              name:          nameVal,
+              email:         emailVal,
+              age_confirmed: true,   // checkbox verified above
+              boarding_type: boardingType,
+              source:        'landing',
+              flight_code:   (window.__TUJ && typeof window.__TUJ.getFlightCode === 'function' ? window.__TUJ.getFlightCode() : (new URLSearchParams(location.search).get('flight_code') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || '')),
+              flight_id:    (window.__TUJ && typeof window.__TUJ.getFlightCode === 'function' ? window.__TUJ.getFlightCode() : (new URLSearchParams(location.search).get('flight_id') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_id') || '')),
+              cabin_class:   ((((new URLSearchParams(location.search).get('boarding_type') || new URLSearchParams(location.search).get('cohort') || new URLSearchParams(location.search).get('seat_type') || '').trim().toLowerCase() === 'vip' || (new URLSearchParams(location.search).get('boarding_type') || new URLSearchParams(location.search).get('cohort') || new URLSearchParams(location.search).get('seat_type') || '').trim().toLowerCase() === 'bracketbarbie') ? 'First' : 'Economy')),
+              seats_reserved: 'F5-04',
+              tuj_code:      (window.__TUJ && typeof window.__TUJ.getTujCode === 'function' ? window.__TUJ.getTujCode() : (new URLSearchParams(location.search).get('tuj_code') || sessionStorage.getItem('tuj_code') || '')),
+              ...(seatLabelVal ? { seat_label: seatLabelVal } : {})
+            })
           })
-          .then(function (r) { return r.json(); })
+          .then(async function (r) {
+            var text = await r.text();
+            try { return text && text.trim() ? JSON.parse(text) : {}; } catch (e) { return {}; }
+          })
           .then(function (d) {
             if (d.ok && d.seat_id) {
               sessionStorage.setItem(SEAT_KEY, d.seat_id);
+              if (d.tuj_code) sessionStorage.setItem(TUJ_KEY, d.tuj_code);
               form.style.display = 'none';
               // ── Gate Contract: auto-mark Step 1 (Signal subscription) done ──
               // beehiiv subscribe already fired server-side; mark locally so
@@ -3686,38 +3000,18 @@
                 console.error('[TUJ] Failed to mark Step 1 done — seat_id:', d.seat_id, 'stepKey: signal', flagErr);
               }
               // Redirect to dashboard state with Welcome Aboard banner
-              var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
-              history.replaceState({}, '', newUrl);
+              var nextUrl = new URL(window.location.href);
+              nextUrl.searchParams.set('status', 'boarded');
+              nextUrl.searchParams.set('seat_id', d.seat_id);
+              var storedTujCode = (window.__TUJ && typeof window.__TUJ.getTujCode === 'function' ? window.__TUJ.getTujCode() : (new URLSearchParams(location.search).get('tuj_code') || sessionStorage.getItem('tuj_code') || ''));
+              if (storedTujCode) nextUrl.searchParams.set('tuj_code', storedTujCode);
+              history.replaceState({}, '', nextUrl.pathname + nextUrl.search + nextUrl.hash);
               window.__TUJ.rerender();
-            } else if (d.waitlisted) {
-              // F143: Cohort full — show "You're on the next flight" state
-              form.style.display = 'none';
-              var wlConf = document.getElementById('seat-request-waitlisted');
-              if (wlConf) wlConf.style.display = 'block';
             } else if (d.ok) {
               // Legacy ok:true without seat_id (Base44 stub path)
               form.style.display = 'none';
               var conf = document.getElementById('seat-request-confirm');
               if (conf) conf.style.display = 'block';
-            } else if (d.duplicate) {
-              // One seat per email — surface a clear, friendly message
-              // If the API returned the existing seat_id, redirect directly to dashboard
-              if (d.seat_id) {
-                sessionStorage.setItem(SEAT_KEY, d.seat_id);
-                form.style.display = 'none';
-                var newUrl = '/?status=boarded&seat_id=' + encodeURIComponent(d.seat_id);
-                history.replaceState({}, '', newUrl);
-                window.__TUJ.rerender();
-              } else {
-                errEl.textContent  = d.error || 'A seat request has already been submitted for this email. Check your inbox for your original confirmation.';
-                subBtn.disabled    = false;
-                subBtn.textContent = '✈️ Submit Request';
-              }
-            } else if (d.error === 'hold_active') {
-              // hold_mode=true — hide form, show hold state message
-              form.style.display = 'none';
-              var holdEl = document.getElementById('seat-request-hold');
-              if (holdEl) holdEl.style.display = 'block';
             } else {
               errEl.textContent  = d.error || 'Something went wrong — please try again.';
               subBtn.disabled    = false;
@@ -3733,13 +3027,18 @@
       });
 
       // ── Expose public API ─────────────────────────────────────────────────
-      window.__TUJ = {
+      window.__TUJ = Object.assign(window.__TUJ || {}, {
         rerender:     rerender,
         showAgeGate:  showAgeGate,
         get state()   { return _state; },
         get status()  { return _status; },
-        get seatId()  { return _seatId; }
-      };
+        get seatId()  { return _seatId; },
+        getSeatId:    getSeatId,
+        getTujCode:   getTujCode,
+        getFlightCode: function () {
+          return (new URLSearchParams(location.search).get('flight_code') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || '').trim();
+        }
+      });
 
       // ── Boot: run on DOMContentLoaded ─────────────────────────────────────
       if (document.readyState === 'loading') {
@@ -3755,11 +3054,10 @@
 
     // ── Live countdown timer — target driven by applySeatGate() ─────────────
     // Waits for window.__seatStatusReady to be populated by the IIFE above,
-    // then starts counting down to the Command Center arrival target.
+    // then starts counting down to next_flight_departure_date.
     (function () {
       var wrap      = document.getElementById('countdown-wrap');
       var departed  = document.getElementById('countdown-departed');
-      var cdDays    = document.getElementById('cd-days');
       var cdHours   = document.getElementById('cd-hours');
       var cdMinutes = document.getElementById('cd-minutes');
       var cdSeconds = document.getElementById('cd-seconds');
@@ -3767,47 +3065,6 @@
       var target    = null;
 
       function pad(n) { return String(n).padStart(2, '0'); }
-
-      function parseCountdownTarget(value) {
-        if (!value) return null;
-        if (typeof value !== 'string' || /[zZ]|[+-]\d{2}:?\d{2}$/.test(value)) {
-          var direct = new Date(value);
-          return isNaN(direct.getTime()) ? null : direct;
-        }
-        var match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
-        if (!match) {
-          var fallback = new Date(value);
-          return isNaN(fallback.getTime()) ? null : fallback;
-        }
-        var localUtcMs = Date.UTC(
-          Number(match[1]),
-          Number(match[2]) - 1,
-          Number(match[3]),
-          Number(match[4]),
-          Number(match[5]),
-          Number(match[6] || 0)
-        );
-        var probe = new Date(localUtcMs);
-        var parts = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'America/New_York',
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit', second: '2-digit',
-          hour12: false
-        }).formatToParts(probe).reduce(function (acc, part) {
-          acc[part.type] = part.value;
-          return acc;
-        }, {});
-        var zonedUtcMs = Date.UTC(
-          Number(parts.year),
-          Number(parts.month) - 1,
-          Number(parts.day),
-          Number(parts.hour),
-          Number(parts.minute),
-          Number(parts.second)
-        );
-        var offsetMinutes = (zonedUtcMs - localUtcMs) / 60000;
-        return new Date(localUtcMs - offsetMinutes * 60000);
-      }
 
       function tick() {
         if (!target) { if (wrap) wrap.style.display = 'none'; return; }
@@ -3824,9 +3081,7 @@
         var totalSec = Math.floor(diff / 1000);
         var secs  = totalSec % 60;
         var mins  = Math.floor(totalSec / 60) % 60;
-        var hours = Math.floor(totalSec / 3600) % 24;
-        var days  = Math.floor(totalSec / 86400);
-        if (cdDays)    cdDays.textContent    = pad(days);
+        var hours = Math.floor(totalSec / 3600);
         if (cdHours)   cdHours.textContent   = pad(hours);
         if (cdMinutes) cdMinutes.textContent = pad(mins);
         if (cdSeconds) cdSeconds.textContent = pad(secs);
@@ -3838,15 +3093,14 @@
         if (rdy === null) return; // not yet populated
         clearInterval(pollInterval);
 
-        var countdownDate = rdy.countdownDate || rdy.arrivalDate || rdy.departureDate;
-        if (!countdownDate) {
-          // No arrival/departure date set in Admin — hide countdown entirely
+        if (!rdy.departureDate) {
+          // No departure date set in Admin — hide countdown entirely
           if (wrap) wrap.style.display = 'none';
           return;
         }
 
-        target = parseCountdownTarget(countdownDate);
-        if (!target) {
+        target = new Date(rdy.departureDate);
+        if (isNaN(target.getTime())) {
           if (wrap) wrap.style.display = 'none';
           return;
         }
@@ -4141,7 +3395,7 @@
     (function() {
       const themeStatus = document.getElementById('theme-status');
       document.body.classList.add('black-glass');
-      themeStatus.textContent = 'Glass Runway / Neon Horizon — Active May 1, 2026';
+      themeStatus.textContent = 'Mission Control Dark Theme Active';
     })();
 
     // St. Patrick's Day theme (March 17 only)
@@ -4166,8 +3420,8 @@
       var raf;
       var particles = [];
       var PARTICLE_COUNT = 55;
-      // Match site accent: #FBBF24 = rgb(255, 20, 147)
-      var ACCENT = { r: 0, g: 217, b: 255 };
+      // Match site accent: #7c9fff = rgb(124, 159, 255)
+      var ACCENT = { r: 168, g: 196, b: 0 };
 
       function resize() {
         canvas.width  = window.innerWidth;
@@ -4264,128 +3518,5 @@
     })();
   </script>
 
-  <!-- ── Mission Control deep-link wiring — Apr 19, 2026
-       Rewrites all stale .tech root-only hrefs to named routes using seat_id from URL.
-       Spec: link audit rewrite, Apr 2026.
-       Targets: bstep-2-cta, bstep-6-cta, bstep-7-cta, bstep-8-cta,
-                .mc-tile[Systems], .mc-section-link[Build], .mc-action-btn[Systems],
-                .btn-systems (nav bar) ── -->
-  <script>
-  (function () {
-    var TECH   = 'https://www.thispagedoesnotexist12345.tech';
-    var params = new URLSearchParams(window.location.search);
-    var seatId  = params.get('seat_id')  || '';
-    var tujCode = params.get('tuj_code') || '';
-
-    function deepLink(path, extraQuery) {
-      var url = TECH + path;
-      var qs  = [];
-      if (extraQuery) qs.push(extraQuery);
-      if (seatId)  qs.push('seat_id='  + encodeURIComponent(seatId));
-      if (tujCode) qs.push('tuj_code=' + encodeURIComponent(tujCode));
-      return qs.length ? url + '?' + qs.join('&') : url;
-    }
-
-    // Step 2 — Complete Your Profile → /Passengers
-    var s2 = document.getElementById('bstep-2-cta');
-    if (s2) s2.href = deepLink('/Passengers');
-
-    // Step 6 — Add 5 Target Companies → /JDLibrary
-    var s6 = document.getElementById('bstep-6-cta');
-    if (s6) s6.href = deepLink('/JDLibrary');
-
-    // Step 7 — Submit 3 Applications → /Applications
-    var s7 = document.getElementById('bstep-7-cta');
-    if (s7) s7.href = deepLink('/Applications');
-
-    // Step 8 — Set Follow-Up Reminders → /InterviewsAndFollowUps
-    var s8 = document.getElementById('bstep-8-cta');
-    if (s8) s8.href = deepLink('/InterviewsAndFollowUps');
-
-    // Ecosystem tile — Systems → /Dashboard
-    document.querySelectorAll('.mc-tile').forEach(function (el) {
-      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
-        el.href = deepLink('/Dashboard');
-      }
-    });
-
-    // Section link — "Open in Systems →" (The Build section) → /FlightLog
-    document.querySelectorAll('.mc-section-link').forEach(function (el) {
-      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
-        el.href = deepLink('/FlightLog');
-      }
-    });
-
-    // Footer action button — ⚙️ Systems → /Dashboard
-    document.querySelectorAll('.mc-action-btn').forEach(function (el) {
-      if (el.getAttribute('href') === TECH || el.getAttribute('href') === TECH + '/') {
-        el.href = deepLink('/Dashboard');
-      }
-    });
-
-    // Nav bar Systems button (.btn-systems)
-    var navSys = document.querySelector('.btn-systems');
-    if (navSys && (navSys.getAttribute('href') === TECH || navSys.getAttribute('href') === TECH + '/')) {
-      navSys.href = deepLink('/Dashboard');
-    }
-  })();
-  </script>
-
-  <!-- ── Status strip tokenization — STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE ── -->
-  <!-- Runs once on DOMContentLoaded. Reads seat_id + tuj_code from URL.
-       When seat_id present: optimistic update from URL, then async refinement from seat record.
-       When absent: JS defaults (Boarding / 5 active / Review signal path) remain. -->
-  <script>
-  (function () {
-    var STATUS_LANE       = 'Boarding';
-    var STATUS_OPERATORS  = '5 active';
-    var STATUS_NEXT_MOVE  = 'Review signal path';
-
-    var params  = new URLSearchParams(window.location.search);
-    var seatId  = params.get('seat_id')  || '';
-    var tujCode = params.get('tuj_code') || '';
-
-    function applyStrip(lane, ops, next, pill) {
-      var laneEl = document.getElementById('mcStatusLane');
-      var opsEl  = document.getElementById('mcStatusOperators');
-      var nextEl = document.getElementById('mcStatusNextMove');
-      var seatEl = document.getElementById('dashboard-seat-id');
-      if (laneEl) laneEl.textContent = lane;
-      if (opsEl)  opsEl.textContent  = ops;
-      if (nextEl) nextEl.textContent = next;
-      if (pill && seatEl) seatEl.textContent = pill;
-    }
-
-    if (seatId) {
-      // Optimistic update from URL params
-      applyStrip(
-        tujCode || seatId,
-        STATUS_OPERATORS,
-        STATUS_NEXT_MOVE,
-        tujCode ? tujCode + ' · active' : seatId
-      );
-
-      // Async refinement from seat record (non-blocking, silent on error)
-      fetch('/api/seat?id=' + encodeURIComponent(seatId))
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (seat) {
-          if (!seat) return;
-          var lane = seat.cabin_class
-            ? seat.cabin_class + (tujCode ? ' · ' + tujCode : '')
-            : (tujCode || seatId);
-          var ops  = seat.status || STATUS_OPERATORS;
-          var next = seat.scheduled_departure_date
-            ? 'Departure set · ' + seat.scheduled_departure_date.slice(0, 10)
-            : STATUS_NEXT_MOVE;
-          var pill = seat.cabin_class
-            ? seat.cabin_class + ' · ' + (tujCode || seatId) + ' · active'
-            : (tujCode ? tujCode + ' · active' : seatId);
-          applyStrip(lane, ops, next, pill);
-        })
-        .catch(function () { /* silently skip — defaults already applied */ });
-    }
-    // No seat_id: JS defaults (STATUS_LANE / STATUS_OPERATORS / STATUS_NEXT_MOVE) already set in HTML
-  })();
-  </script>
 </body>
 </html>
