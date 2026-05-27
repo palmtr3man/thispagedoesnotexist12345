@@ -21,10 +21,14 @@
  *   SENDGRID_DEMO_DAILY_LIMIT default: 100
  */
 
+const fs = require('fs');
+const path = require('path');
 const { TEMPLATES, templateKeyForId } = require('./sendgrid-templates');
 
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+const URL_OVERRIDE_FIELDS = ['passport_url', 'wheels_up_url', 'unsubscribe_url'];
+const TEMPLATE_HTML_DIR = path.join(__dirname, '..', '..', 'sendgrid-templates');
 
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -65,6 +69,52 @@ function safeCompare(a, b) {
   return mismatch === 0;
 }
 
+function validateHttpUrl(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > 2048) return null;
+  let parsed;
+  try { parsed = new URL(trimmed); } catch { return null; }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+  return parsed.toString();
+}
+
+function sanitizeUrlOverrides(input) {
+  const overrides = {};
+  const errors = [];
+  if (input == null || typeof input !== 'object') return { overrides, errors };
+  for (const field of URL_OVERRIDE_FIELDS) {
+    if (!Object.prototype.hasOwnProperty.call(input, field)) continue;
+    const raw = input[field];
+    const safe = validateHttpUrl(raw);
+    if (!safe) errors.push(field);
+    else overrides[field] = safe;
+  }
+  return { overrides, errors };
+}
+
+function renderTemplateHtml(templateKey, dynamicData) {
+  try {
+    const filePath = path.join(TEMPLATE_HTML_DIR, `${templateKey}.html`);
+    const html = fs.readFileSync(filePath, 'utf8');
+    return html.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (match, key) => {
+      const value = dynamicData[key];
+      return value == null ? '' : String(value);
+    });
+  } catch {
+    return null;
+  }
+}
+
+function extractHrefs(html) {
+  if (typeof html !== 'string') return [];
+  const matches = [];
+  const re = /href\s*=\s*"([^"]+)"/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) matches.push(m[1]);
+  return matches;
+}
+
 function sanitizeTemplateKeys(input) {
   if (!Array.isArray(input) || input.length === 0) return DEFAULT_TEMPLATE_SEQUENCE;
   return input
@@ -72,14 +122,17 @@ function sanitizeTemplateKeys(input) {
     .filter((value) => value && DEFAULT_TEMPLATE_SEQUENCE.includes(value));
 }
 
-function buildDynamicData({ seatId, firstName, lastName, email, flightCode, siteUrl }) {
+function buildDynamicData({ seatId, firstName, lastName, email, flightCode, siteUrl, overrides = {} }) {
   const canonicalFlightId = String(flightCode || '').replace(/ /g, '_');
   const passportUrl = `${siteUrl}/?seat_id=${seatId}&tuj_code=${seatId}`;
   const studioUrl = `${siteUrl}/Studio?seat_id=${seatId}&tuj_code=${seatId}&flight_id=${canonicalFlightId}`;
   const techUrl = 'https://www.thispagedoesnotexist12345.tech';
   const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const defaultWheelsUpUrl = process.env.BEEHIIV_GIFT_LINK_URL
+    || `https://newsletter.thispagedoesnotexist12345.us/p/${canonicalFlightId.toLowerCase()}`;
+  const defaultUnsubscribeUrl = '<%asm_group_unsubscribe_raw_url%>';
 
-  return {
+  const data = {
     subject: `Demo boarding pass — ${flightCode}`,
     first_name: firstName,
     last_name: lastName,
@@ -103,6 +156,8 @@ function buildDynamicData({ seatId, firstName, lastName, email, flightCode, site
     flight_id: flightCode,
     flight_display_name: flightCode,
     passport_url: passportUrl,
+    wheels_up_url: defaultWheelsUpUrl,
+    unsubscribe_url: defaultUnsubscribeUrl,
     dashboard_url: passportUrl,
     platform_url: siteUrl,
     signal_url: 'https://newsletter.thispagedoesnotexist12345.us/',
@@ -128,6 +183,13 @@ function buildDynamicData({ seatId, firstName, lastName, email, flightCode, site
     boarding_close_time: 'Demo only',
     career_stage: 'Active Job Seeker',
   };
+
+  for (const field of URL_OVERRIDE_FIELDS) {
+    if (overrides && Object.prototype.hasOwnProperty.call(overrides, field)) {
+      data[field] = overrides[field];
+    }
+  }
+  return data;
 }
 
 async function sendTemplate({ apiKey, fromEmail, toEmail, templateId, dynamicData, asm }) {
@@ -164,15 +226,19 @@ exports.handler = async (event) => {
     return json(401, { ok: false, error: 'Unauthorized' });
   }
 
+  let body = {};
+  try { body = JSON.parse(event.body || '{}'); } catch { return json(400, { ok: false, error: 'Invalid JSON body' }); }
+
+  const renderOnly = body.render_only === true || body.dry_run === true;
+
   const apiKey = process.env.SENDGRID_API_KEY || '';
   const fromEmail = process.env.SENDGRID_FROM_EMAIL || '';
   const toEmail = process.env.DEMO_ACCOUNT_EMAIL || '';
-  if (!apiKey) return json(500, { ok: false, error: 'SENDGRID_API_KEY is not configured' });
-  if (!fromEmail) return json(500, { ok: false, error: 'SENDGRID_FROM_EMAIL is not configured' });
-  if (!toEmail) return json(500, { ok: false, error: 'DEMO_ACCOUNT_EMAIL is not configured' });
-
-  let body = {};
-  try { body = JSON.parse(event.body || '{}'); } catch { return json(400, { ok: false, error: 'Invalid JSON body' }); }
+  if (!renderOnly) {
+    if (!apiKey) return json(500, { ok: false, error: 'SENDGRID_API_KEY is not configured' });
+    if (!fromEmail) return json(500, { ok: false, error: 'SENDGRID_FROM_EMAIL is not configured' });
+    if (!toEmail) return json(500, { ok: false, error: 'DEMO_ACCOUNT_EMAIL is not configured' });
+  }
 
   const seatId = String(body.seat_id || process.env.DEMO_SEAT_ID || 'TUJ-KC2222').trim().toUpperCase();
   if (!SEAT_ID_REGEX.test(seatId)) return json(400, { ok: false, error: 'Invalid demo seat_id format' });
@@ -187,7 +253,48 @@ exports.handler = async (event) => {
   const lastName = String(body.last_name || process.env.DEMO_LAST_NAME || 'Clark').trim() || 'Clark';
   const flightCode = String(body.flight_code || process.env.DEMO_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_CODE || 'FL_051126').trim();
   const siteUrl = String(process.env.SITE_URL || 'https://www.thispagedoesnotexist12345.com').replace(/\/$/, '');
-  const dynamicData = buildDynamicData({ seatId, firstName, lastName, email: toEmail, flightCode, siteUrl });
+
+  const { overrides, errors: overrideErrors } = sanitizeUrlOverrides(body.url_overrides || body);
+  if (overrideErrors.length) {
+    return json(400, { ok: false, error: `Invalid URL override(s): ${overrideErrors.join(', ')}. Must be http(s) URL.` });
+  }
+
+  const dynamicData = buildDynamicData({ seatId, firstName, lastName, email: toEmail, flightCode, siteUrl, overrides });
+
+  if (renderOnly) {
+    const previews = requestedTemplates.map((key) => {
+      const templateId = TEMPLATES[key] || null;
+      const html = renderTemplateHtml(key, dynamicData);
+      const hrefs = extractHrefs(html);
+      const preview = {
+        template_key: key,
+        template_id: templateId,
+        dynamic_data: dynamicData,
+        rendered: Boolean(html),
+        href_count: hrefs.length,
+        hrefs,
+      };
+      if (key === 'boarding_pass_free_v1') {
+        preview.cta = {
+          primary_cta: { label: 'Mission Control', href: dynamicData.passport_url, field: 'passport_url' },
+          secondary_cta: { label: 'Read your wheels-up briefing', href: dynamicData.wheels_up_url, field: 'wheels_up_url' },
+          unsubscribe: { href: dynamicData.unsubscribe_url, field: 'unsubscribe_url' },
+        };
+      }
+      return preview;
+    });
+
+    return json(200, {
+      ok: true,
+      render_only: true,
+      seat_id: seatId,
+      flight_code: flightCode,
+      recipient: toEmail ? toEmail.replace(/^(.).+(@.+)$/, '$1***$2') : null,
+      templates: requestedTemplates,
+      overrides_applied: overrides,
+      previews,
+    });
+  }
 
   const asmGroupId = Number.parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10);
   const asmMarketingGroupId = process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING ? Number.parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING, 10) : null;
