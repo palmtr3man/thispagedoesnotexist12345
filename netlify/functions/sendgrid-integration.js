@@ -5,7 +5,7 @@
  * Triggered when a Seat entity is activated (admin approves a SeatRequest).
  * Dispatches the boarding sequence in order based on boarding_type:
  *   - Alpha / default: alphaflightannouncement_v1 → boarding_confirmation_v1
- *   - Bracket.Barbie / VIP cohort: vip_boarding_pass_v1 → vip_boarding_instructions_v1
+ *   - VIP cohort: vip_boarding_pass_v1 → vip_boarding_instructions_v1
  *
  * After both sends confirm 2xx, stamps boarding_confirmation_sent_at on the
  * Seat record via the Base44 API. Idempotency guard: will not overwrite if
@@ -37,6 +37,8 @@ const DEFAULT_FLIGHT_DETAILS = {
     departureDate: process.env.ACTIVE_FLIGHT_DEPARTURE_DATE || ''
   }
 };
+
+const DISPATCH_LEASE_MS = Math.max(60_000, Number(process.env.BOARDING_CONFIRMATION_DISPATCH_LEASE_MS || 15 * 60 * 1000));
 
 function getTrimmedEnv(name) {
   const value = process.env[name];
@@ -87,6 +89,22 @@ function resolveLastName(seat) {
 
 function resolveBoardingType(seat) {
   return String(seat.boarding_type || 'first_class').trim().toLowerCase();
+}
+
+function isVipBoardingType(boardingType) {
+  return boardingType === 'vip' || boardingType === 'bracket.barbie';
+}
+
+function parseIso(value) {
+  const ms = Date.parse(value);
+  return Number.isFinite(ms) ? ms : null;
+}
+
+function isDispatchLeaseActive(boarding_confirmation_dispatch_started_at) {
+  if (!boarding_confirmation_dispatch_started_at) return false;
+  const startedMs = parseIso(boarding_confirmation_dispatch_started_at);
+  if (startedMs === null) return false;
+  return Date.now() - startedMs < DISPATCH_LEASE_MS;
 }
 
 const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || '').trim();
@@ -165,8 +183,8 @@ function buildVipDynamicData(seat) {
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
     boarding_type: 'vip',
     seats_reserved: 'F5-04',
-    newsletter_brand: 'Bracket.Barbie',
-    newsletter_promo: 'Bracket.Barbie newsletter promotion'
+    newsletter_brand: 'VIP cohort',
+    newsletter_promo: 'Mission Control promo'
   };
 }
 
@@ -185,23 +203,28 @@ async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData)
     template_id: templateId
   };
 
-  const response = await fetch(SENDGRID_API_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
+  try {
+    const response = await fetch(SENDGRID_API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
 
-  if (response.ok || response.status === 202) {
-    console.log(`[sendgrid-integration] Template ${templateId} sent to ${toEmail} — status ${response.status}`);
-    return true;
+    if (response.ok || response.status === 202) {
+      console.log(`[sendgrid-integration] Template ${templateId} sent to ${toEmail} — status ${response.status}`);
+      return true;
+    }
+
+    const errorText = await response.text();
+    console.error(`[sendgrid-integration] Template ${templateId} failed for ${toEmail} — status ${response.status}:`, errorText);
+    return false;
+  } catch (error) {
+    console.error(`[sendgrid-integration] Template ${templateId} fetch failed for ${toEmail}:`, error);
+    return false;
   }
-
-  const errorText = await response.text();
-  console.error(`[sendgrid-integration] Template ${templateId} failed for ${toEmail} — status ${response.status}:`, errorText);
-  return false;
 }
 
 /**
@@ -209,20 +232,25 @@ async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData)
  */
 async function updateSeatRecord(base44SeatUrl, seatId, fields) {
   const url = `${base44SeatUrl}/${seatId}`;
-  const response = await fetch(url, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(fields)
-  });
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields)
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[sendgrid-integration] Base44 Seat update failed for seat ${seatId} — status ${response.status}:`, errorText);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[sendgrid-integration] Base44 Seat update failed for seat ${seatId} — status ${response.status}:`, errorText);
+      return false;
+    }
+
+    console.log(`[sendgrid-integration] Seat record ${seatId} updated:`, Object.keys(fields).join(', '));
+    return true;
+  } catch (error) {
+    console.error(`[sendgrid-integration] Base44 Seat update fetch failed for seat ${seatId}:`, error);
     return false;
   }
-
-  console.log(`[sendgrid-integration] Seat record ${seatId} updated:`, Object.keys(fields).join(', '));
-  return true;
 }
 
 /**
@@ -248,7 +276,7 @@ async function sendSeatConfirmation(seat) {
   const firstName = resolveFirstName(seat);
   const lastName = resolveLastName(seat);
   const boardingType = resolveBoardingType(seat);
-  const isVipBoarding = boardingType.includes('vip');
+  const isVipBoarding = isVipBoardingType(boardingType);
   const { boarding_confirmation_sent_at, boarding_confirmation_dispatch_started_at } = seat;
 
   if (!seatId || !tujCode || !recipientEmail || !firstName || !lastName) {
@@ -256,29 +284,19 @@ async function sendSeatConfirmation(seat) {
     return { success: false, error: 'Missing required seat fields' };
   }
 
-  if (boarding_confirmation_sent_at || boarding_confirmation_dispatch_started_at) {
-    const marker = boarding_confirmation_sent_at
-      ? `boarding_confirmation_sent_at (${boarding_confirmation_sent_at})`
-      : `boarding_confirmation_dispatch_started_at (${boarding_confirmation_dispatch_started_at})`;
-    console.log(`[sendgrid-integration] Seat ${seatId} already has ${marker} — skipping send`);
+  if (boarding_confirmation_sent_at) {
+    console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boarding_confirmation_sent_at}) — skipping send`);
     return { success: true, skipped: true };
   }
 
-  if (base44SeatUrl && seatId) {
-    const claimed = await updateSeatRecord(base44SeatUrl, seatId, {
-      boarding_confirmation_dispatch_started_at: new Date().toISOString(),
-      boarding_confirmation_dispatch_state: 'in_progress',
-      tuj_code: tujCode,
-      flight_id: resolveFlightCode(seat, isVipBoarding),
-      seats_reserved: 'F5-04'
-    });
-
-    if (!claimed) {
-      return { success: false, error: 'Failed to claim boarding confirmation dispatch lock' };
-    }
+  if (isDispatchLeaseActive(boarding_confirmation_dispatch_started_at)) {
+    console.log(`[sendgrid-integration] Seat ${seatId} already has active boarding_confirmation_dispatch_started_at (${boarding_confirmation_dispatch_started_at}) — skipping send`);
+    return { success: true, skipped: true };
   }
 
-  const { templateIds, missing } = getTemplateIds(isVipBoarding);
+  const dispatchStartedAt = boarding_confirmation_dispatch_started_at || new Date().toISOString();
+
+  const { templateIds, missing } = getTemplateIds(isVipBoarding ? 'vip' : 'alpha');
   if (missing.length) {
     console.error(`[sendgrid-integration] Missing SendGrid template env vars: ${missing.join(', ')}`);
     return { success: false, error: `Missing template env vars: ${missing.join(', ')}` };
@@ -306,7 +324,7 @@ async function sendSeatConfirmation(seat) {
   if (base44SeatUrl && seatId) {
     await updateSeatRecord(base44SeatUrl, seatId, {
       boarding_confirmation_sent_at: new Date().toISOString(),
-      boarding_confirmation_dispatch_started_at: boarding_confirmation_dispatch_started_at || new Date().toISOString(),
+      boarding_confirmation_dispatch_started_at: dispatchStartedAt,
       boarding_confirmation_dispatch_state: 'sent',
       tuj_code: tujCode,
       flight_id: resolveFlightCode(seat, isVipBoarding),
