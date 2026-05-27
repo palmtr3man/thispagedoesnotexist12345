@@ -112,7 +112,7 @@ function deriveResumeFitCheckStatus(user) {
  *   4. null                 — no code available; UI hides the secondary badge
  *
  * Normalisation: spaces replaced with underscores, trimmed.
- * This matches the existing ACTIVE_FLIGHT_CODE convention ("FL 041926" → "FL_041926")
+ * This matches the canonical ACTIVE_FLIGHT_CODE convention ("FL_051126")
  * but the raw value is also preserved for display — callers may choose to display
  * the raw string or the normalised form. The normalised form is what is returned.
  */

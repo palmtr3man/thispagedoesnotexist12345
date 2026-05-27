@@ -79,6 +79,6 @@ Commit: `f876e25` — use as rollback reference when March campaigns resume.
 
 - `founding_fare_unlocked_v1` — no active version in SendGrid as of Apr 7, 2026. Paste HTML and activate when ready.
 - `boarding_instructions_paid_v1` — Notion registry updated Apr 21, 2026. Active version = `v7-dark-neon-canonical-2026-04-07`. Full token set: `first_name`, `flight_code`, `first_task_url`, `seat_id`, `tuj_code`, `secondary_url`, `platform_url`, `unsubscribe_url`.
-- `ACTIVE_FLIGHT_CODE_DEFAULT` in `seat-request.js` updated from `FL 041926` → `FL 042126` (Apr 21, 2026).
-- Alpha test banners remain in all announcement templates — must be stripped before live sends (FL 042126).
+- `ACTIVE_FLIGHT_CODE_DEFAULT` in `seat-request.js` updated to `FL_051126` (May 11, 2026).
+- Alpha test banners remain in all announcement templates — must be stripped before live sends (FL_051126).
 - All announcement templates: banner stripped before live sends. Test sends pending daily quota reset.

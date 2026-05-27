@@ -82,7 +82,7 @@ const ASM_GROUPS_TO_DISPLAY  = ASM_MARKETING_GROUP_ID
   : [ASM_GROUP_ID];
 const NOTION_API_VERSION = '2022-06-28';
 const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '';
-const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL 042126'; // updated Apr 21, 2026 — Alpha Flight 1 rescheduled from FL 041926
+const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL_051126'; // canonical fallback aligned with FL_051126
 const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
 
 function base44Headers() {
