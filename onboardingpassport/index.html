@@ -101,7 +101,7 @@
       const seatId = (params.get('seat_id') || '').trim();
       const tujCode = (params.get('tuj_code') || seatId || '').trim();
       const flightCode = (params.get('flight_code') || params.get('flight_id') || '').trim();
-      const seatRegex = /^TUJ-[A-Z0-9]{4,}$/;
+      const seatRegex = /^TUJ-[A-Z2-9]{6}$/;
       const seatBadge = document.getElementById('seatBadge');
       const contextCopy = document.getElementById('contextCopy');
       const contextStatus = document.getElementById('contextStatus');
@@ -152,7 +152,7 @@
             body: JSON.stringify({ date_of_birth: dob })
           });
           const data = await res.json().catch(function () { return {}; });
-          if (res.ok && data.ok && data.passed && data.age_token) {
+          if (res.ok && data.ok && data.age_token) {
             sessionStorage.setItem('age_token', data.age_token);
             setStatus(ageStatus, 'Eligibility verified for this browser session.', 'success');
             setStatus(passportStatus, 'Passport can now be completed and handed to Studio.', 'success');

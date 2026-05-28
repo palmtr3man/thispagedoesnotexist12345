@@ -100,7 +100,7 @@
             body: JSON.stringify({ date_of_birth: dob })
           });
           const ageData = await ageRes.json().catch(function () { return {}; });
-          if (!ageRes.ok || !ageData.ok || !ageData.passed || !ageData.age_token) {
+          if (!ageRes.ok || !ageData.ok || !ageData.age_token) {
             setStatus(ageData.reason || ageData.error || 'Age verification failed.', 'error');
             return;
           }
