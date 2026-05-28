@@ -38,6 +38,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/verify-age"
+  to = "/.netlify/functions/verify-age"
+  status = 200
+
+[[redirects]]
   from = "/api/seat-ready"
   to = "/.netlify/functions/seat-ready"
   status = 200
@@ -171,14 +176,5 @@
   status = 200
   force = true
 
-[[redirects]]
-  from = "/Studio"
-  to = "/"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/Studio/*"
-  to = "/"
-  status = 200
-  force = true
+# /Studio is served directly from Studio/index.html. Do not force-rewrite it to /,
+# because boarding handoff URLs preserve seat_id/tuj_code on the Studio route.
