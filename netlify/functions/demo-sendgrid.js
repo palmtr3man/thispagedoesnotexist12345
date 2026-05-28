@@ -124,7 +124,7 @@ function sanitizeTemplateKeys(input) {
 
 function buildDynamicData({ seatId, firstName, lastName, email, flightCode, siteUrl, overrides = {} }) {
   const canonicalFlightId = String(flightCode || '').replace(/ /g, '_');
-  const passportUrl = `${siteUrl}/?seat_id=${seatId}&tuj_code=${seatId}`;
+  const passportUrl = `${siteUrl}/OnboardingPassport?seat_id=${seatId}&tuj_code=${seatId}`;
   const studioUrl = `${siteUrl}/Studio?seat_id=${seatId}&tuj_code=${seatId}&flight_id=${canonicalFlightId}`;
   const techUrl = 'https://www.thispagedoesnotexist12345.tech';
   const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -161,8 +161,8 @@ function buildDynamicData({ seatId, firstName, lastName, email, flightCode, site
     dashboard_url: passportUrl,
     platform_url: siteUrl,
     signal_url: 'https://newsletter.thispagedoesnotexist12345.us/',
-    first_task_url: `${siteUrl}/ResumeFitCheck?seat_id=${seatId}&tuj_code=${seatId}`,
-    secondary_url: `${siteUrl}/OnboardingPassport?seat_id=${seatId}&tuj_code=${seatId}`,
+    first_task_url: passportUrl,
+    secondary_url: studioUrl,
     board_now_url: `${siteUrl}/OnboardingPassport?seat_id=${seatId}&tuj_code=${seatId}`,
     mission_studio: studioUrl,
     mission_passengers: `${techUrl}/Passengers?seat_id=${seatId}&tuj_code=${seatId}&flight_id=${canonicalFlightId}`,

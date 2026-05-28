@@ -18,7 +18,7 @@ const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
 const MAIN_SITE_URL = 'https://www.thispagedoesnotexist12345.com';
 const CANONICAL_FIRST_TIME_PATH = '/OnboardingPassport';
-const CANONICAL_RETURN_PATH = '/';
+const CANONICAL_RETURN_PATH = '/Studio';
 
 const TEMPLATE_ENV = {
   alphaAnnouncement: 'SENDGRID_TEMPLATE_ALPHA_FLIGHT_ANNOUNCEMENT',

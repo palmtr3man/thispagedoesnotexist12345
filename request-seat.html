@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request a Seat | The Ultimate Journey</title>
+  <meta name="description" content="Request a boarding seat for The Ultimate Journey with age verification and seat-token handoff.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070d;
+      --panel: rgba(11, 18, 32, 0.9);
+      --cyan: #00d9ff;
+      --text: #eef7fb;
+      --muted: #9fb2c2;
+      --border: rgba(88, 199, 215, 0.28);
+      --danger: #ff8a8a;
+      --success: #7df2b1;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 20% 0%, rgba(0,217,255,0.18), transparent 30rem), linear-gradient(145deg, #05070d, #101827); color: var(--text); }
+    main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 56px 0; }
+    section { border: 1px solid var(--border); border-radius: 28px; background: var(--panel); padding: 34px; box-shadow: 0 30px 90px rgba(0,0,0,0.42); }
+    .eyebrow { color: var(--cyan); font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 850; }
+    h1 { margin: 12px 0 10px; font-size: clamp(2.2rem, 6vw, 4.2rem); line-height: 0.95; letter-spacing: -0.055em; }
+    p { color: var(--muted); line-height: 1.65; }
+    label { display: block; margin: 16px 0 7px; font-weight: 750; }
+    input, select { width: 100%; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; background: rgba(255,255,255,0.06); color: var(--text); padding: 12px 13px; font: inherit; }
+    select option { background: #101827; color: var(--text); }
+    button, .button { display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; padding: 13px 20px; margin-top: 18px; background: var(--cyan); color: #041018; font-weight: 850; cursor: pointer; text-decoration: none; }
+    .button.secondary { background: rgba(88,199,215,0.12); color: var(--cyan); border: 1px solid var(--border); }
+    .status { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.06); color: var(--muted); }
+    .status.success { color: var(--success); border: 1px solid rgba(125,242,177,0.28); }
+    .status.error { color: var(--danger); border: 1px solid rgba(255,138,138,0.28); }
+    .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <div class="eyebrow">The Ultimate Journey · Seat Request</div>
+      <h1>Request a Seat</h1>
+      <p>Submit the boarding request with age verification first. If a seat is issued, this page stores the public seat token for the browser session and opens the Onboarding Passport route with `seat_id` preserved.</p>
+      <form id="seatForm">
+        <label for="name">Full name</label>
+        <input id="name" name="name" autocomplete="name" required>
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+
+        <label for="dob">Date of birth</label>
+        <input id="dob" name="date_of_birth" type="date" autocomplete="bday" required>
+
+        <label for="careerStage">Career stage</label>
+        <select id="careerStage" name="career_stage">
+          <option value="Active Job Seeker">Active Job Seeker</option>
+          <option value="Passive Browser">Passive Browser</option>
+          <option value="Career Changer">Career Changer</option>
+          <option value="Recent Graduate">Recent Graduate</option>
+        </select>
+
+        <button type="submit">Verify and request seat</button>
+      </form>
+      <div class="status" id="status">Ready to request a seat.</div>
+      <div class="row">
+        <a class="button secondary hidden" id="passportLink" href="/OnboardingPassport">Open Passport</a>
+        <a class="button secondary" href="/">Return to landing</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const form = document.getElementById('seatForm');
+      const status = document.getElementById('status');
+      const passportLink = document.getElementById('passportLink');
+
+      function setStatus(text, mode) {
+        status.textContent = text;
+        status.className = 'status' + (mode ? ' ' + mode : '');
+      }
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const dob = document.getElementById('dob').value;
+        const careerStage = document.getElementById('careerStage').value;
+        if (!name || !email || !dob) {
+          setStatus('Name, email, and date of birth are required.', 'error');
+          return;
+        }
+        try {
+          setStatus('Verifying age gate…');
+          const ageRes = await fetch('/api/verify-age', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date_of_birth: dob })
+          });
+          const ageData = await ageRes.json().catch(function () { return {}; });
+          if (!ageRes.ok || !ageData.ok || !ageData.passed || !ageData.age_token) {
+            setStatus(ageData.reason || ageData.error || 'Age verification failed.', 'error');
+            return;
+          }
+
+          setStatus('Requesting seat…');
+          const seatRes = await fetch('/api/seat-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name,
+              email,
+              age_token: ageData.age_token,
+              source: 'request-seat',
+              career_stage: careerStage
+            })
+          });
+          const seatData = await seatRes.json().catch(function () { return {}; });
+          if (seatRes.ok && seatData.ok && seatData.seat_id) {
+            sessionStorage.setItem('seat_id', seatData.seat_id);
+            sessionStorage.setItem('tuj_code', seatData.tuj_code || seatData.seat_id);
+            sessionStorage.setItem('age_token', ageData.age_token);
+            const url = '/OnboardingPassport?seat_id=' + encodeURIComponent(seatData.seat_id) + '&tuj_code=' + encodeURIComponent(seatData.tuj_code || seatData.seat_id);
+            passportLink.href = url;
+            passportLink.classList.remove('hidden');
+            setStatus('Seat issued: ' + seatData.seat_id + '. Open Passport to continue boarding.', 'success');
+          } else if (seatRes.status === 409 && seatData.seat_id) {
+            const url = '/OnboardingPassport?seat_id=' + encodeURIComponent(seatData.seat_id) + '&tuj_code=' + encodeURIComponent(seatData.seat_id);
+            passportLink.href = url;
+            passportLink.classList.remove('hidden');
+            setStatus('This email already has a seat request. Open Passport with the existing seat.', 'success');
+          } else if (seatData.waitlisted) {
+            setStatus(seatData.message || 'The current cabin is full. You have been added to the next-flight waitlist.', 'success');
+          } else {
+            setStatus(seatData.error || 'Seat request failed. Please try again.', 'error');
+          }
+        } catch (err) {
+          setStatus('Seat request service is temporarily unavailable. Please try again.', 'error');
+        }
+      });
+    }());
+  </script>
+</body>
+</html>
