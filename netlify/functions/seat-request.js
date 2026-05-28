@@ -26,7 +26,7 @@
  *     career_stage?: string, current_goal?: string }
  *
  * BLOCKER-04 (2026-04-12): age_confirmed boolean replaced with age_token (HMAC-signed).
- * Supabase waitlist_submissions upsert added after SendGrid ack.
+ * Supabase waitlist_submissions upsert runs before email or Notion side effects.
  * SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY env vars required for Supabase write.
  *
  * Success response:
@@ -121,11 +121,11 @@ function notionRichText(content) {
 
 /**
  * Check whether an email already has a seat request in the Notion registry.
- * Returns the existing seat_id string if found, or null if not found / API unavailable.
+ * Returns the existing Notion page id and seat_id if found, or null if not found / API unavailable.
  * Fails gracefully — a Notion outage must not block new seat requests.
  */
 async function checkExistingRequest({ email, notionApiKey, databaseId }) {
-  if (!notionApiKey) return null;
+  if (!notionApiKey || !databaseId) return null;
   try {
     const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
       method: 'POST',
@@ -167,13 +167,39 @@ async function checkExistingRequest({ email, notionApiKey, databaseId }) {
         ? seatIdProp.rich_text[0].plain_text
         : null;
       console.log(`[seat-request] Duplicate request detected for ${email} — existing seat_id: ${existingSeatId || 'unknown'}`);
-      return existingSeatId || '__duplicate__';
+      return { pageId: page.id, seatId: existingSeatId || null };
     }
     return null;
   } catch (err) {
     console.warn('[seat-request] Notion dedupe check unexpected error:', err.message);
     return null; // fail open
   }
+}
+
+async function updateExistingRequestInNotion({ pageId, name, source, requestDate, notionApiKey }) {
+  if (!pageId || !notionApiKey) return false;
+  const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: 'Bearer ' + notionApiKey,
+      'Content-Type': 'application/json',
+      'Notion-Version': NOTION_API_VERSION
+    },
+    body: JSON.stringify({
+      properties: {
+        Name: { title: notionRichText(name) },
+        Source: { rich_text: notionRichText(source) },
+        'Request Date': { date: { start: requestDate } }
+      }
+    })
+  });
+  if (response.ok) {
+    console.log('[seat-request] Existing Notion request updated for page ' + pageId);
+    return true;
+  }
+  const errorText = await response.text();
+  console.error('[seat-request] Existing Notion request update failed ' + response.status + ': ' + errorText);
+  return false;
 }
 
 async function logSeatRequestToNotion({ seatId, name, email, requestDate, source, notionApiKey, databaseId }) {
@@ -337,6 +363,57 @@ async function applyBeehiivWaitlistTag(subId, apiKey, pubId) {
   } catch (err) {
     console.error('[seat-request] beehiiv tag apply unexpected error:', err);
   }
+}
+
+async function persistSeatRequestToSupabase({ supabaseUrl, supabaseKey, payload, contextLabel }) {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not configured');
+  }
+  const response = await fetch(`${supabaseUrl}/rest/v1/waitlist_submissions`, {
+    method: 'POST',
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates,return=minimal'
+    },
+    body: JSON.stringify(payload)
+  });
+  if (response.ok || response.status === 201 || response.status === 204) {
+    console.log(`[seat-request] Supabase waitlist upsert succeeded for ${contextLabel}`);
+    return true;
+  }
+  const errorText = await response.text();
+  throw new Error(`Supabase waitlist upsert failed ${response.status}: ${errorText}`);
+}
+
+async function sendSeatRequestAcknowledgement({ apiKey, fromEmail, toEmail, subject, dynamicTemplateData, correlationId, templateKey = 'seat_request_acknowledgement_v1' }) {
+  const t0 = Date.now();
+  const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: { email: fromEmail },
+      subject,
+      personalizations: [{
+        to: [{ email: toEmail }],
+        dynamic_template_data: dynamicTemplateData
+      }],
+      template_id: TEMPLATE_ID,
+      asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
+    })
+  });
+  const status = response.status;
+  const ok = response.ok || status === 202;
+  sgLog({ correlation_id: correlationId, request_id: dynamicTemplateData.seat_id, template_key: templateKey, sendgrid_template_id: TEMPLATE_ID, status, elapsed_ms: Date.now() - t0, ok, attempt: 1 });
+  if (!ok) {
+    const errorText = await response.text();
+    throw new Error(`SendGrid error ${status}: ${errorText}`);
+  }
+  return true;
 }
 
 exports.handler = async function (event, context) {
@@ -536,26 +613,99 @@ exports.handler = async function (event, context) {
     console.warn('[seat-request] Capacity check unavailable (F143 — fail open):', capacityErr.message);
   }
 
+  const activeFlightCode = process.env.ACTIVE_FLIGHT_CODE || ACTIVE_FLIGHT_CODE_DEFAULT;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
   // --- Deduplicate: one seat request per email (Gate Contract §2e) ---
-  // Query the Notion Seat Request Registry before generating a new seat_id.
-  // If the email already has a record, return 409 with the existing seat_id.
-  // Fails gracefully: if Notion is unavailable, proceed normally.
-  const existingSeatId = await checkExistingRequest({
+  // Repeat submits do not create a new seat. They update approved free-text fields,
+  // preserve the existing seat_id, and send an already-on-manifest confirmation.
+  const existingRequest = await checkExistingRequest({
     email: emailTrimmed,
     notionApiKey,
     databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
   });
-  if (existingSeatId) {
-    console.log(`[seat-request] Rejecting duplicate request for ${emailTrimmed}`);
-    const resolvedExisting = existingSeatId === '__duplicate__' ? null : existingSeatId;
+  if (existingRequest) {
+    const resolvedExistingSeatId = existingRequest.seatId;
+    console.log(`[seat-request] Repeat request for ${emailTrimmed} — preserving existing seat_id: ${resolvedExistingSeatId || 'unknown'}`);
+    try {
+      await persistSeatRequestToSupabase({
+        supabaseUrl,
+        supabaseKey,
+        contextLabel: emailTrimmed,
+        payload: {
+          email: emailTrimmed.toLowerCase(),
+          first_name: firstName || null,
+          ...(resolvedExistingSeatId ? { seat_id: resolvedExistingSeatId } : {}),
+          source: sourceValue || 'landing',
+          age_verified: true
+        }
+      });
+    } catch (err) {
+      console.error('[seat-request] Supabase repeat-submit upsert failed before side effects:', err.message);
+      return {
+        statusCode: 503,
+        headers,
+        body: JSON.stringify({ ok: false, error: 'Seat request persistence is temporarily unavailable. Please retry shortly.' })
+      };
+    }
+
+    await updateExistingRequestInNotion({
+      pageId: existingRequest.pageId,
+      name: nameTrimmed,
+      source: sourceValue,
+      requestDate,
+      notionApiKey
+    });
+
+    if (resolvedExistingSeatId) {
+      const existingPassportUrl = `${passportBase}?seat_id=${resolvedExistingSeatId}&tuj_code=${resolvedExistingSeatId}`;
+      try {
+        await sendSeatRequestAcknowledgement({
+          apiKey,
+          fromEmail,
+          toEmail: emailTrimmed,
+          subject: `Your seat is already on the manifest — ${activeFlightCode}`,
+          correlationId: `repeat_${resolvedExistingSeatId}`,
+          templateKey: 'seat_request_already_on_manifest',
+          dynamicTemplateData: {
+            subject: `Your seat is already on the manifest — ${activeFlightCode}`,
+            first_name: firstName,
+            full_name: nameTrimmed,
+            email: emailTrimmed,
+            seat_id: resolvedExistingSeatId,
+            tuj_code: resolvedExistingSeatId,
+            source: sourceValue,
+            platform_url: platformUrl,
+            signal_url: signalUrl,
+            passport_url: existingPassportUrl,
+            request_date: requestDate,
+            flight_code: activeFlightCode,
+            flight_id: activeFlightCode,
+            duplicate: true,
+            status: 'already_on_manifest'
+          }
+        });
+        console.log(`[seat-request] Already-on-manifest acknowledgement sent to ${emailTrimmed} with seat_id ${resolvedExistingSeatId}`);
+      } catch (err) {
+        console.error('[seat-request] Already-on-manifest SendGrid error:', err.message);
+        return {
+          statusCode: 502,
+          headers,
+          body: JSON.stringify({ ok: false, error: 'Failed to send already-on-manifest acknowledgement' })
+        };
+      }
+    }
+
     return {
-      statusCode: 409,
+      statusCode: 200,
       headers,
       body: JSON.stringify({
-        ok: false,
+        ok: true,
         duplicate: true,
-        error: 'A seat request has already been submitted for this email address. Check your inbox for your original confirmation.',
-        ...(resolvedExisting ? { seat_id: resolvedExisting } : {})
+        status: 'already_on_manifest',
+        message: 'A seat request already exists for this email address.',
+        ...(resolvedExistingSeatId ? { seat_id: resolvedExistingSeatId, tuj_code: resolvedExistingSeatId } : {})
       })
     };
   }
@@ -602,7 +752,6 @@ exports.handler = async function (event, context) {
   // Canon token alignment (Apr 19, 2026): flight_code is canonical across all boarding templates.
   // flight_id is aliased to the same value for backward-compat with seat_request_acknowledgement_v1
   // which was built against {{flight_id}}. Both tokens resolve to the same string.
-  const activeFlightCode = process.env.ACTIVE_FLIGHT_CODE || ACTIVE_FLIGHT_CODE_DEFAULT;
   const dynamicTemplateData = {
     subject:      SUBJECT_TEMPLATE(activeFlightCode),
     first_name:   firstName,
@@ -621,117 +770,71 @@ exports.handler = async function (event, context) {
 
   // correlation_id: no flight_id or passenger_id at this stage — use seat_id as request anchor
   const correlationId = `req_${seatId}`;
-  // subject is now dynamic — update the SendGrid personalizations subject to match
-  // (SendGrid dynamic templates can override subject via personalizations.dynamic_template_data.subject)
 
+  // --- Supabase upsert: waitlist_submissions (BLOCKER-04) ---
+  // Persist before email, Notion, beehiiv, or Base44 side effects to avoid ghost passengers.
   try {
-    const t0_ack = Date.now();
-    const sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: { email: fromEmail },
-        subject: SUBJECT_TEMPLATE(activeFlightCode),
-        personalizations: [{
-          to: [{ email: emailTrimmed }],
-          dynamic_template_data: dynamicTemplateData
-        }],
-        template_id: TEMPLATE_ID,
-        asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
-      })
-    });
-
-    const ackStatus = sgResponse.status;
-    const ackOk = sgResponse.ok || ackStatus === 202;
-    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'seat_request_acknowledgement_v1', sendgrid_template_id: TEMPLATE_ID, status: ackStatus, elapsed_ms: Date.now() - t0_ack, ok: ackOk, attempt: 1 });
-    if (ackOk) {
-      console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed} with seat_id ${seatId}`);
-    } else {
-      const errorText = await sgResponse.text();
-      console.error(`[seat-request] SendGrid error ${ackStatus}: ${errorText}`);
-      return {
-        statusCode: 502,
-        headers,
-        body: JSON.stringify({
-          ok: false,
-          error: 'Failed to send acknowledgement email',
-          details: errorText
-        })
-      };
+    // Generate a stable referral_code for this record (8 chars, same charset as seat_id)
+    const refCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const refCodeArr = new Uint8Array(8);
+    crypto.getRandomValues(refCodeArr);
+    const newReferralCode = Array.from(refCodeArr).map(b => refCodeChars[b % refCodeChars.length]).join('');
+    const upsertPayload = {
+      email:         emailTrimmed.toLowerCase(),
+      first_name:    firstName || null,
+      seat_id:       seatId,
+      source:        sourceValue || 'landing',
+      referral_code: newReferralCode,
+      status:        'pending',
+      age_verified:  true
+    };
+    // If passenger arrived via a referral link, resolve the referring record's id.
+    if (inboundReferralCode && typeof inboundReferralCode === 'string') {
+      try {
+        const refLookup = await fetch(
+          `${supabaseUrl}/rest/v1/waitlist_submissions?referral_code=eq.${encodeURIComponent(inboundReferralCode.trim())}&select=id&limit=1`,
+          { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+        );
+        const refRows = await refLookup.json();
+        if (Array.isArray(refRows) && refRows[0]?.id) {
+          upsertPayload.referred_by = refRows[0].id;
+        }
+      } catch (refErr) {
+        console.warn('[seat-request] Referral lookup failed (non-blocking):', refErr.message);
+      }
     }
-  } catch (err) {
-    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'seat_request_acknowledgement_v1', sendgrid_template_id: TEMPLATE_ID, ok: false, elapsed_ms: 0, error_name: err?.name, error_message: err?.message, status: err?.code || err?.response?.statusCode });
-    console.error('[seat-request] Unexpected error during SendGrid call:', err);
+    await persistSeatRequestToSupabase({
+      supabaseUrl,
+      supabaseKey,
+      contextLabel: emailTrimmed,
+      payload: upsertPayload
+    });
+  } catch (sbErr) {
+    console.error('[seat-request] Supabase upsert failed before side effects:', sbErr.message);
     return {
-      statusCode: 500,
+      statusCode: 503,
       headers,
-      body: JSON.stringify({ ok: false, error: 'Internal server error' })
+      body: JSON.stringify({ ok: false, error: 'Seat request persistence is temporarily unavailable. Please retry shortly.' })
     };
   }
 
-  // --- Supabase upsert: waitlist_submissions (BLOCKER-04) ---
-  // Persists the seat request to Supabase as the canonical waitlist store.
-  // Fails gracefully — a Supabase outage must not block the SendGrid ack.
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (supabaseUrl && supabaseKey) {
-    try {
-      // Generate a stable referral_code for this record (8 chars, same charset as seat_id)
-      const refCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      const refCodeArr = new Uint8Array(8);
-      crypto.getRandomValues(refCodeArr);
-      const newReferralCode = Array.from(refCodeArr).map(b => refCodeChars[b % refCodeChars.length]).join('');
-      const upsertPayload = {
-        email:         emailTrimmed.toLowerCase(),
-        first_name:    firstName || null,
-        seat_id:       seatId,
-        source:        sourceValue || 'landing',
-        referral_code: newReferralCode,
-        status:        'pending',
-        age_verified:  true
-      };
-      // If passenger arrived via a referral link, resolve the referring record's id
-      if (inboundReferralCode && typeof inboundReferralCode === 'string') {
-        try {
-          const refLookup = await fetch(
-            `${supabaseUrl}/rest/v1/waitlist_submissions?referral_code=eq.${encodeURIComponent(inboundReferralCode.trim())}&select=id&limit=1`,
-            { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
-          );
-          const refRows = await refLookup.json();
-          if (Array.isArray(refRows) && refRows[0]?.id) {
-            upsertPayload.referred_by = refRows[0].id;
-          }
-        } catch (refErr) {
-          console.warn('[seat-request] Referral lookup failed (non-blocking):', refErr.message);
-        }
-      }
-      const sbRes = await fetch(
-        `${supabaseUrl}/rest/v1/waitlist_submissions`,
-        {
-          method: 'POST',
-          headers: {
-            apikey:         supabaseKey,
-            Authorization:  `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-            Prefer:         'resolution=merge-duplicates,return=minimal'
-          },
-          body: JSON.stringify(upsertPayload)
-        }
-      );
-      if (sbRes.ok || sbRes.status === 201) {
-        console.log(`[seat-request] Supabase waitlist upsert succeeded for ${emailTrimmed}`);
-      } else {
-        const sbErr = await sbRes.text();
-        console.error(`[seat-request] Supabase waitlist upsert failed ${sbRes.status}: ${sbErr}`);
-      }
-    } catch (sbErr) {
-      console.error('[seat-request] Supabase upsert unexpected error (non-blocking):', sbErr.message);
-    }
-  } else {
-    console.warn('[seat-request] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set — skipping Supabase waitlist upsert');
+  try {
+    await sendSeatRequestAcknowledgement({
+      apiKey,
+      fromEmail,
+      toEmail: emailTrimmed,
+      subject: SUBJECT_TEMPLATE(activeFlightCode),
+      dynamicTemplateData,
+      correlationId
+    });
+    console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed} with seat_id ${seatId}`);
+  } catch (err) {
+    console.error('[seat-request] Unexpected error during SendGrid call:', err);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Failed to send acknowledgement email' })
+    };
   }
 
   // --- Notion log: Seat Request Registry ---
