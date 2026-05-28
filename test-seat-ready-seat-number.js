@@ -4,7 +4,7 @@ const { handler } = require('./netlify/functions/seat-ready.js');
 process.env.BASE44_SEAT_URL = 'https://app.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
 process.env.ACTIVE_FLIGHT_ID = 'FL_051126';
 process.env.READY_CLICK_SEND_ENABLED = 'false';
-process.env.SEAT_API_SECRET = 'test-seat-secret';
+process.env.SEC06_INTERNAL_TOKEN = 'test-seat-secret';
 process.env.READY_CLICK_IDEMPOTENCY_GUARD_OPTIONAL = 'true';
 
 global.fetch = async (url, options = {}) => {
