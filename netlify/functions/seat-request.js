@@ -124,9 +124,25 @@ function notionRichText(content) {
  * Returns the existing Notion page id and seat_id if found, or null if not found / API unavailable.
  * Fails gracefully — a Notion outage must not block new seat requests.
  */
-async function checkExistingRequest({ email, notionApiKey, databaseId }) {
+async function checkExistingRequest({ email, flightCode, notionApiKey, databaseId }) {
   if (!notionApiKey || !databaseId) return null;
   try {
+    const filters = [
+      {
+        property: 'Email',
+        email: { equals: email }
+      },
+      {
+        property: 'Status',
+        select: { does_not_equal: 'Denied' }
+      }
+    ];
+    if (flightCode) {
+      filters.push({
+        property: 'Flight Code',
+        rich_text: { equals: flightCode }
+      });
+    }
     const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
       method: 'POST',
       headers: {
@@ -139,17 +155,9 @@ async function checkExistingRequest({ email, notionApiKey, databaseId }) {
         // Denied is treated as a closed/voided state — only Pending Review,
         // Approved, Waitlisted, and Level Lounge are considered active duplicates.
         // Fix (Apr 19, 2026): compound filter added to prevent permanent lockout.
+        // Flight Code scopes duplicates to the active flight (Apr 23 seat_requests contract).
         filter: {
-          and: [
-            {
-              property: 'Email',
-              email: { equals: email }
-            },
-            {
-              property: 'Status',
-              select: { does_not_equal: 'Denied' }
-            }
-          ]
+          and: filters
         },
         page_size: 1
       })
@@ -178,34 +186,50 @@ async function checkExistingRequest({ email, notionApiKey, databaseId }) {
 
 async function updateExistingRequestInNotion({ pageId, name, source, requestDate, notionApiKey }) {
   if (!pageId || !notionApiKey) return false;
-  const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
-    method: 'PATCH',
-    headers: {
-      Authorization: 'Bearer ' + notionApiKey,
-      'Content-Type': 'application/json',
-      'Notion-Version': NOTION_API_VERSION
-    },
-    body: JSON.stringify({
-      properties: {
-        Name: { title: notionRichText(name) },
-        Source: { rich_text: notionRichText(source) },
-        'Request Date': { date: { start: requestDate } }
-      }
-    })
-  });
-  if (response.ok) {
-    console.log('[seat-request] Existing Notion request updated for page ' + pageId);
-    return true;
+  try {
+    const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: 'Bearer ' + notionApiKey,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_API_VERSION
+      },
+      body: JSON.stringify({
+        properties: {
+          Name: { title: notionRichText(name) },
+          Source: { rich_text: notionRichText(source) },
+          'Request Date': { date: { start: requestDate } }
+        }
+      })
+    });
+    if (response.ok) {
+      console.log('[seat-request] Existing Notion request updated for page ' + pageId);
+      return true;
+    }
+    const errorText = await response.text();
+    console.error('[seat-request] Existing Notion request update failed ' + response.status + ': ' + errorText);
+    return false;
+  } catch (err) {
+    console.warn('[seat-request] Existing Notion request update unexpected error:', err.message);
+    return false;
   }
-  const errorText = await response.text();
-  console.error('[seat-request] Existing Notion request update failed ' + response.status + ': ' + errorText);
-  return false;
 }
 
-async function logSeatRequestToNotion({ seatId, name, email, requestDate, source, notionApiKey, databaseId }) {
+async function logSeatRequestToNotion({ seatId, name, email, requestDate, source, flightCode, notionApiKey, databaseId }) {
   if (!notionApiKey) {
     console.warn('[seat-request] NOTION_API_KEY not set — skipping Notion log write');
     return false;
+  }
+
+  const properties = {
+    Name: { title: notionRichText(name) },
+    Email: { email },
+    'Seat ID': { rich_text: notionRichText(seatId) },
+    Source: { rich_text: notionRichText(source) },
+    'Request Date': { date: { start: requestDate } }
+  };
+  if (flightCode) {
+    properties['Flight Code'] = { rich_text: notionRichText(flightCode) };
   }
 
   const response = await fetch('https://api.notion.com/v1/pages', {
@@ -217,13 +241,7 @@ async function logSeatRequestToNotion({ seatId, name, email, requestDate, source
     },
     body: JSON.stringify({
       parent: { database_id: databaseId },
-      properties: {
-        Name: { title: notionRichText(name) },
-        Email: { email },
-        'Seat ID': { rich_text: notionRichText(seatId) },
-        Source: { rich_text: notionRichText(source) },
-        'Request Date': { date: { start: requestDate } }
-      }
+      properties
     })
   });
 
@@ -369,16 +387,44 @@ async function persistSeatRequestToSupabase({ supabaseUrl, supabaseKey, payload,
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not configured');
   }
-  const response = await fetch(`${supabaseUrl}/rest/v1/waitlist_submissions`, {
-    method: 'POST',
-    headers: {
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-      'Content-Type': 'application/json',
-      Prefer: 'resolution=merge-duplicates,return=minimal'
-    },
-    body: JSON.stringify(payload)
-  });
+  const authHeaders = {
+    apikey: supabaseKey,
+    Authorization: `Bearer ${supabaseKey}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=minimal'
+  };
+  const normalizedEmail = String(payload.email || '').trim().toLowerCase();
+  if (!normalizedEmail) {
+    throw new Error('Supabase waitlist upsert missing email');
+  }
+
+  const lookup = await fetch(
+    `${supabaseUrl}/rest/v1/waitlist_submissions?email=eq.${encodeURIComponent(normalizedEmail)}&select=id&limit=1`,
+    { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+  );
+  if (!lookup.ok) {
+    const lookupError = await lookup.text();
+    throw new Error(`Supabase waitlist lookup failed ${lookup.status}: ${lookupError}`);
+  }
+  const existingRows = await lookup.json();
+  const writePayload = { ...payload, email: normalizedEmail };
+  let response;
+  if (Array.isArray(existingRows) && existingRows.length > 0) {
+    response = await fetch(
+      `${supabaseUrl}/rest/v1/waitlist_submissions?email=eq.${encodeURIComponent(normalizedEmail)}`,
+      {
+        method: 'PATCH',
+        headers: authHeaders,
+        body: JSON.stringify(writePayload)
+      }
+    );
+  } else {
+    response = await fetch(`${supabaseUrl}/rest/v1/waitlist_submissions`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(writePayload)
+    });
+  }
   if (response.ok || response.status === 201 || response.status === 204) {
     console.log(`[seat-request] Supabase waitlist upsert succeeded for ${contextLabel}`);
     return true;
@@ -622,6 +668,7 @@ exports.handler = async function (event, context) {
   // preserve the existing seat_id, and send an already-on-manifest confirmation.
   const existingRequest = await checkExistingRequest({
     email: emailTrimmed,
+    flightCode: activeFlightCode,
     notionApiKey,
     databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
   });
@@ -845,6 +892,7 @@ exports.handler = async function (event, context) {
       email: emailTrimmed,
       requestDate,
       source: sourceValue,
+      flightCode: activeFlightCode,
       notionApiKey,
       databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
     });
