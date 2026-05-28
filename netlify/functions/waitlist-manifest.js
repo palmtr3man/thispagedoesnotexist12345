@@ -18,27 +18,19 @@
  *   }
  *
  * Required env vars:
- *   ADMIN_SECRET                  — Shared secret (header: x-admin-secret)
+ *   SEC06_INTERNAL_TOKEN          — Admin/internal auth (header: x-admin-secret or x-internal-token)
  *   SUPABASE_URL                  — Supabase project URL
  *   SUPABASE_SERVICE_ROLE_KEY     — Supabase service role key
  *
  * BLOCKER-03 (2026-04-15): Initial implementation.
  */
 
-function safeCompare(a, b) {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
+const { validateAdminHeader } = require('./shared/sec06-auth.js');
 
 exports.handler = async function (event) {
   const headers = {
     'Access-Control-Allow-Origin':  process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
-    'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret',
+    'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Content-Type':                 'application/json',
   };
@@ -51,10 +43,7 @@ exports.handler = async function (event) {
     return { statusCode: 405, headers, body: JSON.stringify({ ok: false, error: 'Method Not Allowed' }) };
   }
 
-  // --- Auth ---
-  const adminSecret    = process.env.ADMIN_SECRET;
-  const providedSecret = event.headers['x-admin-secret'] || event.headers['X-Admin-Secret'] || '';
-  if (!adminSecret || !safeCompare(providedSecret, adminSecret)) {
+  if (!validateAdminHeader(event)) {
     console.warn('[waitlist-manifest] Unauthorized attempt');
     return { statusCode: 401, headers, body: JSON.stringify({ ok: false, error: 'Unauthorized' }) };
   }

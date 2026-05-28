@@ -15,8 +15,7 @@
  *     SIGNALWELCOME_SENT_TAG are skipped. On successful send, that tag is added.
  *   - Dry-run support: ?dry_run=true or SIGNALWELCOME_DRY_RUN=true prevents
  *     live sends and tag writes.
- *   - Manual trigger protection: non-scheduled invocations require
- *     x-admin-secret = ADMIN_SECRET.
+ *   - Manual trigger protection: non-scheduled invocations require SEC06 internal token.
  *   - Scheduled trigger can be disabled with SIGNALWELCOME_ENABLED=false.
  *
  * Required env vars:
@@ -36,10 +35,12 @@
  *   SIGNALWELCOME_CANDIDATE_TAG    optional; if set, only subscribers with this tag are eligible
  */
 
+const { validateInternalOrSchedulerOrNetlifySchedule } = require('./shared/sec06-auth.js');
+
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret',
+  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token, x-scheduler-secret',
   'Content-Type': 'application/json',
 };
 
@@ -170,13 +171,6 @@ function isScheduledInvocation(event) {
   return marker === 'schedule' || marker === 'scheduled';
 }
 
-function isAdminInvocation(event) {
-  const expected = process.env.ADMIN_SECRET;
-  const headers = event.headers || {};
-  const provided = headers['x-admin-secret'] || headers['X-Admin-Secret'];
-  return Boolean(expected && provided === expected);
-}
-
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: HEADERS, body: '' };
@@ -187,8 +181,8 @@ exports.handler = async (event) => {
   }
 
   const scheduled = isScheduledInvocation(event);
-  const admin = isAdminInvocation(event);
-  if (!scheduled && !admin) {
+  const authorized = validateInternalOrSchedulerOrNetlifySchedule(event);
+  if (!scheduled && !authorized) {
     return { statusCode: 403, headers: HEADERS, body: JSON.stringify({ ok: false, error: 'Unauthorized' }) };
   }
 

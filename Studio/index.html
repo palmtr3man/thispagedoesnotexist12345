@@ -1971,8 +1971,9 @@ window.addEventListener('load', async () => {
   'use strict';
 
   var SEAT_STATUS_API = '/api/seat-status';
+  var SEAT_READY_API  = '/api/seat-ready'; // Ready-click canonical seating transaction (QA-gated by ?ready_click=1)
   var FIT_CHECK_URL   = 'https://www.thispagedoesnotexist12345.tech/Dashboard'; // ATS analyzer entry
-  var SEAT_REQUEST_URL = 'https://www.thispagedoesnotexist12345.com/?view=seat-request'; // seat request flow
+  var SEAT_REQUEST_URL = 'https://www.thispagedoesnotexist12345.com/?view=seat-request'; // legacy seat request flow fallback
   var FETCH_TIMEOUT_MS = 8000;
 
   // Status label map for Condition C
@@ -1995,10 +1996,49 @@ window.addEventListener('load', async () => {
     }
   }
 
+  function postReadyClickSeat(seatId, tujCode, passengerEmail, button) {
+    var originalText = button ? button.textContent : '';
+    if (button) {
+      button.textContent = 'Confirming seat…';
+      button.setAttribute('aria-busy', 'true');
+    }
+
+    return fetch(SEAT_READY_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        seat_id: seatId,
+        tuj_code: tujCode,
+        passenger_email: passengerEmail || '',
+        flight_id: 'FL_051126',
+        origin: 'studio-b06-ready-click'
+      })
+    })
+      .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, status: res.status, body: body }; }); })
+      .then(function (result) {
+        if (!result.ok || !result.body || result.body.ok !== true) {
+          throw new Error((result.body && (result.body.reason || result.body.error)) || 'seat_ready_failed');
+        }
+        var labelEl = document.getElementById('b06-seat-status-label');
+        if (labelEl) labelEl.textContent = 'Seat confirmed — you are on board';
+        showState('b06-state-seat-active');
+        return result.body;
+      })
+      .catch(function (err) {
+        console.warn('[Studio] Ready-click seat transaction blocked:', err.message);
+        if (button) {
+          button.textContent = originalText || 'Request a Seat';
+          button.removeAttribute('aria-busy');
+        }
+        showState('b06-state-error');
+      });
+  }
+
   function initStatefulCta() {
     var params = new URLSearchParams(window.location.search);
     var seatId = (params.get('seat_id') || '').replace(/ /g, '_').trim();
     var tujCode = params.get('tuj_code') || '';
+    var readyClickEnabled = params.get('ready_click') === '1';
 
     // No seat_id in URL — show prompt, hide loading
     if (!seatId) {
@@ -2042,7 +2082,16 @@ window.addEventListener('load', async () => {
 
         // Condition B — fit check exists (in_progress or complete), seat not yet requested → Request a Seat
         var reqBtn = document.getElementById('b06-btn-request-seat');
-        if (reqBtn) reqBtn.href = SEAT_REQUEST_URL + '&seat_id=' + encodeURIComponent(seatId) + '&tuj_code=' + encodeURIComponent(tujCode) + '&origin=studio-b06';
+        if (reqBtn) {
+          reqBtn.href = SEAT_REQUEST_URL + '&seat_id=' + encodeURIComponent(seatId) + '&tuj_code=' + encodeURIComponent(tujCode) + '&origin=studio-b06';
+          if (readyClickEnabled) {
+            reqBtn.textContent = 'Ready — Confirm My Seat';
+            reqBtn.addEventListener('click', function (evt) {
+              evt.preventDefault();
+              postReadyClickSeat(seatId, tujCode, data.passenger_email || '', reqBtn);
+            }, { once: true });
+          }
+        }
         showState('b06-state-request-seat');
       })
       .catch(function () {

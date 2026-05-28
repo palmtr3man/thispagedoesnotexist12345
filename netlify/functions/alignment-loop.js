@@ -20,8 +20,8 @@
  *   NOTION_SECRET                — TUJ Alignment Bot integration token
  *   NOTION_SEAT_DB_ID            — Passenger Pipeline DB (86452d89-...)
  *   NOTION_DRIFT_REPORT_DB_ID    — TUJ Drift Reports DB (ce04014f-...)
- *   ALIGNMENT_WEBHOOK_SECRET     — Shared secret for webhook trigger (x-webhook-secret header)
- *   ALIGNMENT_CRON_SECRET        — Bearer token for scheduled cron invocations
+ *   SEC06_INTERNAL_TOKEN         — Internal token for webhook trigger (x-webhook-secret / x-internal-token / Bearer)
+ *   SEC06_SCHEDULER_SECRET       — Scheduler token (Authorization: Bearer or x-scheduler-secret)
  *   BASE44_SEAT_URL              — Base44 Seat entity read endpoint
  *   BASE44_USER_URL              — Base44 User entity read endpoint
  *   BASE44_APPLICATION_URL       — Base44 Application entity endpoint for PAL-21 polling
@@ -33,6 +33,8 @@
  */
 
 'use strict';
+
+const { validateAlignmentLoopTrigger } = require('./shared/sec06-auth.js');
 
 const FETCH_TIMEOUT_MS = 8000;
 
@@ -73,18 +75,7 @@ function supabaseHeaders() {
 
 /** Validate the incoming trigger secret. Returns 'cron' | 'webhook' | null. */
 function validateTrigger(event) {
-  const method = (event.httpMethod || '').toUpperCase();
-  const headers = event.headers || {};
-
-  // Cron: scheduled invocation passes Authorization: Bearer <ALIGNMENT_CRON_SECRET>
-  const authHeader = headers['authorization'] || headers['Authorization'] || '';
-  if (authHeader === `Bearer ${process.env.ALIGNMENT_CRON_SECRET}`) return 'cron';
-
-  // Webhook: POST with x-webhook-secret header
-  const webhookSecret = headers['x-webhook-secret'] || '';
-  if (method === 'POST' && webhookSecret === process.env.ALIGNMENT_WEBHOOK_SECRET) return 'webhook';
-
-  return null;
+  return validateAlignmentLoopTrigger(event);
 }
 
 // ── Notion DB queries ─────────────────────────────────────────────────────────
@@ -378,7 +369,7 @@ async function fetchSupabaseSeatRequest(seatId) {
 
 const REQUIRED_ENV_VARS = [
   'NOTION_SECRET', 'NOTION_SEAT_DB_ID', 'NOTION_DRIFT_REPORT_DB_ID',
-  'ALIGNMENT_WEBHOOK_SECRET', 'ALIGNMENT_CRON_SECRET',
+  'SEC06_INTERNAL_TOKEN', 'SEC06_SCHEDULER_SECRET',
   'BASE44_SEAT_URL', 'BASE44_USER_URL',
   'BASE44_APPLICATION_URL', 'NOTION_JD_PIPELINE_DB_ID',
   'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY',
@@ -600,7 +591,7 @@ exports.handler = async function handler(event) {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-webhook-secret',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-webhook-secret, x-internal-token, x-scheduler-secret',
       },
       body: '',
     };
