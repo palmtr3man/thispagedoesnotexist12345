@@ -33,14 +33,14 @@
  * Blocked / QA required:
  *   { ok: false, error: 'qa_reconciliation_required', reason, ... }
  *
- * Legacy Zapier path:
- *   Full Base44 Seat entity payloads (internal id + tuj_code) still route to
- *   sendSeatConfirmation when x-seat-api-secret matches SEC06_INTERNAL_TOKEN.
+ * Internal send path:
+ *   Full Base44 Seat entity payloads (internal id + tuj_code) route to
+ *   sendSeatConfirmation only when the canonical SEC06 internal trigger is valid.
  */
 
 const crypto = require('crypto');
 const { sendSeatConfirmation } = require('./sendgrid-integration.js');
-const { validateHeaderSecret } = require('./shared/sec06-auth.js');
+const { validateInternalTrigger } = require('./shared/sec06-auth.js');
 
 const VALID_SEAT_ID = /^TUJ-[A-Z2-9]{6}$/;
 const FETCH_TIMEOUT_MS = 8000;
@@ -50,7 +50,7 @@ const VALID_CABIN_CLASSES = ['First', 'Sponsored', 'Economy'];
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-seat-api-secret, x-internal-token, x-passenger-ready-token',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token, x-passenger-ready-token',
   'Content-Type': 'application/json',
 };
 
@@ -72,9 +72,6 @@ function headerValue(headers, name) {
   return headers[name] || headers[name.toLowerCase()] || headers[name.toUpperCase()] || '';
 }
 
-function requireServerSecret(event) {
-  return validateHeaderSecret(event, 'x-seat-api-secret');
-}
 
 function extractBearerToken(value) {
   const raw = String(value || '').trim();
@@ -97,7 +94,7 @@ function isLegacySeatOpenedPayload(payload) {
 }
 
 async function handleLegacySeatOpened(event, payload) {
-  if (!requireServerSecret(event)) {
+  if (!validateInternalTrigger(event)) {
     return json(401, { ok: false, error: 'unauthorized' });
   }
   if (!payload.id && !payload.seat_id && !payload.tuj_code) {

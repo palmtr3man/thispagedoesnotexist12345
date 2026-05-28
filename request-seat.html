@@ -82,6 +82,13 @@
         status.className = 'status' + (mode ? ' ' + mode : '');
       }
 
+      async function resolveActiveFlightCode() {
+        const res = await fetch('/api/seat-status?_ts=' + Date.now(), { cache: 'no-store' });
+        const data = await res.json().catch(function () { return {}; });
+        if (!res.ok) return '';
+        return String(data.flight_code || '').trim();
+      }
+
       form.addEventListener('submit', async function (event) {
         event.preventDefault();
         const name = document.getElementById('name').value.trim();
@@ -105,6 +112,14 @@
             return;
           }
 
+          setStatus('Resolving active flight…');
+          const flightCode = await resolveActiveFlightCode();
+          if (!flightCode) {
+            setStatus('Active flight is not configured. Please try again later.', 'error');
+            return;
+          }
+          sessionStorage.setItem('tuj:flight_code', flightCode);
+
           setStatus('Requesting seat…');
           const seatRes = await fetch('/api/seat-request', {
             method: 'POST',
@@ -114,7 +129,9 @@
               email,
               age_token: ageData.age_token,
               source: 'request-seat',
-              career_stage: careerStage
+              career_stage: careerStage,
+              flight_code: flightCode,
+              boarding_type: 'standard'
             })
           });
           const seatData = await seatRes.json().catch(function () { return {}; });
@@ -122,12 +139,14 @@
             sessionStorage.setItem('seat_id', seatData.seat_id);
             sessionStorage.setItem('tuj_code', seatData.tuj_code || seatData.seat_id);
             sessionStorage.setItem('age_token', ageData.age_token);
-            const url = '/OnboardingPassport?seat_id=' + encodeURIComponent(seatData.seat_id) + '&tuj_code=' + encodeURIComponent(seatData.tuj_code || seatData.seat_id);
+            sessionStorage.setItem('tuj:flight_code', seatData.flight_code || flightCode);
+            const url = '/OnboardingPassport?seat_id=' + encodeURIComponent(seatData.seat_id) + '&tuj_code=' + encodeURIComponent(seatData.tuj_code || seatData.seat_id) + '&flight_code=' + encodeURIComponent(seatData.flight_code || flightCode);
             passportLink.href = url;
             passportLink.classList.remove('hidden');
             setStatus('Seat issued: ' + seatData.seat_id + '. Open Passport to continue boarding.', 'success');
           } else if (seatRes.status === 409 && seatData.seat_id) {
-            const url = '/OnboardingPassport?seat_id=' + encodeURIComponent(seatData.seat_id) + '&tuj_code=' + encodeURIComponent(seatData.seat_id);
+            if (seatData.flight_code || flightCode) sessionStorage.setItem('tuj:flight_code', seatData.flight_code || flightCode);
+            const url = '/OnboardingPassport?seat_id=' + encodeURIComponent(seatData.seat_id) + '&tuj_code=' + encodeURIComponent(seatData.tuj_code || seatData.seat_id) + '&flight_code=' + encodeURIComponent(seatData.flight_code || flightCode);
             passportLink.href = url;
             passportLink.classList.remove('hidden');
             setStatus('This email already has a seat request. Open Passport with the existing seat.', 'success');

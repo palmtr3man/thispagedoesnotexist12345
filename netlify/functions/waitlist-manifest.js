@@ -2,7 +2,7 @@
  * /api/waitlist-manifest — Netlify Function (BLOCKER-03: Admin Tower Approve/Deny Flow)
  *
  * Returns all waitlist_submissions rows and the current cohort state for the
- * Admin Tower WaitlistTab component. Secured by x-admin-secret header.
+ * Admin Tower WaitlistTab component. Secured by canonical internal-token header.
  *
  * Query params:
  *   status  — optional filter: 'pending' | 'boarded' | 'denied' | 'waitlisted'
@@ -18,7 +18,7 @@
  *   }
  *
  * Required env vars:
- *   SEC06_INTERNAL_TOKEN          — Admin/internal auth (header: x-admin-secret or x-internal-token)
+ *   SEC06_INTERNAL_TOKEN          — Admin/internal auth (header: x-internal-token or Authorization Bearer)
  *   SUPABASE_URL                  — Supabase project URL
  *   SUPABASE_SERVICE_ROLE_KEY     — Supabase service role key
  *
@@ -30,7 +30,7 @@ const { validateAdminHeader } = require('./shared/sec06-auth.js');
 exports.handler = async function (event) {
   const headers = {
     'Access-Control-Allow-Origin':  process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
-    'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Content-Type':                 'application/json',
   };

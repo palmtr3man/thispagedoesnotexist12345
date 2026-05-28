@@ -7,7 +7,7 @@
  *
  * Triggers:
  *   1. Cron: every 4 hours (configured in netlify.toml)
- *   2. Webhook: POST /api/alignment-loop with x-webhook-secret header
+ *   2. Webhook: POST /api/alignment-loop with x-internal-token or Authorization Bearer
  *      (deploy/gate-change events, manual ops runs)
  *
  * Policy (locked May 1, 2026):
@@ -20,7 +20,7 @@
  *   NOTION_SECRET                — TUJ Alignment Bot integration token
  *   NOTION_SEAT_DB_ID            — Passenger Pipeline DB (86452d89-...)
  *   NOTION_DRIFT_REPORT_DB_ID    — TUJ Drift Reports DB (ce04014f-...)
- *   SEC06_INTERNAL_TOKEN         — Internal token for webhook trigger (x-webhook-secret / x-internal-token / Bearer)
+ *   SEC06_INTERNAL_TOKEN         — Internal token for webhook trigger (x-internal-token or Authorization Bearer)
  *   SEC06_SCHEDULER_SECRET       — Scheduler token (Authorization: Bearer or x-scheduler-secret)
  *   BASE44_SEAT_URL              — Base44 Seat entity read endpoint
  *   BASE44_USER_URL              — Base44 User entity read endpoint
@@ -591,7 +591,7 @@ exports.handler = async function handler(event) {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-webhook-secret, x-internal-token, x-scheduler-secret',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token, x-scheduler-secret',
       },
       body: '',
     };

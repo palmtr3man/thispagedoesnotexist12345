@@ -40,7 +40,7 @@ const { validateInternalOrSchedulerOrNetlifySchedule } = require('./shared/sec06
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token, x-scheduler-secret',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token, x-scheduler-secret',
   'Content-Type': 'application/json',
 };
 

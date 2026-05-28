@@ -161,15 +161,14 @@ function normalizeBoardingType(boardingType) {
 
 export async function requestSeat(payload) {
   const tujCode = (payload && payload.tuj_code) || sessionStorage.getItem(GATE.TUJ_KEY) || new URLSearchParams(location.search).get('tuj_code') || '';
-  const resolvedFlightCode = String((payload && payload.flight_code) || (payload && payload.flight_id) || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || '').trim();
+  const resolvedFlightCode = String((payload && payload.flight_code) || sessionStorage.getItem('tuj:flight_code') || '').trim();
   const resolvedCabinClass = String((payload && payload.cabin_class) || (payload && payload.cabin) || (payload && payload.boarding_type) || '').trim().toLowerCase();
   const cabinClass = resolvedCabinClass === 'first' || resolvedCabinClass === 'first_class' || resolvedCabinClass === 'paid' || resolvedCabinClass === 'vip'
     ? 'First'
     : (resolvedCabinClass === 'sponsored' ? 'Sponsored' : 'Economy');
   const requestBody = {
     ...payload,
-    flight_code: (payload && payload.flight_code) || resolvedFlightCode,
-    flight_id: (payload && payload.flight_id) || resolvedFlightCode,
+    flight_code: resolvedFlightCode,
     cabin_class: (payload && payload.cabin_class) || cabinClass,
     seats_reserved: (payload && payload.seats_reserved) || 'F5-04',
     boarding_type: normalizeBoardingType(payload && payload.boarding_type),

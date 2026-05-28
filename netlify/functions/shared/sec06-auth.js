@@ -39,11 +39,7 @@ function rejectBrowserOrigin(event) {
 }
 
 function submittedInternalToken(event) {
-  return (
-    headerValue(event.headers, 'x-internal-token').trim()
-    || headerValue(event.headers, 'x-webhook-secret').trim()
-    || bearerToken(event.headers)
-  );
+  return headerValue(event.headers, 'x-internal-token').trim() || bearerToken(event.headers);
 }
 
 function submittedSchedulerSecret(event) {
@@ -75,10 +71,7 @@ function validateHeaderSecret(event, headerName) {
 function validateAdminHeader(event) {
   const expected = requiredSecret(INTERNAL_TOKEN_ENV);
   if (!expected) return false;
-  const supplied =
-    headerValue(event.headers, 'x-admin-secret').trim()
-    || headerValue(event.headers, 'x-internal-token').trim()
-    || submittedInternalToken(event);
+  const supplied = submittedInternalToken(event);
   return secretsMatch(supplied, expected);
 }
 
@@ -111,7 +104,6 @@ function validateDemoSecret(event) {
   if (!demoSecret) return false;
   return validateConfiguredSecret(event, demoSecret, [
     'x-demo-secret',
-    'x-admin-secret',
     'x-internal-token',
   ]);
 }

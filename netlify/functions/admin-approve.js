@@ -2,7 +2,7 @@
  * /api/admin-approve — Netlify Function (BLOCKER-03: Admin Tower Approve/Deny Flow)
  *
  * Approves a pending seat request:
- *   1. Validates SEC-06 internal token (header: x-admin-secret or x-internal-token)
+ *   1. Validates SEC-06 internal token (header: x-internal-token or Authorization Bearer)
  *   2. Looks up the seat request in Supabase waitlist_submissions by seat_request_id
  *   3. Checks request is still in 'pending' status (idempotency guard)
  *   4. Updates Supabase status: pending → approved
@@ -13,7 +13,7 @@
  *   8. Returns { ok: true, seat_id, email }
  *
  * Required env vars:
- *   SEC06_INTERNAL_TOKEN          — Admin/internal auth (header: x-admin-secret or x-internal-token)
+ *   SEC06_INTERNAL_TOKEN          — Admin/internal auth (header: x-internal-token or Authorization Bearer)
  *   SUPABASE_URL                  — Supabase project URL
  *   SUPABASE_SERVICE_ROLE_KEY     — Supabase service role key
  *   SENDGRID_API_KEY              — SendGrid API key
@@ -62,7 +62,7 @@ function generateSeatId() {
 exports.handler = async function (event) {
   const headers = {
     'Access-Control-Allow-Origin':  process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
-    'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type':                 'application/json'
   };

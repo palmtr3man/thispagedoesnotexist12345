@@ -9,7 +9,7 @@
  * dry_run=false AND BEEHIIV_SYNC_LIVE_ENABLED=true.
  *
  * Required env vars:
- *   SEC06_INTERNAL_TOKEN          — x-admin-secret or x-internal-token for manual invocations
+ *   SEC06_INTERNAL_TOKEN          — x-internal-token or Authorization Bearer for manual invocations
  *   SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY
  *   BEEHIIV_API_KEY
@@ -36,7 +36,7 @@ const { validateAdminHeader } = require('./shared/sec06-auth.js');
 const HEADERS = {
   'Access-Control-Allow-Origin': process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token',
   'Content-Type': 'application/json',
 };
 
