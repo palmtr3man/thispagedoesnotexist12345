@@ -11,7 +11,7 @@
  *   SENDGRID_API_KEY
  *   SENDGRID_FROM_EMAIL
  *   DEMO_ACCOUNT_EMAIL
- *   ADMIN_SECRET or DEMO_SEND_SECRET
+ *   DEMO_SEND_SECRET or SEC06_INTERNAL_TOKEN
  *
  * Optional env vars:
  *   DEMO_SEAT_ID          default: TUJ-KC2222
@@ -24,6 +24,7 @@
 const fs = require('fs');
 const path = require('path');
 const { TEMPLATES, templateKeyForId } = require('./sendgrid-templates');
+const { validateDemoSecret } = require('./shared/sec06-auth.js');
 
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
@@ -220,9 +221,7 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: HEADERS, body: '' };
   if (event.httpMethod !== 'POST') return json(405, { ok: false, error: 'Method Not Allowed' });
 
-  const configuredSecret = process.env.DEMO_SEND_SECRET || process.env.ADMIN_SECRET || '';
-  const providedSecret = event.headers['x-demo-secret'] || event.headers['X-Demo-Secret'] || event.headers['x-admin-secret'] || event.headers['X-Admin-Secret'] || '';
-  if (!configuredSecret || !safeCompare(providedSecret, configuredSecret)) {
+  if (!validateDemoSecret(event)) {
     return json(401, { ok: false, error: 'Unauthorized' });
   }
 

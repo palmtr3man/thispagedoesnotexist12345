@@ -72,6 +72,50 @@ function validateHeaderSecret(event, headerName) {
   return secretsMatch(supplied, expected);
 }
 
+function validateAdminHeader(event) {
+  const expected = requiredSecret(INTERNAL_TOKEN_ENV);
+  if (!expected) return false;
+  const supplied =
+    headerValue(event.headers, 'x-admin-secret').trim()
+    || headerValue(event.headers, 'x-internal-token').trim()
+    || submittedInternalToken(event);
+  return secretsMatch(supplied, expected);
+}
+
+function isNetlifyScheduledInvocation(event) {
+  const marker = String(
+    headerValue(event.headers, 'x-nf-event')
+    || headerValue(event.headers, 'x-netlify-event'),
+  ).toLowerCase();
+  return marker === 'schedule' || marker === 'scheduled';
+}
+
+function validateInternalOrSchedulerOrNetlifySchedule(event) {
+  if (validateSchedulerTrigger(event)) return true;
+  if (validateAdminHeader(event)) return true;
+  if (isNetlifyScheduledInvocation(event) && !rejectBrowserOrigin(event)) return true;
+  return false;
+}
+
+function validateConfiguredSecret(event, configuredSecret, headerNames) {
+  if (!configuredSecret) return false;
+  for (const name of headerNames) {
+    const supplied = headerValue(event.headers, name).trim();
+    if (supplied && secretsMatch(supplied, configuredSecret)) return true;
+  }
+  return false;
+}
+
+function validateDemoSecret(event) {
+  const demoSecret = requiredSecret('DEMO_SEND_SECRET') || requiredSecret(INTERNAL_TOKEN_ENV);
+  if (!demoSecret) return false;
+  return validateConfiguredSecret(event, demoSecret, [
+    'x-demo-secret',
+    'x-admin-secret',
+    'x-internal-token',
+  ]);
+}
+
 /** Cron or webhook trigger for alignment-loop. Returns 'cron' | 'webhook' | null. */
 function validateAlignmentLoopTrigger(event) {
   const method = (event.httpMethod || '').toUpperCase();
@@ -87,5 +131,9 @@ module.exports = {
   validateSchedulerTrigger,
   validateInternalTrigger,
   validateHeaderSecret,
+  validateAdminHeader,
   validateAlignmentLoopTrigger,
+  validateInternalOrSchedulerOrNetlifySchedule,
+  validateDemoSecret,
+  isNetlifyScheduledInvocation,
 };

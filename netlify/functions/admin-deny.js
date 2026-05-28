@@ -2,7 +2,7 @@
  * /api/admin-deny — Netlify Function (BLOCKER-03: Admin Tower Approve/Deny Flow)
  *
  * Denies a pending seat request:
- *   1. Validates ADMIN_SECRET header (constant-time compare)
+ *   1. Validates SEC-06 internal token (header: x-admin-secret or x-internal-token)
  *   2. Looks up the seat request in Supabase waitlist_submissions by seat_request_id
  *   3. Checks request is still in 'pending' or 'approved' status (idempotency guard)
  *   4. Updates Supabase status: pending → denied
@@ -10,7 +10,7 @@
  *   6. Returns { ok: true, email, status: 'denied' }
  *
  * Required env vars:
- *   ADMIN_SECRET                  — Shared secret for admin authentication (header: x-admin-secret)
+ *   SEC06_INTERNAL_TOKEN          — Admin/internal auth (header: x-admin-secret or x-internal-token)
  *   SUPABASE_URL                  — Supabase project URL
  *   SUPABASE_SERVICE_ROLE_KEY     — Supabase service role key
  *   SENDGRID_API_KEY              — SendGrid API key
@@ -23,7 +23,7 @@
  *   { ok: true, email: string, status: 'denied', email_sent: boolean }
  *
  * Error responses:
- *   401 — Missing or invalid ADMIN_SECRET
+ *   401 — Missing or invalid internal token
  *   400 — Missing seat_request_id
  *   404 — Seat request not found
  *   409 — Already denied or boarded (idempotency)
@@ -42,6 +42,7 @@
  */
 
 const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
+const { validateAdminHeader } = require('./shared/sec06-auth.js');
 
 assertTemplates(['next_flight_waitlist_v1']);
 const TEMPLATE_NEXT_FLIGHT_WAITLIST = TEMPLATES.next_flight_waitlist_v1;
@@ -110,19 +111,6 @@ async function applyBeehiivWaitlistTag(subId, apiKey, pubId) {
   }
 }
 
-/**
- * Constant-time string comparison to prevent timing attacks on the admin secret.
- */
-function safeCompare(a, b) {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
-
 async function sendDenialEmail({ email, firstName, apiKey, fromEmail }) {
   const dynamicData = {
     first_name:   firstName || email.split('@')[0],
@@ -165,7 +153,7 @@ async function sendDenialEmail({ email, firstName, apiKey, fromEmail }) {
 exports.handler = async function (event) {
   const headers = {
     'Access-Control-Allow-Origin':  process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
-    'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret',
+    'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type':                 'application/json'
   };
@@ -178,11 +166,8 @@ exports.handler = async function (event) {
     return { statusCode: 405, headers, body: JSON.stringify({ ok: false, error: 'Method Not Allowed' }) };
   }
 
-  // --- Auth: validate ADMIN_SECRET header ---
-  const adminSecret = process.env.ADMIN_SECRET;
-  const providedSecret = event.headers['x-admin-secret'] || event.headers['X-Admin-Secret'] || '';
-  if (!adminSecret || !safeCompare(providedSecret, adminSecret)) {
-    console.warn('[admin-deny] Unauthorized attempt — invalid or missing x-admin-secret');
+  if (!validateAdminHeader(event)) {
+    console.warn('[admin-deny] Unauthorized attempt — invalid or missing internal token');
     return { statusCode: 401, headers, body: JSON.stringify({ ok: false, error: 'Unauthorized' }) };
   }
 

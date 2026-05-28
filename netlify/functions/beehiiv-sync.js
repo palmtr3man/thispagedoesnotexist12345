@@ -9,7 +9,7 @@
  * dry_run=false AND BEEHIIV_SYNC_LIVE_ENABLED=true.
  *
  * Required env vars:
- *   ADMIN_SECRET                  — x-admin-secret for manual invocations
+ *   SEC06_INTERNAL_TOKEN          — x-admin-secret or x-internal-token for manual invocations
  *   SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY
  *   BEEHIIV_API_KEY
@@ -31,23 +31,14 @@
  */
 
 const { validateBeehiivSyncIdentity } = require('./lib/beehiiv-flight-identity');
+const { validateAdminHeader } = require('./shared/sec06-auth.js');
 
 const HEADERS = {
   'Access-Control-Allow-Origin': process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret',
+  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token',
   'Content-Type': 'application/json',
 };
-
-function safeCompare(a, b) {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
 
 function boolEnv(name, defaultValue = false) {
   const value = process.env[name];
@@ -317,9 +308,7 @@ exports.handler = async function handler(event) {
     return json(405, { ok: false, error: 'method_not_allowed' });
   }
 
-  const adminSecret = process.env.ADMIN_SECRET;
-  const providedSecret = event.headers['x-admin-secret'] || event.headers['X-Admin-Secret'] || '';
-  if (!adminSecret || !safeCompare(providedSecret, adminSecret)) {
+  if (!validateAdminHeader(event)) {
     console.warn('[beehiiv-sync] Unauthorized attempt');
     return json(401, { ok: false, error: 'unauthorized' });
   }

@@ -8,7 +8,7 @@
  *   audit-view evidence. It never triggers SendGrid.
  *
  * Required env vars:
- *   ADMIN_SECRET
+ *   SEC06_INTERNAL_TOKEN
  *   SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY
  *
@@ -22,23 +22,17 @@
  *   }
  */
 
+const { validateAdminHeader } = require('./shared/sec06-auth.js');
+
 const HEADERS = {
   'Access-Control-Allow-Origin': process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret',
+  'Access-Control-Allow-Headers': 'Content-Type, x-admin-secret, x-internal-token',
   'Content-Type': 'application/json',
 };
 
 function json(statusCode, body) {
   return { statusCode, headers: HEADERS, body: JSON.stringify(body) };
-}
-
-function safeCompare(a, b) {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i += 1) result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return result === 0;
 }
 
 function normalizeFlightCode(value) {
@@ -133,9 +127,7 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: HEADERS, body: '' };
   if (event.httpMethod !== 'POST') return json(405, { ok: false, error: 'method_not_allowed' });
 
-  const adminSecret = process.env.ADMIN_SECRET || '';
-  const providedSecret = event.headers['x-admin-secret'] || event.headers['X-Admin-Secret'] || '';
-  if (!adminSecret || !safeCompare(providedSecret, adminSecret)) {
+  if (!validateAdminHeader(event)) {
     return json(401, { ok: false, error: 'Unauthorized' });
   }
 
