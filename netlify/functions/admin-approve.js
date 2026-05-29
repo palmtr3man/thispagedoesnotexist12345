@@ -61,7 +61,7 @@ function generateSeatId() {
 
 exports.handler = async function (event) {
   const headers = {
-    'Access-Control-Allow-Origin':  process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
+    'Access-Control-Allow-Origin':  process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.com',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type':                 'application/json'
