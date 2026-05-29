@@ -2,7 +2,7 @@ const assert = require('assert');
 const { handler } = require('./netlify/functions/mission-control-bind.js');
 
 process.env.SEC06_INTERNAL_TOKEN = 'test-secret';
-process.env.ADMIN_ORIGIN = 'https://thispagedoesnotexist12345.net';
+process.env.ADMIN_ORIGIN = 'https://thispagedoesnotexist12345.com';
 process.env.SUPABASE_URL = 'https://supabase.example.co';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role';
 process.env.ACTIVE_FLIGHT_CODE = 'FL_051126';
