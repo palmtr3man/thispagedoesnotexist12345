@@ -26,7 +26,7 @@ The corrected deploy preview succeeded:
 | Item | Result |
 |---|---|
 | Pull request | https://github.com/palmtr3man/thispagedoesnotexist12345/pull/27 |
-| Deploy preview | https://deploy-preview-27--thispagedoesnotexist12345.netlify.app/ |
+| Deploy preview | https://deploy-preview-27--thispagedoesnotexist12345.comlify.app/ |
 | Latest deploy | Successful; functions bundled and deployed. |
 | Secrets scan | Passed; no secrets detected in build output or repository code. |
 | Function count | 14 functions deployed, including `demo-sendgrid.js`. |
