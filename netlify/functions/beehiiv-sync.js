@@ -34,7 +34,7 @@ const { validateBeehiivSyncIdentity } = require('./lib/beehiiv-flight-identity')
 const { validateAdminHeader } = require('./shared/sec06-auth.js');
 
 const HEADERS = {
-  'Access-Control-Allow-Origin': process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.net',
+  'Access-Control-Allow-Origin': process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.com',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token',
   'Content-Type': 'application/json',
