@@ -19,7 +19,6 @@ const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
 const MAIN_SITE_URL = 'https://www.thispagedoesnotexist12345.com';
 const CANONICAL_FIRST_TIME_PATH = '/OnboardingPassport';
 const CANONICAL_RETURN_PATH = '/';
-const BRANDING = require('../../branding-constants.js');
 
 const TEMPLATE_ENV = {
   alphaAnnouncement: 'SENDGRID_TEMPLATE_ALPHA_FLIGHT_ANNOUNCEMENT',
@@ -30,11 +29,11 @@ const TEMPLATE_ENV = {
 
 const DEFAULT_FLIGHT_DETAILS = {
   alpha: {
-    flightCode: process.env.ACTIVE_FLIGHT_CODE || BRANDING.ACTIVE_FLIGHT_CODE || '',
+    flightCode: process.env.ACTIVE_FLIGHT_CODE || '',
     departureDate: process.env.ACTIVE_FLIGHT_DEPARTURE_DATE || ''
   },
   vip: {
-    flightCode: process.env.ACTIVE_FLIGHT_CODE || BRANDING.ACTIVE_FLIGHT_CODE || '',
+    flightCode: process.env.ACTIVE_FLIGHT_CODE || '',
     departureDate: process.env.ACTIVE_FLIGHT_DEPARTURE_DATE || ''
   }
 };
@@ -110,7 +109,7 @@ function isDispatchLeaseActive(boarding_confirmation_dispatch_started_at) {
   return Date.now() - startedMs < DISPATCH_LEASE_MS;
 }
 
-const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || BRANDING.ACTIVE_FLIGHT_CODE || 'FL-CG-000').trim() || 'FL-CG-000';
+const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-000').trim() || 'FL-CG-000';
 
 function resolveFlightCode(...values) {
   for (const value of values) {
