@@ -18,7 +18,7 @@ const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
 const MAIN_SITE_URL = 'https://www.thispagedoesnotexist12345.com';
 const CANONICAL_FIRST_TIME_PATH = '/OnboardingPassport';
-const CANONICAL_RETURN_PATH = '/Studio';
+const CANONICAL_RETURN_PATH = '/';
 
 const TEMPLATE_ENV = {
   alphaAnnouncement: 'SENDGRID_TEMPLATE_ALPHA_FLIGHT_ANNOUNCEMENT',
@@ -88,7 +88,7 @@ function resolveLastName(seat) {
 }
 
 function resolveBoardingType(seat) {
-  return String(seat.boarding_type || 'first_class').trim().toLowerCase();
+  return String(seat.boarding_type || seat.boardingtype || 'first_class').trim().toLowerCase();
 }
 
 function isVipBoardingType(boardingType) {
@@ -107,18 +107,30 @@ function isDispatchLeaseActive(boarding_confirmation_dispatch_started_at) {
   return Date.now() - startedMs < DISPATCH_LEASE_MS;
 }
 
-const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || '').trim();
+const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-000').trim() || 'FL-CG-000';
 
-function normalizeFlightCode(value, fallback) {
-  const rawValue = String(value || '').trim();
-  if (!rawValue) return fallback;
-  if (/^FL(?:[_\s-]?VIP)?[_\s-]?042426$/i.test(rawValue)) return CANONICAL_FLIGHT_ID;
-  return rawValue;
+function resolveFlightCode(...values) {
+  for (const value of values) {
+    const rawValue = String(value ?? '').trim();
+    if (!rawValue) continue;
+
+    if (/^FL(?:[\s-]?VIP)?[\s-]?(?:051126|CG[-_\s]?000)$/i.test(rawValue)) {
+      return CANONICAL_FLIGHT_ID || 'FL-CG-000';
+    }
+
+    return rawValue;
+  }
+  return CANONICAL_FLIGHT_ID || 'FL-CG-000';
 }
 
-function resolveFlightCode(seat, isVipBoarding) {
-  const source = seat.flight_code || seat.flight_id || seat.flight_label || seat.flight_number || '';
-  return normalizeFlightCode(source, DEFAULT_FLIGHT_DETAILS[isVipBoarding ? 'vip' : 'alpha'].flightCode || '');
+function resolveFlightCodeForSeat(seat) {
+  return resolveFlightCode(
+    seat.flight_code,
+    seat.flightcode,
+    seat.flight_id,
+    seat.flight_label,
+    seat.flight_number
+  );
 }
 
 function resolveCabinClass(seat, isVipBoarding) {
@@ -143,6 +155,7 @@ function buildAlphaDynamicData(seat) {
   const seatRecordId = resolveSeatRecordId(seat);
   const tujCode = resolveTujCode(seat, seatId);
   const canonicalSeatId = tujCode || seatId;
+  const flightCode = resolveFlightCodeForSeat(seat);
 
   return {
     first_name: resolveFirstName(seat),
@@ -150,15 +163,17 @@ function buildAlphaDynamicData(seat) {
     user_email: resolveRecipient(seat),
     seat_id: seatId,
     tuj_code: tujCode,
-    flight_code: resolveFlightCode(seat, false),
-    flight_id: resolveFlightCode(seat, false),
+    flight_code: flightCode,
+    flightcode: flightCode,
+    flight_id: flightCode,
     cabin_class: resolveCabinClass(seat, false),
     departure_date: resolveDepartureDate(seat, false),
     seats_available: resolveSeatsAvailable(seat),
     first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
-    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(resolveFlightCode(seat, false))}`,
+    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
     boarding_type: 'alpha',
+    boardingtype: 'alpha',
     seats_reserved: 'F5-04'
   };
 }
@@ -167,6 +182,7 @@ function buildVipDynamicData(seat) {
   const seatId = resolveSeatId(seat);
   const tujCode = resolveTujCode(seat, seatId);
   const canonicalSeatId = tujCode || seatId;
+  const flightCode = resolveFlightCodeForSeat(seat);
 
   return {
     first_name: resolveFirstName(seat),
@@ -174,15 +190,17 @@ function buildVipDynamicData(seat) {
     user_email: resolveRecipient(seat),
     seat_id: seatId,
     tuj_code: tujCode,
-    flight_code: resolveFlightCode(seat, true),
-    flight_id: resolveFlightCode(seat, true),
+    flight_code: flightCode,
+    flightcode: flightCode,
+    flight_id: flightCode,
     cabin_class: resolveCabinClass(seat, true),
     departure_date: resolveDepartureDate(seat, true),
     seats_available: resolveSeatsAvailable(seat),
     first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
-    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(resolveFlightCode(seat, true))}`,
+    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
     boarding_type: 'vip',
+    boardingtype: 'vip',
     seats_reserved: 'F5-04',
     newsletter_brand: 'VIP cohort',
     newsletter_promo: 'Mission Control promo'
@@ -191,7 +209,7 @@ function buildVipDynamicData(seat) {
 
 /**
  * Send a single SendGrid dynamic template email.
- * Returns true on 2xx, false otherwise.
+ * Returns { ok: true } on 2xx, or { ok: false, error } otherwise.
  */
 async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData) {
   const payload = {
@@ -216,15 +234,16 @@ async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData)
 
     if (response.ok || response.status === 202) {
       console.log(`[sendgrid-integration] Template ${templateId} sent to ${toEmail} — status ${response.status}`);
-      return true;
+      return { ok: true };
     }
 
     const errorText = await response.text();
     console.error(`[sendgrid-integration] Template ${templateId} failed for ${toEmail} — status ${response.status}:`, errorText);
-    return false;
+    return { ok: false, error: errorText };
   } catch (error) {
+    const errorMsg = String(error && error.message ? error.message : error);
     console.error(`[sendgrid-integration] Template ${templateId} fetch failed for ${toEmail}:`, error);
-    return false;
+    return { ok: false, error: errorMsg };
   }
 }
 
@@ -278,24 +297,25 @@ async function sendSeatConfirmation(seat) {
   const lastName = resolveLastName(seat);
   const boardingType = resolveBoardingType(seat);
   const isVipBoarding = isVipBoardingType(boardingType);
-  const { boarding_confirmation_sent_at, boarding_confirmation_dispatch_started_at } = seat;
+  const boardingConfirmationSentAt = seat.boarding_confirmation_sent_at || seat.boardingconfirmationsentat;
+  const boardingConfirmationDispatchStartedAt = seat.boarding_confirmation_dispatch_started_at || seat.boardingconfirmationdispatchstartedat;
 
   if (!seatId || !tujCode || !recipientEmail || !firstName || !lastName) {
     console.error(`[sendgrid-integration] Seat ${seatId || tujCode || 'unknown'} missing required fields (recipientEmail, firstName, lastName, tuj_code) — aborting`);
     return { success: false, error: 'Missing required seat fields' };
   }
 
-  if (boarding_confirmation_sent_at) {
-    console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boarding_confirmation_sent_at}) — skipping send`);
+  if (boardingConfirmationSentAt) {
+    console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boardingConfirmationSentAt}) — skipping send`);
     return { success: true, skipped: true };
   }
 
-  if (isDispatchLeaseActive(boarding_confirmation_dispatch_started_at)) {
-    console.log(`[sendgrid-integration] Seat ${seatId} already has active boarding_confirmation_dispatch_started_at (${boarding_confirmation_dispatch_started_at}) — skipping send`);
+  if (isDispatchLeaseActive(boardingConfirmationDispatchStartedAt)) {
+    console.log(`[sendgrid-integration] Seat ${seatId} already has active boarding_confirmation_dispatch_started_at (${boardingConfirmationDispatchStartedAt}) — skipping send`);
     return { success: true, skipped: true };
   }
 
-  const dispatchStartedAt = boarding_confirmation_dispatch_started_at || new Date().toISOString();
+  const dispatchStartedAt = boardingConfirmationDispatchStartedAt || new Date().toISOString();
 
   const { templateIds, missing } = getTemplateIds(isVipBoarding ? 'vip' : 'alpha');
   if (missing.length) {
@@ -315,20 +335,29 @@ async function sendSeatConfirmation(seat) {
       ];
 
   for (const step of sequence) {
-    const sent = await sendTemplate(apiKey, fromEmail, recipientEmail, step.templateId, dynamicData);
-    if (!sent) {
+    const result = await sendTemplate(apiKey, fromEmail, recipientEmail, step.templateId, dynamicData);
+    if (!result.ok) {
       console.error(`[sendgrid-integration] ${step.label} failed for seat ${seatId} — aborting sequence`);
-      return { success: false, error: `${step.label} send failed` };
+      return { success: false, error: `${step.label} send failed${result.error ? `: ${result.error}` : ''}` };
     }
   }
 
   if (base44SeatUrl && seatId) {
+    const boardingConfirmationSentAtValue = new Date().toISOString();
+    const flightCode = resolveFlightCodeForSeat(seat);
     await updateSeatRecord(base44SeatUrl, seatId, {
-      boarding_confirmation_sent_at: new Date().toISOString(),
+      boarding_confirmation_sent_at: boardingConfirmationSentAtValue,
+      boardingconfirmationsentat: boardingConfirmationSentAtValue,
       boarding_confirmation_dispatch_started_at: dispatchStartedAt,
+      boardingconfirmationdispatchstartedat: dispatchStartedAt,
       boarding_confirmation_dispatch_state: 'sent',
+      boardingconfirmationdispatchstate: 'sent',
       tuj_code: tujCode,
-      flight_id: resolveFlightCode(seat, isVipBoarding),
+      flight_code: flightCode,
+      flightcode: flightCode,
+      flight_id: flightCode,
+      boarding_type: boardingType,
+      boardingtype: boardingType,
       seats_reserved: 'F5-04'
     });
   } else {

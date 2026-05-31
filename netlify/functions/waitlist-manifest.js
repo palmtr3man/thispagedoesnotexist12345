@@ -62,7 +62,7 @@ exports.handler = async function (event) {
 
   const qs         = event.queryStringParameters || {};
   const statusFilter = qs.status;
-  const flightId = String(qs.flight_id || process.env.ACTIVE_FLIGHT_CODE || 'FL_051126')
+  const flightId = String(qs.flight_id || process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-000')
     .trim()
     .replace(/\s+/g, '_');
 
