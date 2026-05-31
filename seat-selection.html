@@ -115,7 +115,7 @@
       'use strict';
 
       var params = new URLSearchParams(window.location.search);
-      var flightId = (params.get('flight_id') || 'FL_051126').replace(/\s+/g, '_');
+      var flightId = (params.get('flight_id') || 'FL-CG-000').replace(/\s+/g, '_');
       var passengerId = (params.get('passenger_id') || '').trim();
       var passengerEmail = (params.get('passenger_email') || params.get('email') || '').trim().toLowerCase();
       var origin = params.get('origin') || 'seat-selection-page';

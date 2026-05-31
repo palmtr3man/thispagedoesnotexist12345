@@ -149,7 +149,7 @@ async function sendSignalWelcome(subscription) {
         dynamic_template_data: {
           first_name: firstName,
           email,
-          flight_code: 'FL_051126',
+          flight_code: 'FL-CG-000',
           flight_label: 'Gemini ♊',
         },
       }],
@@ -249,7 +249,7 @@ exports.handler = async (event) => {
         ok: true,
         template: 'signalwelcome_v1',
         template_id: process.env.SENDGRID_TEMPLATE_WELCOME || null,
-        flight_code: 'FL_051126',
+        flight_code: 'FL-CG-000',
         flight_label: 'Gemini ♊',
         dry_run: dryRun,
         active_seen: active.length,

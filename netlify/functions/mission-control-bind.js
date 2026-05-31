@@ -147,7 +147,7 @@ exports.handler = async (event) => {
   if (!supabaseUrl || !serviceRoleKey) return json(500, { ok: false, error: 'Supabase configuration missing' });
 
   const dryRun = payload.dry_run !== false;
-  const flightCode = normalizeFlightCode(payload.flight_code || process.env.ACTIVE_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_ID || 'FL_051126');
+  const flightCode = normalizeFlightCode(payload.flight_code || process.env.ACTIVE_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_ID || 'FL-CG-000');
   const completedBy = String(payload.completed_by || 'mission-control').trim() || 'mission-control';
   const operatorNote = String(payload.operator_note || '').trim() || `Mission Control binding gate for ${flightCode}`;
 
