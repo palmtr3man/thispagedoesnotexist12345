@@ -40,8 +40,6 @@ const DEFAULT_FLIGHT_DETAILS = {
 
 const DISPATCH_LEASE_MS = Math.max(60_000, Number(process.env.BOARDING_CONFIRMATION_DISPATCH_LEASE_MS || 15 * 60 * 1000));
 
-let lastSendgridError = '';
-
 function getTrimmedEnv(name) {
   const value = process.env[name];
   return value ? String(value).trim() : '';
@@ -211,7 +209,7 @@ function buildVipDynamicData(seat) {
 
 /**
  * Send a single SendGrid dynamic template email.
- * Returns true on 2xx, false otherwise.
+ * Returns { ok: true } on 2xx, or { ok: false, error } otherwise.
  */
 async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData) {
   const payload = {
@@ -236,17 +234,16 @@ async function sendTemplate(apiKey, fromEmail, toEmail, templateId, dynamicData)
 
     if (response.ok || response.status === 202) {
       console.log(`[sendgrid-integration] Template ${templateId} sent to ${toEmail} — status ${response.status}`);
-      return true;
+      return { ok: true };
     }
 
     const errorText = await response.text();
-    lastSendgridError = errorText;
     console.error(`[sendgrid-integration] Template ${templateId} failed for ${toEmail} — status ${response.status}:`, errorText);
-    return false;
+    return { ok: false, error: errorText };
   } catch (error) {
-    lastSendgridError = String(error && error.message ? error.message : error);
+    const errorMsg = String(error && error.message ? error.message : error);
     console.error(`[sendgrid-integration] Template ${templateId} fetch failed for ${toEmail}:`, error);
-    return false;
+    return { ok: false, error: errorMsg };
   }
 }
 
@@ -338,10 +335,10 @@ async function sendSeatConfirmation(seat) {
       ];
 
   for (const step of sequence) {
-    const sent = await sendTemplate(apiKey, fromEmail, recipientEmail, step.templateId, dynamicData);
-    if (!sent) {
+    const result = await sendTemplate(apiKey, fromEmail, recipientEmail, step.templateId, dynamicData);
+    if (!result.ok) {
       console.error(`[sendgrid-integration] ${step.label} failed for seat ${seatId} — aborting sequence`);
-      return { success: false, error: `${step.label} send failed${lastSendgridError ? `: ${lastSendgridError}` : ''}` };
+      return { success: false, error: `${step.label} send failed${result.error ? `: ${result.error}` : ''}` };
     }
   }
 
