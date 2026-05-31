@@ -2385,7 +2385,7 @@
     <section style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(0,217,255,0.1); font-size:0.8rem;">
       <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(0,217,255,0.6); text-decoration:none; margin:0 0.75rem;">About / Resources</a>
       <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(0,217,255,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
-      <a href="https://www.buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(0,217,255,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
+      <a href="https://www.buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(0,217,255,0.6); text-decoration:none; margin:0 0.75rem;">☕️ Support</a>
     </section>
     <footer>
       &copy; 2026 The Ultimate Journey | <span id="theme-status">Mission Control Dark Theme Active</span>
@@ -3392,7 +3392,7 @@
         getSeatId:    getSeatId,
         getTujCode:   getTujCode,
         getFlightCode: function () {
-          return (new URLSearchParams(location.search).get('flight_code') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || '').trim();
+          return (new URLSearchParams(location.search).get('flight_code') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || (window.brand && window.brand.activeflightcode) || '').trim();
         }
       });
 
