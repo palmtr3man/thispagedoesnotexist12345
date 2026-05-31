@@ -3392,7 +3392,7 @@
         getSeatId:    getSeatId,
         getTujCode:   getTujCode,
         getFlightCode: function () {
-          return (new URLSearchParams(location.search).get('flight_code') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || '').trim();
+          return (new URLSearchParams(location.search).get('flight_code') || sessionStorage.getItem('tuj:flight_code') || sessionStorage.getItem('flight_code') || (window.brand && window.brand.activeflightcode) || '').trim();
         }
       });
 
