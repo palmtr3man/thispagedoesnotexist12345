@@ -104,6 +104,18 @@
   force = true
 
 [[redirects]]
+  from = "/Studio"
+  to = "/Studio/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/Studio/*"
+  to = "/Studio/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
   status = 200
