@@ -71,7 +71,7 @@ function sgLog(fields) {
 assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_v1', 'next_flight_waitlist_v1']);
 const TEMPLATE_ID = TEMPLATES.seat_request_acknowledgement_v1;
 const INTERNAL_TEMPLATE_ID = TEMPLATES.internalsignupnotification_v1;
-const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
+const INTERNAL_NOTIFY_EMAIL = 'support@thispagedoesnotexist12345.com';
 const ASM_GROUP_ID          = parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10); // "The Ultimate Journey — Transactional" unsubscribe group
 const ASM_MARKETING_GROUP_ID = process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING
   ? parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING, 10)
