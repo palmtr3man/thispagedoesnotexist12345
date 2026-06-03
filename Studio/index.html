@@ -1971,7 +1971,7 @@ window.addEventListener('load', async () => {
   'use strict';
 
   var SEAT_STATUS_API = '/api/seat-status';
-  var SEAT_READY_API  = '/api/seat-ready'; // Ready-click canonical seating transaction (QA-gated by ?ready_click=1)
+  var SEAT_READY_API  = '/.netlify/functions/seat-ready'; // direct fn path until /api redirect deploy lands
   var FIT_CHECK_URL   = 'https://www.thispagedoesnotexist12345.tech/Dashboard'; // ATS analyzer entry
   var SEAT_REQUEST_URL = 'https://www.thispagedoesnotexist12345.com/?view=seat-request'; // legacy seat request flow fallback
   var FETCH_TIMEOUT_MS = 8000;

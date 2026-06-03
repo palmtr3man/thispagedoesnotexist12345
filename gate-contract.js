@@ -16,6 +16,13 @@ export const GATE = {
   REQUEST_SEAT:  '/api/seat-request',
   VALIDATE_SEAT: '/api/seat',          // GET /api/seat/:id (Base44 — pending credits)
 
+  // Direct function paths — prod /api/* redirects not deployed (netlify.toml blocked).
+  // Revert to /api/* once redirect deploy lands.
+  SEAT_READY:    '/.netlify/functions/seat-ready',
+  SEAT_MAP:      '/.netlify/functions/seat-map',
+  SEAT_CLAIM:    '/.netlify/functions/seat-claim',
+  MISSION_CONTROL_BIND: '/.netlify/functions/mission-control-bind',
+
   // --- beehiiv ---
 
   /**
