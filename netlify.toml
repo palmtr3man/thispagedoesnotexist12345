@@ -209,5 +209,51 @@
   status = 200
   force = true
 
+# Admin Tower — BLOCKER-03 / SEC-06: Approve/Deny + waitlist manifest
+[[redirects]]
+  from = "/api/admin-approve"
+  to = "/.netlify/functions/admin-approve"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-deny"
+  to = "/.netlify/functions/admin-deny"
+  status = 200
+
+[[redirects]]
+  from = "/api/waitlist-manifest"
+  to = "/.netlify/functions/waitlist-manifest"
+  status = 200
+
+[[redirects]]
+  from = "/api/demo-sendgrid"
+  to = "/.netlify/functions/demo-sendgrid"
+  status = 200
+
+[[redirects]]
+  from = "/api/beehiiv-sync"
+  to = "/.netlify/functions/beehiiv-sync"
+  status = 200
+
+# BLOCKER-08: Alignment Loop — Notion ↔ SaaS drift detection + repair
+# Webhook: POST /api/alignment-loop with SEC-06 internal token
+# Cron: every 5 minutes for PAL-21 Application sync
+[[redirects]]
+  from = "/api/alignment-loop"
+  to = "/.netlify/functions/alignment-loop"
+  status = 200
+
+[functions."alignment-loop"]
+  schedule = "*/5 * * * *"
+
+# signalwelcome_v1 — Beehiiv → SendGrid welcome runner (cohort-gated in code)
+[[redirects]]
+  from = "/api/signalwelcome-runner"
+  to = "/.netlify/functions/signalwelcome-runner"
+  status = 200
+
+[functions."signalwelcome-runner"]
+  schedule = "0 * * * *"
+
 # /Studio is served directly from Studio/index.html. Do not force-rewrite it to /,
 # because boarding handoff URLs preserve seat_id/tuj_code on the Studio route.
