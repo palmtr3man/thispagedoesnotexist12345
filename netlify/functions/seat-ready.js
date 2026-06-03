@@ -40,7 +40,7 @@
 
 const crypto = require('crypto');
 const { sendSeatConfirmation } = require('./sendgrid-integration.js');
-const { validateInternalTrigger } = require('./shared/sec06-auth.js');
+const { validateInternalTrigger, validateHeaderSecret } = require('./shared/sec06-auth.js');
 
 const VALID_SEAT_ID = /^TUJ-[A-Z2-9]{6}$/;
 const FETCH_TIMEOUT_MS = 8000;
@@ -50,7 +50,7 @@ const VALID_CABIN_CLASSES = ['First', 'Sponsored', 'Economy'];
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-internal-token, x-passenger-ready-token',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-seat-api-secret, x-internal-token, x-passenger-ready-token',
   'Content-Type': 'application/json',
 };
 
@@ -72,6 +72,9 @@ function headerValue(headers, name) {
   return headers[name] || headers[name.toLowerCase()] || headers[name.toUpperCase()] || '';
 }
 
+function requireServerSecret(event) {
+  return validateHeaderSecret(event, 'x-seat-api-secret');
+}
 
 function extractBearerToken(value) {
   const raw = String(value || '').trim();
