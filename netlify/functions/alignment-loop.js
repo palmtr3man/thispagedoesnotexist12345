@@ -6,7 +6,7 @@
  * Base44, Supabase, Netlify env vars, and Notion field sync.
  *
  * Triggers:
- *   1. Cron: every 4 hours (configured in netlify.toml)
+ *   1. Cron: every 5 minutes (netlify.toml schedule; Netlify x-nf-event or x-scheduler-secret)
  *   2. Webhook: POST /api/alignment-loop with x-internal-token or Authorization Bearer
  *      (deploy/gate-change events, manual ops runs)
  *

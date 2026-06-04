@@ -112,6 +112,7 @@ function validateDemoSecret(event) {
 function validateAlignmentLoopTrigger(event) {
   const method = (event.httpMethod || '').toUpperCase();
   if (validateSchedulerTrigger(event)) return 'cron';
+  if (isNetlifyScheduledInvocation(event) && !rejectBrowserOrigin(event)) return 'cron';
   if (method === 'POST' && validateInternalTrigger(event)) return 'webhook';
   return null;
 }
