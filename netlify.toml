@@ -25,7 +25,7 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, x-internal-token, x-scheduler-secret"
 
 [[redirects]]
   from = "/api/seat-status"
@@ -61,18 +61,6 @@
   from = "/api/mission-control-bind"
   to = "/.netlify/functions/mission-control-bind"
   status = 200
-
-# BLOCKER-08: Alignment Loop — Notion ↔ SaaS Drift Detection + Repair
-# Webhook trigger: POST /api/alignment-loop with x-webhook-secret header
-# Cron trigger: every 5 minutes via Netlify scheduled functions for PAL-21 Application sync
-[[redirects]]
-  from = "/api/alignment-loop"
-  to = "/.netlify/functions/alignment-loop"
-  status = 200
-
-[functions."alignment-loop"]
-  schedule = "*/5 * * * *"
-
 
 # Passenger self-seat-selection entry point
 [[redirects]]
@@ -220,6 +208,52 @@
   to = "/"
   status = 200
   force = true
+
+# Admin Tower — BLOCKER-03 / SEC-06: Approve/Deny + waitlist manifest
+[[redirects]]
+  from = "/api/admin-approve"
+  to = "/.netlify/functions/admin-approve"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin-deny"
+  to = "/.netlify/functions/admin-deny"
+  status = 200
+
+[[redirects]]
+  from = "/api/waitlist-manifest"
+  to = "/.netlify/functions/waitlist-manifest"
+  status = 200
+
+[[redirects]]
+  from = "/api/demo-sendgrid"
+  to = "/.netlify/functions/demo-sendgrid"
+  status = 200
+
+[[redirects]]
+  from = "/api/beehiiv-sync"
+  to = "/.netlify/functions/beehiiv-sync"
+  status = 200
+
+# BLOCKER-08 / PR #56: Alignment Loop — Notion ↔ SaaS drift detection + repair
+# Webhook: POST /api/alignment-loop with SEC-06 internal token (x-internal-token or Authorization Bearer)
+# Cron: every 5 minutes (Netlify schedule header; optional x-scheduler-secret for external cron)
+[[redirects]]
+  from = "/api/alignment-loop"
+  to = "/.netlify/functions/alignment-loop"
+  status = 200
+
+[functions."alignment-loop"]
+  schedule = "*/5 * * * *"
+
+# signalwelcome_v1 — Beehiiv → SendGrid welcome runner (SEC-06 gated in function code)
+[[redirects]]
+  from = "/api/signalwelcome-runner"
+  to = "/.netlify/functions/signalwelcome-runner"
+  status = 200
+
+[functions."signalwelcome-runner"]
+  schedule = "0 * * * *"
 
 # /Studio is served directly from Studio/index.html. Do not force-rewrite it to /,
 # because boarding handoff URLs preserve seat_id/tuj_code on the Studio route.
