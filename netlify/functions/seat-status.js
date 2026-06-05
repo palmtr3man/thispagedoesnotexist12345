@@ -16,10 +16,9 @@
  *                              Used to read passport_completed_at + highest_ats_score.
  *
  * F-HIER-01: flight_code field
- *   Sourced from three places in priority order:
- *     1. data.flight_code     — Base44 NextFlightConfig field (add to schema; see below)
- *     2. ACTIVE_FLIGHT_CODE   — Netlify env var (already in use for email tokens)
- *     3. data.flight_id       — legacy operational ID from getCohortStatus
+ *   Sourced from two places in priority order:
+ *     1. data.flight_code     — Base44 NextFlightConfig field (upstream API)
+ *     2. data.flight_id       — legacy operational ID from getCohortStatus
  *   The resolved value is always normalised: spaces → underscores, trimmed.
  *   Exposed as data.flight_code in the public payload.
  *
@@ -117,24 +116,19 @@ function deriveResumeFitCheckStatus(user) {
  *
  * Returns the canonical operational flight code for the active flight.
  * Priority:
- *   1. data.flight_code     — Base44 NextFlightConfig field (future: add to schema)
- *   2. ACTIVE_FLIGHT_CODE   — Netlify env var (already used for email tokens)
- *   3. data.flight_id       — legacy operational ID from getCohortStatus
- *   4. null                 — no code available; UI hides the secondary badge
+ *   1. data.flight_code     — Base44 NextFlightConfig field (upstream API)
+ *   2. data.flight_id       — legacy operational ID from getCohortStatus
+ *   3. null                 — no code available; UI hides the secondary badge
  *
  * Normalisation: spaces replaced with underscores, trimmed.
- * This matches the canonical ACTIVE_FLIGHT_CODE convention ("FL_051126")
- * but the raw value is also preserved for display — callers may choose to display
- * the raw string or the normalised form. The normalised form is what is returned.
  */
 function resolveFlightCode(data) {
   const raw =
     (data.flight_code && String(data.flight_code).trim()) ||
-    (process.env.ACTIVE_FLIGHT_CODE && String(process.env.ACTIVE_FLIGHT_CODE).trim()) ||
     (data.flight_id && String(data.flight_id).trim()) ||
     null;
   if (!raw) return null;
-  // Normalise: replace spaces with underscores (matches ACTIVE_FLIGHT_CODE convention)
+  // Normalise: replace spaces with underscores
   return raw.replace(/ /g, '_');
 }
 
@@ -197,9 +191,8 @@ exports.handler = async function handler(event) {
     }
 
     // ── 4. F-HIER-01: flight_code resolution ──────────────────────────────
-    // Resolves the operational flight code from Base44, env var, or flight_id fallback.
-    // Always overwrites data.flight_code so the public payload has a single canonical field.
-    // Returns null if no code is available — UI hides the secondary badge in that case.
+    // Resolves the operational flight code from Base44 or flight_id fallback.
+    // Prioritizes upstream API data and removes reliance on Netlify env vars.
     data.flight_code = resolveFlightCode(data);
 
     // ── 4b. Stable mode fields ─────────────────────────────────────────────
@@ -243,7 +236,7 @@ exports.handler = async function handler(event) {
         }
         // Seat lookup failed entirely → stays 'unknown' (fail-open)
       }
-      // Env vars not configured → stays 'unknown' (fail-open, graceful stub)
+      // Env vars not configured → stays 'unknown' (fail-open, graceful_stub)
     }
 
     data.resume_fit_check_status = resume_fit_check_status;
