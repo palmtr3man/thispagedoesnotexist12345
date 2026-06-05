@@ -11,7 +11,7 @@
 
 export const GATE = {
   // --- API paths ---
-  API_BASE:      'https://www.thispagedoesnotexist12345.com',
+  API_BASE:      'https://app.thispagedoesnotexist12345.com',
   SEAT_STATUS:   '/api/seat-status',
   REQUEST_SEAT:  '/api/seat-request',
   VALIDATE_SEAT: '/api/seat',          // GET /api/seat/:id (Base44 — pending credits)
