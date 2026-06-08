@@ -61,7 +61,7 @@ global.fetch = async (url, options = {}) => {
 async function invoke(body, secret = 'test-secret') {
   const res = await handler({
     httpMethod: 'POST',
-    headers: { 'x-admin-secret': secret },
+    headers: { 'x-internal-token': secret },
     body: JSON.stringify(body),
   });
   return { statusCode: res.statusCode, body: JSON.parse(res.body) };
