@@ -10,7 +10,8 @@
  *
  * Required Netlify env vars:
  *   SENDGRID_API_KEY              — SendGrid API key
- *   SENDGRID_FROM_EMAIL         — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   SENDGRID_FROM_EMAIL         — Sender address (default: support@thispagedoesnotexist12345.com)
+ *   SENDER_EMAIL                — Optional shared sender fallback; should match SENDGRID_FROM_EMAIL
  *   SENDGRID_TEMPLATE_SEAT_REQUEST — seat_request_acknowledgement_v1 template ID (canonical fallback defined in sendgrid-templates.js)
  *   PLATFORM_URL             — Platform URL injected into email (default: https://www.thispagedoesnotexist12345.com)
  *   SIGNAL_URL               — Signal newsletter URL injected into email
@@ -544,7 +545,7 @@ exports.handler = async function (event, context) {
     };
   }
 
-  const fromEmail   = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const fromEmail   = process.env.SENDGRID_FROM_EMAIL || process.env.SENDER_EMAIL || 'support@thispagedoesnotexist12345.com';
   const platformUrl = process.env.PLATFORM_URL        || 'https://www.thispagedoesnotexist12345.com';
   const signalUrl   = process.env.SIGNAL_URL          || 'https://newsletter.thispagedoesnotexist12345.us';
   const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.com';

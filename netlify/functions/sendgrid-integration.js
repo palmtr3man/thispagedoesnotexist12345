@@ -282,7 +282,7 @@ async function updateSeatRecord(base44SeatUrl, seatId, fields) {
  */
 async function sendSeatConfirmation(seat) {
   const apiKey = process.env.SENDGRID_API_KEY;
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || process.env.SENDER_EMAIL || 'support@thispagedoesnotexist12345.com';
   const base44SeatUrl = process.env.BASE44_SEAT_URL;
 
   if (!apiKey) {
