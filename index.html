@@ -2339,7 +2339,7 @@
 
       <!-- Gate-closed locked state (hidden when gate is open) -->
       <div class="gate-locked-msg" style="display:none">
-        🔒 Next Flight — Studio → Signal → Systems
+        🔒 Next Flight — Complete the path to unlock
       </div>
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
@@ -2660,7 +2660,12 @@
         try {
           var res = await fetch('/api/seat-status?t=' + Date.now(), { cache: 'no-store' });
           if (!res.ok) return null;
-          return await res.json();
+          var data = await res.json();
+          var forceState = (new URLSearchParams(window.location.search).get('force_state') || '').trim().toLowerCase();
+          if (forceState) {
+            data.gate_status = forceState;
+          }
+          return data;
         } catch (e) {
           console.warn('[seat-status] Could not fetch:', e);
           return null;
@@ -2694,6 +2699,10 @@
         var joinWaitlistBtn = document.getElementById('joinWaitlistBtn');
         var calBtn          = document.querySelector('[data-umami-event="Book a Consultation Click"]');
         var lockedMsg       = document.querySelector('.gate-locked-msg');
+        var gateReveal      = document.querySelector('.gate-closed-reveal');
+        var seatForm        = document.getElementById('seat-request-form');
+        var seatConfirm     = document.getElementById('seat-request-confirm');
+        var nextStepGuidance = document.querySelector('.btn-row-waitlist p');
         var statusNote      = document.querySelector('p.status-text[style*="opacity: 0.7"]');
 
         // Helper for #departure-date inner text node (after the .arriving-dot span)
@@ -2746,30 +2755,79 @@
         }
 
         // ── 4. CTA visibility / Seat count ───────────────────────────────────
-        // Intake Mode: REQUEST_SEAT vs JOIN_WAITLIST
-        // Driven by intake_mode field (and fallback seat count)
-        var intakeMode = status.intake_mode || (status.open_count >= 5 ? 'JOIN_WAITLIST' : 'REQUEST_SEAT');
+        // F151: PUBLIC_GATE_STATE / gate_status CLOSED or HOLD must override all
+        // public seat CTAs and turn index.html into the gate-closed puzzle mode.
+        var gateStatusNorm = (status.gate_status || '').toString().trim().toLowerCase();
+        var isGateClosed = ['closed', 'hold', 'held', 'departed'].indexOf(gateStatusNorm) !== -1;
 
-        if (intakeMode === 'JOIN_WAITLIST') {
+        if (isGateClosed) {
+          document.body.classList.add('gate-closed');
+
+          if (dockEl) dockEl.textContent = 'GATE CLOSED';
+          if (fullEl) fullEl.textContent = 'DEPARTED';
+          if (shortEl) shortEl.textContent = 'DEPARTED';
+          if (statusNote) {
+            statusNote.textContent = "Flight TUJ-001 has departed. The next cohort is being assembled. Complete the path below to see what's coming.";
+          }
+
           if (waitlistBtn) waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'inline-block';
-        } else {
-          if (waitlistBtn) waitlistBtn.style.display = 'inline-block';
           if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
-        }
+          if (seatForm) seatForm.style.display = 'none';
+          if (seatConfirm) seatConfirm.style.display = 'none';
+          if (ctaSubtextEl) ctaSubtextEl.style.display = 'none';
 
-        // Seat Count Label
-        if (ctaSubtextEl) {
-          var count = status.open_count || 0;
-          var remaining = Math.max(0, 5 - count);
-          var countText = remaining === 0 ? 'Waitlist open.' : remaining + ' seats remaining.';
-          ctaSubtextEl.textContent = countText + ' One flight.';
-          ctaSubtextEl.style.display = 'block';
+          var chosenPaths = JSON.parse(localStorage.getItem('paths-chosen') || '[]');
+          var puzzleComplete = chosenPaths.indexOf('signal') !== -1 && chosenPaths.indexOf('systems') !== -1 && chosenPaths.indexOf('support') !== -1;
+          if (lockedMsg) lockedMsg.style.display = puzzleComplete ? 'none' : 'block';
+          if (gateReveal) gateReveal.style.display = puzzleComplete ? 'block' : 'none';
+
+          if (calBtn) {
+            calBtn.style.opacity = '0.45';
+            calBtn.style.pointerEvents = 'none';
+            calBtn.setAttribute('aria-disabled', 'true');
+          }
+          if (nextStepGuidance) {
+            nextStepGuidance.innerHTML = 'Next step: Complete <strong>Signal → Systems → Support</strong> to unlock the next flight manifest.';
+          }
+        } else {
+          document.body.classList.remove('gate-closed');
+          if (lockedMsg) lockedMsg.style.display = 'none';
+          if (gateReveal) gateReveal.style.display = 'none';
+          if (calBtn) {
+            calBtn.style.opacity = '';
+            calBtn.style.pointerEvents = '';
+            calBtn.removeAttribute('aria-disabled');
+          }
+          if (nextStepGuidance) {
+            nextStepGuidance.innerHTML = 'Next step: Use the <strong>Request a Seat</strong> button above to board.';
+          }
+
+          // Intake Mode: REQUEST_SEAT vs JOIN_WAITLIST
+          // Driven by intake_mode field (and fallback seat count)
+          var intakeMode = status.intake_mode || (status.open_count >= 5 ? 'JOIN_WAITLIST' : 'REQUEST_SEAT');
+
+          if (intakeMode === 'JOIN_WAITLIST') {
+            if (waitlistBtn) waitlistBtn.style.display = 'none';
+            if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'inline-block';
+          } else {
+            if (waitlistBtn) waitlistBtn.style.display = 'inline-block';
+            if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+          }
+
+          // Seat Count Label
+          if (ctaSubtextEl) {
+            var count = status.open_count || 0;
+            var remaining = Math.max(0, 5 - count);
+            var countText = remaining === 0 ? 'Waitlist open.' : remaining + ' seats remaining.';
+            ctaSubtextEl.textContent = countText + ' One flight.';
+            ctaSubtextEl.style.display = 'block';
+          }
         }
 
         // ── 5. Manual overrides from NextFlightConfig ──────────────────────
         // gate_status overrides the #dock-status label (default "GATE OPEN")
-        if (dockEl && status.gate_status) {
+        // F151 closed/hold states render as GATE CLOSED, not raw "hold".
+        if (!isGateClosed && dockEl && status.gate_status) {
           dockEl.textContent = status.gate_status;
         }
 
