@@ -1523,7 +1523,11 @@ function initCareerNavigatorCard() {
     }
   } else {
     // Standalone session — guide user to Career Navigator to create a record
-    const dashUrl = 'https://thispagedoesnotexist12345.tech/Dashboard' + (seatId ? '?seat_id=' + encodeURIComponent(seatId) : '');
+    const tujCode  = params.get('tuj_code') || sessionStorage.getItem('tuj_code') || '';
+    const dashParams = new URLSearchParams();
+    if (seatId) dashParams.set('seat_id', seatId);
+    if (tujCode) dashParams.set('tuj_code', tujCode);
+    const dashUrl = 'https://thispagedoesnotexist12345.tech/Dashboard' + (dashParams.toString() ? '?' + dashParams.toString() : '');
     if (body) body.innerHTML = 'To sync your resume with Career Navigator, open the Studio from within the app. <a href="' + dashUrl + '" style="color:var(--color-primary);">Go to Career Navigator →</a>';
     if (btn) {
       btn.textContent = 'Open Career Navigator';
@@ -1583,6 +1587,51 @@ function loadLocalDraft() {
       },
       experience: [], education: [], skills: [], certifications: [], projects: []
     });
+  }
+}
+
+// ============================================================
+// MISSION CONTROL GATEWAY CTA WIRING (seat_id + tuj_code passthrough)
+// ============================================================
+function buildUrlWithSeatContext(baseUrl, context) {
+  const url = new URL(baseUrl, window.location.origin);
+  if (context.seatId) url.searchParams.set('seat_id', context.seatId);
+  if (context.tujCode) url.searchParams.set('tuj_code', context.tujCode);
+  return url.toString();
+}
+
+function getGatewayContext() {
+  const params = new URLSearchParams(window.location.search);
+  const seatId = params.get('seat_id') || sessionStorage.getItem('seat_id') || '';
+  const tujCode = params.get('tuj_code') || sessionStorage.getItem('tuj_code') || '';
+  if (seatId) sessionStorage.setItem('seat_id', seatId);
+  if (tujCode) sessionStorage.setItem('tuj_code', tujCode);
+  return { seatId, tujCode };
+}
+
+function initGatewayCtas() {
+  const context = getGatewayContext();
+  const boardingEl = document.querySelector('[data-cta="boarding-signal"]');
+  if (boardingEl) {
+    const url = new URL('https://www.thispagedoesnotexist12345.com/', window.location.origin);
+    if (context.seatId) url.searchParams.set('seat_id', context.seatId);
+    if (context.tujCode) url.searchParams.set('tuj_code', context.tujCode);
+    if (context.seatId || context.tujCode) url.searchParams.set('view', 'boarding-signal');
+    boardingEl.href = url.toString();
+  }
+
+  const traceEl = document.querySelector('[data-cta="operator-trace"]');
+  if (traceEl) {
+    const url = new URL('https://www.thispagedoesnotexist12345.com/mission-control', window.location.origin);
+    if (context.tujCode) url.searchParams.set('tuj_code', context.tujCode);
+    if (context.seatId) url.searchParams.set('seat_id', context.seatId);
+    if (context.seatId || context.tujCode) url.searchParams.set('origin', 'gateway');
+    traceEl.href = url.toString();
+  }
+
+  const studioEl = document.querySelector('[data-cta="studio-entry"]');
+  if (studioEl) {
+    studioEl.href = buildUrlWithSeatContext('https://www.thispagedoesnotexist12345.com/Studio', context);
   }
 }
 
@@ -1647,4 +1696,166 @@ function loadLocalDraft() {
     fetch(SET_DEPARTURE_URL, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ seat_id: seatId, departure_date: selectedDate, email: passengerEmail })
-    }).then(functio... [truncated]
+    }).then(function (res) {
+      if (!res.ok) throw new Error('Failed to set departure');
+      return res.json();
+    }).then(function (data) {
+      showStatus('success', 'Departure set for ' + formatDateLabel(selectedDate));
+      if (confirmMsg) {
+        confirmMsg.textContent = 'Flight confirmed for ' + formatDateLabel(selectedDate) + '. Your operator has been notified.';
+        confirmMsg.classList.remove('hidden');
+      }
+      setTimeout(hideStatus, 4000);
+    }).catch(function (err) {
+      showStatus('error', 'Error setting date: ' + err.message);
+      if (errorMsg) {
+        errorMsg.textContent = 'Could not confirm flight: ' + err.message + '. Please try again or contact support.';
+        errorMsg.classList.remove('hidden');
+      }
+      if (optionsContainer) {
+        optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+      }
+    });
+  }
+
+  window.checkDepartureWindow = function (seatId) {
+    if (!seatId) return;
+    var token = getAuthToken();
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    fetch(BASE44_SEAT_API + '/' + seatId, { headers }).then(function (res) {
+      if (!res.ok) return; // Silent on failure; selector just stays hidden
+      return res.json();
+    }).then(function (seat) {
+      if (seat.departure_window_start && seat.departure_window_end && !seat.scheduled_departure_date) {
+        var panel = document.getElementById('departureSelectorPanel');
+        if (panel) panel.classList.remove('hidden');
+        renderDateOptions(seat.departure_window_start, seat.departure_window_end, seatId, seat.user_email);
+      }
+    }).catch(function () {});
+  };
+})();
+
+// ============================================================
+// BLOCKER-06: STUDIO STATEFUL ROUTING
+// ============================================================
+(function() {
+  const SEAT_STATUS_API = '/api/seat-status';
+  const ATS_MATCH_URL = '/Studio/ATS-Match'; // Mapping to ATS Match Analyzer
+  const SEAT_REQUEST_URL = '/Studio/Seat-Request'; // Mapping to seat request flow
+
+  function switchCtaState(state, label = '') {
+    const states = ['loading', 'no-seat', 'fit-check', 'request-seat', 'seat-active', 'error'];
+    states.forEach(s => {
+      const el = document.getElementById('b06-state-' + s);
+      if (el) el.style.display = (s === state) ? 'flex' : 'none';
+      // Loading and active are flex; buttons are block-ish but the containers work
+      if (el && (s === 'fit-check' || s === 'request-seat' || s === 'error' || s === 'no-seat')) {
+         el.style.display = (s === state) ? 'block' : 'none';
+      }
+    });
+    if (state === 'seat-active' && label) {
+      const labelEl = document.getElementById('b06-seat-status-label');
+      if (labelEl) labelEl.textContent = label;
+    }
+  }
+
+  async function fetchSeatStatus(seatId) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+      const res = await fetch(`${SEAT_STATUS_API}?seat_id=${encodeURIComponent(seatId)}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.error('[Blocker-06] Status fetch failed:', err);
+      throw err;
+    }
+  }
+
+  window.initStudioRouting = async function() {
+        const params = new URLSearchParams(window.location.search);
+    const seatId = params.get('seat_id') || sessionStorage.getItem('seat_id');
+    const tujCode = params.get('tuj_code') || sessionStorage.getItem('tuj_code') || '';
+    if (tujCode) sessionStorage.setItem('tuj_code', tujCode);
+    if (!seatId) {
+      switchCtaState('no-seat');
+      return;
+    }
+
+    switchCtaState('loading');
+
+    try {
+      const data = await fetchSeatStatus(seatId);
+      // Spec: dynamic swap based on resume_fit_check_status
+      // 'complete' -> Request a Seat
+      // others -> Run Fit Check
+      const status = data.resume_fit_check_status || 'unknown';
+
+      if (status === 'complete') {
+        switchCtaState('request-seat');
+        const btn = document.getElementById('b06-btn-request-seat');
+        if (btn) btn.href = `${SEAT_REQUEST_URL}?seat_id=${encodeURIComponent(seatId)}${tujCode ? '&tuj_code=' + encodeURIComponent(tujCode) : ''}`;
+      } else if (data.seat_status === 'active' || data.seat_status === 'held') {
+        // Fallback for already active seats
+        switchCtaState('seat-active', data.seat_status === 'active' ? 'Seat confirmed' : 'Seat held');
+      } else {
+        switchCtaState('fit-check');
+        const btn = document.getElementById('b06-btn-fit-check');
+        if (btn) btn.href = `${ATS_MATCH_URL}?seat_id=${encodeURIComponent(seatId)}${tujCode ? '&tuj_code=' + encodeURIComponent(tujCode) : ''}`;
+      }
+    } catch (err) {
+      switchCtaState('error');
+    }
+  };
+})();
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+  const seatId = params.get('seat_id');
+  const tujCode = params.get('tuj_code');
+  const resumeId = params.get('resume_id');
+  if (seatId) sessionStorage.setItem('seat_id', seatId);
+  if (tujCode) sessionStorage.setItem('tuj_code', tujCode);
+  if (window.initGatewayCtas) initGatewayCtas();
+  if (resumeId) currentResumeId = resumeId;
+  // Initialize Blocker-06 routing
+  if (window.initStudioRouting) {
+    window.initStudioRouting();
+  }
+
+  if (currentResumeId) {
+    await loadResumeFromCareerNavigator(currentResumeId);
+  } else {
+    loadLocalDraft();
+  }
+
+  initCareerNavigatorCard();
+  if (seatId) checkDepartureWindow(seatId);
+
+  // Auto-save setup
+  document.addEventListener('input', debouncedUpdatePreview);
+
+  // Theme toggle
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    });
+  }
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+});
+</script>
+</body>
+</html>
