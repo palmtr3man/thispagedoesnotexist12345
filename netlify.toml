@@ -38,6 +38,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/db-merge-01-apply"
+  to = "/.netlify/functions/db-merge-01-apply"
+  status = 200
+
+[[redirects]]
   from = "/api/seat-request"
   to = "/.netlify/functions/seat-request"
   status = 200
