@@ -109,6 +109,9 @@ function isDispatchLeaseActive(boarding_confirmation_dispatch_started_at) {
 
 const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-000').trim() || 'FL-CG-000';
 
+// SENDGRID-CG-001: dry-run mode — set BOARDING_DRY_RUN=true to log payload without sending
+const DRY_RUN = process.env.BOARDING_DRY_RUN === 'true';
+
 function resolveFlightCode(...values) {
   for (const value of values) {
     const rawValue = String(value ?? '').trim();
@@ -131,6 +134,49 @@ function resolveFlightCodeForSeat(seat) {
     seat.flight_label,
     seat.flight_number
   );
+}
+
+/**
+ * SENDGRID-CG-001: resolve passport_url — passenger-specific boarding pass route.
+ * Uses seat.passport_url if provided, otherwise constructs from MAIN_SITE_URL + seat_id.
+ */
+function resolvePassportUrl(seat, canonicalSeatId, tujCode) {
+  if (seat.passport_url) return seat.passport_url;
+  return `${MAIN_SITE_URL}/?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`;
+}
+
+/**
+ * SENDGRID-CG-001: resolve cabin_tier — normalised tier label for SendGrid template.
+ * Derived from the authoritative seat/passenger record.
+ */
+function resolveCabinTier(seat, isVipBoarding) {
+  const raw = String(
+    seat.cabin_tier || seat.cabin_class || seat.cabin || seat.boarding_type || ''
+  ).trim().toLowerCase();
+  if (raw === 'vip' || raw === 'first' || raw === 'first_class' || raw === 'paid') return 'first';
+  if (raw === 'sponsored') return 'sponsored';
+  return 'economy';
+}
+
+/**
+ * SENDGRID-CG-001: fail-closed pre-send validation.
+ * Returns an array of error strings; empty array means all required fields are valid.
+ */
+function validateBoardingPayload(dynamicData, label) {
+  const errors = [];
+  const requiredHttpsFields = ['passport_url', 'first_task_url', 'secondary_url'];
+  for (const field of requiredHttpsFields) {
+    const val = dynamicData[field];
+    if (!val || typeof val !== 'string' || val.trim() === '') {
+      errors.push(`${label}: required field '${field}' is absent or blank`);
+    } else if (!val.startsWith('https://')) {
+      errors.push(`${label}: required field '${field}' is not HTTPS — got: ${val.slice(0, 60)}`);
+    }
+  }
+  if (!dynamicData.cabin_tier || typeof dynamicData.cabin_tier !== 'string' || dynamicData.cabin_tier.trim() === '') {
+    errors.push(`${label}: required field 'cabin_tier' is absent or blank`);
+  }
+  return errors;
 }
 
 function resolveCabinClass(seat, isVipBoarding) {
@@ -156,6 +202,7 @@ function buildAlphaDynamicData(seat) {
   const tujCode = resolveTujCode(seat, seatId);
   const canonicalSeatId = tujCode || seatId;
   const flightCode = resolveFlightCodeForSeat(seat);
+  const passportUrl = resolvePassportUrl(seat, canonicalSeatId, tujCode);
 
   return {
     first_name: resolveFirstName(seat),
@@ -167,8 +214,10 @@ function buildAlphaDynamicData(seat) {
     flightcode: flightCode,
     flight_id: flightCode,
     cabin_class: resolveCabinClass(seat, false),
+    cabin_tier: resolveCabinTier(seat, false),
     departure_date: resolveDepartureDate(seat, false),
     seats_available: resolveSeatsAvailable(seat),
+    passport_url: passportUrl,
     first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
     secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
@@ -183,6 +232,7 @@ function buildVipDynamicData(seat) {
   const tujCode = resolveTujCode(seat, seatId);
   const canonicalSeatId = tujCode || seatId;
   const flightCode = resolveFlightCodeForSeat(seat);
+  const passportUrl = resolvePassportUrl(seat, canonicalSeatId, tujCode);
 
   return {
     first_name: resolveFirstName(seat),
@@ -194,8 +244,10 @@ function buildVipDynamicData(seat) {
     flightcode: flightCode,
     flight_id: flightCode,
     cabin_class: resolveCabinClass(seat, true),
+    cabin_tier: resolveCabinTier(seat, true),
     departure_date: resolveDepartureDate(seat, true),
     seats_available: resolveSeatsAvailable(seat),
+    passport_url: passportUrl,
     first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
     secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
@@ -324,6 +376,27 @@ async function sendSeatConfirmation(seat) {
   }
 
   const dynamicData = isVipBoarding ? buildVipDynamicData(seat) : buildAlphaDynamicData(seat);
+
+  // SENDGRID-CG-001: fail-closed pre-send validation
+  const validationErrors = validateBoardingPayload(dynamicData, `seat ${seatId}`);
+  if (validationErrors.length > 0) {
+    console.error('[sendgrid-integration] Payload validation failed — aborting send:', validationErrors);
+    return { success: false, error: `Payload validation failed: ${validationErrors.join('; ')}` };
+  }
+
+  // SENDGRID-CG-001: dry-run mode — log payload and exit without sending
+  if (DRY_RUN) {
+    console.log('[sendgrid-integration] DRY RUN — payload validated, no email sent:', JSON.stringify({
+      seatId,
+      tujCode,
+      recipientEmail,
+      boardingType,
+      templateIds,
+      dynamicData
+    }, null, 2));
+    return { success: true, dryRun: true };
+  }
+
   const sequence = isVipBoarding
     ? [
         { label: 'vip_boarding_pass_v1', templateId: templateIds.vipBoardingPass },
