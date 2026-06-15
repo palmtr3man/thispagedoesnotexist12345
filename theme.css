@@ -1,0 +1,13 @@
+:root {
+  --neon-bg: #0a0b10;
+  --neon-text: #e2e8f0;
+  --neon-accent: #00e5ff;
+}
+body {
+  background-color: var(--neon-bg);
+  color: var(--neon-text);
+}
+.neon-button {
+  border: 2px solid var(--neon-accent);
+  box-shadow: 0 0 10px var(--neon-accent);
+}
