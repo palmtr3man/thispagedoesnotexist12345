@@ -135,25 +135,21 @@
   from = "/Dashboard"
   to = "/?status=boarded"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/Dashboard/*"
   to = "/?status=boarded"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/dashboard"
   to = "/?status=boarded"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/dashboard/*"
   to = "/?status=boarded"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/Passengers"
