@@ -3,7 +3,12 @@
  *
  * Consumes the Beehiiv sync canon contract, writes one row to
  * public.beehiiv_sync_log per invocation, and resolves cohort audience
- * against Supabase seat_requests + Beehiiv active subscribers.
+ * against the public.passengers table (flight_tag = flight_key) plus
+ * Beehiiv active subscribers.
+ *
+ * Audience source: public.passengers WHERE flight_tag = flight_key AND
+ * intake_status != 'cancelled'. Falls back to seat_requests if no
+ * passengers are found for the given flight_key (legacy path).
  *
  * Phase 2: dry_run by default. Live Beehiiv subscriber mutation requires
  * dry_run=false AND BEEHIIV_SYNC_LIVE_ENABLED=true.
@@ -20,12 +25,12 @@
  *
  * Request body:
  *   {
- *     "flight_key": "FL_051126",
- *     "flight_id": "FL 051126",
- *     "cohort_id": "gemini-alpha-2026-05-11",
+ *     "flight_key": "FL_CG_001",
+ *     "flight_id": "FL CG 001",
+ *     "cohort_id": "alpha",
  *     "dry_run": true,
- *     "segment_key": "gemini-alpha",
- *     "boarding_opened_at": "2026-05-11T12:34:00Z",
+ *     "segment_key": null,
+ *     "boarding_opened_at": null,
  *     "boarding_closed_at": null
  *   }
  */
@@ -107,22 +112,43 @@ async function finalizeAuditRow(supabaseUrl, supabaseKey, id, patch) {
   );
 }
 
-async function fetchSeatRequestsForFlight(supabaseUrl, supabaseKey, flightKey) {
-  const url = `${supabaseUrl}/rest/v1/seat_requests?flight_id=eq.${encodeURIComponent(flightKey)}&status=neq.cancelled&select=id,email,seat_id,status,cabin_class&limit=500`;
+/**
+ * Primary audience source: public.passengers WHERE flight_tag = flightKey.
+ * Excludes passengers whose intake_status is 'cancelled'.
+ * Returns rows shaped as { id, email, seat_id, intake_status, cabin_tier }.
+ */
+async function fetchPassengersForFlight(supabaseUrl, supabaseKey, flightKey) {
+  const params = new URLSearchParams({
+    flight_tag: `eq.${flightKey}`,
+    intake_status: 'neq.cancelled',
+    select: 'id,email,seat_id,intake_status,cabin_tier',
+    limit: '500',
+  });
+  const url = `${supabaseUrl}/rest/v1/passengers?${params.toString()}`;
   const rows = await supabaseFetch(url, supabaseKey, { prefer: 'return=representation' });
   return Array.isArray(rows) ? rows : [];
 }
 
-async function fetchCohortById(supabaseUrl, supabaseKey, cohortId) {
-  const url = `${supabaseUrl}/rest/v1/cohorts?id=eq.${encodeURIComponent(cohortId)}&limit=1`;
-  const rows = await supabaseFetch(url, supabaseKey, { prefer: 'return=representation' });
-  return Array.isArray(rows) && rows[0] ? rows[0] : null;
-}
-
-async function fetchCohortByFlightKey(supabaseUrl, supabaseKey, flightKey) {
-  const url = `${supabaseUrl}/rest/v1/cohorts?flight_id=eq.${encodeURIComponent(flightKey)}&limit=1`;
-  const rows = await supabaseFetch(url, supabaseKey, { prefer: 'return=representation' });
-  return Array.isArray(rows) && rows[0] ? rows[0] : null;
+/**
+ * Legacy fallback: public.seat_requests WHERE flight_id = flightKey.
+ * Used only when fetchPassengersForFlight returns zero rows.
+ */
+async function fetchSeatRequestsForFlight(supabaseUrl, supabaseKey, flightKey) {
+  const params = new URLSearchParams({
+    flight_id: `eq.${flightKey}`,
+    status: 'neq.cancelled',
+    select: 'id,email,seat_id,status,cabin_class',
+    limit: '500',
+  });
+  const url = `${supabaseUrl}/rest/v1/seat_requests?${params.toString()}`;
+  try {
+    const rows = await supabaseFetch(url, supabaseKey, { prefer: 'return=representation' });
+    return Array.isArray(rows) ? rows : [];
+  } catch (err) {
+    // seat_requests may not exist in all environments; treat as empty
+    console.warn('[beehiiv-sync] seat_requests fallback failed:', err.message);
+    return [];
+  }
 }
 
 async function beehiivFetch(path, options = {}) {
@@ -254,7 +280,14 @@ async function runLiveBeehiivSync(matchedEntries, subscriberByEmail, input) {
   return { updated, failed, skipped, failures };
 }
 
-function buildAudiencePlan(seatRequests, beehiivSubscribers, segmentKey) {
+/**
+ * Build the audience plan from a list of passenger/seat rows and the
+ * current Beehiiv active subscriber list.
+ *
+ * Accepts rows from either public.passengers or public.seat_requests;
+ * both shapes expose at minimum { email, seat_id }.
+ */
+function buildAudiencePlan(audienceRows, beehiivSubscribers, segmentKey) {
   const subscriberByEmail = new Map();
   for (const sub of beehiivSubscribers) {
     const email = subscriberEmail(sub);
@@ -265,34 +298,35 @@ function buildAudiencePlan(seatRequests, beehiivSubscribers, segmentKey) {
   const matched = [];
   const skipped = [];
 
-  for (const seat of seatRequests) {
-    const email = String(seat.email || '').trim().toLowerCase();
+  for (const row of audienceRows) {
+    const email = String(row.email || '').trim().toLowerCase();
     if (!email) {
-      skipped.push({ seat_id: seat.seat_id, reason: 'missing_email' });
+      skipped.push({ seat_id: row.seat_id, reason: 'missing_email' });
       continue;
     }
 
     const subscriber = subscriberByEmail.get(email);
     if (!subscriber) {
-      skipped.push({ seat_id: seat.seat_id, email_domain: email.split('@')[1] || null, reason: 'not_in_beehiiv_active' });
+      skipped.push({ seat_id: row.seat_id, email_domain: email.split('@')[1] || null, reason: 'not_in_beehiiv_active' });
       continue;
     }
 
     if (segmentKey) {
       const tags = normaliseTags(subscriber).map((tag) => tag.toLowerCase());
       if (!tags.includes(segmentKey.toLowerCase())) {
-        skipped.push({ seat_id: seat.seat_id, email_domain: email.split('@')[1] || null, reason: 'segment_key_mismatch' });
+        skipped.push({ seat_id: row.seat_id, email_domain: email.split('@')[1] || null, reason: 'segment_key_mismatch' });
         continue;
       }
     }
 
     matched.push({
-      seat_id: seat.seat_id,
+      seat_id: row.seat_id,
       email,
       email_domain: email.split('@')[1] || null,
       beehiiv_subscription_id: subscriber.id || null,
-      status: seat.status,
-      cabin_class: seat.cabin_class,
+      // Preserve whichever status field is present (passengers vs seat_requests)
+      status: row.intake_status || row.status || null,
+      cabin_class: row.cabin_tier || row.cabin_class || null,
     });
   }
 
@@ -356,13 +390,18 @@ exports.handler = async function handler(event) {
       throw new Error('beehiiv_sync_log insert did not return an id');
     }
 
-    const cohortById = await fetchCohortById(supabaseUrl, supabaseKey, input.cohort_id);
-    const cohortByFlight = cohortById ? null : await fetchCohortByFlightKey(supabaseUrl, supabaseKey, input.flight_key);
-    const cohort = cohortById || cohortByFlight;
+    // --- Audience resolution ---
+    // Primary: passengers table (flight_tag = flight_key)
+    // Fallback: seat_requests table (flight_id = flight_key, legacy)
+    let audienceRows = await fetchPassengersForFlight(supabaseUrl, supabaseKey, input.flight_key);
+    const audienceSource = audienceRows.length > 0 ? 'passengers' : 'seat_requests';
+    if (audienceRows.length === 0) {
+      console.log(`[beehiiv-sync] No passengers found for flight_tag=${input.flight_key}, falling back to seat_requests`);
+      audienceRows = await fetchSeatRequestsForFlight(supabaseUrl, supabaseKey, input.flight_key);
+    }
 
-    const seatRequests = await fetchSeatRequestsForFlight(supabaseUrl, supabaseKey, input.flight_key);
     const beehiivSubscribers = await listActiveBeehiivSubscribers();
-    const audience = buildAudiencePlan(seatRequests, beehiivSubscribers, input.segment_key);
+    const audience = buildAudiencePlan(audienceRows, beehiivSubscribers, input.segment_key);
 
     const liveEnabled = boolEnv('BEEHIIV_SYNC_LIVE_ENABLED', false);
     let status = 'completed';
@@ -373,9 +412,8 @@ exports.handler = async function handler(event) {
     const metadata = {
       phase: 'beehiiv_issue_2',
       invocation: 'netlify/beehiiv-sync',
-      cohort_found: Boolean(cohort),
-      cohort_lookup: cohortById ? 'id' : (cohortByFlight ? 'flight_key' : 'none'),
-      seat_request_count: seatRequests.length,
+      audience_source: audienceSource,
+      audience_row_count: audienceRows.length,
       beehiiv_active_count: beehiivSubscribers.length,
       matched_sample: audience.matched.slice(0, 10).map(({ email, ...rest }) => rest),
       skipped_sample: audience.skipped.slice(0, 10),
