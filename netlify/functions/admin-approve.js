@@ -7,10 +7,11 @@
  *   3. Checks request is still in 'pending' status (idempotency guard)
  *   4. Updates Supabase status: pending → approved
  *   5. Generates a TUJ-XXXXXX seat_id (if not already assigned)
- *   6. Fires the dual boarding email sequence via sendSeatConfirmation()
+ *   6. [DB-MERGE-01 P3] Synchronously upserts passenger into public.passengers
+ *   7. Fires the dual boarding email sequence via sendSeatConfirmation()
  *      (boarding_pass_free/paid_v1 + boarding_instructions_free/paid_v1)
- *   7. Updates Supabase status: approved → boarded
- *   8. Returns { ok: true, seat_id, email }
+ *   8. Updates Supabase status: approved → boarded
+ *   9. Returns { ok: true, seat_id, email }
  *
  * Required env vars:
  *   SEC06_INTERNAL_TOKEN          — Admin/internal auth (header: x-internal-token or Authorization Bearer)
@@ -171,6 +172,30 @@ exports.handler = async function (event) {
   } catch (err) {
     console.error('[admin-approve] Supabase approve update failed:', err.message);
     return { statusCode: 500, headers, body: JSON.stringify({ ok: false, error: 'Failed to update seat request status' }) };
+  }
+
+  // --- [DB-MERGE-01 P3] Synchronous Passenger Upsert (Option A: Dual-Write) ---
+  try {
+    await fetch(
+      `${supabaseUrl}/rest/v1/passengers?on_conflict=email`,
+      {
+        method:  'POST',
+        headers: { ...sbHeaders, Prefer: 'return=minimal' },
+        body:    JSON.stringify({
+          email,
+          first_name:    firstName,
+          last_name:     seatRequest.last_name || null,
+          seat_id:       seatId,
+          flight_tag:    flight_id,
+          intake_status: 'complete',
+          updated_at:    new Date().toISOString()
+        })
+      }
+    );
+    console.log(`[admin-approve] public.passengers upserted for ${email}`);
+  } catch (err) {
+    // Non-fatal — log for reconciliation, do not block boarding
+    console.error('[admin-approve] public.passengers upsert failed (non-fatal):', err.message);
   }
 
   // --- BLOCKER-09: Create seat_requests record (SeatRequest entity) ---
