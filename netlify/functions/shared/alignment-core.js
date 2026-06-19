@@ -84,11 +84,28 @@ async function fetchBase44User(userId) {
 async function fetchSupabaseSeatRequest(seatId) {
   if (!process.env.SUPABASE_URL || !seatId) return null;
   try {
-    const url = `${process.env.SUPABASE_URL}/rest/v1/seat_requests?seat_id=eq.${encodeURIComponent(seatId)}&limit=1`;
-    const res = await timedFetch(url, { headers: supabaseHeaders() });
-    if (!res.ok) return null;
-    const rows = await res.json();
-    return rows[0] ?? null;
+    // [DB-MERGE-01 P4] Repoint primary lookup to passengers table.
+    // seat_requests is now demoted to an immutable historical audit fallback.
+    const passengerUrl = `${process.env.SUPABASE_URL}/rest/v1/passengers?seat_id=eq.${encodeURIComponent(seatId)}&limit=1`;
+    const pRes = await timedFetch(passengerUrl, { headers: supabaseHeaders() });
+    if (pRes.ok) {
+      const pRows = await pRes.json();
+      if (pRows[0]) {
+        // Map passengers schema to expected seat_request shape for alignment loop compatibility
+        return {
+          ...pRows[0],
+          status: pRows[0].intake_status,
+          cabin_class: pRows[0].cabin_tier
+        };
+      }
+    }
+
+    // Historical fallback to seat_requests (Audit Log)
+    const auditUrl = `${process.env.SUPABASE_URL}/rest/v1/seat_requests?seat_id=eq.${encodeURIComponent(seatId)}&limit=1`;
+    const aRes = await timedFetch(auditUrl, { headers: supabaseHeaders() });
+    if (!aRes.ok) return null;
+    const aRows = await aRes.json();
+    return aRows[0] ?? null;
   } catch (_) { return null; }
 }
 
