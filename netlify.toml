@@ -34,6 +34,12 @@
   force = true
 
 [[redirects]]
+  from = "https://thispagedoesnotexist12345.com/*"
+  to = "https://www.thispagedoesnotexist12345.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/api/seat-status"
   to = "/.netlify/functions/seat-status"
   status = 200
