@@ -28,6 +28,12 @@
     Access-Control-Allow-Headers = "Content-Type, Authorization, x-internal-token, x-scheduler-secret"
 
 [[redirects]]
+  from = "http://thispagedoesnotexist12345.com/*"
+  to = "https://www.thispagedoesnotexist12345.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/api/seat-status"
   to = "/.netlify/functions/seat-status"
   status = 200
@@ -37,7 +43,6 @@
   to = "/.netlify/functions/health"
   status = 200
 
-[[redirects]]
 [[redirects]]
   from = "/api/seat-request"
   to = "/.netlify/functions/seat-request"
