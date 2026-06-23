@@ -65,7 +65,7 @@ const HEADERS = {
  * Fetch the current Seat record from Base44 by tuj_code.
  */
 async function fetchSeat(base44SeatUrl, seatId) {
-  const apiKey = process.env.BASE44APIKEY || '';
+  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
   // Query by tuj_code field
   const url = `${base44SeatUrl}?tuj_code=${encodeURIComponent(seatId)}`;
   const res = await fetch(url, {
@@ -93,7 +93,7 @@ async function fetchSeat(base44SeatUrl, seatId) {
  * Uses the internal _id from the fetched seat record.
  */
 async function patchSeat(base44SeatUrl, seat, fields) {
-  const apiKey = process.env.BASE44APIKEY || '';
+  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
   const internalId = seat.id || seat._id;
   const res = await fetch(`${base44SeatUrl}/${internalId}`, {
     method:  'PUT',
