@@ -107,7 +107,7 @@ function isDispatchLeaseActive(boarding_confirmation_dispatch_started_at) {
   return Date.now() - startedMs < DISPATCH_LEASE_MS;
 }
 
-const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-000').trim() || 'FL-CG-000';
+const CANONICAL_FLIGHT_ID = (process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-001').trim() || 'FL-CG-001';
 
 // SENDGRID-CG-001: dry-run mode — set BOARDING_DRY_RUN=true to log payload without sending
 const DRY_RUN = process.env.BOARDING_DRY_RUN === 'true';
@@ -117,13 +117,12 @@ function resolveFlightCode(...values) {
     const rawValue = String(value ?? '').trim();
     if (!rawValue) continue;
 
-    if (/^FL(?:[\s-]?VIP)?[\s-]?(?:051126|CG[-_\s]?000)$/i.test(rawValue)) {
-      return CANONICAL_FLIGHT_ID || 'FL-CG-000';
+        if (/^FL(?:[\s-]?VIP)?[\s-]?(?:051126|CG[-_\s]?00[01])$/i.test(rawValue)) {
+      return CANONICAL_FLIGHT_ID || 'FL-CG-001';
     }
-
     return rawValue;
   }
-  return CANONICAL_FLIGHT_ID || 'FL-CG-000';
+  return CANONICAL_FLIGHT_ID || 'FL-CG-001';
 }
 
 function resolveFlightCodeForSeat(seat) {
