@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.seat_requests (
   first_name              TEXT,
   last_name               TEXT,
   cabin_class             TEXT NOT NULL DEFAULT 'Economy',  -- 'Economy' | 'First' | 'Sponsored'
-  flight_id               TEXT NOT NULL DEFAULT 'FL032126',
+  flight_id               TEXT NOT NULL DEFAULT 'FL-CG-002',
   status                  TEXT NOT NULL DEFAULT 'opened'
                             CHECK (status IN ('opened', 'boarded', 'departed', 'cancelled')),
   boarding_emails_sent    BOOLEAN NOT NULL DEFAULT FALSE,
@@ -51,7 +51,7 @@ CREATE POLICY "service_role_all_seat_requests"
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.cohorts (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  flight_id         TEXT NOT NULL UNIQUE,               -- e.g. 'FL032126'
+  flight_id         TEXT NOT NULL UNIQUE,               -- e.g. 'FL-CG-002'
   flight_label      TEXT,                               -- e.g. 'TUJ Alpha Flight 1'
   status            TEXT NOT NULL DEFAULT 'active'
                       CHECK (status IN ('active', 'boarding', 'departed', 'closed')),
@@ -62,9 +62,9 @@ CREATE TABLE IF NOT EXISTS public.cohorts (
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Seed the alpha cohort (FL032126) — idempotent
+-- Seed the alpha cohort (FL-CG-002) — idempotent
 INSERT INTO public.cohorts (flight_id, flight_label, status, open_count, max_seats)
-VALUES ('FL032126', 'TUJ Alpha Flight 1', 'active', 0, 5)
+VALUES ('FL-CG-002', 'TUJ Alpha Flight 1', 'active', 0, 5)
 ON CONFLICT (flight_id) DO NOTHING;
 
 -- RLS: service role can read/write; no public access
