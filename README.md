@@ -1,3 +1,1 @@
-# The Ultimate Journey
-
-The Ultimate Journey career platform and broken-link recovery tool. This repository powers the primary .com launch surface, landing pages, and flight-manifest experience.
+IyBUaGUgVWx0aW1hdGUgSm91cm5leQoKVGhlIFVsdGltYXRlIEpvdXJuZXkgY2FyZWVyIHBsYXRmb3JtIGFuZCBicm9rZW4tbGluayByZWNvdmVyeSB0b29sLiBUaGlzIHJlcG9zaXRvcnkgcG93ZXJzIHRoZSBwcmltYXJ5IC5jb20gbGF1bmNoIHN1cmZhY2UsIGxhbmRpbmcgcGFnZXMsIGFuZCBmbGlnaHQtbWFuaWZlc3QgZXhwZXJpZW5jZS4K
