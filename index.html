@@ -829,6 +829,23 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* ── Center the canonical numbered nav as a group while keeping labels left-aligned. */
+    .btn-row--cadence,
+    .mc-nav-row--cadence {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn-row--cadence .btn,
+    .mc-nav-row--cadence .mc-nav-btn,
+    .mc-nav-row--cadence .mc-nav-btn--primary,
+    .mc-nav-row--cadence .mc-nav-btn--secondary {
+      width: min(100%, 18rem);
+      min-width: 0;
+      justify-content: flex-start;
+      text-align: left;
+    }
+
     /* ── Mission Control: Responsive ─────────────────────────────────────── */
     @media (max-width: 400px) {
       .mc-tiles { grid-template-columns: 1fr; }
@@ -2027,10 +2044,10 @@
       <div class="mc-section mc-section--paths">
         <h3 class="mc-section-title">📡 Your Paths</h3>
         <div class="mc-nav-row mc-nav-row--cadence" aria-label="Numbered path activation buttons">
-          <a class="mc-nav-btn mc-nav-btn--primary" href="https://www.thispagedoesnotexist12345.com/" target="_blank" rel="noopener noreferrer">1. MISSION CONTROL</a>
+          <a class="mc-nav-btn mc-nav-btn--primary" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">1. SIGNAL</a>
           <a class="mc-nav-btn mc-nav-btn--secondary" href="/Studio" target="_blank" rel="noopener noreferrer">2. STUDIO</a>
-          <a class="mc-nav-btn mc-nav-btn--secondary" href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer">3. SIGNAL</a>
-          <a class="mc-nav-btn mc-nav-btn--secondary" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">4. SYSTEMS</a>
+          <a class="mc-nav-btn mc-nav-btn--secondary" href="https://www.thispagedoesnotexist12345.tech" target="_blank" rel="noopener noreferrer">3. SYSTEMS</a>
+          <a class="mc-nav-btn mc-nav-btn--secondary" href="https://www.thispagedoesnotexist12345.com/" target="_blank" rel="noopener noreferrer">4. MISSION CONTROL</a>
           <a class="mc-nav-btn mc-nav-btn--secondary" href="https://www.buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer">5. SUPPORT THE JOURNEY</a>
         </div>
         <div class="puzzle-tracker" id="puzzleTrackerDashboard">
@@ -2344,7 +2361,7 @@
 
       <!-- Gate-closed locked state (hidden when gate is open) -->
       <div class="gate-locked-msg" style="display:none">
-        🔒 Next Flight — Complete the path to unlock
+        🔒 Next Flight — Signal → Studio → Systems
       </div>
 
       <!-- Gate-closed reveal panel (hidden until all 3 paths clicked) -->
@@ -2360,10 +2377,10 @@
 
     <!-- BLACK GLASS BUTTONS -->
     <div class="btn-row btn-row--cadence" aria-label="Numbered Black Glass path cadence">
-      <a href="https://www.thispagedoesnotexist12345.com/" class="btn" data-path="mission-control" target="_blank" rel="noopener noreferrer" data-umami-event="Mission Control Click">1. MISSION CONTROL</a>
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">1. SIGNAL</a>
       <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">2. STUDIO</a>
-      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">3. SIGNAL</a>
-      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">4. SYSTEMS</a>
+      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">3. SYSTEMS</a>
+      <a href="https://www.thispagedoesnotexist12345.com/" class="btn" data-path="mission-control" target="_blank" rel="noopener noreferrer" data-umami-event="Mission Control Click">4. MISSION CONTROL</a>
       <a href="https://www.buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">5. SUPPORT THE JOURNEY</a>
     </div>
 
@@ -2390,7 +2407,7 @@
     <!-- Option B: About / Footer Links -->
     <section style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(168,196,0,0.1); font-size:0.8rem;">
       <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">About / Resources</a>
-      <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
+      <a href="https://peerlist.io/wagonman" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">Community (Peerlist)</a>
       <a href="https://www.buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(168,196,0,0.6); text-decoration:none; margin:0 0.75rem;">☕️ Support</a>
     </section>
     <footer>
@@ -2431,7 +2448,7 @@
             return '';
           }
         }
-        return /^TUJ-[A-Z2-9]{6}$/.test(sessionSeatId) ? sessionSeatId : '';
+        return /^TUJ-[A-Z2-9]{6}$/.test(sessionStorage.getItem('seat_id')) ? sessionStorage.getItem('seat_id') : '';
       }
 
       function getPreservedTujCode() {
@@ -2714,97 +2731,175 @@
         function setDepartureDate(text) {
           if (!depDateEl) return;
           var dot = depDateEl.querySelector('.arriving-dot');
-          if (dot && dot.nextSibling) {
-            dot.nextSibling.textContent = text;
-          } else if (dot) {
-            depDateEl.appendChild(document.createTextNode(text));
-          }
+          depDateEl.innerHTML = '';
+          if (dot) depDateEl.appendChild(dot);
+          depDateEl.appendChild(document.createTextNode(text || ''));
         }
 
-        // ── 1. Flight label badge (#flight-number) ───────────────────────
-        // Driven by Admin → NextFlightConfig → next_flight_number
+        // ── 1. Flight Identity ──────────────────────────────────────────────
         if (flightEl) {
-          var label = status.flight_label && status.flight_label.trim()
-            ? status.flight_label.trim() + ' ✈️'
-            : 'Next Departure ✈️';
-          flightEl.textContent = label;
+          flightEl.textContent = status.next_flight_label || 'Next Departure ✈️';
         }
 
-        // ── 2. Gate / status badge (#dock-status-badge) ───────────────────
-        // Driven by Admin → NextFlightConfig → next_flight_status
-        // Base44 emits the collapsed key (nextflightstatus); accept both forms.
-        var nextFlightStatus = status.nextflightstatus || status.next_flight_status || 'SCHEDULED';
-        var labels = statusLabels(nextFlightStatus);
-        if (fullEl)  fullEl.textContent  = labels.full;
+        // ── 2. Dock Status Badges ───────────────────────────────────────────
+        if (dockEl) {
+          dockEl.textContent = status.gate_status === 'open' ? 'GATE OPEN' : 'GATE CLOSED';
+        }
+        var labels = statusLabels(status.next_flight_status);
+        if (fullEl)  fullEl.textContent = labels.full;
         if (shortEl) shortEl.textContent = labels.short;
 
-        // ── 3. Arrival Times ──────────────────────────────────────────────
-        // Driven by Admin → NextFlightConfig → next_arrival_date
-        var arrTimeStr = fmtTime(status.next_arrival_date);
-        var arrDateStr = fmtDate(status.next_arrival_date);
-        if (arrivalTextEl && arrTimeStr) arrivalTextEl.textContent = arrTimeStr;
-        if (arrivalDateTextEl && arrDateStr) arrivalDateTextEl.textContent = arrDateStr;
+        // ── 3. Arrival/Departure Dates ──────────────────────────────────────
+        if (arrivalDateTextEl) arrivalDateTextEl.textContent = fmtDate(status.next_arrival_date) || 'Next Arrival';
+        if (arrivalTextEl)     arrivalTextEl.textContent     = fmtTime(status.next_arrival_date) || '—';
+        setDepartureDate(fmtDate(status.next_departure_date) || 'Next Departure');
+        if (depTimeBadgeEl)    depTimeBadgeEl.textContent    = fmtTime(status.next_departure_date) || '—';
 
-        // ── 4. Departure Times + Date ────────────────────────────────────
-        // Driven by Admin → NextFlightConfig → next_departure_date
-        var depTimeStr = fmtTime(status.next_departure_date);
-        var depDateStr = fmtDate(status.next_departure_date);
-        if (depTimeBadgeEl && depTimeStr) depTimeBadgeEl.textContent = depTimeStr;
-        if (depDateStr) setDepartureDate(depDateStr);
+        // ── 4. CTA Visibility & Intake Mode ─────────────────────────────────
+        var gateOpen = status.gate_status === 'open';
+        var flightFull = status.open_count >= 5;
 
-        // ── 5. Intake logic (open/closed) + Seat Count ───────────────────
-        // Gate status (from Admin config) + Seat count (from confirmed_count row in Base44)
-        var isGateOpen = status.gate_status === 'open';
-        var seatsConfirmed = parseInt(status.confirmed_count, 10) || 0;
-        var isFlightFull = seatsConfirmed >= 5;
+        // Reset visibility
+        if (waitlistBtn)     waitlistBtn.style.display     = 'none';
+        if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
+        if (seatForm)        seatForm.style.display        = 'none';
+        if (seatConfirm)     seatConfirm.style.display     = 'none';
+        if (lockedMsg)       lockedMsg.style.display       = 'none';
+        if (gateReveal)      gateReveal.style.display      = 'none';
 
-        // Update dock label
-        if (dockEl) {
-          dockEl.textContent = isGateOpen ? (isFlightFull ? 'FLIGHT FULL' : 'GATE OPEN') : 'GATE CLOSED';
-        }
-
-        // Update seat-count subtext (F148)
-        if (ctaSubtextEl) {
-          ctaSubtextEl.style.display = 'block';
-          if (isFlightFull) {
-            ctaSubtextEl.textContent = 'Flight is full (5/5 seats). Join the waitlist for the next departure.';
+        if (gateOpen) {
+          document.body.classList.remove('gate-closed');
+          if (flightFull) {
+            if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'inline-block';
+            if (ctaSubtextEl) {
+              ctaSubtextEl.textContent = 'This flight is currently full. Join Signal to stay on the manifest.';
+              ctaSubtextEl.style.display = 'block';
+            }
           } else {
-            var left = 5 - seatsConfirmed;
-            ctaSubtextEl.textContent = left + ' ' + (left === 1 ? 'seat' : 'seats') + ' remaining. One flight. Five seats.';
+            if (waitlistBtn) waitlistBtn.style.display = 'inline-block';
+            if (ctaSubtextEl) {
+              ctaSubtextEl.textContent = 'Request a seat. Five seats. One flight.';
+              ctaSubtextEl.style.display = 'block';
+            }
           }
-        }
-
-        // Button visibility matrix
-        if (isGateOpen) {
-          if (isFlightFull) {
-            // Open but full → newsletter waitlist
-            if (waitlistBtn)     waitlistBtn.style.display = 'none';
-            if (joinWaitlistBtn) joinWaitlistBtn.style.display = '';
-          } else {
-            // Open and has seats → standard seat-request flow
-            if (waitlistBtn)     waitlistBtn.style.display = '';
-            if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
-          }
-          if (lockedMsg) lockedMsg.style.display = 'none';
-          if (gateReveal) gateReveal.style.display = 'none';
         } else {
-          // Gate closed → hide all CTAs, show "Next Flight — Complete path" message
-          if (waitlistBtn)     waitlistBtn.style.display = 'none';
-          if (joinWaitlistBtn) joinWaitlistBtn.style.display = 'none';
-          if (lockedMsg)       lockedMsg.style.display = 'block';
-
-          // Guidance update for closed state
-          if (nextStepGuidance) {
-            nextStepGuidance.innerHTML = 'The gate is currently closed. Activate all paths to see the next assembling cohort.';
+          document.body.classList.add('gate-closed');
+          if (lockedMsg) lockedMsg.style.display = 'block';
+          if (ctaSubtextEl) ctaSubtextEl.style.display = 'none';
+          // Check puzzle stage from localStorage
+          if (localStorage.getItem('puzzle-stage') === 'unlocked') {
+            if (gateReveal) gateReveal.style.display = 'block';
+            if (lockedMsg) lockedMsg.style.display = 'none';
           }
         }
 
-        // Notify countdown IIFE that we have the departure date
+        // ── 5. Status Note / Guidance ───────────────────────────────────────
+        if (nextStepGuidance) {
+          if (gateOpen) {
+            nextStepGuidance.innerHTML = flightFull
+              ? 'This flight is full. Use the <strong>Join the Waitlist</strong> button above to stay updated.'
+              : 'Next step: Use the <strong>Request a Seat</strong> button above to board.';
+          } else {
+            nextStepGuidance.innerHTML = 'The gate is currently closed. Activate the paths below to unlock the next move.';
+          }
+        }
+
+        // Signal readiness for the countdown IIFE
         window.__seatStatusReady = status;
       };
 
-      // Initial run
+      // Initial call on load
       window.__applySeatGate();
+
+    })();
+
+    // ── Countdown Timer (Drives #countdown-wrap) ───────────────────────────
+    (function () {
+      var daysEl    = document.getElementById('cd-days');
+      var hoursEl   = document.getElementById('cd-hours');
+      var minutesEl = document.getElementById('cd-minutes');
+      var secondsEl = document.getElementById('cd-seconds');
+      var wrapEl    = document.getElementById('countdown-wrap');
+      var depMsgEl  = document.getElementById('countdown-departed');
+
+      function update() {
+        // Wait for __seatStatusReady to be populated by applySeatGate()
+        var status = window.__seatStatusReady;
+        if (!status || !status.next_departure_date) return;
+
+        var target = new Date(status.next_departure_date).getTime();
+        var now    = new Date().getTime();
+        var diff   = target - now;
+
+        if (diff <= 0) {
+          if (wrapEl)   wrapEl.style.display   = 'none';
+          if (depMsgEl) depMsgEl.style.display = 'block';
+          return;
+        }
+
+        if (wrapEl)   wrapEl.style.display   = 'grid';
+        if (depMsgEl) depMsgEl.style.display = 'none';
+
+        var d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        var h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        var s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (daysEl)    daysEl.textContent    = d.toString().padStart(2, '0');
+        if (hoursEl)   hoursEl.textContent   = h.toString().padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = m.toString().padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = s.toString().padStart(2, '0');
+      }
+
+      setInterval(update, 1000);
+      update();
+    })();
+
+    // ── TUJ Global State Machine (Preserves Preserved Auth/Session) ─────────
+    (function () {
+      /**
+       * Primary state machine for the Corporate G.A.M.E.S. landing experience.
+       * Handles preserved session data (seat_id, tuj_code) and drives transitions
+       * between loading, landing, dashboard, and departed states.
+       */
+      async function sync() {
+        var seatId  = window.__TUJ.getPreservedSeatId();
+        var tujCode = window.__TUJ.getPreservedTujCode();
+        var status  = new URLSearchParams(window.location.search).get('status');
+        var forceState = new URLSearchParams(window.location.search).get('force_state');
+
+        // Transition from loading -> landing as default
+        document.body.dataset.state = 'landing';
+
+        // 1. If force_state is present, use it
+        if (forceState) {
+          document.body.dataset.state = forceState;
+          return;
+        }
+
+        // 2. If seatId is valid (and optionally confirmed by ?status=boarded), show dashboard
+        if (seatId && /^TUJ-[A-Z2-9]{6}$/.test(seatId)) {
+          document.body.dataset.state = 'dashboard';
+          var seatEl = document.getElementById('dashboard-seat-id');
+          if (seatEl) seatEl.textContent = seatId;
+          
+          if (status === 'boarded') {
+            var banner = document.getElementById('welcome-aboard-banner');
+            if (banner) banner.style.display = 'block';
+          }
+          return;
+        }
+
+        // 3. Fallback to landing
+        document.body.dataset.state = 'landing';
+      }
+
+      // Run sync on load
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', sync, { once: true });
+      } else {
+        sync();
+      }
     })();
 
   </script>
