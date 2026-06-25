@@ -15,6 +15,7 @@
  *   SUPABASE_SERVICE_ROLE_KEY     — Supabase service role key
  *   SENDGRID_API_KEY              — SendGrid API key
  *   SENDGRID_FROM_EMAIL           — Sender address
+ *   SENDER_EMAIL                  — Optional shared sender fallback; should match SENDGRID_FROM_EMAIL
  *
  * Request body (JSON):
  *   { seat_request_id: string, reason?: string }
@@ -294,7 +295,7 @@ exports.handler = async function (event) {
 
    // --- Fire next_flight_waitlist_v1 email (graceful — non-blocking) ---
   const apiKey   = process.env.SENDGRID_API_KEY;
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || process.env.SENDER_EMAIL || 'support@thispagedoesnotexist12345.com';
   let emailSent = false;
   if (apiKey) {
     emailSent = await sendDenialEmail({ email, firstName, apiKey, fromEmail });
