@@ -15,7 +15,9 @@
  *   SENDGRID_TEMPLATE_SEAT_REQUEST — seat_request_acknowledgement_v1 template ID (canonical fallback defined in sendgrid-templates.js)
  *   PLATFORM_URL             — Platform URL injected into email (default: https://www.thispagedoesnotexist12345.com)
  *   SIGNAL_URL               — Signal newsletter URL injected into email
- *   BASE44_SEAT_REQUEST_URL  — Base44 endpoint for seat-request writes (optional; skipped if unset)
+ *   BASE44_SEAT_REQUEST_URL  — Base44 seatRequestIntake function URL (optional; skipped if unset)
+ *   BASE44SEATREQUEST_URL    — deprecated legacy alias; accepted only when canonical var is unset
+ *   SEC06_INTERNAL_TOKEN     — server-to-server token required by Base44 seatRequestIntake
  *   BEEHIIV_API_KEY          — beehiiv API key
  *   BEEHIIV_PUB_ID           — beehiiv Publication ID (required for auto-subscribe)
  *   SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM — (optional) Seat ID / TUJ code follow-up for Active Job Seekers
@@ -86,10 +88,25 @@ const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE
 const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL-CG-001'; // canonical Corporate Games fallback
 const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
 
+function getBase44SeatRequestUrl() {
+  const canonicalUrl = String(process.env.BASE44_SEAT_REQUEST_URL || '').trim();
+  const legacyUrl = String(process.env.BASE44SEATREQUEST_URL || '').trim();
+
+  if (canonicalUrl && legacyUrl && canonicalUrl !== legacyUrl) {
+    console.warn('[seat-request] BASE44SEATREQUEST_URL is deprecated and differs from BASE44_SEAT_REQUEST_URL — using canonical BASE44_SEAT_REQUEST_URL');
+  } else if (!canonicalUrl && legacyUrl) {
+    console.warn('[seat-request] BASE44SEATREQUEST_URL is deprecated — using it for compatibility; rename to BASE44_SEAT_REQUEST_URL');
+  }
+
+  return canonicalUrl || legacyUrl;
+}
+
 function base44Headers() {
   const headers = { 'Content-Type': 'application/json' };
   const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  const internalToken = process.env.SEC06_INTERNAL_TOKEN || '';
   if (apiKey) headers.api_key = apiKey;
+  if (internalToken) headers['x-internal-token'] = internalToken;
   return headers;
 }
 
@@ -1019,11 +1036,13 @@ exports.handler = async function (event, context) {
     console.warn('[seat-request] BEEHIIV-SEG: SENDGRID_TEMPLATE_PREBOARD_NURTURE not set — skipping pre-board nurture email');
   }
 
-  // --- Write to Base44 seat store (stub — wires in when credits return) ---
-  const base44Url = process.env.BASE44_SEAT_REQUEST_URL;
+  // --- Write to Base44 seat store (server-to-server handoff into Base44 seatRequestIntake) ---
+  const base44Url = getBase44SeatRequestUrl();
   if (!base44Url) {
     console.warn('[seat-request] BASE44_SEAT_REQUEST_URL not set — skipping Base44 write (stub active)');
     // Base44 is blocked; proceed without it. seat_id is still returned to client.
+  } else if (!process.env.SEC06_INTERNAL_TOKEN) {
+    console.warn('[seat-request] SEC06_INTERNAL_TOKEN not set — skipping Base44 write because seatRequestIntake rejects unauthenticated server calls');
   } else {
     try {
       const base44Response = await fetch(base44Url, {
