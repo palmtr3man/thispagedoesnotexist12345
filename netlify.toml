@@ -288,52 +288,8 @@
   to = "/?status=boarded"
   status = 200
 
+# Catch-all SPA rewrite: all other paths serve the root index.html
 [[redirects]]
-  from = "/Passengers"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/Passengers/*"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/FlightLog"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/FlightLog/*"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/Applications"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/Applications/*"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/InterviewsAndFollowUps"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/InterviewsAndFollowUps/*"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/CommandCenter"
-  to = "/"
-  status = 200
-
-[[redirects]]
-  from = "/CommandCenter/*"
+  from = "/*"
   to = "/"
   status = 200
