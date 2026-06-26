@@ -687,7 +687,7 @@
 
         <!-- Departure selector panel (preserved — shown when seat has departure window) -->
           <div id="departureSelectorPanel" class="hidden" style="margin-top:1.5rem; background:rgba(168,196,0,0.06); border:1px solid rgba(168,196,0,0.2); border-radius:0.75rem; padding:1.25rem; width:100%; box-sizing:border-box;">
-          <p style="color:var(--color-text-muted); margin-bottom:0.75rem; font-size:14px;">Your flight window is ready. Select your departure date:</p>
+          <p style="color:var(--color-text-muted); margin-bottom:0.75rem; font-size:14px;">Your flight window is ready. Select your onward date:</p>
           <div id="departureDateOptions" style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.5rem;"></div>
           <div id="departureConfirmMsg" class="hidden status-bar status-success" style="margin-top:8px; margin-bottom:0;"></div>
           <div id="departureErrorMsg" class="hidden status-bar status-error" style="margin-top:8px; margin-bottom:0;"></div>
@@ -734,12 +734,12 @@
     <!-- ── Control surfaces ────────────────────────────────────────────── -->
     <section class="mc-control-band" id="control-surfaces">
       <article class="mc-panel mc-section-card">
-        <h2 class="mc-h2">Arrival to departure</h2>
+        <h2 class="mc-h2">Arrival path to next move</h2>
         <p class="mc-subcopy">The one-page Studio tells a story of movement. You enter through the lounge, see the hidden field of action, then step into a clear path forward.</p>
         <div class="mc-timeline">
           <div class="mc-timeline-item">
             <div class="mc-timeline-mark"></div>
-            <div class="mc-timeline-copy"><h4>Arrival</h4><p>Orient with one line of truth, one status, one invitation to look outward.</p></div>
+            <div class="mc-timeline-copy"><h4>Arrival path</h4><p>Orient with one line of truth, one status, one invitation to look outward.</p></div>
           </div>
           <div class="mc-timeline-item">
             <div class="mc-timeline-mark"></div>
@@ -747,7 +747,7 @@
           </div>
           <div class="mc-timeline-item">
             <div class="mc-timeline-mark"></div>
-            <div class="mc-timeline-copy"><h4>Control</h4><p>Only after that reveal the practical tools, prompts, and next actions that let you steer.</p></div>
+            <div class="mc-timeline-copy"><h4>Next move</h4><p>Only after that reveal the practical tools, prompts, and next actions that let you steer.</p></div>
           </div>
         </div>
       </article>
@@ -1700,9 +1700,9 @@ function initGatewayCtas() {
       if (!res.ok) throw new Error('Failed to set departure');
       return res.json();
     }).then(function (data) {
-      showStatus('success', 'Departure set for ' + formatDateLabel(selectedDate));
+      showStatus('success', 'Onward date confirmed!');
       if (confirmMsg) {
-        confirmMsg.textContent = 'Flight confirmed for ' + formatDateLabel(selectedDate) + '. Your operator has been notified.';
+        confirmMsg.textContent = '✈️ Onward date confirmed: ' + formatDateLabel(selectedDate);
         confirmMsg.classList.remove('hidden');
       }
       setTimeout(hideStatus, 4000);
