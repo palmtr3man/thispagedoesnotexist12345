@@ -292,58 +292,48 @@
   from = "/Passengers"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/Passengers/*"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/FlightLog"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/FlightLog/*"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/Applications"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/Applications/*"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/InterviewsAndFollowUps"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/InterviewsAndFollowUps/*"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/CommandCenter"
   to = "/"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/CommandCenter/*"
   to = "/"
   status = 200
-  force = true
