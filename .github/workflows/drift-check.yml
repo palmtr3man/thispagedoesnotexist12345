@@ -1,0 +1,38 @@
+name: "Netlify Guardrails: Drift Check"
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Drift Check
+        env:
+          # Mapping GHA Context to Strictness
+          # production (main) -> fail
+          # staging (develop/PR) -> fail
+          # dev/others -> warn
+          STRICTNESS: ${{ 
+            github.ref == 'refs/heads/main' && 'fail' || 
+            (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 
+            'warn' 
+          }}
+          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
+        run: npx ts-node scripts/drift-check.ts
