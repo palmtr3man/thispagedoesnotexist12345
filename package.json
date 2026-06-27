@@ -1,0 +1,16 @@
+{
+  "name": "thispagedoesnotexist12345",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "drift-check": "tsx scripts/drift-check.ts",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@infisical/sdk": "^5.0.2",
+    "@types/node": "^26.0.1",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

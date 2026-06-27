@@ -25,14 +25,12 @@ jobs:
 
       - name: Run Drift Check
         env:
-          # Mapping GHA Context to Strictness
-          # production (main) -> fail
-          # staging (develop/PR) -> fail
-          # dev/others -> warn
           STRICTNESS: ${{ 
             github.ref == 'refs/heads/main' && 'fail' || 
             (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 
             'warn' 
           }}
           INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
-        run: npx ts-node scripts/drift-check.ts
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+        run: npm run drift-check
