@@ -29,7 +29,8 @@
 
 # Bare-domain → www canonical redirects (HTTP + HTTPS)
 [[redirects]]
-  from = "https://www.corporate-games.tech/*"
+  hostname = "www.corporate-games.tech"
+  from = "/*"
   to = "https://corporate-games.tech/:splat"
   status = 301
   force = true
