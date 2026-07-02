@@ -10,6 +10,9 @@
 [functions]
   node_bundler = "esbuild"
 
+[[plugins]]
+  package = "./plugins/netlify-plugin-function-env-guard"
+
 [[headers]]
   for = "/*.html"
   [headers.values]
@@ -29,14 +32,9 @@
 
 # Bare-domain → www canonical redirects (HTTP + HTTPS)
 [[redirects]]
-  from = "http://thispagedoesnotexist12345.com/*"
-  to = "https://www.thispagedoesnotexist12345.com/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "https://thispagedoesnotexist12345.com/*"
-  to = "https://www.thispagedoesnotexist12345.com/:splat"
+  hostname = "www.corporate-games.tech"
+  from = "/*"
+  to = "https://corporate-games.tech/:splat"
   status = 301
   force = true
 
