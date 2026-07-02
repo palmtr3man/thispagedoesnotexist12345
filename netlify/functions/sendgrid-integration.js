@@ -220,6 +220,7 @@ function buildAlphaDynamicData(seat) {
     first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
     secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
+    platform_url: MAIN_SITE_URL,
     boarding_type: 'alpha',
     boardingtype: 'alpha',
     seats_reserved: 'F5-04'
@@ -250,6 +251,7 @@ function buildVipDynamicData(seat) {
     first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
     secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
+    platform_url: MAIN_SITE_URL,
     boarding_type: 'vip',
     boardingtype: 'vip',
     seats_reserved: 'F5-04',
