@@ -11,6 +11,9 @@
 [[plugins]]
   package = "./plugins/netlify-plugin-function-env-guard"
 
+[[plugins]]
+  package = "./plugins/netlify-plugin-function-env-guard"
+
 [[headers]]
   for = "/*.html"
   [headers.values]
