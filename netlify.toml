@@ -29,22 +29,6 @@
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization, x-internal-token, x-scheduler-secret"
 
-# ── Domain canonicalization ───────────────────────────────────────────────────
-# Legacy .tech hostnames forward to www .com (PR #7 parity on main site).
-[[redirects]]
-  hostname = "corporate-games.tech"
-  from = "/*"
-  to = "https://www.thispagedoesnotexist12345.com/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  hostname = "www.corporate-games.tech"
-  from = "/*"
-  to = "https://www.thispagedoesnotexist12345.com/:splat"
-  status = 301
-  force = true
-
 # ── Core API functions ────────────────────────────────────────────────────────
 
 [[redirects]]
