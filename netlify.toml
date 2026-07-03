@@ -45,19 +45,6 @@
   status = 301
   force = true
 
-# Apex .com → www .com canonical (restores pre-5e7dab2 behavior).
-[[redirects]]
-  from = "http://thispagedoesnotexist12345.com/*"
-  to = "https://www.thispagedoesnotexist12345.com/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "https://thispagedoesnotexist12345.com/*"
-  to = "https://www.thispagedoesnotexist12345.com/:splat"
-  status = 301
-  force = true
-
 # ── Core API functions ────────────────────────────────────────────────────────
 
 [[redirects]]
