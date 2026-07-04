@@ -25,11 +25,7 @@ jobs:
 
       - name: Run Drift Check
         env:
-          STRICTNESS: ${{ 
-            github.ref == 'refs/heads/main' && 'fail' || 
-            (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 
-            'warn' 
-          }}
+          STRICTNESS: ${{ github.ref == 'refs/heads/main' && 'fail' || (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 'warn' }}
           INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
