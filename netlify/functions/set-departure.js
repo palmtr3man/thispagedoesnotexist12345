@@ -19,7 +19,7 @@
  */
 
 const ALLOWED_ORIGIN = 'https://www.thispagedoesnotexist12345.com';
-const BASE44_APP_ID = '67912f60b0c40c4f1a48d1c7';
+const BASE44_APP_ID = '697140e628131a06045ebd18';
 
 function base44Headers() {
   const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
