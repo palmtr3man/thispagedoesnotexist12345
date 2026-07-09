@@ -4,7 +4,7 @@ import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
 const INFISICAL_SITE_URL = "https://us.infisical.com";
 const INFISICAL_ENV = "staging";
-const INFISICAL_PATH = "/tuj";
+const INFISICAL_PATH = "/";
 
 interface NetlifyEnvVar {
   key?: string;
