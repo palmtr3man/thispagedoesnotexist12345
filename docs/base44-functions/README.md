@@ -443,7 +443,7 @@ BMAC_WEBHOOK_SECRET
 |---------|------|
 | Base44 (deploy target) | `base44-functions/notifyTaskFailure.ts` |
 | Base44 caller helper | `base44-functions/shared/notifyTaskFailureClient.ts` |
-| Netlify (shared helper) | `netlify/functions/shared/notify-task-failure.js` |
+| Netlify (shared helper) | `netlify/functions/shared/notify-task-failure.cjs` |
 
 Internal-only admin alert when drift scan, JD sync, or other scheduled tasks fail.
 Requires `SEC06_INTERNAL_TOKEN` via `x-internal-token` or `Authorization: Bearer` on Base44.
