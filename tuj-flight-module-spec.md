@@ -58,7 +58,7 @@ The revised module renders the following fields in this order:
 
 | Field | Role | DOM ID | Data Source | Notes |
 |---|---|---|---|---|
-| Flight Name | **Primary identity** | `#flight-name-primary` (new) | `status.flight_name` → `status.flight_label` → `'Next Departure'` | Must use canonical passenger-facing name. Never the raw flight code. |
+| Flight Name | **Primary identity** | `#flight-name-primary` (new) | `status.flight_name` → `status.flight_label` → `'Alpha Arrival'` | Must use canonical passenger-facing name. Never the raw flight code. |
 | Flight Code | Secondary metadata | `#flight-number` (existing) | `status.flight_code` → `status.flight_id` → hidden | Rendered as a small muted badge below the name. Hidden if no code. |
 | Arrival Date | Paired with Arrival Time | `#arrival-date-text` (new) | `fmtDate(status.nextflightarrivaldate)` | New field — currently missing from the DOM. |
 | Arrival Time | Paired with Arrival Date | `#arrival-text` (existing) | `fmtTime(status.nextflightarrivaldate)` | Existing field, no change to JS logic. |
@@ -118,7 +118,7 @@ The JS patch reads fields in this priority order:
 
 1. `status.flight_name` — a new dedicated field to add to the Base44 `NextFlightConfig` schema. This is the cleanest long-term solution.
 2. `status.flight_label` — the existing field currently used. If this contains the correct human-facing name (e.g. "Solo Flight 1"), no schema change is needed.
-3. `'Next Departure'` — safe fallback if neither field is populated.
+3. `'Alpha Arrival'` — safe fallback if neither field is populated.
 
 The flight code badge reads:
 1. `status.flight_code` — new dedicated field (recommended to add to Base44)
@@ -159,4 +159,4 @@ Add a `flight_name` field to `NextFlightConfig` (or the active `cohorts` record)
    - Gate open with active flight: name + code + paired dates + Request a Seat dominant
    - Gate closed / departed: name + code + paired dates + Join Waitlist dominant, consultation muted
    - CALENDARJET intake mode: consultation CTA becomes primary (existing JS logic)
-   - No flight data: fallback "Next Departure" name, hidden code badge
+   - No flight data: fallback "Alpha Arrival" name, hidden code badge

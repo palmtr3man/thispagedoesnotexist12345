@@ -18,7 +18,7 @@
  *   Priority order for flight name:
  *     1. status.flight_name         (new dedicated field — add to Base44 schema)
  *     2. status.flight_label        (existing field — current source of truth)
- *     3. 'Next Departure'           (safe fallback)
+ *     3. 'Alpha Arrival'            (safe fallback)
  *
  *   Priority order for flight code (secondary metadata):
  *     1. status.flight_code         (operational code — e.g. FL032126)
@@ -36,7 +36,7 @@ var arrivalDateTextEl    = document.getElementById('arrival-date-text');    // n
 //   if (flightEl) {
 //     var label = status.flight_label && status.flight_label.trim()
 //       ? status.flight_label.trim() + ' ✈️'
-//       : 'Next Departure ✈️';
+//       : 'Alpha Arrival ✈️';
 //     flightEl.textContent = label;
 //   }
 //
@@ -45,7 +45,7 @@ if (flightNamePrimaryEl) {
   // Primary: canonical passenger-facing name
   var flightName = (status.flight_name && status.flight_name.trim())
     || (status.flight_label && status.flight_label.trim())
-    || 'Next Departure';
+    || 'Alpha Arrival';
   flightNamePrimaryEl.textContent = flightName;
 }
 

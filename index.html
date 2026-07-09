@@ -2131,7 +2131,7 @@
 
     </div><!-- /#dashboard-view -->
 
-    <!-- CYBERPUNK STATUS SECTION — element order: Flight, Departure, Status, Loading Dock -->
+    <!-- CYBERPUNK STATUS SECTION — element order: Flight, Alpha Arrival, Next Horizon, Status, Loading Dock -->
     <div class="status-section" id="loading-dock">
       <div class="status-scanlines"></div>
 
@@ -2152,7 +2152,7 @@
 
       <div class="status-title">
         <span class="status-title-label">FLIGHT:</span>
-        <span class="badge badge--flight" id="flight-number">Next Departure ✈️</span>
+        <span class="badge badge--flight" id="flight-number">Alpha Arrival ✈️</span>
       </div>
 
       <div class="status-title">
@@ -2178,8 +2178,8 @@
       </div>
 
       <div class="status-title">
-        <span class="status-title-label">ARRIVAL TIME:</span>
-        <span class="badge badge--highlight" id="departure-time-badge">Next Move Horizon</span>
+        <span class="status-title-label">NEXT DEPARTURE HORIZON:</span>
+        <span class="badge badge--highlight" id="departure-time-badge">Next Move Horizon · TBD</span>
       </div>
 
       <div class="status-title">
@@ -2755,8 +2755,9 @@
         }
 
         // ── 1. Flight Identity ──────────────────────────────────────────────
+        // Display labels stay arrival-first; schema still uses next_*_departure_* fields.
         if (flightEl) {
-          flightEl.textContent = status.next_flight_label || 'Next Departure ✈️';
+          flightEl.textContent = status.next_flight_label || 'Alpha Arrival ✈️';
         }
 
         // ── 2. Dock Status Badges ───────────────────────────────────────────
@@ -2767,11 +2768,19 @@
         if (fullEl)  fullEl.textContent = labels.full;
         if (shortEl) shortEl.textContent = labels.short;
 
-        // ── 3. Arrival/Departure Dates ──────────────────────────────────────
+        // ── 3. Arrival / Alpha Arrival / Next Departure Horizon ─────────────
+        // next_departure_date holds the Alpha Arrival (Phase 4 close) stamp in
+        // reverse-flight framing — display it as Alpha Arrival, never "Departure".
+        // Next departure horizon stays TBD / separate from May 27 Alpha Arrival.
         if (arrivalDateTextEl) arrivalDateTextEl.textContent = fmtDate(status.next_arrival_date) || 'Next Arrival';
         if (arrivalTextEl)     arrivalTextEl.textContent     = fmtTime(status.next_arrival_date) || '—';
-        setDepartureDate(fmtDate(status.next_departure_date) || 'Next Departure');
-        if (depTimeBadgeEl)    depTimeBadgeEl.textContent    = fmtTime(status.next_departure_date) || '—';
+        setDepartureDate(fmtDate(status.next_departure_date) || 'Alpha Arrival');
+        if (depTimeBadgeEl) {
+          var horizonLabel = status.next_departure_horizon_label
+            || status.next_move_horizon_label
+            || null;
+          depTimeBadgeEl.textContent = horizonLabel || 'Next Move Horizon · TBD';
+        }
 
         // ── 4. CTA Visibility & Intake Mode ─────────────────────────────────
         var gateOpen = status.gate_status === 'open';

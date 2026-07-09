@@ -712,7 +712,7 @@
           <div class="mc-tower-signal"></div>
           <div class="mc-operator-blip one"><small id="blipLabel1">Recruiter desk</small><strong id="blipStatus1">Gate 03 · reviewing profile</strong></div>
           <div class="mc-operator-blip two"><small id="blipLabel2">ATS filter</small><strong id="blipStatus2">Ramp check · parsing resume</strong></div>
-          <div class="mc-operator-blip three"><small id="blipLabel3">Referral line</small><strong id="blipStatus3">Pushback queued · waiting handoff</strong></div>
+          <div class="mc-operator-blip three"><small id="blipLabel3">Referral line</small><strong id="blipStatus3">Onward move queued · waiting handoff</strong></div>
           <div class="mc-plane" aria-hidden="true"></div>
           <div class="mc-launchpad" aria-hidden="true"></div>
           <div class="mc-smoke" aria-hidden="true"></div>
@@ -1692,24 +1692,24 @@ function initGatewayCtas() {
     if (optionsContainer) {
       optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = true; b.style.opacity = '0.5'; });
     }
-    showStatus('loading', 'Updating departure date...');
+    showStatus('loading', 'Updating onward date...');
     fetch(SET_DEPARTURE_URL, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ seat_id: seatId, departure_date: selectedDate, email: passengerEmail })
     }).then(function (res) {
-      if (!res.ok) throw new Error('Failed to set departure');
+      if (!res.ok) throw new Error('Failed to set onward date');
       return res.json();
     }).then(function (data) {
-      showStatus('success', 'Onward date confirmed!');
+      showStatus('success', 'Next move set!');
       if (confirmMsg) {
-        confirmMsg.textContent = '✈️ Onward date confirmed: ' + formatDateLabel(selectedDate);
+        confirmMsg.textContent = '✈️ Next move set · ' + formatDateLabel(selectedDate);
         confirmMsg.classList.remove('hidden');
       }
       setTimeout(hideStatus, 4000);
     }).catch(function (err) {
-      showStatus('error', 'Error setting date: ' + err.message);
+      showStatus('error', 'Error setting onward date: ' + err.message);
       if (errorMsg) {
-        errorMsg.textContent = 'Could not confirm flight: ' + err.message + '. Please try again or contact support.';
+        errorMsg.textContent = 'Could not confirm onward date: ' + err.message + '. Please try again or contact support.';
         errorMsg.classList.remove('hidden');
       }
       if (optionsContainer) {
@@ -1822,7 +1822,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
   const seatId = params.get('seat_id');
   const tujCode = params.get('tuj_code');
-  const resumeId = params.get('resume_id');
+  const resumeId = params.get('resume_id') || params.get('resumeId');
   if (seatId) sessionStorage.setItem('seat_id', seatId);
   if (tujCode) sessionStorage.setItem('tuj_code', tujCode);
   if (window.initGatewayCtas) initGatewayCtas();
