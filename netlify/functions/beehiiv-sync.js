@@ -36,6 +36,7 @@
  */
 
 const { validateBeehiivSyncIdentity } = require('./lib/beehiiv-flight-identity');
+const { notifyTaskFailure } = require('./shared/notify-task-failure.cjs');
 const { validateAdminHeader } = require('./shared/sec06-auth.js');
 
 const HEADERS = {
@@ -483,6 +484,11 @@ exports.handler = async function handler(event) {
         console.error('[beehiiv-sync] audit finalize failed:', finalizeErr.message);
       }
     }
+    await notifyTaskFailure({
+      task: 'beehiiv-sync',
+      error: err.message,
+      details: { request_id: requestId, audit_id: auditId },
+    });
     return json(500, { ok: false, error: 'sync_failed', detail: err.message, request_id: requestId, audit_id: auditId });
   }
 };

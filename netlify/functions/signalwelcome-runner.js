@@ -36,6 +36,7 @@
  */
 
 const { validateInternalOrSchedulerOrNetlifySchedule } = require('./shared/sec06-auth.js');
+const { notifyTaskFailure } = require('./shared/notify-task-failure.cjs');
 
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -263,6 +264,10 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error('[signalwelcome-runner]', error.message);
+    await notifyTaskFailure({
+      task: 'signalwelcome-runner',
+      error: error.message,
+    });
     return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ ok: false, error: error.message }) };
   }
 };

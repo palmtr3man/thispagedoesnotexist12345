@@ -5,6 +5,7 @@
 'use strict';
 
 const { runAlignmentLoop } = require('./shared/alignment-core.js');
+const { notifyTaskFailure } = require('./shared/notify-task-failure.cjs');
 const { validateAdminHeader } = require('./shared/sec06-auth.js');
 
 exports.handler = async function handler(event) {
@@ -43,6 +44,11 @@ exports.handler = async function handler(event) {
       }),
     };
   } catch (err) {
+    await notifyTaskFailure({
+      task: 'alignment-loop (manual)',
+      error: err.message,
+      details: { trigger: 'manual' },
+    });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
