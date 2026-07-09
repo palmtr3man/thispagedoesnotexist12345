@@ -6,7 +6,7 @@
  * Both the .com landing/dashboard repo and the .tech boarding app must
  * import from this module — neither repo should hardcode these values.
  *
- * Gate Contract v1.0 · March 27, 2026
+ * Gate Contract v1.1 · July 9, 2026
  */
 
 export const GATE = {
@@ -14,23 +14,19 @@ export const GATE = {
   API_BASE:      'https://app.thispagedoesnotexist12345.com',
   SEAT_STATUS:   '/api/seat-status',
   REQUEST_SEAT:  '/api/seat-request',
-  VALIDATE_SEAT: '/api/seat',          // GET /api/seat/:id (Base44 — pending credits)
+  VALIDATE_SEAT: '/api/seat',
 
   // --- beehiiv ---
-
-  /**
-   * @type {string} Beehiiv publication ID — set via Netlify BEEHIIV_PUB_ID (not hardcoded).
-   * Signal resolves to https://newsletter.thispagedoesnotexist12345.us/
-   */
   BEEHIIV_PUB_ID: '',
 
-  // --- Age gate (Gate Contract §5) ---
+  // --- Age gate ---
   MIN_AGE: 21,
 
   // --- Seat identity (Gate Contract §3) ---
   MAX_SEATS:      5,
   SEAT_ID_PREFIX: 'TUJ-',
-  SEAT_ID_REGEX:  /^TUJ-[A-Z2-9]{6}$/,
+  // REGEX-MIGRATE-01: Support dual-prefix seat IDs (Legacy TUJ- and Flight-bound FL-)
+  SEAT_ID_REGEX:  /^(TUJ-[A-Z2-9]{6}|FL-[A-Z0-9-]{3,10})$/,
   SESSION_KEY:    'seat_id',
   TUJ_KEY:        'tuj_code',
 
@@ -64,18 +60,6 @@ export const GATE = {
 
 /**
  * resolveState() — Two-State Machine (.com)
- *
- * Reads gate status + sessionStorage seat_id and returns the view to render.
- * Call this on DOMContentLoaded on the .com landing page.
- *
- * Returns one of: 'departed' | 'lounge' | 'dashboard' | 'landing'
- *
- * Usage:
- *   import { resolveState } from '/gate-contract.js';
- *   const view = await resolveState();
- *   if (view === 'dashboard') renderDashboard();
- *   else if (view === 'departed') renderDeparted();
- *   else renderLanding();
  */
 export async function resolveState() {
   try {
@@ -135,12 +119,6 @@ export async function resolveState() {
 
 /**
  * requestSeat(payload) — Seat Request Helper
- *
- * POSTs to /api/seat-request and returns the parsed response.
- * Caller is responsible for rendering success/error UI.
- *
- * @param {{ name: string, email: string, age_confirmed: boolean, source?: string }} payload
- * @returns {Promise<{ ok: boolean, seat_id?: string, status?: string, error?: string }>}
  */
 async function readJsonResponse(res) {
   const text = await res.text();
@@ -153,8 +131,6 @@ async function readJsonResponse(res) {
 }
 
 function normalizeBoardingType(boardingType) {
-  // Future cabin-selection flows (for example, a BMAC checkout callback)
-  // should pass the chosen cabin tier here; alpha cohorts default to first_class.
   const value = String(boardingType || 'first_class').trim().toLowerCase();
   return value || 'first_class';
 }
@@ -182,7 +158,6 @@ export async function requestSeat(payload) {
   const data = await readJsonResponse(res);
 
   if (data.ok && data.seat_id) {
-    // Store seat_id and any returned tuj_code in sessionStorage immediately
     sessionStorage.setItem(GATE.SESSION_KEY, data.seat_id);
     if (requestBody.tuj_code) sessionStorage.setItem(GATE.TUJ_KEY, requestBody.tuj_code);
     if (data.tuj_code) sessionStorage.setItem(GATE.TUJ_KEY, data.tuj_code);
