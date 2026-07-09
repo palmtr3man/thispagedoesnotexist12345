@@ -3,9 +3,11 @@
  * Netlify Function: sendgrid-integration
  *
  * Triggered when a Seat entity is activated (admin approves a SeatRequest).
- * Dispatches the boarding sequence in order based on boarding_type:
- *   - Alpha / default: alphaflightannouncement_v1 → boarding_confirmation_v1
- *   - VIP cohort: vip_boarding_pass_v1 → vip_boarding_instructions_v1
+ * Dispatches the boarding sequence in order based on cabin / boarding path:
+ *   - Economy / free:  boarding_pass_free_v1 → boarding_instructions_free_v1
+ *   - First / paid:    boarding_pass_paid_v1 → boarding_instructions_paid_v1
+ *   - VIP cohort:      vip_boarding_pass_v1 → vip_boarding_instructions_v1
+ *   - Alpha legacy:    alphaflightannouncement_v1 → boarding_confirmation_v1
  *
  * After both sends confirm 2xx, stamps boarding_confirmation_sent_at on the
  * Seat record via the Base44 API. Idempotency guard: will not overwrite if
@@ -14,18 +16,13 @@
  * All sends BCC support@thispagedoesnotexist12345.com per universal BCC rule.
  */
 
+const { TEMPLATES } = require('./sendgrid-templates.js');
+
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
 const MAIN_SITE_URL = 'https://www.thispagedoesnotexist12345.com';
 const CANONICAL_FIRST_TIME_PATH = '/OnboardingPassport';
-const CANONICAL_RETURN_PATH = '/';
-
-const TEMPLATE_ENV = {
-  alphaAnnouncement: 'SENDGRID_TEMPLATE_ALPHA_FLIGHT_ANNOUNCEMENT',
-  boardingConfirmation: 'SENDGRID_TEMPLATE_BOARDING_CONFIRMATION',
-  vipBoardingPass: 'SENDGRID_TEMPLATE_VIP_BOARDING_PASS',
-  vipBoardingInstructions: 'SENDGRID_TEMPLATE_VIP_BOARDING_INSTRUCTIONS'
-};
+const CANONICAL_SECONDARY_PATH = '/ResumeFitCheck';
 
 const DEFAULT_FLIGHT_DETAILS = {
   alpha: {
@@ -45,22 +42,54 @@ function getTrimmedEnv(name) {
   return value ? String(value).trim() : '';
 }
 
-function getTemplateIds(boardingType) {
-  const keys = boardingType === 'vip'
-    ? ['vipBoardingPass', 'vipBoardingInstructions']
-    : ['alphaAnnouncement', 'boardingConfirmation'];
+function getPlatformTechUrl() {
+  return getTrimmedEnv('PLATFORM_TECH_URL') || 'https://www.thispagedoesnotexist12345.tech';
+}
 
-  const templateIds = {};
-  const missing = [];
+function buildBoardingTaskUrls(seat, canonicalSeatId, tujCode, flightCode) {
+  const flightCodeParam = flightCode ? `&flight_code=${encodeURIComponent(flightCode)}` : '';
+  const query = `seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}${flightCodeParam}`;
+  const platformTechUrl = getPlatformTechUrl();
+  return {
+    first_task_url: seat.first_task_url || `${platformTechUrl}${CANONICAL_FIRST_TIME_PATH}?${query}`,
+    secondary_url: seat.secondary_url || `${platformTechUrl}${CANONICAL_SECONDARY_PATH}?${query}`,
+  };
+}
 
-  for (const key of keys) {
-    const envName = TEMPLATE_ENV[key];
-    const value = getTrimmedEnv(envName);
-    if (!value) missing.push(envName);
-    templateIds[key] = value;
+function resolveBoardingPath(seat) {
+  const boardingType = resolveBoardingType(seat);
+  if (isVipBoardingType(boardingType)) return 'vip';
+
+  const cabinTier = resolveCabinTier(seat, false);
+  if (cabinTier === 'first') return 'paid';
+  if (boardingType === 'alpha' || boardingType === 'first_class') return 'alpha_announcement';
+  return 'free';
+}
+
+function boardingTemplateSequence(path) {
+  switch (path) {
+    case 'vip':
+      return [
+        { label: 'vip_boarding_pass_v1', templateId: TEMPLATES.vip_boarding_pass_v1 },
+        { label: 'vip_boarding_instructions_v1', templateId: TEMPLATES.vip_boarding_instructions_v1 },
+      ];
+    case 'paid':
+      return [
+        { label: 'boarding_pass_paid_v1', templateId: TEMPLATES.boarding_pass_paid_v1 },
+        { label: 'boarding_instructions_paid_v1', templateId: TEMPLATES.boarding_instructions_paid_v1 },
+      ];
+    case 'alpha_announcement':
+      return [
+        { label: 'alphaflightannouncement_v1', templateId: TEMPLATES.alphaflightannouncement_v1 },
+        { label: 'boarding_confirmation_v1', templateId: TEMPLATES.boarding_confirmation_v1 },
+      ];
+    case 'free':
+    default:
+      return [
+        { label: 'boarding_pass_free_v1', templateId: TEMPLATES.boarding_pass_free_v1 },
+        { label: 'boarding_instructions_free_v1', templateId: TEMPLATES.boarding_instructions_free_v1 },
+      ];
   }
-
-  return { templateIds, missing };
 }
 
 function resolveSeatId(seat) {
@@ -195,15 +224,17 @@ function resolveSeatsAvailable(seat) {
   return typeof value === 'number' ? value : String(value);
 }
 
-function buildAlphaDynamicData(seat) {
+function buildBoardingDynamicData(seat, path) {
+  const resolvedPath = path || resolveBoardingPath(seat);
+  const isVipBoarding = resolvedPath === 'vip';
   const seatId = resolveSeatId(seat);
-  const seatRecordId = resolveSeatRecordId(seat);
   const tujCode = resolveTujCode(seat, seatId);
   const canonicalSeatId = tujCode || seatId;
   const flightCode = resolveFlightCodeForSeat(seat);
   const passportUrl = resolvePassportUrl(seat, canonicalSeatId, tujCode);
+  const taskUrls = buildBoardingTaskUrls(seat, canonicalSeatId, tujCode, flightCode);
 
-  return {
+  const data = {
     first_name: resolveFirstName(seat),
     last_name: resolveLastName(seat),
     user_email: resolveRecipient(seat),
@@ -212,52 +243,25 @@ function buildAlphaDynamicData(seat) {
     flight_code: flightCode,
     flightcode: flightCode,
     flight_id: flightCode,
-    cabin_class: resolveCabinClass(seat, false),
-    cabin_tier: resolveCabinTier(seat, false),
-    departure_date: resolveDepartureDate(seat, false),
+    cabin_class: resolveCabinClass(seat, isVipBoarding),
+    cabin_tier: resolveCabinTier(seat, isVipBoarding),
+    departure_date: resolveDepartureDate(seat, isVipBoarding),
     seats_available: resolveSeatsAvailable(seat),
     passport_url: passportUrl,
-    first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
-    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
+    ...taskUrls,
     unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
     platform_url: MAIN_SITE_URL,
-    boarding_type: 'alpha',
-    boardingtype: 'alpha',
-    seats_reserved: 'F5-04'
-  };
-}
-
-function buildVipDynamicData(seat) {
-  const seatId = resolveSeatId(seat);
-  const tujCode = resolveTujCode(seat, seatId);
-  const canonicalSeatId = tujCode || seatId;
-  const flightCode = resolveFlightCodeForSeat(seat);
-  const passportUrl = resolvePassportUrl(seat, canonicalSeatId, tujCode);
-
-  return {
-    first_name: resolveFirstName(seat),
-    last_name: resolveLastName(seat),
-    user_email: resolveRecipient(seat),
-    seat_id: seatId,
-    tuj_code: tujCode,
-    flight_code: flightCode,
-    flightcode: flightCode,
-    flight_id: flightCode,
-    cabin_class: resolveCabinClass(seat, true),
-    cabin_tier: resolveCabinTier(seat, true),
-    departure_date: resolveDepartureDate(seat, true),
-    seats_available: resolveSeatsAvailable(seat),
-    passport_url: passportUrl,
-    first_task_url: seat.first_task_url || `${MAIN_SITE_URL}${CANONICAL_FIRST_TIME_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}`,
-    secondary_url: seat.secondary_url || `${MAIN_SITE_URL}${CANONICAL_RETURN_PATH}?seat_id=${encodeURIComponent(canonicalSeatId)}&tuj_code=${encodeURIComponent(tujCode)}&flight_id=${encodeURIComponent(flightCode)}`,
-    unsubscribe_url: seat.unsubscribe_url || getTrimmedEnv('SENDGRID_UNSUBSCRIBE_URL') || `${MAIN_SITE_URL}/unsubscribe`,
-    platform_url: MAIN_SITE_URL,
-    boarding_type: 'vip',
-    boardingtype: 'vip',
+    boarding_type: isVipBoarding ? 'vip' : resolvedPath === 'alpha_announcement' ? 'alpha' : 'standard',
+    boardingtype: isVipBoarding ? 'vip' : resolvedPath === 'alpha_announcement' ? 'alpha' : 'standard',
     seats_reserved: 'F5-04',
-    newsletter_brand: 'VIP cohort',
-    newsletter_promo: 'Mission Control promo'
   };
+
+  if (isVipBoarding) {
+    data.newsletter_brand = 'VIP cohort';
+    data.newsletter_promo = 'Mission Control promo';
+  }
+
+  return data;
 }
 
 /**
@@ -349,7 +353,7 @@ async function sendSeatConfirmation(seat) {
   const firstName = resolveFirstName(seat);
   const lastName = resolveLastName(seat);
   const boardingType = resolveBoardingType(seat);
-  const isVipBoarding = isVipBoardingType(boardingType);
+  const boardingPath = resolveBoardingPath(seat);
   const boardingConfirmationSentAt = seat.boarding_confirmation_sent_at || seat.boardingconfirmationsentat;
   const boardingConfirmationDispatchStartedAt = seat.boarding_confirmation_dispatch_started_at || seat.boardingconfirmationdispatchstartedat;
 
@@ -360,23 +364,24 @@ async function sendSeatConfirmation(seat) {
 
   if (boardingConfirmationSentAt) {
     console.log(`[sendgrid-integration] Seat ${seatId} already has boarding_confirmation_sent_at (${boardingConfirmationSentAt}) — skipping send`);
-    return { success: true, skipped: true };
+    return { success: true, skipped: true, path: boardingPath };
   }
 
   if (isDispatchLeaseActive(boardingConfirmationDispatchStartedAt)) {
     console.log(`[sendgrid-integration] Seat ${seatId} already has active boarding_confirmation_dispatch_started_at (${boardingConfirmationDispatchStartedAt}) — skipping send`);
-    return { success: true, skipped: true };
+    return { success: true, skipped: true, path: boardingPath };
   }
 
   const dispatchStartedAt = boardingConfirmationDispatchStartedAt || new Date().toISOString();
 
-  const { templateIds, missing } = getTemplateIds(isVipBoarding ? 'vip' : 'alpha');
+  const sequence = boardingTemplateSequence(boardingPath);
+  const missing = sequence.filter((step) => !step.templateId).map((step) => step.label);
   if (missing.length) {
-    console.error(`[sendgrid-integration] Missing SendGrid template env vars: ${missing.join(', ')}`);
-    return { success: false, error: `Missing template env vars: ${missing.join(', ')}` };
+    console.error(`[sendgrid-integration] Missing SendGrid template IDs for: ${missing.join(', ')}`);
+    return { success: false, error: `Missing template env vars: ${missing.join(', ')}`, path: boardingPath };
   }
 
-  const dynamicData = isVipBoarding ? buildVipDynamicData(seat) : buildAlphaDynamicData(seat);
+  const dynamicData = buildBoardingDynamicData(seat, boardingPath);
 
   // SENDGRID-CG-001: fail-closed pre-send validation
   const validationErrors = validateBoardingPayload(dynamicData, `seat ${seatId}`);
@@ -392,27 +397,18 @@ async function sendSeatConfirmation(seat) {
       tujCode,
       recipientEmail,
       boardingType,
-      templateIds,
+      boardingPath,
+      sequence,
       dynamicData
     }, null, 2));
-    return { success: true, dryRun: true };
+    return { success: true, dryRun: true, path: boardingPath };
   }
-
-  const sequence = isVipBoarding
-    ? [
-        { label: 'vip_boarding_pass_v1', templateId: templateIds.vipBoardingPass },
-        { label: 'vip_boarding_instructions_v1', templateId: templateIds.vipBoardingInstructions }
-      ]
-    : [
-        { label: 'alphaflightannouncement_v1', templateId: templateIds.alphaAnnouncement },
-        { label: 'boarding_confirmation_v1', templateId: templateIds.boardingConfirmation }
-      ];
 
   for (const step of sequence) {
     const result = await sendTemplate(apiKey, fromEmail, recipientEmail, step.templateId, dynamicData);
     if (!result.ok) {
       console.error(`[sendgrid-integration] ${step.label} failed for seat ${seatId} — aborting sequence`);
-      return { success: false, error: `${step.label} send failed${result.error ? `: ${result.error}` : ''}` };
+      return { success: false, error: `${step.label} send failed${result.error ? `: ${result.error}` : ''}`, path: boardingPath };
     }
   }
 
@@ -438,7 +434,7 @@ async function sendSeatConfirmation(seat) {
     console.warn('[sendgrid-integration] BASE44_SEAT_URL not set — boarding_confirmation_sent_at stamp skipped');
   }
 
-  return { success: true };
+  return { success: true, path: boardingPath };
 }
 
 /**
@@ -487,7 +483,12 @@ exports.handler = async (event) => {
   return {
     statusCode: 200,
     headers,
-    body: JSON.stringify({ ok: true, skipped: result.skipped || false })
+    body: JSON.stringify({
+      ok: true,
+      skipped: result.skipped || false,
+      dry_run: result.dryRun || false,
+      path: result.path || null,
+    })
   };
 };
 
