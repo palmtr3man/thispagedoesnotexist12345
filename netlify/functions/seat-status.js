@@ -26,7 +26,7 @@
 // REGEX-MIGRATE-01: Support dual-prefix seat IDs (Legacy TUJ- and Flight-bound FL-)
 const SEAT_ID_REGEX = /^(TUJ-[A-Z2-9]{6}|FL-[A-Z0-9-]{3,10})$/;
 const LOOKUP_TIMEOUT_MS = 4000;
-const BASE44_APP_ID = '67912f60b0c40c4f1a48d1c7';
+const BASE44_APP_ID = '697140e628131a06045ebd18';
 
 /**
  * Fetch a single Base44 entity record by ID with a hard timeout.
