@@ -40,7 +40,7 @@
 
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
 const VALIDATION_TIMEOUT_MS = 4000; // 4 s — fast enough for UX; generous enough for cold starts
-const BASE44_APP_ID = '67912f60b0c40c4f1a48d1c7';
+const BASE44_APP_ID = '697140e628131a06045ebd18';
 // Demo seats are allowed through Mission Control even when Base44 is missing
 // or the upstream Seat entity has not been provisioned yet. Keep this list
 // small and explicit; override in Netlify with DEMO_SEAT_IDS="TUJ-KC2222".

@@ -21,29 +21,12 @@
  *     2. data.flight_id       — legacy operational ID from getCohortStatus
  *   The resolved value is always normalised: spaces → underscores, trimmed.
  *   Exposed as data.flight_code in the public payload.
- *
- *   Base44 NextFlightConfig schema addition (long-term):
- *     Field name:  flight_code
- *     Type:        Text (short string)
- *     Description: Operational flight code shown as secondary metadata on the
- *                  public window (e.g. "FL032126"). Separate from flight_label
- *                  (the passenger-facing display name). Returned by getCohortStatus.
- *
- * BLOCKER-05-FU: When seat_id is provided as a query param (?seat_id=TUJ-XXXXXX),
- * this function enriches the response with resume_fit_check_status for the Studio
- * Boarding Readiness Panel. The field is derived from the User record:
- *   'complete'    → passport_completed_at is set (OnboardingPassport done)
- *   'in_progress' → highest_ats_score > 0 (ATS run but passport not yet done)
- *   'not_started' → neither condition met
- *   'unknown'     → BASE44_SEAT_URL / BASE44_USER_URL not configured, or lookup failed (fail-open)
- *
- * CORS headers are already set on the Base44 side; this proxy passes the
- * response through cleanly. Falls back to gate_status: 'closed' on any error.
  */
 
-const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
+// REGEX-MIGRATE-01: Support dual-prefix seat IDs (Legacy TUJ- and Flight-bound FL-)
+const SEAT_ID_REGEX = /^(TUJ-[A-Z2-9]{6}|FL-[A-Z0-9-]{3,10})$/;
 const LOOKUP_TIMEOUT_MS = 4000;
-const BASE44_APP_ID = '67912f60b0c40c4f1a48d1c7';
+const BASE44_APP_ID = '697140e628131a06045ebd18';
 
 /**
  * Fetch a single Base44 entity record by ID with a hard timeout.
@@ -99,10 +82,6 @@ async function fetchBase44Record(baseUrl, id, lookupField = 'id') {
 
 /**
  * Derive resume_fit_check_status from a User record.
- *   'complete'    → passport_completed_at is set
- *   'in_progress' → highest_ats_score > 0 (ATS run, passport not yet done)
- *   'not_started' → no signal
- *   'unknown'     → user record unavailable
  */
 function deriveResumeFitCheckStatus(user) {
   if (!user) return 'unknown';
@@ -113,14 +92,6 @@ function deriveResumeFitCheckStatus(user) {
 
 /**
  * resolveFlightCode(data) — F-HIER-01
- *
- * Returns the canonical operational flight code for the active flight.
- * Priority:
- *   1. data.flight_code     — Base44 NextFlightConfig field (upstream API)
- *   2. data.flight_id       — legacy operational ID from getCohortStatus
- *   3. null                 — no code available; UI hides the secondary badge
- *
- * Normalisation: spaces replaced with underscores, trimmed.
  */
 function resolveFlightCode(data) {
   const raw =
@@ -128,7 +99,6 @@ function resolveFlightCode(data) {
     (data.flight_id && String(data.flight_id).trim()) ||
     null;
   if (!raw) return null;
-  // Normalise: replace spaces with underscores
   return raw.replace(/ /g, '_');
 }
 
@@ -156,7 +126,6 @@ function ensureStableModeFields(data) {
 }
 
 exports.handler = async function handler(event) {
-  // ── Preflight ──────────────────────────────────────────────────────────────
   if ((event.httpMethod || '').toUpperCase() === 'OPTIONS') {
     return {
       statusCode: 204,
@@ -170,39 +139,23 @@ exports.handler = async function handler(event) {
   }
 
   try {
-    // ── 1. Proxy getCohortStatus ───────────────────────────────────────────
     const res = await fetch(process.env.BASE44_COHORT_STATUS_URL);
     if (!res.ok) throw new Error(`Upstream error: ${res.status}`);
     const data = await res.json();
 
-    // ── 2. ALPHA_MODE override ─────────────────────────────────────────────
     const alphaModeEnv = String(process.env.ALPHA_MODE || '').toLowerCase();
     if (alphaModeEnv === 'false') {
-      // Preserve the passenger-facing flight label from the upstream source.
-      // ALPHA_MODE only controls whether public intake is enabled; it must not
-      // rename the active flight to a generic Beta label.
       data.alpha_mode = false;
     }
 
-    // ── 3. PUBLIC_GATE_STATE operator override ─────────────────────────────
     const publicGateState = (process.env.PUBLIC_GATE_STATE || '').trim().toLowerCase();
     if (publicGateState && ['open', 'hold', 'closed', 'boarding'].includes(publicGateState)) {
       data.gate_status = publicGateState;
     }
 
-    // ── 4. F-HIER-01: flight_code resolution ──────────────────────────────
-    // Resolves the operational flight code from Base44 or flight_id fallback.
-    // Prioritizes upstream API data and removes reliance on Netlify env vars.
     data.flight_code = resolveFlightCode(data);
-
-    // ── 4b. Stable mode fields ─────────────────────────────────────────────
-    // Keep /api/seat-status schema stable even while the upstream Base44
-    // getCohortStatus deployment is catching up to the merged schema change.
     ensureStableModeFields(data);
 
-    // ── 5. BLOCKER-05-FU: resume_fit_check_status enrichment ──────────────
-    // Attempted only when seat_id is present and Base44 endpoints are configured.
-    // Fails open to 'unknown' on any error — never blocks the primary response.
     const qp = event.queryStringParameters || {};
     let rawSeatId = (qp.seat_id || qp.id || '').replace(/ /g, '_').trim();
 
@@ -214,7 +167,6 @@ exports.handler = async function handler(event) {
       const base44UserUrl = normalizeBase44EntityUrl(process.env.BASE44_USER_URL, 'User');
 
       if (base44SeatUrl && base44UserUrl) {
-        // Step A: fetch Seat record to get user_id + seat status
         const seat = await fetchBase44Record(base44SeatUrl, rawSeatId, 'tuj_code');
         if (seat) {
           const normalizedSeatStatus = (seat.status && String(seat.status).toLowerCase()) || 'unknown';
@@ -226,17 +178,13 @@ exports.handler = async function handler(event) {
           if (seatEmail) data.passenger_email = seatEmail;
 
           if (seat.user_id) {
-            // Step B: fetch User record to read passport_completed_at + highest_ats_score
             const user = await fetchBase44Record(base44UserUrl, seat.user_id);
             resume_fit_check_status = deriveResumeFitCheckStatus(user);
           } else {
-            // Seat found but user_id not present — treat as not_started
             resume_fit_check_status = 'not_started';
           }
         }
-        // Seat lookup failed entirely → stays 'unknown' (fail-open)
       }
-      // Env vars not configured → stays 'unknown' (fail-open, graceful_stub)
     }
 
     data.resume_fit_check_status = resume_fit_check_status;
