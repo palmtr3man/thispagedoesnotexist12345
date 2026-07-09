@@ -1863,6 +1863,9 @@ async function init() {
 
   window.initDepartureSelector();
 
+  const savedTheme = localStorage.getItem('tuj_theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
   // Dark mode toggle listener
   const themeToggle = document.querySelector('[data-theme-toggle]');
   if (themeToggle) {
