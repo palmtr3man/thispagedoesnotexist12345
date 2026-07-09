@@ -29,6 +29,14 @@
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization, x-internal-token, x-scheduler-secret"
 
+# ── Canonical Domain Redirect ───────────────────────────────────────────────
+
+[[redirects]]
+  from = "https://www.thispagedoesnotexist12345.tech/*"
+  to = "https://thispagedoesnotexist12345.tech/:splat"
+  status = 301
+  force = true
+
 # ── Core API functions ────────────────────────────────────────────────────────
 
 [[redirects]]
