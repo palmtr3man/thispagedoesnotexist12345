@@ -249,14 +249,16 @@ Seat by `event.entity_id`.
 
 | Surface | Mechanism |
 |---------|-----------|
-| Base44 automation | `rejectBrowserOrigin` — blocks browser `Origin` header only (no internal token) |
+| Base44 automation | `SEC06_INTERNAL_TOKEN` via `x-internal-token` or `Authorization: Bearer` (`requireInternalToken`) |
+
+Automation must pass the internal token on each invoke. Browser `Origin` requests are rejected.
 
 ### Deploy checklist
 
 1. Copy `base44-functions/autoPilotBoardingSend.ts`, `base44-functions/boardingDispatch.ts`, `base44-functions/handleSeatOpened.ts`, `base44-functions/sendgridTemplateData.ts`, and `base44-functions/shared/*` into Base44 Dashboard → Code → Functions.
 2. Add `auto_pilot_enabled` (boolean) to the `NextFlightConfig` entity schema.
-3. Wire a Seat entity automation: trigger on `status` change → `opened`, action → invoke `autoPilotBoardingSend`.
-4. Ensure SendGrid env vars are set (see handleSeatOpened section — shared via `boardingDispatch.ts`).
+3. Wire a Seat entity automation: trigger on `status` change → `opened`, action → invoke `autoPilotBoardingSend` with `x-internal-token` / Bearer set to `SEC06_INTERNAL_TOKEN`.
+4. Ensure SendGrid env vars and `SEC06_INTERNAL_TOKEN` are set (see handleSeatOpened section — shared via `boardingDispatch.ts`).
 5. Enable AutoPilot in Admin → Next Flight Config when ready for live sends.
 
 ## handleSeatOpened

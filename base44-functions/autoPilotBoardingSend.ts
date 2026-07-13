@@ -8,6 +8,7 @@
  * Idempotency: boarding_confirmation_sent_at on the Seat record prevents
  * duplicate sends — boardingDispatch already enforces this.
  *
+ * Auth: SEC06_INTERNAL_TOKEN via x-internal-token or Authorization Bearer.
  * Deploy source of truth: career-navigator/base44/functions/autoPilotBoardingSend/
  * Git remote: https://github.com/palmtr3man/career-navigator.git
  */
@@ -15,12 +16,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { sendSeatConfirmation } from './boardingDispatch.ts';
 import { evaluateAutoPilotBoardingSend } from './shared/autoPilotBoardingSend-logic.mjs';
-import { auditInvocation, rejectBrowserOrigin } from './shared/invocationGuard.ts';
+import { auditInvocation, requireInternalToken } from './shared/invocationGuard.ts';
 import type { SeatRecord } from './sendgridTemplateData.ts';
 
 Deno.serve(async (req) => {
-  const originGuard = rejectBrowserOrigin(req);
-  if (!originGuard.ok) return originGuard.response;
+  const guard = requireInternalToken(req);
+  if (!guard.ok) return guard.response;
 
   try {
     const base44 = createClientFromRequest(req);
@@ -31,7 +32,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'invalid_automation_payload' }, { status: 400 });
     }
 
-    auditInvocation('autoPilotBoardingSend', originGuard, {
+    auditInvocation('autoPilotBoardingSend', guard, {
       event_type: event.type,
       entity_id: event.entity_id,
     });
