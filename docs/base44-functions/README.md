@@ -176,7 +176,7 @@ platform-managed secrets whitelist. Remediation has two parts:
 | `patchUserSeatId` | pilot TUJ code (admin self-test) | `DEMO_SEAT_ID` | `PILOT_USER_TUJ_CODE`, `PILOT_SEAT_ID` |
 | `getCohortStatus` | active flight fallback (other functions) | `ACTIVE_FLIGHT_ID` | `ACTIVE_FLIGHT_CODE` |
 | `sendgridTemplateData` | active flight fallback | `ACTIVE_FLIGHT_ID` | `ACTIVE_FLIGHT_CODE` |
-| `patchAlphaSeats` | *(removed)* | — | PII manifest now loaded from Passenger entities or POST body |
+| `patchAlphaSeats` | *(removed)* | — | PII manifest from POST body only (`{ manifest, force? }`); dry-run unless `force: true` |
 
 ### Deploy patched functions
 
@@ -195,6 +195,7 @@ Reference copies in this repo:
 | `syncPassengerPipeline` | `base44-functions/syncPassengerPipeline.ts` |
 | `syncBmacMembers` | `base44-functions/syncBmacMembers.ts` |
 | `patchUserSeatId` | `base44-functions/patchUserSeatId.ts` |
+| `patchAlphaSeats` | `base44-functions/patchAlphaSeats.ts` |
 | Shared helpers | `base44-functions/shared/*` |
 
 Promote changes to **career-navigator** (`base44/functions/*/entry.ts`) before Base44 git sync deploys.
@@ -211,7 +212,7 @@ base44 secrets set \
   ACTIVE_FLIGHT_ID=FL_051126
 ```
 
-Remove `ALPHA_MANIFEST_JSON` from Base44 function env after deploying `patchAlphaSeats` — manifest PII now lives in Passenger records.
+Remove `ALPHA_MANIFEST_JSON` from Base44 function env after deploying `patchAlphaSeats` — pass the manifest in the POST body only (`{ "manifest": [...], "force": true }` to apply; omit `force` for dry-run).
 
 Re-run the Base44 security scan after deploy to confirm all findings clear.
 
