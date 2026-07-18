@@ -75,3 +75,13 @@ Items from the Jul 18 “outstanding maintenance” checklist that are **killed 
 ---
 
 Kevin Clark · Jul 18, 2026
+
+---
+
+## Related CI blocker (PR #83 · Jul 18, 2026)
+
+`drift-check` fails with Infisical **404: Service token … not found**.
+
+- Code path `INFISICAL_PATH = "/"` is intentional (commit `d4d7ca6`); last green run Jul 15 used the same path.
+- GitHub secret `INFISICAL_TOKEN` was last updated **2026-07-09**; the Infisical-side service token was revoked or deleted after Jul 15.
+- **Action (Pilot KC):** create a new Infisical service/machine token for project `6c7646e9-04dd-484a-a5d1-612b9582da15` (staging `/`), update repo secret `INFISICAL_TOKEN`, re-run the workflow. No code path change required.

@@ -8,6 +8,7 @@
   SECRETS_SCAN_OMIT_PATHS = "supabase/migrations"
 
 [functions]
+  node_bundler = "esbuild"
 
 [[plugins]]
   package = "./plugins/netlify-plugin-function-env-guard"
@@ -33,6 +34,12 @@
 
 [[redirects]]
   from = "https://thispagedoesnotexist12345.com/*"
+  to = "https://thispagedoesnotexist12345.tech/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.thispagedoesnotexist12345.com/*"
   to = "https://thispagedoesnotexist12345.tech/:splat"
   status = 301
   force = true
@@ -289,6 +296,11 @@
 [[redirects]]
   from = "/dashboard/*"
   to = "/?status=boarded"
+  status = 200
+
+[[redirects]]
+  from = "/linkedin"
+  to = "/l/linkedin/"
   status = 200
 
 # Catch-all SPA rewrite: all other paths serve the root index.html
