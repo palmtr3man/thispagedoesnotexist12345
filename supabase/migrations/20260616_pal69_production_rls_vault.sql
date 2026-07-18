@@ -6,6 +6,12 @@
 --   2. Fix waitlist_submissions anon INSERT policy (broken WITH CHECK was blocking client inserts)
 --   3. Apply PAL-69 RLS lockdown to five operational tables missing from SEC-02
 --
+-- DRIFT (read-only audit 2026-07-18): live tuj-backend has no supabase_vault extension
+-- and pgsodium is not installed. Treat §1 (Vault) as NOT verified on prod until
+-- pg_extension / vault.secrets evidence exists. See:
+--   docs/tuj-backend-corrected-audit-2026-07-18.md
+-- Do not chase TC-01 / ALTER EXTENSION supabase_vault UPDATE as a prod blocker.
+--
 -- NOTE: The SERVICE_ROLE_KEY value is NOT stored in this file.
 --       Apply via Supabase SQL editor with the secret substituted, or use:
 --         SELECT vault.create_secret('<key>', 'SERVICE_ROLE_KEY', 'description');

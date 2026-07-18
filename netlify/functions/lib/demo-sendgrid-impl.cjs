@@ -23,8 +23,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { TEMPLATES, templateKeyForId } = require('./sendgrid-templates');
-const { validateDemoSecret } = require('./shared/sec06-auth.js');
+const { TEMPLATES, templateKeyForId } = require('./sendgrid-templates.js');
+const { validateDemoSecret } = require('../shared/sec06-auth.js');
 
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
@@ -276,7 +276,7 @@ exports.handler = async (event) => {
       if (key === 'boarding_pass_free_v1') {
         preview.cta = {
           primary_cta: { label: 'Mission Control', href: dynamicData.passport_url, field: 'passport_url' },
-          secondary_cta: { label: 'Read your wheels-up briefing', href: dynamicData.wheels_up_url, field: 'wheels_up_url' },
+          secondary_cta: { label: 'Read your Alpha Arrival briefing', href: dynamicData.wheels_up_url, field: 'wheels_up_url' },
           unsubscribe: { href: dynamicData.unsubscribe_url, field: 'unsubscribe_url' },
         };
       }

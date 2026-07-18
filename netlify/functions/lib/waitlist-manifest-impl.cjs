@@ -25,7 +25,7 @@
  * BLOCKER-03 (2026-04-15): Initial implementation.
  */
 
-const { validateAdminHeader } = require('./shared/sec06-auth.js');
+const { validateAdminHeader } = require('../shared/sec06-auth.js');
 
 exports.handler = async function (event) {
   const headers = {

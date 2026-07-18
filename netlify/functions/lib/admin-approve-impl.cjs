@@ -43,8 +43,8 @@
  * - Stamps boarding_emails_sent + boarding_sent_at on seat_requests after email sequence
  */
 
-const { sendSeatConfirmation } = require('./sendgrid-integration');
-const { validateAdminHeader } = require('./shared/sec06-auth.js');
+const { sendSeatConfirmation } = require('./sendgrid-integration-impl.cjs');
+const { validateAdminHeader } = require('../shared/sec06-auth.js');
 
 const SEAT_ID_PREFIX = 'TUJ-';
 const SEAT_ID_CHARS  = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I ambiguity

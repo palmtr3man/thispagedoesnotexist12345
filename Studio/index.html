@@ -712,7 +712,7 @@
           <div class="mc-tower-signal"></div>
           <div class="mc-operator-blip one"><small id="blipLabel1">Recruiter desk</small><strong id="blipStatus1">Gate 03 · reviewing profile</strong></div>
           <div class="mc-operator-blip two"><small id="blipLabel2">ATS filter</small><strong id="blipStatus2">Ramp check · parsing resume</strong></div>
-          <div class="mc-operator-blip three"><small id="blipLabel3">Referral line</small><strong id="blipStatus3">Pushback queued · waiting handoff</strong></div>
+          <div class="mc-operator-blip three"><small id="blipLabel3">Referral line</small><strong id="blipStatus3">Onward move queued · waiting handoff</strong></div>
           <div class="mc-plane" aria-hidden="true"></div>
           <div class="mc-launchpad" aria-hidden="true"></div>
           <div class="mc-smoke" aria-hidden="true"></div>
@@ -1654,6 +1654,82 @@ function initGatewayCtas() {
     return headers;
   }
 
+  function formatDateLabel(dateStr) {
+    if (!dateStr) return dateStr;
+    var d = new Date(dateStr + 'T00:00:00.000Z');
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+  }
+
+  function midpointDate(startStr, endStr) {
+    var start = new Date(startStr + 'T00:00:00.000Z');
+    var end   = new Date(endStr   + 'T00:00:00.000Z');
+    var mid   = new Date((start.getTime() + end.getTime()) / 2);
+    return mid.toISOString().slice(0, 10);
+  }
+
+  function renderDateOptions(windowStart, windowEnd, seatId, passengerEmail) {
+    var optionA = windowStart;
+    var optionB = midpointDate(windowStart, windowEnd);
+    var optionC = windowEnd;
+    var container = document.getElementById('departureDateOptions');
+    if (!container) return;
+    container.innerHTML = '';
+    var options = [
+      { label: 'Earliest — ' + formatDateLabel(optionA), value: optionA },
+      { label: 'Mid-window — ' + formatDateLabel(optionB), value: optionB },
+      { label: 'Latest — ' + formatDateLabel(optionC), value: optionC }
+    ];
+    options.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.className = 'btn-secondary-studio';
+      btn.style.cssText = 'text-align:left; padding:10px 16px; font-size:13px; width:100%;';
+      btn.textContent = opt.label;
+      btn.addEventListener('click', function () {
+        handleDateSelection(opt.value, seatId, passengerEmail, container);
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  async function updateDeparture(seatId, email, date) {
+    var res = await fetch(SET_DEPARTURE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seat_id: seatId, passenger_email: email, selected_date: date })
+    });
+    if (!res.ok) throw new Error('Failed to set onward date');
+    return res.json();
+  }
+
+  async function handleDateSelection(selectedDate, seatId, passengerEmail, optionsContainer) {
+    var confirmMsg = document.getElementById('departureConfirmMsg');
+    var errorMsg   = document.getElementById('departureErrorMsg');
+    if (confirmMsg) { confirmMsg.classList.add('hidden'); confirmMsg.textContent = ''; }
+    if (errorMsg)   { errorMsg.classList.add('hidden');   errorMsg.textContent = ''; }
+    if (optionsContainer) {
+      optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = true; b.style.opacity = '0.5'; });
+    }
+    showStatus('loading', 'Updating onward date...');
+    try {
+      await updateDeparture(seatId, passengerEmail, selectedDate);
+      showStatus('success', 'Next move set!');
+      if (confirmMsg) {
+        confirmMsg.textContent = '✈️ Next move set · ' + formatDateLabel(selectedDate);
+        confirmMsg.classList.remove('hidden');
+      }
+      setTimeout(hideStatus, 4000);
+    } catch (err) {
+      showStatus('error', 'Error setting onward date: ' + err.message);
+      if (errorMsg) {
+        errorMsg.textContent = 'Could not confirm onward date: ' + err.message + '. Please try again or contact support.';
+        errorMsg.classList.remove('hidden');
+      }
+      if (optionsContainer) {
+        optionsContainer.querySelectorAll('button').forEach(function (b) { b.disabled = false; b.style.opacity = '1'; });
+      }
+    }
+  }
+
   async function fetchSeatDetails(seatId) {
     var res = await fetch(BASE44_SEAT_API + '?tuj_code=' + encodeURIComponent(seatId), {
       headers: buildHeaders()
@@ -1663,66 +1739,96 @@ function initGatewayCtas() {
     return Array.isArray(data) ? data[0] : (data.items ? data.items[0] : data);
   }
 
-  async function updateDeparture(seatId, email, date) {
-    var res = await fetch(SET_DEPARTURE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ seat_id: seatId, passenger_email: email, selected_date: date })
-    });
-    return res.json();
-  }
-
-  window.confirmDeparture = async function (date) {
-    var seatId = sessionStorage.getItem('seat_id');
-    var email = sessionStorage.getItem('passenger_email');
-    if (!seatId || !email) return;
-
-    var btn = document.querySelector('[onclick="confirmDeparture(\'' + date + '\')"]');
-    var originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Confirming...';
-
-    var res = await updateDeparture(seatId, email, date);
-    if (res.ok) {
-      document.getElementById('departureDateOptions').classList.add('hidden');
-      var msg = document.getElementById('departureConfirmMsg');
-      msg.textContent = 'Departure confirmed for ' + date + '. Check your email for next steps.';
-      msg.classList.remove('hidden');
-    } else {
-      var err = document.getElementById('departureErrorMsg');
-      err.textContent = res.error || 'Failed to confirm departure.';
-      err.classList.remove('hidden');
-      btn.disabled = false;
-      btn.innerHTML = originalText;
-    }
-  };
-
   async function initDepartureSelector() {
     var seatId = new URLSearchParams(window.location.search).get('seat_id') || sessionStorage.getItem('seat_id');
     if (!seatId) return;
 
     var seat = await fetchSeatDetails(seatId);
     if (!seat || !seat.departure_window_start || !seat.departure_window_end) return;
-    if (seat.scheduled_departure_date) return; // already scheduled
+    if (seat.scheduled_departure_date) return;
 
     if (seat.user_email) sessionStorage.setItem('passenger_email', seat.user_email);
 
-    var start = new Date(seat.departure_window_start);
-    var end = new Date(seat.departure_window_end);
-    var html = '';
-
-    for (var d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      var dateStr = d.toISOString().split('T')[0];
-      html += '<button class="btn-secondary-studio" onclick="confirmDeparture(\'' + dateStr + '\')">' + dateStr + '</button>';
-    }
-
-    if (html) {
-      document.getElementById('departureDateOptions').innerHTML = html;
-      document.getElementById('departureSelectorPanel').classList.remove('hidden');
-    }
+    var panel = document.getElementById('departureSelectorPanel');
+    if (panel) panel.classList.remove('hidden');
+    renderDateOptions(seat.departure_window_start, seat.departure_window_end, seatId, seat.user_email);
   }
 
   window.initDepartureSelector = initDepartureSelector;
+})();
+
+// ============================================================
+// BLOCKER-06: STUDIO STATEFUL ROUTING
+// ============================================================
+(function() {
+  const SEAT_STATUS_API = '/api/seat-status';
+  const ATS_MATCH_URL = '/Studio/ATS-Match';
+  const SEAT_REQUEST_URL = '/Studio/Seat-Request';
+
+  function switchCtaState(state, label = '') {
+    const states = ['loading', 'no-seat', 'fit-check', 'request-seat', 'seat-active', 'error'];
+    states.forEach(s => {
+      const el = document.getElementById('b06-state-' + s);
+      if (el) el.style.display = (s === state) ? 'flex' : 'none';
+      if (el && (s === 'fit-check' || s === 'request-seat' || s === 'error' || s === 'no-seat')) {
+         el.style.display = (s === state) ? 'block' : 'none';
+      }
+    });
+    if (state === 'seat-active' && label) {
+      const labelEl = document.getElementById('b06-seat-status-label');
+      if (labelEl) labelEl.textContent = label;
+    }
+  }
+
+  async function fetchSeatStatus(seatId) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const res = await fetch(`${SEAT_STATUS_API}?seat_id=${encodeURIComponent(seatId)}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.error('[Blocker-06] Status fetch failed:', err);
+      throw err;
+    }
+  }
+
+  window.initStudioRouting = async function() {
+    const params = new URLSearchParams(window.location.search);
+    const seatId = params.get('seat_id') || sessionStorage.getItem('seat_id');
+    const tujCode = params.get('tuj_code') || sessionStorage.getItem('tuj_code') || '';
+    if (tujCode) sessionStorage.setItem('tuj_code', tujCode);
+    if (!seatId) {
+      switchCtaState('no-seat');
+      return;
+    }
+
+    switchCtaState('loading');
+
+    try {
+      const data = await fetchSeatStatus(seatId);
+      const status = data.resume_fit_check_status || 'unknown';
+
+      if (status === 'complete') {
+        switchCtaState('request-seat');
+        const btn = document.getElementById('b06-btn-request-seat');
+        if (btn) btn.href = `${SEAT_REQUEST_URL}?seat_id=${encodeURIComponent(seatId)}${tujCode ? '&tuj_code=' + encodeURIComponent(tujCode) : ''}`;
+      } else if (data.seat_status === 'active' || data.seat_status === 'held') {
+        switchCtaState('seat-active', data.seat_status === 'active' ? 'Seat confirmed' : 'Seat held');
+      } else {
+        switchCtaState('fit-check');
+        const btn = document.getElementById('b06-btn-fit-check');
+        if (btn) btn.href = `${ATS_MATCH_URL}?seat_id=${encodeURIComponent(seatId)}${tujCode ? '&tuj_code=' + encodeURIComponent(tujCode) : ''}`;
+      }
+    } catch (err) {
+      switchCtaState('error');
+    }
+  };
 })();
 
 // ============================================================
@@ -1730,10 +1836,20 @@ function initGatewayCtas() {
 // ============================================================
 async function init() {
   const params = new URLSearchParams(window.location.search);
-  currentResumeId = params.get('resumeId') || params.get('id');
+  const seatId = params.get('seat_id');
+  const tujCode = params.get('tuj_code');
+  const resumeId = params.get('resume_id') || params.get('resumeId') || params.get('id');
+
+  if (seatId) sessionStorage.setItem('seat_id', seatId);
+  if (tujCode) sessionStorage.setItem('tuj_code', tujCode);
+  if (resumeId) currentResumeId = resumeId;
 
   initGatewayCtas();
   initCareerNavigatorCard();
+
+  if (window.initStudioRouting) {
+    await window.initStudioRouting();
+  }
 
   if (currentResumeId) {
     await loadResumeFromCareerNavigator(currentResumeId);
@@ -1746,6 +1862,9 @@ async function init() {
   });
 
   window.initDepartureSelector();
+
+  const savedTheme = localStorage.getItem('tuj_theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
 
   // Dark mode toggle listener
   const themeToggle = document.querySelector('[data-theme-toggle]');

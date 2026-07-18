@@ -22,7 +22,7 @@
  *   }
  */
 
-const { validateAdminHeader } = require('./shared/sec06-auth.js');
+const { validateAdminHeader } = require('../shared/sec06-auth.js');
 
 const HEADERS = {
   'Access-Control-Allow-Origin': process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.com',

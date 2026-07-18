@@ -58,6 +58,79 @@ export const GATE = {
   }
 };
 
+/** Cabin tiers written to PassengerFlight.cabin before BMAC redirect (Option A). */
+export const CABIN_CLASSES = Object.freeze({
+  ECONOMY:  'Economy',
+  BUSINESS: 'Business',
+  FIRST:    'First',
+});
+
+/** BMAC checkout surface — cabin must be stamped on PassengerFlight before redirect. */
+export const BMAC_CHECKOUT = Object.freeze({
+  SUPPORT_URL: 'https://buymeacoffee.com/theultimatejourney',
+  PAID_CABINS: new Set(['Business', 'First']),
+});
+
+/** Maps PassengerFlight.cabin to Seat.cabin_class (boarding path enum). */
+export function cabinToSeatClass(cabin) {
+  const value = String(cabin || '').trim();
+  if (value === CABIN_CLASSES.FIRST) return 'First';
+  return CABIN_CLASSES.ECONOMY;
+}
+
+/**
+ * prepareBmacCabinCheckout — Option A precondition write before BMAC redirect.
+ *
+ * @param {object} base44 — authenticated Base44 SDK client
+ * @param {{ cabin: string, flightId?: string }} opts
+ */
+export async function prepareBmacCabinCheckout(base44, { cabin, flightId } = {}) {
+  if (!base44?.entities?.PassengerFlight) {
+    return { ok: false, error: 'base44_client_required' };
+  }
+
+  const normalizedCabin = String(cabin || '').trim();
+  const validCabins = Object.values(CABIN_CLASSES);
+  if (!validCabins.includes(normalizedCabin)) {
+    return { ok: false, error: 'invalid_cabin', valid: validCabins };
+  }
+
+  const me = await base44.auth.me();
+  if (!me?.id) {
+    return { ok: false, error: 'auth_required' };
+  }
+
+  if (me.is_sponsored === true) {
+    return { ok: false, error: 'sponsored_bypass' };
+  }
+
+  const filter = { passenger_id: me.id, bmac_payment_confirmed: false };
+  if (flightId) filter.flight_id = String(flightId).trim();
+
+  const rows = await base44.entities.PassengerFlight.filter(filter);
+  if (!rows?.length) {
+    return { ok: false, error: 'no_passenger_flight_row' };
+  }
+
+  const flight = rows.sort((a, b) => {
+    const aTime = a.joined_at ? new Date(a.joined_at).getTime() : 0;
+    const bTime = b.joined_at ? new Date(b.joined_at).getTime() : 0;
+    return bTime - aTime;
+  })[0];
+
+  await base44.entities.PassengerFlight.update(flight.id, {
+    cabin: normalizedCabin,
+    bmac_payment_confirmed: false,
+  });
+
+  return {
+    ok: true,
+    passengerFlightId: flight.id,
+    cabin: normalizedCabin,
+    redirectUrl: BMAC_CHECKOUT.SUPPORT_URL,
+  };
+}
+
 /**
  * resolveState() — Two-State Machine (.com)
  */

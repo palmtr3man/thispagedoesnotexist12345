@@ -7,6 +7,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- `#34` / PAL-35 copy pass — reverse-flight Alpha Arrival framing on public `.com`, Studio, and SendGrid templates. Public labels no longer treat May 27 as departure; passenger onward-date selection stays available as "next move"; schema tokens (`departure_date`, `next_departure_date`) preserved.
+
 ---
 
 ## [2026-04-12] — F-190 Phase 2: AutoSend Retired — SendGrid-Only Boarding Sequence

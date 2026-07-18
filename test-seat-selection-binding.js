@@ -1,6 +1,6 @@
 const assert = require('assert');
-const seatClaim = require('./netlify/functions/seat-claim.js');
-const seatMap = require('./netlify/functions/seat-map.js');
+const seatClaim = require('./netlify/functions/lib/seat-claim-impl.cjs');
+const seatMap = require('./netlify/functions/lib/seat-map-impl.cjs');
 
 process.env.BASE44_SEAT_URL = 'https://app.base44.com/api/apps/test/entities/Seat';
 process.env.BASE44_SEAT_LIST_URL = 'https://app.base44.com/api/apps/test/entities/Seat';

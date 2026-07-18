@@ -4,8 +4,9 @@
 
 'use strict';
 
-const { runAlignmentLoop } = require('./shared/alignment-core.js');
-const { validateAlignmentLoopTrigger } = require('./shared/sec06-auth.js');
+const { runAlignmentLoop } = require('../shared/alignment-core.js');
+const { notifyTaskFailure } = require('../shared/notify-task-failure.cjs');
+const { validateAlignmentLoopTrigger } = require('../shared/sec06-auth.js');
 
 exports.handler = async function handler(event) {
   // Auth gate - only allow scheduled or internal trigger
@@ -31,6 +32,11 @@ exports.handler = async function handler(event) {
       }),
     };
   } catch (err) {
+    await notifyTaskFailure({
+      task: 'alignment-loop',
+      error: err.message,
+      details: { trigger: triggerType },
+    });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

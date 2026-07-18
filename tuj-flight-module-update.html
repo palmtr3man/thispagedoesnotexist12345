@@ -56,17 +56,18 @@
           </div>
         </div>
 
-        <!-- ── DEPARTURE: Date + Time paired ─────────────────────────────
+        <!-- ── ALPHA ARRIVAL + NEXT HORIZON: Date + Horizon paired ───────
              JS targets: #departure-date (existing), #departure-time-badge (existing)
-             Driven by: status.nextflightdeparturedate (existing field)
+             Driven by: status.next_departure_date → Alpha Arrival display
+             Next departure horizon is separate (June 19 TBD onward movement)
              ──────────────────────────────────────────────────────────── -->
         <div class="status-pair">
-          <span class="status-pair-label">Departure</span>
+          <span class="status-pair-label">Alpha Arrival</span>
           <div class="status-pair-values">
             <span class="badge badge--arriving" id="departure-date">
-              <span class="arriving-dot"></span>April 3
+              <span class="arriving-dot"></span>May 27
             </span>
-            <span class="badge badge--highlight" id="departure-time-badge">2:01 AM ET</span>
+            <span class="badge badge--highlight" id="departure-time-badge">Next Move Horizon · TBD</span>
           </div>
         </div>
       </div>
@@ -106,7 +107,7 @@
             <span class="countdown-label">Seconds</span>
           </div>
         </div>
-        <div class="countdown-departed" id="countdown-departed" style="display:none;">✈️ Wheels Up — Flight Departed</div>
+        <div class="countdown-departed" id="countdown-departed" style="display:none;">Alpha Arrived — Phase 4 Closed</div>
       </div>
 
       <!-- ── SEAT INVALID RECOVERY NOTICE (preserved as-is) ───────────── -->
