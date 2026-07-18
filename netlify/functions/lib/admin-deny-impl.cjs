@@ -42,8 +42,8 @@
  *   BEEHIIV_PUB_ID                — beehiiv publication ID (required for tag updates)
  */
 
-const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
-const { validateAdminHeader } = require('./shared/sec06-auth.js');
+const { TEMPLATES, assertTemplates } = require('./sendgrid-templates.js');
+const { validateAdminHeader } = require('../shared/sec06-auth.js');
 
 assertTemplates(['next_flight_waitlist_v1']);
 const TEMPLATE_NEXT_FLIGHT_WAITLIST = TEMPLATES.next_flight_waitlist_v1;

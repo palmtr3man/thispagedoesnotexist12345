@@ -196,6 +196,8 @@ Reference copies in this repo:
 | `syncBmacMembers` | `base44-functions/syncBmacMembers.ts` |
 | `patchUserSeatId` | `base44-functions/patchUserSeatId.ts` |
 | `patchAlphaSeats` | `base44-functions/patchAlphaSeats.ts` |
+| `attachQrCode` | `base44-functions/attachQrCode.ts` |
+| `gmailJobScanner` | `base44-functions/gmailJobScanner.ts` |
 | Shared helpers | `base44-functions/shared/*` |
 
 Promote changes to **career-navigator** (`base44/functions/*/entry.ts`) before Base44 git sync deploys.
@@ -464,3 +466,111 @@ Base44 scheduled functions should call via `notifyTaskFailureBestEffort` from
 `shared/notifyTaskFailureClient.ts` (set `NOTIFY_TASK_FAILURE_URL` to the deployed
 function URL). Netlify also needs `SENDGRID_API_KEY` and `SENDGRID_FROM_EMAIL` for
 the shared helper.
+
+## attachQrCode
+
+| Surface | Path |
+|---------|------|
+| Base44 (deploy target) | `base44-functions/attachQrCode.ts` |
+| Netlify | — (admin panel calls Base44 function URL directly) |
+
+### Purpose
+
+Generates a branded QR code (navy modules, white background, center TUJ logo) encoding
+the passenger's Mission Control URL (`APP_BASE_URL/?seat_id=TUJ-XXXXXX`), uploads it via
+`Core.UploadFile`, and stamps `qr_code_url` on the Seat entity.
+
+Only runs for **paid** passengers — resolved via `resolveBoardingPath` from
+`sendgridTemplateData.ts` (`cabin_class: 'First'`). Skips free, VIP, and alpha paths.
+
+### Request payload
+
+```json
+{ "seat_id": "TUJ-CC2222" }
+```
+
+### Response
+
+```json
+{
+  "ok": true,
+  "seat_id": "TUJ-CC2222",
+  "qr_code_url": "https://...",
+  "mission_control_url": "https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-CC2222"
+}
+```
+
+Skipped (non-paid):
+
+```json
+{
+  "ok": false,
+  "skipped": true,
+  "reason": "Seat is not on the paid (First class) boarding path — QR code not generated",
+  "seat_id": "TUJ-CC2222"
+}
+```
+
+### Auth
+
+| Surface | Mechanism |
+|---------|-----------|
+| Base44 | `base44.auth.me()` — caller must have `role === 'admin'` |
+
+### Required env — Base44 deploy
+
+```
+APP_BASE_URL
+```
+
+### Deploy checklist
+
+1. Copy `base44-functions/attachQrCode.ts`, `base44-functions/sendgridTemplateData.ts`, and `base44-functions/shared/*` into Base44 Dashboard → Code → Functions (or promote via career-navigator git sync).
+2. Set `APP_BASE_URL` in Base44 secrets vault.
+3. Wire Admin panel "Generate QR" action to POST `{ seat_id }` to the deployed function URL with admin session.
+4. Optionally invoke after seat activation when `cabin_class === 'First'`.
+
+### curl — Base44 function URL
+
+```bash
+curl -sS -X POST "$BASE44_ATTACH_QR_CODE_URL" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ADMIN_SESSION_TOKEN" \
+  -d '{ "seat_id": "TUJ-CC2222" }'
+```
+
+## gmailJobScanner
+
+| Surface | Path |
+|---------|------|
+| Base44 (deploy target) | `base44-functions/gmailJobScanner.ts` |
+| Netlify | — (Gmail Pub/Sub pushes directly to Base44 function URL) |
+
+### Purpose
+
+Gmail Pub/Sub push handler. Reads Gmail history deltas, classifies job-search
+emails (application confirmation, interview invite, rejection), and upserts
+`Application` records. Maintains cursor state in `GmailSyncState`.
+
+### Auth
+
+| Surface | Mechanism |
+|---------|-----------|
+| Base44 | Google Pub/Sub push JWT (`Authorization: Bearer`) verified via `tokeninfo`, or `SEC06_INTERNAL_TOKEN` |
+
+### Required env — Base44 deploy
+
+```
+SEC06_INTERNAL_TOKEN
+GMAIL_PUBSUB_AUDIENCE          # recommended — Pub/Sub push JWT aud claim
+```
+
+Gmail OAuth connector must be configured in Base44 (`connectors.getConnection('gmail')`).
+
+### Deploy checklist
+
+1. Copy `base44-functions/gmailJobScanner.ts` and `base44-functions/shared/*` into Base44 Dashboard → Code → Functions (or promote via career-navigator git sync).
+2. Set `GMAIL_PUBSUB_AUDIENCE` to the Pub/Sub push subscription audience (function URL).
+3. Register the Base44 function URL as the Gmail watch Pub/Sub push endpoint.
+4. Ensure `GmailSyncState` and `Application` entities exist with expected fields.
+

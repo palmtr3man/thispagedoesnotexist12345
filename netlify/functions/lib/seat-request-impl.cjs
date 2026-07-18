@@ -56,7 +56,7 @@
  */
 
 const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
-const { verifyAgeToken } = require('./verify-age');
+const { verifyAgeToken } = require('./verify-age-impl.cjs');
 
 const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'seat-request';
 const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';

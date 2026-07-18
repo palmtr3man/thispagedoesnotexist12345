@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "drift-check": "tsx scripts/drift-check.ts",
+    "sync-drift-keys": "tsx scripts/sync-drift-keys.ts",
     "test": "vitest run"
   },
   "devDependencies": {

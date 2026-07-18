@@ -23,8 +23,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { TEMPLATES, templateKeyForId } = require('./sendgrid-templates');
-const { validateDemoSecret } = require('./shared/sec06-auth.js');
+const { TEMPLATES, templateKeyForId } = require('./sendgrid-templates.js');
+const { validateDemoSecret } = require('../shared/sec06-auth.js');
 
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;

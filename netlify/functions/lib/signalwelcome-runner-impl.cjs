@@ -35,8 +35,8 @@
  *   SIGNALWELCOME_CANDIDATE_TAG    optional; if set, only subscribers with this tag are eligible
  */
 
-const { validateInternalOrSchedulerOrNetlifySchedule } = require('./shared/sec06-auth.js');
-const { notifyTaskFailure } = require('./shared/notify-task-failure.cjs');
+const { validateInternalOrSchedulerOrNetlifySchedule } = require('../shared/sec06-auth.js');
+const { notifyTaskFailure } = require('../shared/notify-task-failure.cjs');
 
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',

@@ -4,7 +4,7 @@ const assert = require('assert');
 const {
   validateAlignmentLoopTrigger,
 } = require('./netlify/functions/shared/sec06-auth.js');
-const { handler } = require('./netlify/functions/alignment-loop.js');
+const { handler } = require('./netlify/functions/lib/alignment-loop-impl.cjs');
 
 function event(overrides = {}) {
   return {

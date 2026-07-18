@@ -35,9 +35,9 @@
  *   }
  */
 
-const { validateBeehiivSyncIdentity } = require('./lib/beehiiv-flight-identity');
-const { notifyTaskFailure } = require('./shared/notify-task-failure.cjs');
-const { validateAdminHeader } = require('./shared/sec06-auth.js');
+const { validateBeehiivSyncIdentity } = require('./beehiiv-flight-identity');
+const { notifyTaskFailure } = require('../shared/notify-task-failure.cjs');
+const { validateAdminHeader } = require('../shared/sec06-auth.js');
 
 const HEADERS = {
   'Access-Control-Allow-Origin': process.env.ADMIN_ORIGIN || 'https://thispagedoesnotexist12345.com',

@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { handler } = require('./netlify/functions/mission-control-bind.js');
+const { handler } = require('./netlify/functions/lib/mission-control-bind-impl.cjs');
 
 process.env.SEC06_INTERNAL_TOKEN = 'test-secret';
 process.env.ADMIN_ORIGIN = 'https://thispagedoesnotexist12345.com';

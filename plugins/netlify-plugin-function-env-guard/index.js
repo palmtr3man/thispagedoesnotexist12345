@@ -140,8 +140,7 @@ function canTrim(name) {
   return true;
 }
 
-module.exports = {
-  onPostBuild({ utils }) {
+function trimFunctionEnvironment({ utils, phase }) {
     const entries = Object.entries(process.env);
     for (const [name] of entries) {
       if (shouldDeleteFromEnvironment(name)) {
@@ -153,7 +152,7 @@ module.exports = {
     const initialSize = envByteSize(functionEntries);
 
     if (initialSize <= TARGET_MAX_BYTES) {
-      console.log(`[function-env-guard] Environment payload is ${initialSize} bytes; no trimming needed.`);
+      console.log(`[function-env-guard:${phase}] Environment payload is ${initialSize} bytes; no trimming needed.`);
       return;
     }
 
@@ -176,13 +175,21 @@ module.exports = {
     }
 
     console.log(
-      `[function-env-guard] Trimmed ${trimmedCount} non-function environment variable(s); estimated payload ${currentSize} bytes.`
+      `[function-env-guard:${phase}] Trimmed ${trimmedCount} non-function environment variable(s); estimated payload ${currentSize} bytes.`
     );
 
     if (currentSize > BYTE_LIMIT) {
       utils.build.failBuild(
-        `Function environment is still above AWS Lambda's ${BYTE_LIMIT} byte limit after trimming non-function variables. Move large required function values to function-scoped Netlify environment variables or an external secret store.`
+        `Function environment is still above AWS Lambda's ${BYTE_LIMIT} byte limit after trimming non-function variables. Migrate functions to the modern Netlify Functions runtime (export default + Request/Response) or scope large values to Builds-only in the Netlify UI.`
       );
     }
+}
+
+module.exports = {
+  onPreBuild(ctx) {
+    trimFunctionEnvironment({ ...ctx, phase: 'pre' });
+  },
+  onPostBuild(ctx) {
+    trimFunctionEnvironment({ ...ctx, phase: 'post' });
   },
 };

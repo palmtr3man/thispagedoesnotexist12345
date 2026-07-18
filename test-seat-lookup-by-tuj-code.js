@@ -1,6 +1,6 @@
 const assert = require('assert');
-const seatFn = require('./netlify/functions/seat.js');
-const seatStatusFn = require('./netlify/functions/seat-status.js');
+const seatFn = require('./netlify/functions/lib/seat-impl.cjs');
+const seatStatusFn = require('./netlify/functions/lib/seat-status-impl.cjs');
 
 process.env.BASE44_SEAT_URL = 'https://api.base44.com/api/apps/test/entities/Seat';
 process.env.BASE44_USER_URL = 'https://api.base44.com/api/apps/test/entities/User';

@@ -1,0 +1,6 @@
+{
+  "type": "commonjs",
+  "dependencies": {
+    "@netlify/aws-lambda-compat": "^1.0.2"
+  }
+}

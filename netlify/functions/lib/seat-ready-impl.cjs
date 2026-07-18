@@ -39,8 +39,8 @@
  */
 
 const crypto = require('crypto');
-const { sendSeatConfirmation } = require('./sendgrid-integration.js');
-const { validateInternalTrigger, validateHeaderSecret } = require('./shared/sec06-auth.js');
+const { sendSeatConfirmation } = require('./sendgrid-integration-impl.cjs');
+const { validateInternalTrigger, validateHeaderSecret } = require('../shared/sec06-auth.js');
 
 const VALID_SEAT_ID = /^TUJ-[A-Z2-9]{6}$/;
 const FETCH_TIMEOUT_MS = 8000;
