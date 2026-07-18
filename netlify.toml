@@ -3,14 +3,11 @@
   functions = "netlify/functions"
 
 [build.environment]
-  # Keep Netlify secrets-scan aligned with the current deploy scan surface.
-  SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID,NOTION_JD_PIPELINE_DB_ID,BEEHIIV_PUB_ID,DEMO_FIRST_NAME,DEMO_LAST_NAME,DEMO_ACCOUNT_EMAIL,DEMO_FLIGHT_CODE,DEMO_SEAT_ID,DEMO_SEAT_IDS,DEMO_SEND_SECRET,TASK_FAILURE_ALERT_EMAIL,TASK_FAILURE_EMAIL"
+  SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID,NOTION_JD_PIPELINE_DB_ID,BEEHIIV_PUB_ID"
   SECRETS_SCAN_OMIT_PATHS = "supabase/migrations"
 
 [functions]
-
-[[plugins]]
-  package = "./plugins/netlify-plugin-function-env-guard"
+  node_bundler = "esbuild"
 
 [[headers]]
   for = "/*.html"
@@ -29,25 +26,15 @@
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization, x-internal-token, x-scheduler-secret"
 
-# ── Canonical Domain Redirect ───────────────────────────────────────────────
-
 [[redirects]]
-  from = "https://thispagedoesnotexist12345.com/*"
-  to = "https://thispagedoesnotexist12345.tech/:splat"
+  from = "https://thispagedoesnotexist12345.tech/*"
+  to = "https://www.thispagedoesnotexist12345.tech/:splat"
   status = 301
   force = true
 
 [[redirects]]
-  from = "https://www.thispagedoesnotexist12345.tech/*"
-  to = "https://thispagedoesnotexist12345.tech/:splat"
-  status = 301
-  force = true
-
-# ── Core API functions ────────────────────────────────────────────────────────
-
-[[redirects]]
-  from = "/api/health"
-  to = "/.netlify/functions/health"
+  from = "/api/trpc/*"
+  to = "/.netlify/functions/trpc/:splat"
   status = 200
 
 [[redirects]]
@@ -86,17 +73,118 @@
   status = 200
 
 [[redirects]]
+  from = "/seat-selection"
+  to = "/seat-selection.html"
+  status = 200
+
+[[redirects]]
+  from = "/ResumeOnePageStudio"
+  to = "/Studio"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/ResumeOnePageStudio/*"
+  to = "/Studio/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/request-seat"
+  to = "/request-seat.html"
+  status = 200
+
+[[redirects]]
+  from = "/request-seat/"
+  to = "/request-seat.html"
+  status = 200
+
+[[redirects]]
+  from = "/OnboardingPassport"
+  to = "/onboardingpassport/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/OnboardingPassport/*"
+  to = "/onboardingpassport/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/Studio"
+  to = "/Studio/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/Studio/*"
+  to = "/Studio/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
   status = 200
 
-# tRPC router
 [[redirects]]
-  from = "/api/trpc/*"
-  to = "/.netlify/functions/trpc/:splat"
+  from = "/Dashboard"
+  to = "/?status=boarded"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/?status=boarded"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin-approve"
+  to = "/.netlify/functions/admin-approve"
   status = 200
 
-# ── v1 API namespace ────────────────────────────────────────────────────────
+[[redirects]]
+  from = "/api/admin-deny"
+  to = "/.netlify/functions/admin-deny"
+  status = 200
+
+[[redirects]]
+  from = "/api/waitlist-manifest"
+  to = "/.netlify/functions/waitlist-manifest"
+  status = 200
+
+[[redirects]]
+  from = "/api/demo-sendgrid"
+  to = "/.netlify/functions/demo-sendgrid"
+  status = 200
+
+[[redirects]]
+  from = "/api/beehiiv-sync"
+  to = "/.netlify/functions/beehiiv-sync"
+  status = 200
+
+[[redirects]]
+  from = "/api/alignment-loop"
+  to = "/.netlify/functions/manual-alignment-loop"
+  status = 200
+
+[[redirects]]
+  from = "/api/manual-alignment-loop"
+  to = "/.netlify/functions/manual-alignment-loop"
+  status = 200
+
+[functions."alignment-loop"]
+  schedule = "*/5 * * * *"
+
+[[redirects]]
+  from = "/api/signalwelcome-runner"
+  to = "/.netlify/functions/signalwelcome-runner"
+  status = 200
+
+[functions."signalwelcome-runner"]
+  schedule = "0 * * * *"
 
 [[redirects]]
   from = "/api/v1/user-config/*"
@@ -158,141 +246,7 @@
   to = "/.netlify/functions/telemetry/:splat"
   status = 200
 
-# ── Admin Tower — BLOCKER-03 / SEC-06: Approve/Deny + waitlist manifest ───────
-
 [[redirects]]
-  from = "/api/admin-approve"
-  to = "/.netlify/functions/admin-approve"
-  status = 200
-
-[[redirects]]
-  from = "/api/admin-deny"
-  to = "/.netlify/functions/admin-deny"
-  status = 200
-
-[[redirects]]
-  from = "/api/waitlist-manifest"
-  to = "/.netlify/functions/waitlist-manifest"
-  status = 200
-
-[[redirects]]
-  from = "/api/demo-sendgrid"
-  to = "/.netlify/functions/demo-sendgrid"
-  status = 200
-
-[[redirects]]
-  from = "/api/beehiiv-sync"
-  to = "/.netlify/functions/beehiiv-sync"
-  status = 200
-
-# BLOCKER-08 / PR #56: Alignment Loop — Notion ↔ SaaS drift detection + repair
-# Webhook: POST /api/alignment-loop (manual) or cron (scheduled)
-# We keep the scheduled function but map the manual trigger to a non-scheduled one.
-[[redirects]]
-  from = "/api/alignment-loop"
-  to = "/.netlify/functions/manual-alignment-loop"
-  status = 200
-
-[[redirects]]
-  from = "/api/manual-alignment-loop"
-  to = "/.netlify/functions/manual-alignment-loop"
-  status = 200
-
-[functions."alignment-loop"]
-  schedule = "*/5 * * * *"
-
-# signalwelcome_v1 — Beehiiv → SendGrid welcome runner (SEC-06 gated in function code)
-[[redirects]]
-  from = "/api/signalwelcome-runner"
-  to = "/.netlify/functions/signalwelcome-runner"
-  status = 200
-
-[functions."signalwelcome-runner"]
-  schedule = "0 * * * *"
-
-# ── Static page rewrites ──────────────────────────────────────────────────────
-
-# Passenger self-seat-selection entry point
-[[redirects]]
-  from = "/seat-selection"
-  to = "/seat-selection.html"
-  status = 200
-
-[[redirects]]
-  from = "/request-seat"
-  to = "/request-seat.html"
-  status = 200
-
-[[redirects]]
-  from = "/request-seat/"
-  to = "/request-seat.html"
-  status = 200
-
-# ── Legacy / alias redirects ──────────────────────────────────────────────────
-
-# One Page Studio — serve /Studio from the Studio subfolder
-[[redirects]]
-  from = "/ResumeOnePageStudio"
-  to = "/Studio"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/ResumeOnePageStudio/*"
-  to = "/Studio/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/OnboardingPassport"
-  to = "/onboardingpassport/"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/OnboardingPassport/*"
-  to = "/onboardingpassport/:splat"
-  status = 200
-  force = true
-
-# /Studio is served directly from Studio/index.html. Do not force-rewrite it to /,
-# because boarding handoff URLs preserve seat_id/tuj_code on the Studio route.
-[[redirects]]
-  from = "/Studio"
-  to = "/Studio/"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/Studio/*"
-  to = "/Studio/:splat"
-  status = 200
-  force = true
-
-# ── Dashboard / SPA shell routes ──────────────────────────────────────────────
-
-[[redirects]]
-  from = "/Dashboard"
-  to = "/?status=boarded"
-  status = 200
-
-[[redirects]]
-  from = "/Dashboard/*"
-  to = "/?status=boarded"
-  status = 200
-
-[[redirects]]
-  from = "/dashboard"
-  to = "/?status=boarded"
-  status = 200
-
-[[redirects]]
-  from = "/dashboard/*"
-  to = "/?status=boarded"
-  status = 200
-
-# Catch-all SPA rewrite: all other paths serve the root index.html
-[[redirects]]
-  from = "/*"
-  to = "/"
+  from = "/linkedin"
+  to = "/l/linkedin/"
   status = 200
