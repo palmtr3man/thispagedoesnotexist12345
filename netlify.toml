@@ -27,8 +27,20 @@
     Access-Control-Allow-Headers = "Content-Type, Authorization, x-internal-token, x-scheduler-secret"
 
 [[redirects]]
-  from = "https://thispagedoesnotexist12345.tech/*"
-  to = "https://www.thispagedoesnotexist12345.tech/:splat"
+  from = "https://thispagedoesnotexist12345.com/*"
+  to = "https://thispagedoesnotexist12345.tech/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.thispagedoesnotexist12345.com/*"
+  to = "https://thispagedoesnotexist12345.tech/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.thispagedoesnotexist12345.tech/*"
+  to = "https://thispagedoesnotexist12345.tech/:splat"
   status = 301
   force = true
 
