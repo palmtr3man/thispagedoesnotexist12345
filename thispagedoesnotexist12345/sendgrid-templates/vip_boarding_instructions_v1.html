@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!--
+  Template: vip_boarding_instructions_v1
+  SendGrid ID: d-54a2336a46134073b589ec5f698c11f3
+  Purpose: VIP boarding instructions — FL 042426 Birthday Flight (Nicole's 36th)
+  Theme: Birthday Edition — highlighter green (#39FF14) / hot pink (#FF2D78) / black (#0a0a0a)
+  Last updated: 2026-04-23
+  Tokens used:
+    {{first_name}}       — Passenger first name
+    {{flight_code}}      — Canonical flight code (e.g. FL 042426)
+    {{departure_date}}   — Departure date (e.g. Friday, April 24, 2026)
+    {{seat_id}}          — TUJ seat ID (e.g. TUJ-XXXXXX)
+    {{tuj_code}}         — Alias for seat_id (canonical TUJ code)
+    {{first_task_url}}   — Deep-link to ResumeFitCheck (?seat_id=...&tuj_code=...)
+    {{secondary_url}}    — Secondary link to OnboardingPassport
+    {{mission_studio}}   — Mission Control Studio deep-link
+    {{platform_url}}     — Main site URL
+    {{unsubscribe_url}}  — Unsubscribe link
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIP Boarding Instructions — FL 042426 Birthday Flight</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; }
+      .step-cell { display: block; width: 100% !important; }
+      .cta-btn { width: 90% !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#0a0a0a;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+
+  <!-- ── Outer wrapper ─────────────────────────────────────────────────── -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0a0a0a;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0"
+               style="max-width:600px;width:100%;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e;">
+
+          <!-- ── HEADER ──────────────────────────────────────────────── -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0a0a0a 0%,#0a0f0a 100%);
+                        padding:32px 40px 24px 40px;text-align:center;
+                        border-bottom:3px solid #FF2D78;">
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
+                         color:#39FF14;font-weight:700;">
+                PageForward Airways &nbsp;&middot;&nbsp; The Ultimate Journey
+              </p>
+              <p style="margin:0 0 14px 0;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+                         color:#FF2D78;font-weight:600;">
+                🎂 Birthday VIP Flight &nbsp;&middot;&nbsp; Your Flight Plan
+              </p>
+              <h1 style="margin:0 0 6px 0;font-size:26px;font-weight:800;color:#ffffff;line-height:1.2;">
+                Here's how to fly, {{first_name}}.
+              </h1>
+              <p style="margin:0;font-size:14px;color:#888888;line-height:1.6;">
+                Your VIP seat on <strong style="color:#39FF14;">{{flight_code}}</strong> is active.
+                Here's everything you need to get airborne.
+              </p>
+            </td>
+          </tr>
+
+          <!-- ── BOARDING SEQUENCE ───────────────────────────────────── -->
+          <tr>
+            <td style="background-color:#111111;padding:28px 40px;">
+
+              <!-- Section label -->
+              <p style="margin:0 0 20px 0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+                         color:#FF2D78;font-weight:700;">
+                Your Boarding Sequence
+              </p>
+
+              <!-- Step 1 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="margin:0 0 16px 0;background:#0a0a0a;border:1px solid #1e1e1e;
+                             border-left:4px solid #39FF14;border-radius:4px;">
+                <tr>
+                  <td class="step-cell" style="padding:16px 20px;width:40px;vertical-align:top;">
+                    <span style="display:inline-block;width:28px;height:28px;background:#39FF14;
+                                  color:#0a0a0a;border-radius:50%;text-align:center;line-height:28px;
+                                  font-size:13px;font-weight:800;">1</span>
+                  </td>
+                  <td class="step-cell" style="padding:16px 20px 16px 0;vertical-align:top;">
+                    <p style="margin:0 0 4px 0;font-size:13px;font-weight:700;color:#ffffff;">
+                      Open Your Boarding Gate
+                    </p>
+                    <p style="margin:0;font-size:13px;color:#888888;line-height:1.6;">
+                      Click the button below to access your VIP flight dashboard.
+                      Your Seat ID is <strong style="color:#39FF14;">{{seat_id}}</strong> — keep it handy.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Step 2 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="margin:0 0 16px 0;background:#0a0a0a;border:1px solid #1e1e1e;
+                             border-left:4px solid #FF2D78;border-radius:4px;">
+                <tr>
+                  <td class="step-cell" style="padding:16px 20px;width:40px;vertical-align:top;">
+                    <span style="display:inline-block;width:28px;height:28px;background:#FF2D78;
+                                  color:#ffffff;border-radius:50%;text-align:center;line-height:28px;
+                                  font-size:13px;font-weight:800;">2</span>
+                  </td>
+                  <td class="step-cell" style="padding:16px 20px 16px 0;vertical-align:top;">
+                    <p style="margin:0 0 4px 0;font-size:13px;font-weight:700;color:#ffffff;">
+                      Complete Your Onboarding Passport
+                    </p>
+                    <p style="margin:0;font-size:13px;color:#888888;line-height:1.6;">
+                      Your passport unlocks your full VIP profile. Takes about 5 minutes.
+                      This is how the crew gets to know you before wheels-up.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Step 3 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="margin:0 0 28px 0;background:#0a0a0a;border:1px solid #1e1e1e;
+                             border-left:4px solid #39FF14;border-radius:4px;">
+                <tr>
+                  <td class="step-cell" style="padding:16px 20px;width:40px;vertical-align:top;">
+                    <span style="display:inline-block;width:28px;height:28px;background:#39FF14;
+                                  color:#0a0a0a;border-radius:50%;text-align:center;line-height:28px;
+                                  font-size:13px;font-weight:800;">3</span>
+                  </td>
+                  <td class="step-cell" style="padding:16px 20px 16px 0;vertical-align:top;">
+                    <p style="margin:0 0 4px 0;font-size:13px;font-weight:700;color:#ffffff;">
+                      Start Your First Task
+                    </p>
+                    <p style="margin:0;font-size:13px;color:#888888;line-height:1.6;">
+                      Your first task is queued and ready in Mission Control.
+                      This is where the journey officially begins.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Flight manifest summary -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:4px;
+                             margin:0 0 28px 0;">
+                <tr>
+                  <td style="padding:16px 24px;">
+                    <p style="margin:0 0 12px 0;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+                               color:#39FF14;font-weight:700;">Flight Details</p>
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding:4px 0;font-size:11px;color:#555555;text-transform:uppercase;
+                                    letter-spacing:0.08em;width:130px;">Flight</td>
+                        <td style="padding:4px 0;font-size:13px;color:#ffffff;font-weight:700;">{{flight_code}}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0;font-size:11px;color:#555555;text-transform:uppercase;
+                                    letter-spacing:0.08em;">Departure</td>
+                        <td style="padding:4px 0;font-size:13px;color:#cccccc;">{{departure_date}}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0;font-size:11px;color:#555555;text-transform:uppercase;
+                                    letter-spacing:0.08em;">Seat ID</td>
+                        <td style="padding:4px 0;font-size:13px;color:#39FF14;font-weight:700;
+                                    letter-spacing:0.06em;">{{seat_id}}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Primary CTA -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:0 0 16px 0;">
+                    <a href="{{first_task_url}}"
+                       class="cta-btn"
+                       style="display:inline-block;background:linear-gradient(135deg,#39FF14,#2ecc10);
+                               color:#0a0a0a;padding:16px 40px;text-decoration:none;border-radius:4px;
+                               font-size:15px;font-weight:800;letter-spacing:0.04em;
+                               min-width:220px;text-align:center;">
+                      Start Your First Task &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Secondary CTA -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:0 0 28px 0;">
+                    <a href="{{secondary_url}}"
+                       style="display:inline-block;color:#FF2D78;font-size:13px;
+                               text-decoration:none;letter-spacing:0.04em;
+                               border-bottom:1px solid #FF2D78;padding-bottom:2px;">
+                      View Your Onboarding Passport &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Sign-off -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="border-top:1px solid #1e1e1e;">
+                <tr>
+                  <td style="padding:20px 0 0 0;font-size:14px;color:#888888;line-height:1.7;">
+                    The crew is ready for you, <strong style="color:#ffffff;">{{first_name}}</strong>.
+                    Let's make this flight one to remember.<br/>
+                    <br/>
+                    <strong style="color:#cccccc;">Co-Pilot Kevin</strong><br/>
+                    <span style="color:#39FF14;font-size:12px;">PageForward Airways</span>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- ── FOOTER ──────────────────────────────────────────────── -->
+          <tr>
+            <td style="background-color:#0a0a0a;border-top:1px solid #1e1e1e;
+                        padding:20px 40px;text-align:center;">
+              <p style="margin:0 0 6px 0;font-size:11px;color:#555555;letter-spacing:0.08em;">
+                PageForward Airways &nbsp;&middot;&nbsp; The Ultimate Journey
+              </p>
+              <p style="margin:0 0 6px 0;font-size:11px;">
+                <a href="{{platform_url}}" style="color:#555555;text-decoration:underline;">
+                  www.thispagedoesnotexist12345.com
+                </a>
+              </p>
+              <p style="margin:0;font-size:11px;">
+                <a href="{{unsubscribe_url}}" style="color:#555555;text-decoration:underline;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

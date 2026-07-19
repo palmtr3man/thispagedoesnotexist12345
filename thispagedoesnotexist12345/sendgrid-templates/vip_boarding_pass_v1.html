@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<!--
+  Template: vip_boarding_pass_v1
+  SendGrid ID: d-1e5c7552460444028e37c0f935a9e32f
+  Purpose: VIP boarding pass — FL 042426 Birthday Flight (Nicole's 36th)
+  Theme: Birthday Edition — highlighter green (#39FF14) / hot pink (#FF2D78) / black (#0a0a0a)
+  Last updated: 2026-04-23
+  Tokens used:
+    {{first_name}}       — Passenger first name
+    {{flight_code}}      — Canonical flight code (e.g. FL 042426)
+    {{departure_date}}   — Departure date (e.g. Friday, April 24, 2026)
+    {{seat_id}}          — TUJ seat ID (e.g. TUJ-XXXXXX)
+    {{tuj_code}}         — Alias for seat_id (canonical TUJ code)
+    {{passport_url}}     — Deep-link: /?seat_id={{seat_id}}&tuj_code={{tuj_code}}
+    {{cabin_class}}      — Cabin class label
+    {{unsubscribe_url}}  — Unsubscribe link
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIP Boarding Pass — FL 042426 Birthday Flight</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; }
+      .manifest-row td { display: block; width: 100% !important; }
+      .cta-btn { width: 90% !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#0a0a0a;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+
+  <!-- ── Outer wrapper ─────────────────────────────────────────────────── -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0a0a0a;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0"
+               style="max-width:600px;width:100%;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e;">
+
+          <!-- ── HEADER ──────────────────────────────────────────────── -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0a0a0a 0%,#150a0a 60%,#0a0f0a 100%);
+                        padding:36px 40px 28px 40px;text-align:center;
+                        border-bottom:3px solid #39FF14;">
+              <!-- Airline wordmark -->
+              <p style="margin:0 0 6px 0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
+                         color:#39FF14;font-weight:700;">
+                PageForward Airways &nbsp;&middot;&nbsp; The Ultimate Journey
+              </p>
+              <!-- Birthday eyebrow -->
+              <p style="margin:0 0 16px 0;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+                         color:#FF2D78;font-weight:600;">
+                🎂 Birthday VIP Flight &nbsp;&middot;&nbsp; Priority Boarding
+              </p>
+              <!-- Hero headline -->
+              <h1 style="margin:0 0 6px 0;font-size:34px;font-weight:800;letter-spacing:0.04em;
+                          color:#ffffff;line-height:1.1;">
+                VIP
+              </h1>
+              <h2 style="margin:0 0 20px 0;font-size:22px;font-weight:300;letter-spacing:0.14em;
+                          color:#39FF14;">
+                BOARDING PASS
+              </h2>
+              <!-- Accent divider -->
+              <div style="width:80px;height:2px;
+                           background:linear-gradient(90deg,transparent,#FF2D78,#39FF14,transparent);
+                           margin:0 auto 20px auto;"></div>
+              <!-- Greeting -->
+              <p style="margin:0;font-size:16px;color:#cccccc;line-height:1.6;">
+                Happy Birthday, <strong style="color:#ffffff;">{{first_name}}</strong>. Your seat is confirmed.
+              </p>
+            </td>
+          </tr>
+
+          <!-- ── BOARDING PASS CARD ───────────────────────────────────── -->
+          <tr>
+            <td style="background-color:#111111;padding:28px 40px;">
+
+              <!-- Flight manifest box -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#0a0a0a;border:1px solid #1e1e1e;border-left:4px solid #39FF14;
+                             border-radius:4px;margin:0 0 28px 0;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr class="manifest-row">
+                        <td style="padding:6px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+                                    color:#39FF14;width:140px;font-weight:600;">Flight</td>
+                        <td style="padding:6px 0;font-size:14px;color:#ffffff;font-weight:700;">{{flight_code}}</td>
+                      </tr>
+                      <tr class="manifest-row">
+                        <td style="padding:6px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+                                    color:#39FF14;font-weight:600;">Departure</td>
+                        <td style="padding:6px 0;font-size:14px;color:#ffffff;">{{departure_date}}</td>
+                      </tr>
+                      <tr class="manifest-row">
+                        <td style="padding:6px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+                                    color:#39FF14;font-weight:600;">Seat ID</td>
+                        <td style="padding:6px 0;font-size:14px;color:#ffffff;font-weight:700;
+                                    letter-spacing:0.06em;">{{seat_id}}</td>
+                      </tr>
+                      <tr class="manifest-row">
+                        <td style="padding:6px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+                                    color:#39FF14;font-weight:600;">Cabin</td>
+                        <td style="padding:6px 0;font-size:14px;color:#ffffff;">{{cabin_class}}</td>
+                      </tr>
+                      <tr class="manifest-row">
+                        <td style="padding:6px 0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+                                    color:#39FF14;font-weight:600;">Status</td>
+                        <td style="padding:6px 0;font-size:14px;color:#FF2D78;font-weight:700;">
+                          &#9646; VIP — Cleared for Boarding
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Body copy -->
+              <p style="margin:0 0 16px 0;font-size:15px;color:#cccccc;line-height:1.7;">
+                Your VIP seat on <strong style="color:#ffffff;">{{flight_code}}</strong> is confirmed and ready.
+                This is your priority boarding pass — you're cleared to board ahead of the general queue.
+              </p>
+              <p style="margin:0 0 28px 0;font-size:15px;color:#cccccc;line-height:1.7;">
+                Head to your boarding gate now and get settled in. The crew is ready for you.
+              </p>
+
+              <!-- Primary CTA -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:0 0 28px 0;">
+                    <a href="{{passport_url}}"
+                       class="cta-btn"
+                       style="display:inline-block;background:linear-gradient(135deg,#39FF14,#2ecc10);
+                               color:#0a0a0a;padding:16px 40px;text-decoration:none;border-radius:4px;
+                               font-size:15px;font-weight:800;letter-spacing:0.04em;
+                               border:none;min-width:220px;text-align:center;">
+                      ❖ Board Your Flight &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Secondary CTA -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:0 0 28px 0;">
+                    <a href="{{passport_url}}"
+                       style="display:inline-block;color:#39FF14;font-size:13px;
+                               text-decoration:none;letter-spacing:0.04em;
+                               border-bottom:1px solid #39FF14;padding-bottom:2px;">
+                      Proceed to Boarding Gate &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Sign-off -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="border-top:1px solid #1e1e1e;margin-top:8px;">
+                <tr>
+                  <td style="padding:20px 0 0 0;font-size:14px;color:#888888;line-height:1.7;">
+                    See you aboard, <strong style="color:#ffffff;">{{first_name}}</strong>. Clear skies ahead.<br/>
+                    <br/>
+                    <strong style="color:#cccccc;">Co-Pilot Kevin</strong><br/>
+                    <span style="color:#39FF14;font-size:12px;">PageForward Airways</span>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- ── FOOTER ──────────────────────────────────────────────── -->
+          <tr>
+            <td style="background-color:#0a0a0a;border-top:1px solid #1e1e1e;
+                        padding:20px 40px;text-align:center;">
+              <p style="margin:0 0 6px 0;font-size:11px;color:#555555;letter-spacing:0.08em;">
+                PageForward Airways &nbsp;&middot;&nbsp; The Ultimate Journey
+              </p>
+              <p style="margin:0;font-size:11px;">
+                <a href="{{unsubscribe_url}}" style="color:#555555;text-decoration:underline;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

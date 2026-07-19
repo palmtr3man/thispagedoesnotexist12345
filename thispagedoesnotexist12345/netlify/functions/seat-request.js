@@ -1,0 +1,1100 @@
+/**
+ * /api/seat-request — Netlify Function (Gate Contract v2)
+ *
+ * Upgrades over v1:
+ *   1. Validates age_token (HMAC-signed token from /api/verify-age — rejects if missing/invalid/expired)
+ *   2. Generates seat_id in TUJ-XXXXXX format
+ *   3. Calls beehiiv API to auto-subscribe email to Signal newsletter
+ *   4. Returns { ok: true, seat_id, status } in response body
+ *   5. Base44 write remains a graceful stub (wires in when credits return)
+ *
+ * Required Netlify env vars:
+ *   SENDGRID_API_KEY              — SendGrid API key
+ *   SENDGRID_FROM_EMAIL         — Sender address (default: noreply@thispagedoesnotexist12345.com)
+ *   SENDGRID_TEMPLATE_SEAT_REQUEST — seat_request_acknowledgement_v1 template ID (canonical fallback defined in sendgrid-templates.js)
+ *   PLATFORM_URL             — Platform URL injected into email (default: https://www.thispagedoesnotexist12345.com)
+ *   SIGNAL_URL               — Signal newsletter URL injected into email
+ *   BASE44_SEAT_REQUEST_URL  — Base44 endpoint for seat-request writes (optional; skipped if unset)
+ *   BEEHIIV_API_KEY          — beehiiv API key
+ *   BEEHIIV_PUB_ID           — beehiiv Publication ID (required for auto-subscribe)
+ *   SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM — (optional) Seat ID / TUJ code follow-up for Active Job Seekers
+ *   SENDGRID_TEMPLATE_PREBOARD_NURTURE   — (optional) Pre-boarding nurture track for Passive Browsers
+ *
+ * Request body (JSON):
+ *   { name: string, email: string, age_token: string, source?: string, tier?: string,
+ *     cabin_tier?: string, amount_paid?: number, referral_code?: string,
+ *     career_stage?: string, current_goal?: string }
+ *
+ * BLOCKER-04 (2026-04-12): age_confirmed boolean replaced with age_token (HMAC-signed).
+ * Supabase waitlist_submissions upsert runs before email or Notion side effects.
+ * SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY env vars required for Supabase write.
+ *
+ * Success response:
+ *   { ok: true, seat_id: 'TUJ-XXXXXX', status: 'confirmed' }
+ *
+ * Error response:
+ *   { ok: false, error: string }
+ *
+ * Gate Contract v2 — seat_id bridge + beehiiv auto-subscribe
+ *
+ * F143 (2026-04-12): Waitlist path now correctly applies Beehiiv 'waitlist' tag
+ * via Subscription Tags API (POST /v2/publications/:pubId/subscriptions/:subId/tags).
+ * BCC added to next_flight_waitlist_v1 send per universal BCC rule.
+ * subscribeToBeehiiv() now returns the sub_id for downstream tag application.
+ *
+ * BEEHIIV-SEG (2026-05-06): Segmentation + tag automation wiring.
+ *   - career_stage + current_goal captured from form, pushed as Beehiiv custom fields.
+ *   - 'seat-requested' tag applied on every successful form submission.
+ *   - 'alpha passengers' tag applied when career_stage = 'Active Job Seeker' AND seats available.
+ *   - 'pre-tech' tag applied when career_stage = 'Passive Browser'.
+ *   - 'waitlist' tag applied (instead of 'alpha passengers') when all 5 alpha seats are filled.
+ *   - Conditional SendGrid routing: Active Job Seeker fires SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM;
+ *     Passive Browser fires SENDGRID_TEMPLATE_PREBOARD_NURTURE (both gracefully skipped if unset).
+ */
+
+const { TEMPLATES, assertTemplates } = require('./sendgrid-templates');
+const { verifyAgeToken } = require('./verify-age');
+
+const FUNCTION_NAME = process.env.AWS_LAMBDA_FUNCTION_NAME || 'seat-request';
+const STAGE = process.env.CONTEXT || process.env.NODE_ENV || 'unknown';
+
+/**
+ * Emit a structured observability log line (gated by SENDGRID_DEBUG=true).
+ * Never logs request body, personalizations, or API key.
+ */
+function sgLog(fields) {
+  if (process.env.SENDGRID_DEBUG !== 'true') return;
+  console.log(JSON.stringify({ event: 'tuj_sendgrid_send', function: FUNCTION_NAME, stage: STAGE, ...fields }));
+}
+
+// --- SendGrid template IDs (sourced from sendgrid-templates.js — do not hardcode d-... here) ---
+assertTemplates(['seat_request_acknowledgement_v1', 'internalsignupnotification_v1', 'next_flight_waitlist_v1']);
+const TEMPLATE_ID = TEMPLATES.seat_request_acknowledgement_v1;
+const INTERNAL_TEMPLATE_ID = TEMPLATES.internalsignupnotification_v1;
+const INTERNAL_NOTIFY_EMAIL = 'support@theultimatejourney.app';
+const ASM_GROUP_ID          = parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL || '33047', 10); // "The Ultimate Journey — Transactional" unsubscribe group
+const ASM_MARKETING_GROUP_ID = process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING
+  ? parseInt(process.env.SENDGRID_UNSUBSCRIBE_GROUP_MARKETING, 10)
+  : null;
+// groupsToDisplay shows both groups in the preference center when Marketing group is configured (F152).
+const ASM_GROUPS_TO_DISPLAY  = ASM_MARKETING_GROUP_ID
+  ? [ASM_GROUP_ID, ASM_MARKETING_GROUP_ID]
+  : [ASM_GROUP_ID];
+const NOTION_API_VERSION = '2022-06-28';
+const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE_ID || '';
+const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL_051126'; // canonical fallback aligned with FL_051126
+const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
+
+function base44Headers() {
+  const headers = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (apiKey) headers.api_key = apiKey;
+  return headers;
+}
+
+// --- Gate Contract constants ---
+const SEAT_ID_PREFIX = 'TUJ-';
+const SEAT_ID_CHARS  = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I ambiguity
+const SEAT_ID_LENGTH = 6;
+const MIN_AGE        = 21;
+
+// --- Universal BCC (mirrors sendgrid-integration.js convention) ---
+const BCC_EMAIL = 'support@thispagedoesnotexist12345.com';
+
+/**
+ * Generate a seat_id in TUJ-XXXXXX format.
+ * Uses crypto.getRandomValues for randomness in the Netlify edge runtime.
+ */
+function generateSeatId() {
+  let result = SEAT_ID_PREFIX;
+  const array = new Uint8Array(SEAT_ID_LENGTH);
+  crypto.getRandomValues(array);
+  for (let i = 0; i < SEAT_ID_LENGTH; i++) {
+    result += SEAT_ID_CHARS[array[i] % SEAT_ID_CHARS.length];
+  }
+  return result;
+}
+
+function notionRichText(content) {
+  return [{ type: 'text', text: { content: String(content) } }];
+}
+
+/**
+ * Check whether an email already has a seat request in the Notion registry.
+ * Returns the existing Notion page id and seat_id if found, or null if not found / API unavailable.
+ * Fails gracefully — a Notion outage must not block new seat requests.
+ */
+async function checkExistingRequest({ email, flightCode, notionApiKey, databaseId }) {
+  if (!notionApiKey || !databaseId) return null;
+  try {
+    const filters = [
+      {
+        property: 'Email',
+        email: { equals: email }
+      },
+      {
+        property: 'Status',
+        select: { does_not_equal: 'Denied' }
+      }
+    ];
+    if (flightCode) {
+      filters.push({
+        property: 'Flight Code',
+        rich_text: { equals: flightCode }
+      });
+    }
+    const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + notionApiKey,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_API_VERSION
+      },
+      body: JSON.stringify({
+        // Exclude Denied records so previously denied passengers can re-submit.
+        // Denied is treated as a closed/voided state — only Pending Review,
+        // Approved, Waitlisted, and Level Lounge are considered active duplicates.
+        // Fix (Apr 19, 2026): compound filter added to prevent permanent lockout.
+        // Flight Code scopes duplicates to the active flight (Apr 23 seat_requests contract).
+        filter: {
+          and: filters
+        },
+        page_size: 1
+      })
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      console.warn('[seat-request] Notion dedupe query failed ' + response.status + ': ' + errText);
+      return null; // fail open
+    }
+    const data = await response.json();
+    if (data.results && data.results.length > 0) {
+      const page = data.results[0];
+      const seatIdProp = page.properties && page.properties['Seat ID'];
+      const existingSeatId = seatIdProp && seatIdProp.rich_text && seatIdProp.rich_text[0]
+        ? seatIdProp.rich_text[0].plain_text
+        : null;
+      console.log(`[seat-request] Duplicate request detected for ${email} — existing seat_id: ${existingSeatId || 'unknown'}`);
+      return { pageId: page.id, seatId: existingSeatId || null };
+    }
+    return null;
+  } catch (err) {
+    console.warn('[seat-request] Notion dedupe check unexpected error:', err.message);
+    return null; // fail open
+  }
+}
+
+async function updateExistingRequestInNotion({ pageId, name, source, requestDate, notionApiKey }) {
+  if (!pageId || !notionApiKey) return false;
+  try {
+    const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: 'Bearer ' + notionApiKey,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_API_VERSION
+      },
+      body: JSON.stringify({
+        properties: {
+          Name: { title: notionRichText(name) },
+          Source: { rich_text: notionRichText(source) },
+          'Request Date': { date: { start: requestDate } }
+        }
+      })
+    });
+    if (response.ok) {
+      console.log('[seat-request] Existing Notion request updated for page ' + pageId);
+      return true;
+    }
+    const errorText = await response.text();
+    console.error('[seat-request] Existing Notion request update failed ' + response.status + ': ' + errorText);
+    return false;
+  } catch (err) {
+    console.warn('[seat-request] Existing Notion request update unexpected error:', err.message);
+    return false;
+  }
+}
+
+async function logSeatRequestToNotion({ seatId, name, email, requestDate, source, flightCode, notionApiKey, databaseId }) {
+  if (!notionApiKey) {
+    console.warn('[seat-request] NOTION_API_KEY not set — skipping Notion log write');
+    return false;
+  }
+
+  const properties = {
+    Name: { title: notionRichText(name) },
+    Email: { email },
+    'Seat ID': { rich_text: notionRichText(seatId) },
+    Source: { rich_text: notionRichText(source) },
+    'Request Date': { date: { start: requestDate } }
+  };
+  if (flightCode) {
+    properties['Flight Code'] = { rich_text: notionRichText(flightCode) };
+  }
+
+  const response = await fetch('https://api.notion.com/v1/pages', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + notionApiKey,
+      'Content-Type': 'application/json',
+      'Notion-Version': NOTION_API_VERSION
+    },
+    body: JSON.stringify({
+      parent: { database_id: databaseId },
+      properties
+    })
+  });
+
+  if (response.ok) {
+    console.log('[seat-request] Notion log written for ' + email + ' seat_id ' + seatId);
+    return true;
+  }
+
+  const errorText = await response.text();
+  console.error('[seat-request] Notion log failed ' + response.status + ': ' + errorText);
+  return false;
+}
+
+/**
+ * Subscribe an email to the Signal beehiiv newsletter.
+ * Pushes career_stage and current_goal as custom fields when provided.
+ * Fails gracefully — logs errors but does not block the seat request.
+ * @param {string} email
+ * @param {string} firstName
+ * @param {string} apiKey
+ * @param {string} pubId
+ * @param {object} [segFields]  — { career_stage?: string, current_goal?: string }
+ * @returns {Promise<string|null>} The beehiiv subscription ID (sub_...) on success, or null on failure.
+ */
+async function subscribeToBeehiiv(email, firstName, apiKey, pubId, segFields = {}) {
+  const url = `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`;
+  try {
+    // Build custom_fields array: always include first_name; add segmentation fields when present.
+    const customFields = [
+      { name: 'first_name', value: firstName }
+    ];
+    if (segFields.career_stage && typeof segFields.career_stage === 'string' && segFields.career_stage.trim()) {
+      customFields.push({ name: 'career_stage', value: segFields.career_stage.trim() });
+    }
+    if (segFields.current_goal && typeof segFields.current_goal === 'string' && segFields.current_goal.trim()) {
+      customFields.push({ name: 'current_goal', value: segFields.current_goal.trim() });
+    }
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        reactivate_existing: true,   // update existing subscriber's custom fields on re-submit
+        send_welcome_email: true,
+        utm_source: 'seat-request',
+        utm_medium: 'netlify-function',
+        utm_campaign: 'fl041926-gate',
+        custom_fields: customFields
+      })
+    });
+
+    if (res.ok || res.status === 201 || res.status === 200) {
+      const data = await res.json().catch(() => ({}));
+      const subId = data?.data?.id || null;
+      console.log(`[seat-request] beehiiv subscribe OK for ${email}`, subId || '', '| career_stage:', segFields.career_stage || 'n/a');
+      return subId;
+    } else {
+      const errText = await res.text();
+      console.error(`[seat-request] beehiiv subscribe error ${res.status}:`, errText);
+      return null;
+    }
+  } catch (err) {
+    console.error('[seat-request] beehiiv subscribe unexpected error:', err);
+    return null;
+  }
+}
+
+/**
+ * Apply one or more tags to a beehiiv subscriber.
+ * Uses the Subscription Tags API: POST /v2/publications/:pubId/subscriptions/:subId/tags
+ * Fails gracefully — a tag failure must not block the seat request response.
+ * @param {string}   subId   - beehiiv subscription ID (sub_...)
+ * @param {string[]} tags    - array of tag strings to apply (e.g. ['seat-requested', 'alpha passengers'])
+ * @param {string}   apiKey  - beehiiv API key
+ * @param {string}   pubId   - beehiiv publication ID
+ */
+async function applyBeehiivTags(subId, tags, apiKey, pubId) {
+  if (!subId) {
+    console.warn('[seat-request] applyBeehiivTags: no subId — skipping tag apply for:', tags);
+    return;
+  }
+  if (!tags || tags.length === 0) return;
+  const url = `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subId}/tags`;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ tags })
+    });
+    if (res.ok || res.status === 200 || res.status === 201) {
+      console.log(`[seat-request] beehiiv tags applied to ${subId}:`, tags.join(', '));
+    } else {
+      const errText = await res.text();
+      console.error(`[seat-request] beehiiv tag apply error ${res.status}:`, errText);
+    }
+  } catch (err) {
+    console.error('[seat-request] beehiiv tag apply unexpected error:', err);
+  }
+}
+
+/**
+ * Apply the 'waitlist' tag to an existing beehiiv subscriber (F143).
+ * Uses the Subscription Tags API: POST /v2/publications/:pubId/subscriptions/:subId/tags
+ * Fails gracefully — a tag failure must not block the waitlist response.
+ * @param {string} subId   - beehiiv subscription ID (sub_...)
+ * @param {string} apiKey  - beehiiv API key
+ * @param {string} pubId   - beehiiv publication ID
+ */
+async function applyBeehiivWaitlistTag(subId, apiKey, pubId) {
+  if (!subId) {
+    console.warn('[seat-request] applyBeehiivWaitlistTag: no subId — skipping tag apply');
+    return;
+  }
+  const url = `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subId}/tags`;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ tags: ['waitlist'] })
+    });
+    if (res.ok || res.status === 200 || res.status === 201) {
+      console.log(`[seat-request] beehiiv 'waitlist' tag applied to ${subId}`);
+    } else {
+      const errText = await res.text();
+      console.error(`[seat-request] beehiiv tag apply error ${res.status}:`, errText);
+    }
+  } catch (err) {
+    console.error('[seat-request] beehiiv tag apply unexpected error:', err);
+  }
+}
+
+async function persistSeatRequestToSupabase({ supabaseUrl, supabaseKey, payload, contextLabel }) {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not configured');
+  }
+  const authHeaders = {
+    apikey: supabaseKey,
+    Authorization: `Bearer ${supabaseKey}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=minimal'
+  };
+  const normalizedEmail = String(payload.email || '').trim().toLowerCase();
+  if (!normalizedEmail) {
+    throw new Error('Supabase waitlist upsert missing email');
+  }
+
+  const lookup = await fetch(
+    `${supabaseUrl}/rest/v1/waitlist_submissions?email=eq.${encodeURIComponent(normalizedEmail)}&select=id&limit=1`,
+    { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+  );
+  if (!lookup.ok) {
+    const lookupError = await lookup.text();
+    throw new Error(`Supabase waitlist lookup failed ${lookup.status}: ${lookupError}`);
+  }
+  const existingRows = await lookup.json();
+  const writePayload = { ...payload, email: normalizedEmail };
+  let response;
+  if (Array.isArray(existingRows) && existingRows.length > 0) {
+    response = await fetch(
+      `${supabaseUrl}/rest/v1/waitlist_submissions?email=eq.${encodeURIComponent(normalizedEmail)}`,
+      {
+        method: 'PATCH',
+        headers: authHeaders,
+        body: JSON.stringify(writePayload)
+      }
+    );
+  } else {
+    response = await fetch(`${supabaseUrl}/rest/v1/waitlist_submissions`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(writePayload)
+    });
+  }
+  if (response.ok || response.status === 201 || response.status === 204) {
+    console.log(`[seat-request] Supabase waitlist upsert succeeded for ${contextLabel}`);
+    return true;
+  }
+  const errorText = await response.text();
+  throw new Error(`Supabase waitlist upsert failed ${response.status}: ${errorText}`);
+}
+
+async function sendSeatRequestAcknowledgement({ apiKey, fromEmail, toEmail, subject, dynamicTemplateData, correlationId, templateKey = 'seat_request_acknowledgement_v1' }) {
+  const t0 = Date.now();
+  const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: { email: fromEmail },
+      subject,
+      personalizations: [{
+        to: [{ email: toEmail }],
+        dynamic_template_data: dynamicTemplateData
+      }],
+      template_id: TEMPLATE_ID,
+      asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
+    })
+  });
+  const status = response.status;
+  const ok = response.ok || status === 202;
+  sgLog({ correlation_id: correlationId, request_id: dynamicTemplateData.seat_id, template_key: templateKey, sendgrid_template_id: TEMPLATE_ID, status, elapsed_ms: Date.now() - t0, ok, attempt: 1 });
+  if (!ok) {
+    const errorText = await response.text();
+    throw new Error(`SendGrid error ${status}: ${errorText}`);
+  }
+  return true;
+}
+
+exports.handler = async function (event, context) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' })
+    };
+  }
+
+  // --- Parse body ---
+  let body;
+  try {
+    body = JSON.parse(event.body || '{}');
+  } catch (err) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Invalid JSON body' })
+    };
+  }
+
+  const { name, email, age_token, source, tier, cabin_tier, amount_paid, referral_code: inboundReferralCode, seat_id_override,
+          career_stage: rawCareerStage, current_goal: rawCurrentGoal } = body;
+  // --- Validate: age_token (Gate Contract §2a / §5 — BLOCKER-04) ---
+  // Must be a valid HMAC-signed token issued by /api/verify-age within the last 24h.
+  // age_confirmed: boolean is no longer accepted — token required.
+  const ageSecret = process.env.AGE_TOKEN_SECRET;
+  const agePayload = ageSecret && age_token ? verifyAgeToken(age_token, ageSecret) : null;
+  if (!agePayload || !agePayload.verified) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({
+        ok: false,
+        error: `Age verification required. Please confirm you are ${MIN_AGE} or older before requesting a seat.`
+      })
+    };
+  }
+
+  // --- Validate: name ---
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Missing or invalid field: name' })
+    };
+  }
+
+  // --- Validate: email ---
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || typeof email !== 'string' || !emailRegex.test(email.trim())) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Missing or invalid field: email' })
+    };
+  }
+
+  // --- Resolve env vars ---
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const notionApiKey = process.env.NOTION_API_KEY;
+  if (!apiKey) {
+    console.error('[seat-request] SENDGRID_API_KEY is not set');
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Server configuration error' })
+    };
+  }
+
+  const fromEmail   = process.env.SENDGRID_FROM_EMAIL || 'noreply@thispagedoesnotexist12345.com';
+  const platformUrl = process.env.PLATFORM_URL        || 'https://www.thispagedoesnotexist12345.com';
+  const signalUrl   = process.env.SIGNAL_URL          || 'https://newsletter.thispagedoesnotexist12345.us';
+  const passportBase = process.env.PASSPORT_URL       || 'https://www.thispagedoesnotexist12345.com';
+  const beehiivKey  = process.env.BEEHIIV_API_KEY;
+  const beehiivPub  = process.env.BEEHIIV_PUB_ID || '';
+
+  // --- Segmentation template IDs (BEEHIIV-SEG) ---
+  // Both are optional: if the env var is not set the conditional send is skipped gracefully.
+  const alphaConfirmTemplateId   = process.env.SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM   || null;
+  const preboardNurtureTemplateId = process.env.SENDGRID_TEMPLATE_PREBOARD_NURTURE    || null;
+
+  // --- Normalise inputs ---
+  const nameTrimmed  = name.trim();
+  const emailTrimmed = email.trim().toLowerCase();
+  const nameParts    = nameTrimmed.split(/\s+/);
+  const firstName    = nameParts[0] || nameTrimmed;
+
+  // --- Normalise segmentation fields (BEEHIIV-SEG) ---
+  // Allowed career_stage values mirror the form dropdown options.
+  const VALID_CAREER_STAGES = ['Active Job Seeker', 'Passive Browser', 'Career Changer', 'Recent Graduate'];
+  const careerStage = (rawCareerStage && typeof rawCareerStage === 'string' && VALID_CAREER_STAGES.includes(rawCareerStage.trim()))
+    ? rawCareerStage.trim()
+    : null;
+  // current_goal is a comma-separated string of selected goals (from multi-select chips).
+  const currentGoal = (rawCurrentGoal && typeof rawCurrentGoal === 'string' && rawCurrentGoal.trim())
+    ? rawCurrentGoal.trim()
+    : null;
+  const segFields = { career_stage: careerStage, current_goal: currentGoal };
+  const requestDate  = new Date().toISOString();
+  const sourceValue   = (source && typeof source === 'string' ? source.trim() : 'Website');
+  const resolvedTier  = (tier && typeof tier === 'string' ? tier.trim() : 'Alpha (Founding)');
+  const resolvedCabinTier = (cabin_tier && typeof cabin_tier === 'string' ? cabin_tier.trim() : 'Alpha (Founding)');
+  const formattedAmountPaid = (amount_paid !== undefined && amount_paid !== null ? amount_paid : '$0.00');
+
+  // --- F143: Cohort capacity check — divert to waitlist if seats_available === false ---
+  // Fires next_flight_waitlist_v1 email + applies Beehiiv 'waitlist' tag.
+  // Non-fatal: if /api/seat-status is unavailable, falls through to normal flow.
+  try {
+    const seatStatusUrl = (process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com') + '/api/seat-status';
+    const statusRes = await fetch(seatStatusUrl);
+    if (statusRes.ok) {
+      const statusData = await statusRes.json();
+      if (statusData.seats_available === false) {
+        console.log(`[seat-request] Cohort full — diverting ${emailTrimmed} to waitlist (F143)`);
+        const wlFirstName = nameTrimmed.split(/\s+/)[0] || nameTrimmed;
+        const wlPlatformUrl = (process.env.PLATFORM_URL || 'https://www.thispagedoesnotexist12345.com') + '/ResumeFitCheck';
+        const waitlistTemplateId = TEMPLATES.next_flight_waitlist_v1;
+        // Send next_flight_waitlist_v1 email (with BCC per universal BCC rule)
+        try {
+          const wlRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: { email: fromEmail },
+              personalizations: [{
+                to:  [{ email: emailTrimmed }],
+                bcc: [{ email: BCC_EMAIL }],
+                dynamic_template_data: { first_name: wlFirstName, platform_url: wlPlatformUrl }
+              }],
+              template_id: waitlistTemplateId,
+              asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
+            })
+          });
+          console.log(`[seat-request] next_flight_waitlist_v1 ${wlRes.ok || wlRes.status === 202 ? 'sent' : 'failed (' + wlRes.status + ')'} to ${emailTrimmed}`);
+        } catch (wlErr) {
+          console.error('[seat-request] Waitlist email error:', wlErr.message);
+        }
+        // Subscribe to beehiiv + apply 'seat-requested' + 'waitlist' tags (F143 §4 + BEEHIIV-SEG).
+        // segFields are available here because career_stage / current_goal were parsed before the capacity check.
+        if (beehiivKey) {
+          const wlSubId = await subscribeToBeehiiv(emailTrimmed, wlFirstName, beehiivKey, beehiivPub, segFields);
+          // Always apply 'seat-requested'; 'waitlist' replaces 'alpha passengers' when cohort is full.
+          await applyBeehiivTags(wlSubId, ['seat-requested', 'waitlist'], beehiivKey, beehiivPub);
+        }
+        // F143 §5 — Idempotency marker: write waitlist_email_sent_at to Supabase
+        // Prevents duplicate next_flight_waitlist_v1 sends on retry or re-submission.
+        const supabaseUrlWl = process.env.SUPABASE_URL;
+        const supabaseKeyWl = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (supabaseUrlWl && supabaseKeyWl) {
+          try {
+            const wlSentAt = new Date().toISOString();
+            // Upsert by email — creates or updates the waitlist record with the sent timestamp.
+            await fetch(`${supabaseUrlWl}/rest/v1/waitlist_submissions`, {
+              method: 'POST',
+              headers: {
+                apikey:         supabaseKeyWl,
+                Authorization:  `Bearer ${supabaseKeyWl}`,
+                'Content-Type': 'application/json',
+                Prefer:         'resolution=merge-duplicates,return=minimal'
+              },
+              body: JSON.stringify({
+                email:                  emailTrimmed.toLowerCase(),
+                first_name:             wlFirstName || null,
+                status:                 'waitlisted',
+                waitlist_email_sent_at: wlSentAt,
+                source:                 sourceValue || 'landing'
+              })
+            });
+            console.log(`[seat-request] F143 idempotency marker written for ${emailTrimmed} at ${wlSentAt}`);
+          } catch (wlSbErr) {
+            console.error('[seat-request] F143 Supabase idempotency marker write failed (non-blocking):', wlSbErr.message);
+          }
+        }
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ ok: true, waitlisted: true, status: 'waitlisted', message: "You're on the next flight. Check your inbox for details." })
+        };
+      }
+    }
+  } catch (capacityErr) {
+    console.warn('[seat-request] Capacity check unavailable (F143 — fail open):', capacityErr.message);
+  }
+
+  const activeFlightCode = process.env.ACTIVE_FLIGHT_CODE || ACTIVE_FLIGHT_CODE_DEFAULT;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  // --- Deduplicate: one seat request per email (Gate Contract §2e) ---
+  // Repeat submits do not create a new seat. They update approved free-text fields,
+  // preserve the existing seat_id, and send an already-on-manifest confirmation.
+  const existingRequest = await checkExistingRequest({
+    email: emailTrimmed,
+    flightCode: activeFlightCode,
+    notionApiKey,
+    databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
+  });
+  if (existingRequest) {
+    const resolvedExistingSeatId = existingRequest.seatId;
+    console.log(`[seat-request] Repeat request for ${emailTrimmed} — preserving existing seat_id: ${resolvedExistingSeatId || 'unknown'}`);
+    try {
+      await persistSeatRequestToSupabase({
+        supabaseUrl,
+        supabaseKey,
+        contextLabel: emailTrimmed,
+        payload: {
+          email: emailTrimmed.toLowerCase(),
+          first_name: firstName || null,
+          ...(resolvedExistingSeatId ? { seat_id: resolvedExistingSeatId } : {}),
+          source: sourceValue || 'landing',
+          age_verified: true
+        }
+      });
+    } catch (err) {
+      console.error('[seat-request] Supabase repeat-submit upsert failed before side effects:', err.message);
+      return {
+        statusCode: 503,
+        headers,
+        body: JSON.stringify({ ok: false, error: 'Seat request persistence is temporarily unavailable. Please retry shortly.' })
+      };
+    }
+
+    await updateExistingRequestInNotion({
+      pageId: existingRequest.pageId,
+      name: nameTrimmed,
+      source: sourceValue,
+      requestDate,
+      notionApiKey
+    });
+
+    if (resolvedExistingSeatId) {
+      const existingPassportUrl = `${passportBase}?seat_id=${resolvedExistingSeatId}&tuj_code=${resolvedExistingSeatId}`;
+      try {
+        await sendSeatRequestAcknowledgement({
+          apiKey,
+          fromEmail,
+          toEmail: emailTrimmed,
+          subject: `Your seat is already on the manifest — ${activeFlightCode}`,
+          correlationId: `repeat_${resolvedExistingSeatId}`,
+          templateKey: 'seat_request_already_on_manifest',
+          dynamicTemplateData: {
+            subject: `Your seat is already on the manifest — ${activeFlightCode}`,
+            first_name: firstName,
+            full_name: nameTrimmed,
+            email: emailTrimmed,
+            seat_id: resolvedExistingSeatId,
+            tuj_code: resolvedExistingSeatId,
+            source: sourceValue,
+            platform_url: platformUrl,
+            signal_url: signalUrl,
+            passport_url: existingPassportUrl,
+            request_date: requestDate,
+            flight_code: activeFlightCode,
+            flight_id: activeFlightCode,
+            duplicate: true,
+            status: 'already_on_manifest'
+          }
+        });
+        console.log(`[seat-request] Already-on-manifest acknowledgement sent to ${emailTrimmed} with seat_id ${resolvedExistingSeatId}`);
+      } catch (err) {
+        console.error('[seat-request] Already-on-manifest SendGrid error:', err.message);
+        return {
+          statusCode: 502,
+          headers,
+          body: JSON.stringify({ ok: false, error: 'Failed to send already-on-manifest acknowledgement' })
+        };
+      }
+    }
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        ok: true,
+        duplicate: true,
+        status: 'already_on_manifest',
+        message: 'A seat request already exists for this email address.',
+        ...(resolvedExistingSeatId ? { seat_id: resolvedExistingSeatId, tuj_code: resolvedExistingSeatId } : {})
+      })
+    };
+  }
+
+  // --- Generate seat_id (Gate Contract §3) ---
+  // seat_id_override: allows pre-assigned Alpha cohort passengers to submit with
+  // their canonical ID (e.g. TUJ-KC2222) instead of a randomly generated one.
+  // Validation: must match /^TUJ-[A-Z0-9]{4,}$/ — same regex as handleSeatOpened.
+  // If override is invalid, fall back to generateSeatId() silently.
+  const SEAT_ID_OVERRIDE_REGEX = /^TUJ-[A-Z0-9]{4,}$/;
+  let seatId;
+  if (seat_id_override && typeof seat_id_override === 'string' && SEAT_ID_OVERRIDE_REGEX.test(seat_id_override.trim().toUpperCase())) {
+    seatId = seat_id_override.trim().toUpperCase();
+    console.log(`[seat-request] Using seat_id_override ${seatId} for ${emailTrimmed}`);
+  } else {
+    seatId = generateSeatId();
+    console.log(`[seat-request] Generated seat_id ${seatId} for ${emailTrimmed}`);
+  }
+
+  // --- Build passport URL with seat_id pre-filled (Gate Contract §4 — email handoff) ---
+  // Fix 3b (Apr 5, 2026): encodeURIComponent removed per canonical spec.
+  // seat_id chars (A-Z, 2-9, hyphen) are URL-safe — no encoding needed or wanted.
+  // Canonical form: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
+  // P2 Fix (Apr 19, 2026): tuj_code appended so the acknowledgement email CTA also carries both params.
+  const passportUrl = `${passportBase}?seat_id=${seatId}&tuj_code=${seatId}`;
+
+  // Bug-003 fix: pass values without the leading-space pad so the SendGrid template
+  // can render "Name: Kevin" style rows without label/value collision.
+  // first_name uses the full nameTrimmed so {{first_name}} resolves as "Jo Ann", not "Jo".
+  const internalDynamicTemplateData = {
+    name:         nameTrimmed,
+    first_name:   nameTrimmed,
+    email:        emailTrimmed,
+    seat_id:      seatId,
+    tier:         resolvedTier,
+    cabin_tier:   resolvedCabinTier,
+    signup_date:  requestDate,
+    passport_url: passportUrl,
+    source:       sourceValue,
+    amount_paid:  formattedAmountPaid
+  };
+
+  // --- Send user acknowledgement via SendGrid ---
+  // Canon token alignment (Apr 19, 2026): flight_code is canonical across all boarding templates.
+  // flight_id is aliased to the same value for backward-compat with seat_request_acknowledgement_v1
+  // which was built against {{flight_id}}. Both tokens resolve to the same string.
+  const dynamicTemplateData = {
+    subject:      SUBJECT_TEMPLATE(activeFlightCode),
+    first_name:   firstName,
+    full_name:    nameTrimmed,
+    email:        emailTrimmed,
+    seat_id:      seatId,
+    tuj_code:     seatId,          // alias: same value as seat_id for templates that use {{tuj_code}}
+    source:       sourceValue,
+    platform_url: platformUrl,
+    signal_url:   signalUrl,
+    passport_url: passportUrl,     // https://www.thispagedoesnotexist12345.com?seat_id=TUJ-XXXXXX&tuj_code=TUJ-XXXXXX
+    request_date: requestDate,
+    flight_code:  activeFlightCode,  // canonical token used by all boarding templates
+    flight_id:    activeFlightCode   // alias: seat_request_acknowledgement_v1 uses {{flight_id}}
+  };
+
+  // correlation_id: no flight_id or passenger_id at this stage — use seat_id as request anchor
+  const correlationId = `req_${seatId}`;
+
+  // --- Supabase upsert: waitlist_submissions (BLOCKER-04) ---
+  // Persist before email, Notion, beehiiv, or Base44 side effects to avoid ghost passengers.
+  try {
+    // Generate a stable referral_code for this record (8 chars, same charset as seat_id)
+    const refCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const refCodeArr = new Uint8Array(8);
+    crypto.getRandomValues(refCodeArr);
+    const newReferralCode = Array.from(refCodeArr).map(b => refCodeChars[b % refCodeChars.length]).join('');
+    const upsertPayload = {
+      email:         emailTrimmed.toLowerCase(),
+      first_name:    firstName || null,
+      seat_id:       seatId,
+      source:        sourceValue || 'landing',
+      referral_code: newReferralCode,
+      status:        'pending',
+      age_verified:  true
+    };
+    // If passenger arrived via a referral link, resolve the referring record's id.
+    if (inboundReferralCode && typeof inboundReferralCode === 'string') {
+      try {
+        const refLookup = await fetch(
+          `${supabaseUrl}/rest/v1/waitlist_submissions?referral_code=eq.${encodeURIComponent(inboundReferralCode.trim())}&select=id&limit=1`,
+          { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+        );
+        const refRows = await refLookup.json();
+        if (Array.isArray(refRows) && refRows[0]?.id) {
+          upsertPayload.referred_by = refRows[0].id;
+        }
+      } catch (refErr) {
+        console.warn('[seat-request] Referral lookup failed (non-blocking):', refErr.message);
+      }
+    }
+    await persistSeatRequestToSupabase({
+      supabaseUrl,
+      supabaseKey,
+      contextLabel: emailTrimmed,
+      payload: upsertPayload
+    });
+  } catch (sbErr) {
+    console.error('[seat-request] Supabase upsert failed before side effects:', sbErr.message);
+    return {
+      statusCode: 503,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Seat request persistence is temporarily unavailable. Please retry shortly.' })
+    };
+  }
+
+  try {
+    await sendSeatRequestAcknowledgement({
+      apiKey,
+      fromEmail,
+      toEmail: emailTrimmed,
+      subject: SUBJECT_TEMPLATE(activeFlightCode),
+      dynamicTemplateData,
+      correlationId
+    });
+    console.log(`[seat-request] Acknowledgement sent to ${emailTrimmed} with seat_id ${seatId}`);
+  } catch (err) {
+    console.error('[seat-request] Unexpected error during SendGrid call:', err);
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ ok: false, error: 'Failed to send acknowledgement email' })
+    };
+  }
+
+  // --- Notion log: Seat Request Registry ---
+  try {
+    await logSeatRequestToNotion({
+      seatId,
+      name: nameTrimmed,
+      email: emailTrimmed,
+      requestDate,
+      source: sourceValue,
+      flightCode: activeFlightCode,
+      notionApiKey,
+      databaseId: NOTION_SEAT_REQUEST_DATABASE_ID
+    });
+  } catch (err) {
+    console.error('[seat-request] Notion log write failed:', err);
+  }
+
+  // --- Subscribe to beehiiv Signal newsletter + push segmentation custom fields (BEEHIIV-SEG) ---
+  // subscribeToBeehiiv now accepts segFields and pushes career_stage / current_goal as custom fields.
+  // reactivate_existing: true ensures an existing subscriber's fields are updated on re-submit.
+  let beehiivSubId = null;
+  if (beehiivKey && beehiivPub) {
+    beehiivSubId = await subscribeToBeehiiv(emailTrimmed, firstName, beehiivKey, beehiivPub, segFields);
+  } else if (!beehiivKey) {
+    console.warn('[seat-request] BEEHIIV_API_KEY not set — skipping Signal auto-subscribe + tag wiring');
+  } else {
+    console.warn('[seat-request] BEEHIIV_PUB_ID not set — skipping Signal auto-subscribe + tag wiring');
+  }
+
+  // --- Beehiiv tag automation (BEEHIIV-SEG) ---
+  // Tag decision tree:
+  //   1. Always apply 'seat-requested' on every successful submission.
+  //   2. career_stage = 'Active Job Seeker' AND seats available  → 'alpha passengers'
+  //      career_stage = 'Active Job Seeker' AND seats FULL       → 'waitlist' (already applied above in F143 path)
+  //   3. career_stage = 'Passive Browser'                        → 'pre-tech'
+  //   4. Other career stages (Career Changer, Recent Graduate)   → no extra tag (segment via static Beehiiv segment)
+  //
+  // NOTE: The waitlist path (F143, seats_available === false) already returned early above.
+  // Reaching this point means seats ARE available, so 'alpha passengers' is safe to apply
+  // for Active Job Seekers.
+  if (beehiivKey && beehiivSubId) {
+    const tagsToApply = ['seat-requested'];
+
+    if (careerStage === 'Active Job Seeker') {
+      tagsToApply.push('alpha passengers');
+      console.log(`[seat-request] BEEHIIV-SEG: Active Job Seeker — will apply 'alpha passengers' tag to ${emailTrimmed}`);
+    } else if (careerStage === 'Passive Browser') {
+      tagsToApply.push('pre-tech');
+      console.log(`[seat-request] BEEHIIV-SEG: Passive Browser — will apply 'pre-tech' tag to ${emailTrimmed}`);
+    } else if (careerStage) {
+      console.log(`[seat-request] BEEHIIV-SEG: career_stage='${careerStage}' — no extra tag (segment via static Beehiiv segment)`);
+    } else {
+      console.log(`[seat-request] BEEHIIV-SEG: no career_stage provided — only 'seat-requested' tag applied`);
+    }
+
+    await applyBeehiivTags(beehiivSubId, tagsToApply, beehiivKey, beehiivPub);
+  } else if (beehiivKey && !beehiivSubId) {
+    console.warn('[seat-request] BEEHIIV-SEG: beehiiv subscribe returned no sub_id — skipping tag apply');
+  }
+
+  // --- Conditional SendGrid routing by career_stage (BEEHIIV-SEG) ---
+  // Active Job Seeker  → fire alpha seat confirm email (Seat ID / TUJ code follow-up)
+  // Passive Browser    → fire pre-boarding nurture track email
+  // Both are gracefully skipped if the template env var is not set.
+  if (careerStage === 'Active Job Seeker' && alphaConfirmTemplateId) {
+    try {
+      const t0_alpha = Date.now();
+      const alphaRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: { email: fromEmail },
+          personalizations: [{
+            to:  [{ email: emailTrimmed }],
+            bcc: [{ email: BCC_EMAIL }],
+            dynamic_template_data: {
+              first_name:   firstName,
+              full_name:    nameTrimmed,
+              seat_id:      seatId,
+              tuj_code:     seatId,
+              flight_code:  process.env.ACTIVE_FLIGHT_CODE || ACTIVE_FLIGHT_CODE_DEFAULT,
+              passport_url: passportUrl,
+              platform_url: platformUrl,
+              career_stage: careerStage
+            }
+          }],
+          template_id: alphaConfirmTemplateId,
+          asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
+        })
+      });
+      const alphaOk = alphaRes.ok || alphaRes.status === 202;
+      sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'alpha_seat_confirm', sendgrid_template_id: alphaConfirmTemplateId, status: alphaRes.status, elapsed_ms: Date.now() - t0_alpha, ok: alphaOk, attempt: 1 });
+      console.log(`[seat-request] BEEHIIV-SEG: alpha seat confirm email ${alphaOk ? 'sent' : 'failed (' + alphaRes.status + ')'} to ${emailTrimmed}`);
+    } catch (alphaErr) {
+      console.error('[seat-request] BEEHIIV-SEG: alpha seat confirm email error (non-blocking):', alphaErr.message);
+    }
+  } else if (careerStage === 'Active Job Seeker' && !alphaConfirmTemplateId) {
+    console.warn('[seat-request] BEEHIIV-SEG: SENDGRID_TEMPLATE_ALPHA_SEAT_CONFIRM not set — skipping alpha confirm email');
+  }
+
+  if (careerStage === 'Passive Browser' && preboardNurtureTemplateId) {
+    try {
+      const t0_pre = Date.now();
+      const preRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: { email: fromEmail },
+          personalizations: [{
+            to:  [{ email: emailTrimmed }],
+            bcc: [{ email: BCC_EMAIL }],
+            dynamic_template_data: {
+              first_name:   firstName,
+              full_name:    nameTrimmed,
+              seat_id:      seatId,
+              tuj_code:     seatId,
+              platform_url: platformUrl,
+              signal_url:   signalUrl,
+              career_stage: careerStage
+            }
+          }],
+          template_id: preboardNurtureTemplateId,
+          asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
+        })
+      });
+      const preOk = preRes.ok || preRes.status === 202;
+      sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'preboard_nurture', sendgrid_template_id: preboardNurtureTemplateId, status: preRes.status, elapsed_ms: Date.now() - t0_pre, ok: preOk, attempt: 1 });
+      console.log(`[seat-request] BEEHIIV-SEG: pre-board nurture email ${preOk ? 'sent' : 'failed (' + preRes.status + ')'} to ${emailTrimmed}`);
+    } catch (preErr) {
+      console.error('[seat-request] BEEHIIV-SEG: pre-board nurture email error (non-blocking):', preErr.message);
+    }
+  } else if (careerStage === 'Passive Browser' && !preboardNurtureTemplateId) {
+    console.warn('[seat-request] BEEHIIV-SEG: SENDGRID_TEMPLATE_PREBOARD_NURTURE not set — skipping pre-board nurture email');
+  }
+
+  // --- Write to Base44 seat store (stub — wires in when credits return) ---
+  const base44Url = process.env.BASE44_SEAT_REQUEST_URL;
+  if (!base44Url) {
+    console.warn('[seat-request] BASE44_SEAT_REQUEST_URL not set — skipping Base44 write (stub active)');
+    // Base44 is blocked; proceed without it. seat_id is still returned to client.
+  } else {
+    try {
+      const base44Response = await fetch(base44Url, {
+        method: 'POST',
+        headers: base44Headers(),
+        body: JSON.stringify({
+          name:    nameTrimmed,
+          email:   emailTrimmed,
+          seat_id: seatId,
+          source:  (source && typeof source === 'string' ? source.trim() : 'Website')
+        })
+      });
+
+      if (!base44Response.ok) {
+        const errorText = await base44Response.text();
+        console.error(`[seat-request] Base44 write failed ${base44Response.status}:`, errorText);
+        // Do not block — seat_id already issued and SendGrid sent. Log for manual reconciliation.
+      } else {
+        console.log(`[seat-request] Base44 write succeeded for ${emailTrimmed} seat_id ${seatId}`);
+      }
+    } catch (err) {
+      console.error('[seat-request] Unexpected error during Base44 call:', err);
+      // Do not block — log for manual reconciliation.
+    }
+  }
+
+  // --- Send internal signup notification via SendGrid ---
+  try {
+    const t0_int = Date.now();
+    const internalSgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: { email: fromEmail },
+        personalizations: [{
+          to: [{ email: INTERNAL_NOTIFY_EMAIL }],
+          dynamic_template_data: internalDynamicTemplateData
+        }],
+        template_id: INTERNAL_TEMPLATE_ID,
+        asm: { group_id: ASM_GROUP_ID, groups_to_display: ASM_GROUPS_TO_DISPLAY }
+      })
+    });
+
+    const intStatus = internalSgResponse.status;
+    const intOk = internalSgResponse.ok || intStatus === 202;
+    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'internalsignupnotification_v1', sendgrid_template_id: INTERNAL_TEMPLATE_ID, status: intStatus, elapsed_ms: Date.now() - t0_int, ok: intOk, attempt: 1 });
+    if (intOk) {
+      console.log(`[seat-request] Internal notification sent to ${INTERNAL_NOTIFY_EMAIL} for ${emailTrimmed}`);
+    } else {
+      const errorText = await internalSgResponse.text();
+      // Log but do not fail — user ack already succeeded
+      console.error(`[seat-request] Internal notification SendGrid error ${intStatus}:`, errorText);
+    }
+  } catch (err) {
+    // Log but do not fail
+    sgLog({ correlation_id: correlationId, request_id: seatId, template_key: 'internalsignupnotification_v1', sendgrid_template_id: INTERNAL_TEMPLATE_ID, ok: false, elapsed_ms: 0, error_name: err?.name, error_message: err?.message, status: err?.code || err?.response?.statusCode });
+    console.error('[seat-request] Unexpected error during internal notification SendGrid call:', err);
+  }
+
+  // --- Return seat_id to client (Gate Contract §2c) ---
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      ok:      true,
+      seat_id: seatId,
+      status:  'confirmed',
+      email:   emailTrimmed,
+      name:    nameTrimmed
+    })
+  };
+};

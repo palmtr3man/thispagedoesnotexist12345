@@ -1,0 +1,6 @@
+{
+  "name": "netlify-plugin-function-env-guard",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js"
+}

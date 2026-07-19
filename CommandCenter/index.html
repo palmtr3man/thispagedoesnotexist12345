@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Games | Mission Control</title>
+    <meta name="description" content="Corporate Games mission control for live role-search momentum, launch readiness, and mission execution.">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thispagedoesnotexist12345.tech/">
+    <meta property="og:title" content="Corporate Games | Mission Control">
+    <meta property="og:description" content="Corporate Games mission control for live role-search momentum, launch readiness, and mission execution.">
+    <!-- Umami Analytics — .tech domain + FloorsJS command-center embed -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="5c935661-0414-4670-8777-a89e47266187"></script>
+    <script src="https://floorsjs.com/embed.js" data-key="flr_3f66ddabed1644528c594d4f"></script>
+    <style>
+      :root {
+        --bg: #050814;
+        --bg-2: #08111f;
+        --panel: rgba(10, 18, 34, 0.86);
+        --panel-strong: rgba(12, 22, 42, 0.96);
+        --line: rgba(123, 195, 255, 0.14);
+        --line-strong: rgba(123, 195, 255, 0.28);
+        --text: rgba(240, 248, 255, 0.94);
+        --muted: rgba(240, 248, 255, 0.56);
+        --dim: rgba(240, 248, 255, 0.34);
+        --accent: #7bc3ff;
+        --accent-2: #a8c400;
+        --accent-3: #51e3c2;
+        --warn: #ffb86b;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { min-height: 100%; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(1200px 700px at 20% 0%, rgba(123, 195, 255, 0.13), transparent 55%),
+          radial-gradient(900px 600px at 95% 8%, rgba(168, 196, 0, 0.10), transparent 50%),
+          linear-gradient(180deg, var(--bg) 0%, #050b16 36%, #04070e 100%);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        padding: 24px 16px 40px;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(123, 195, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(123, 195, 255, 0.035) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(180deg, rgba(0,0,0,0.52), transparent 92%);
+      }
+      .shell {
+        position: relative;
+        width: min(1100px, 100%);
+        z-index: 1;
+      }
+      .mission-center {
+        background: linear-gradient(180deg, rgba(15, 25, 44, 0.98), rgba(7, 13, 25, 0.96));
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+      }
+      .mission-header {
+        display: grid;
+        gap: 18px;
+        padding: 28px 28px 22px;
+        border-bottom: 1px solid var(--line);
+        background:
+          linear-gradient(180deg, rgba(123, 195, 255, 0.09), transparent 55%),
+          linear-gradient(90deg, rgba(168, 196, 0, 0.08), transparent 22%);
+      }
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .eyebrow {
+        margin: 0 0 8px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: rgba(123, 195, 255, 0.72);
+        font-size: 11px;
+      }
+      .title {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 44px);
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+      }
+      .subtitle {
+        margin: 10px 0 0;
+        max-width: 64ch;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+      .mission-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+      .tag {
+        border: 1px solid var(--line-strong);
+        color: var(--text);
+        background: rgba(255,255,255,0.03);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .tag strong { color: var(--accent-2); }
+      .top-shell {
+        display: grid;
+        grid-template-columns: 1.7fr 1fr;
+        gap: 14px;
+        padding: 18px 18px 0;
+      }
+      .hero-panel, .status-panel {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        padding: 18px;
+      }
+      .hero-panel {
+        display: grid;
+        gap: 12px;
+      }
+      .hero-label, .section-label {
+        color: rgba(123, 195, 255, 0.7);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 11px;
+        margin: 0;
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .kpi {
+        padding: 14px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(123, 195, 255, 0.11);
+        min-height: 92px;
+      }
+      .kpi .label {
+        display: block;
+        color: var(--dim);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .kpi .value {
+        display: block;
+        margin-top: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+      .kpi .detail {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .status-panel {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+      }
+      .status-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(123, 195, 255, 0.11);
+      }
+      .status-row span:first-child { color: var(--dim); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+      .status-row span:last-child { color: var(--text); font-weight: 650; }
+      .kpi-strip {
+        margin: 18px 18px 0;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.025);
+      }
+      .strip-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .strip-head .meta {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .meter {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .meter-segment {
+        position: relative;
+        padding: 12px 8px 10px;
+        border-radius: 14px;
+        border: 1px solid rgba(123, 195, 255, 0.10);
+        background: rgba(11, 18, 34, 0.8);
+        min-height: 84px;
+        overflow: hidden;
+      }
+      .meter-segment::after {
+        content: "";
+        position: absolute;
+        inset: auto 10px 10px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(123, 195, 255, 0.12);
+      }
+      .meter-segment.done {
+        border-color: rgba(168, 196, 0, 0.35);
+        background: linear-gradient(180deg, rgba(168, 196, 0, 0.10), rgba(11,18,34,0.8));
+      }
+      .meter-segment.done::after { background: linear-gradient(90deg, var(--accent-2), var(--accent-3)); }
+      .meter-num {
+        display: block;
+        color: rgba(240,248,255,0.42);
+        font-size: 11px;
+        letter-spacing: 0.16em;
+      }
+      .meter-label {
+        display: block;
+        margin-top: 10px;
+        font-size: 13px;
+        line-height: 1.35;
+        color: var(--text);
+        font-weight: 650;
+      }
+      .meter-state {
+        position: absolute;
+        top: 12px;
+        right: 10px;
+        color: rgba(123, 195, 255, 0.4);
+        font-size: 14px;
+      }
+      .meter-segment.done .meter-state { color: var(--accent-2); }
+      .mission-board {
+        padding: 18px;
+        display: grid;
+        gap: 12px;
+      }
+      .board-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: baseline;
+      }
+      .board-head h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.03em;
+      }
+      .board-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .mission-cards {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+      }
+      .mission-card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 14px;
+        align-items: start;
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(10,18,34,0.92), rgba(8,13,24,0.94));
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+      .mission-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(123, 195, 255, 0.28);
+        background: linear-gradient(180deg, rgba(12,22,42,0.98), rgba(8,13,24,0.98));
+      }
+      .mission-card.done {
+        border-color: rgba(168, 196, 0, 0.34);
+        box-shadow: 0 0 0 1px rgba(168, 196, 0, 0.04) inset;
+      }
+      .card-index {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: rgba(123, 195, 255, 0.12);
+        border: 1px solid rgba(123, 195, 255, 0.16);
+        color: var(--accent);
+        font-weight: 800;
+        letter-spacing: 0.04em;
+      }
+      .mission-card.done .card-index {
+        background: rgba(168, 196, 0, 0.12);
+        border-color: rgba(168, 196, 0, 0.20);
+        color: var(--accent-2);
+      }
+      .card-body { display: grid; gap: 8px; }
+      .card-title {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: -0.02em;
+      }
+      .card-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .card-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--accent-3);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 650;
+        letter-spacing: 0.04em;
+      }
+      .card-link:hover { color: #91f0de; }
+      .card-state {
+        font-size: 15px;
+        color: rgba(123, 195, 255, 0.36);
+        line-height: 1;
+      }
+      .mission-card.done .card-state { color: var(--accent-2); }
+      .debug-chip {
+        display: none;
+        margin: 18px 18px 0;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 184, 107, 0.28);
+        background: rgba(255, 184, 107, 0.07);
+        color: rgba(255, 231, 205, 0.9);
+        font-size: 12px;
+        letter-spacing: 0.05em;
+      }
+      body.debug-mode .debug-chip { display: block; }
+      body.debug-mode .mission-card { cursor: pointer; }
+      body.debug-mode .mission-card:hover { outline: 1px dashed rgba(255, 184, 107, 0.25); }
+      .error-panel {
+        display: none;
+        margin: 18px;
+        padding: 22px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 184, 107, 0.28);
+        background: rgba(255, 184, 107, 0.07);
+      }
+      .error-panel h2 { margin: 0 0 8px; font-size: 18px; }
+      .error-panel p { margin: 0 0 16px; color: var(--muted); line-height: 1.6; }
+      .error-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--text);
+        background: rgba(123, 195, 255, 0.12);
+        border: 1px solid rgba(123, 195, 255, 0.22);
+        font-size: 13px;
+      }
+      .mission-footer {
+        padding: 20px 18px 22px;
+        border-top: 1px solid var(--line);
+        color: var(--dim);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 12px;
+      }
+      .mission-footer a {
+        color: rgba(123, 195, 255, 0.86);
+        text-decoration: none;
+      }
+      .mission-footer a:hover { color: #d9f2ff; }
+      #mission-content { display: none; }
+      @media (max-width: 920px) {
+        .top-shell, .hero-grid, .mission-cards { grid-template-columns: 1fr; }
+        .meter { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      }
+      @media (max-width: 560px) {
+        body { padding: 12px; }
+        .mission-header, .top-shell, .kpi-strip, .mission-board, .mission-footer, .error-panel { padding-left: 14px; padding-right: 14px; }
+        .meter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .mission-card { grid-template-columns: auto 1fr; }
+        .card-state { grid-column: 2; justify-self: end; }
+      }
+    </style>
+  </head>
+  <body data-state="loading">
+    <main class="shell">
+      <section class="mission-center">
+        <header class="mission-header">
+          <div class="header-top">
+            <div>
+              <p class="eyebrow">Corporate Games / Mission Control</p>
+              <h1 class="title">The competition just got a new command center</h1>
+              <p class="subtitle">Live mission tracking for the next role. Monitor readiness, clear gates, and keep the launch sequence moving without losing momentum.</p>
+            </div>
+            <div class="mission-tags" aria-label="mission tags">
+              <div class="tag"><strong>Live</strong> telemetry</div>
+              <div class="tag"><strong>Fast</strong> status gates</div>
+              <div class="tag"><strong>Tracked</strong> mission flow</div>
+            </div>
+          </div>
+
+          <div class="hero-panel">
+            <p class="hero-label">Command Center Overview</p>
+            <div class="hero-grid">
+              <div class="kpi">
+                <span class="label">Mission Slot</span>
+                <span class="value" id="mission-slot">—</span>
+                <span class="detail">Secure mission ID synced from this deployment.</span>
+              </div>
+              <div class="kpi">
+                <span class="label">Flight Cycle</span>
+                <span class="value">FL 032126</span>
+                <span class="detail">The current operating window for campaign execution.</span>
+              </div>
+              <div class="kpi">
+                <span class="label">Live State</span>
+                <span class="value" id="mission-state">ACTIVE</span>
+                <span class="detail">Mission control is online and the telemetry rail is live.</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div class="top-shell">
+          <section class="status-panel">
+            <p class="section-label">Mission Context</p>
+            <div class="status-row"><span>Campaign</span><span>Corporate Games</span></div>
+            <div class="status-row"><span>Execution Mode</span><span>Mission Control</span></div>
+            <div class="status-row"><span>Focus</span><span>Role Search / Launch Readiness</span></div>
+          </section>
+          <section class="status-panel">
+            <p class="section-label">Signal Summary</p>
+            <div class="status-row"><span>Progress Gates</span><span id="mission-count">0 / 8 cleared</span></div>
+            <div class="status-row"><span>Telemetry</span><span>Synced in-browser</span></div>
+            <div class="status-row"><span>Recovery</span><span>Mission link required</span></div>
+          </section>
+        </div>
+
+        <section class="kpi-strip">
+          <div class="strip-head">
+            <p class="section-label" style="margin:0;">Mission Meter</p>
+            <div class="meta" id="mission-meter-label">0 of 8 segments complete</div>
+          </div>
+          <div class="meter" id="mission-meter"></div>
+        </section>
+
+        <div class="debug-chip">Debug mode enabled: click any mission card to toggle completion state.</div>
+
+        <section class="error-panel" id="mission-error" role="alert">
+          <h2>Mission link missing or invalid</h2>
+          <p>The mission control dashboard needs a valid mission link to load the current campaign state. Reopen the command center from the correct link and the telemetry rail will restore automatically.</p>
+          <a class="error-action" href="https://www.thispagedoesnotexist12345.com/">Return to Mission Control</a>
+        </section>
+
+        <section id="mission-content" class="mission-board">
+          <div class="board-head">
+            <div>
+              <p class="section-label" style="margin-bottom:6px;">Launch Sequence</p>
+              <h2>Mission cards</h2>
+            </div>
+            <p>Clear the gates in order. Each completed card updates the meter and live state.</p>
+          </div>
+          <ol class="mission-cards" id="mission-cards"></ol>
+        </section>
+
+        <footer class="mission-footer">
+          <div><a href="https://www.thispagedoesnotexist12345.com/">Mission Control Home</a> · <a href="https://newsletter.thispagedoesnotexist12345.us/">Signal Newsletter</a></div>
+          <div>thispagedoesnotexist12345.tech</div>
+        </footer>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var SLOT_KEY = 'tuj_seat_id';
+        var SLOT_PATTERN = /^[A-Za-z0-9_-]{4,64}$/;
+        var STEPS = [
+          {
+            key: 'signal',
+            title: 'Subscribe to Signal',
+            copy: 'Your mission brief enters the command stream through the newsletter feed. Issue #001 is the first telemetry packet.',
+            actionLabel: 'Open Signal',
+            actionHref: 'https://newsletter.thispagedoesnotexist12345.us/'
+          },
+          {
+            key: 'profile',
+            title: 'Complete Mission Profile',
+            copy: 'Set your headline, target titles, and location in the mission dossier so the control stack knows where to route opportunities.'
+          },
+          {
+            key: 'resume',
+            title: 'Dock the Resume Payload',
+            copy: 'Upload or build your one-page resume in Studio so the active campaign has a clean payload ready for launch.',
+            actionLabel: 'Open Studio',
+            actionHref: 'https://www.thispagedoesnotexist12345.com/Studio'
+          },
+          {
+            key: 'linkedin',
+            title: 'Optimize the Network Orbit',
+            copy: 'Tune the headline, About section, and skills so your public signal matches the target mission profile.',
+            actionLabel: 'Open LinkedIn',
+            actionHref: 'https://www.linkedin.com/in/kclark27'
+          },
+          {
+            key: 'consultation',
+            title: 'Book the Strategy Sync',
+            copy: 'Reserve a short strategy session so mission control can align the campaign plan and the next set of actions.',
+            actionLabel: 'Book Now',
+            actionHref: 'https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345'
+          },
+          {
+            key: 'targets',
+            title: 'Load Target Stack',
+            copy: 'Research and log five target companies so the command center has a calibrated list of mission destinations.'
+          },
+          {
+            key: 'applications',
+            title: 'Launch Applications',
+            copy: 'Clear three role submissions and record each launch in the mission log to keep the pipeline moving.'
+          },
+          {
+            key: 'followups',
+            title: 'Set Follow-Up Protocol',
+            copy: 'Keep every launch from going dark. Set a five-day follow-up cadence for each submission.'
+          }
+        ];
+
+        function progressKey(slotId, stepKey) {
+          return 'tuj:' + slotId + ':mission:' + stepKey;
+        }
+
+        function loadProgress(slotId) {
+          var progress = {};
+          STEPS.forEach(function (step) {
+            progress[step.key] = localStorage.getItem(progressKey(slotId, step.key)) === '1';
+          });
+          return progress;
+        }
+
+        function saveStepFlag(slotId, stepKey, value) {
+          localStorage.setItem(progressKey(slotId, stepKey), value ? '1' : '0');
+        }
+
+        function renderMissionMeter(progress) {
+          var total = STEPS.length;
+          var doneCount = 0;
+          var meter = document.getElementById('mission-meter');
+          var cards = document.getElementById('mission-cards');
+          if (!meter || !cards) return;
+
+          meter.innerHTML = '';
+          cards.innerHTML = '';
+
+          STEPS.forEach(function (step, index) {
+            var isDone = !!progress[step.key];
+            if (isDone) doneCount++;
+
+            var seg = document.createElement('div');
+            seg.className = 'meter-segment' + (isDone ? ' done' : '');
+            seg.innerHTML = '<span class="meter-num">' + String(index + 1).padStart(2, '0') + '</span>' +
+              '<span class="meter-state">' + (isDone ? '■' : '○') + '</span>' +
+              '<span class="meter-label">' + step.title + '</span>';
+            meter.appendChild(seg);
+
+            var li = document.createElement('li');
+            li.className = 'mission-card' + (isDone ? ' done' : '');
+            li.dataset.step = step.key;
+            li.innerHTML =
+              '<div class="card-index">' + String(index + 1).padStart(2, '0') + '</div>' +
+              '<div class="card-body">' +
+                '<h3 class="card-title">' + step.title + '</h3>' +
+                '<p class="card-copy">' + step.copy + '</p>' +
+                (step.actionHref ? '<a class="card-link" href="' + step.actionHref + '" target="_blank" rel="noopener noreferrer">' + step.actionLabel + ' →</a>' : '') +
+              '</div>' +
+              '<div class="card-state">' + (isDone ? '✔' : '○') + '</div>';
+            cards.appendChild(li);
+          });
+
+          var count = document.getElementById('mission-count');
+          var meterLabel = document.getElementById('mission-meter-label');
+          if (count) count.textContent = doneCount + ' / ' + total + ' cleared';
+          if (meterLabel) meterLabel.textContent = doneCount + ' of ' + total + ' segments complete';
+
+          var liveState = document.getElementById('mission-state');
+          if (liveState) liveState.textContent = doneCount === total ? 'MISSION COMPLETE' : 'ACTIVE';
+        }
+
+        function enableDebugMode(slotId) {
+          document.body.classList.add('debug-mode');
+          document.querySelectorAll('.mission-card').forEach(function (card) {
+            card.addEventListener('click', function () {
+              var key = card.dataset.step;
+              var done = card.classList.contains('done');
+              saveStepFlag(slotId, key, !done);
+              renderMissionMeter(loadProgress(slotId));
+              enableDebugMode(slotId);
+            });
+          });
+        }
+
+        function showError() {
+          var errorPanel = document.getElementById('mission-error');
+          if (errorPanel) errorPanel.style.display = 'block';
+          document.body.setAttribute('data-state', 'error');
+        }
+
+        function boot() {
+          var params = new URLSearchParams(location.search);
+          var slotId = params.get('seat_id') || localStorage.getItem(SLOT_KEY) || '';
+          if (!slotId || !SLOT_PATTERN.test(slotId)) {
+            showError();
+            return;
+          }
+
+          localStorage.setItem(SLOT_KEY, slotId);
+          var slotEl = document.getElementById('mission-slot');
+          if (slotEl) slotEl.textContent = slotId;
+
+          var content = document.getElementById('mission-content');
+          if (content) content.style.display = 'grid';
+
+          renderMissionMeter(loadProgress(slotId));
+          document.body.setAttribute('data-state', 'active');
+
+          if (params.get('debug') === '1') {
+            enableDebugMode(slotId);
+          }
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', boot);
+        } else {
+          boot();
+        }
+
+        window.__MissionControl = {
+          renderMissionMeter: renderMissionMeter,
+          loadProgress: loadProgress,
+          saveStepFlag: saveStepFlag,
+          progressKey: progressKey
+        };
+      })();
+    </script>
+  </body>
+</html>

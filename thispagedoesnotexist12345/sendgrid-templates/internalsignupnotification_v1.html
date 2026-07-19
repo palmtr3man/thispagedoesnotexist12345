@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Signup Notification</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0A0A0A; font-family: 'Inter', Arial, sans-serif; color: #E0E0E0; padding: 40px 20px; }
+    .wrapper { max-width: 600px; margin: 0 auto; }
+
+    .header { text-align: center; margin-bottom: 28px; }
+    .header .tuj { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+    .header .logo { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; margin-bottom: 4px; }
+    .header .powered { font-size: 10px; letter-spacing: 1px; color: #444; margin-bottom: 14px; }
+    .header h1 { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+
+    .tier-badge { display: inline-block; margin-top: 10px; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .tier-badge.free { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #AAA; }
+    .tier-badge.paid { background: rgba(0,217,255,0.15); border: 1px solid #00D9FF; color: #00D9FF; }
+
+    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+    .card-header { background: rgba(0,217,255,0.07); border-bottom: 1px solid rgba(0,217,255,0.15); padding: 12px 20px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 600; }
+
+    .data-row { display: flex; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 14px 20px; align-items: center; }
+    .data-row:last-child { border-bottom: none; }
+    .data-row .key { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #666; width: 140px; flex-shrink: 0; }
+    .data-row .val { font-size: 14px; color: #FFFFFF; font-weight: 500; word-break: break-all; }
+    .data-row .val.cyan { color: #00D9FF; }
+
+    .actions { display: flex; gap: 12px; margin: 24px 0; }
+    .action-btn { flex: 1; display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .action-btn.primary { background: #00D9FF; color: #0A0A0A; }
+    .action-btn.secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #AAA; }
+
+    .footer { text-align: center; font-size: 11px; color: #333; margin-top: 28px; line-height: 1.8; }
+    .footer a { color: #00D9FF; text-decoration: none; }
+    .footer .tuj-footer { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+
+    @media (max-width: 480px) {
+      .actions { flex-direction: column; }
+      .data-row { flex-direction: column; gap: 4px; }
+      .data-row .key { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <div class="header">
+      <div class="tuj">The Ultimate Journey</div>
+      <div class="logo">PageForward Airways</div>
+      <div class="powered">Powered by The Ultimate Journey · Internal Alert</div>
+      <h1>🛬 New Passenger Boarded</h1>
+      <span class="tier-badge {{tier_class}}">{{tier}} Tier</span>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Passenger Details</div>
+      <div class="data-row"><span class="key">Name</span><span class="val">{{first_name}}</span></div>
+      <div class="data-row"><span class="key">Email</span><span class="val cyan">{{email}}</span></div>
+      <div class="data-row"><span class="key">Cabin Tier</span><span class="val">{{tier}}</span></div>
+      <div class="data-row"><span class="key">Signup Date</span><span class="val">{{signup_date}}</span></div>
+      <div class="data-row"><span class="key">Amount Paid</span><span class="val cyan">{{amount_paid}}</span></div>
+    </div>
+
+    <div class="actions">
+      <a href="https://theultimatejourney.base44.app/admin" class="action-btn primary">View in Dashboard</a>
+      <a href="mailto:{{email}}" class="action-btn secondary">Email Passenger</a>
+    </div>
+
+    <div class="footer">
+      <div class="tuj-footer">The Ultimate Journey · PageForward Airways · Internal</div>
+      Internal notification — do not forward.<br />
+      <a href="https://www.thispagedoesnotexist12345.com/" style="color: #00D9FF; text-decoration: none;">Request a Seat</a> &nbsp;·&nbsp;
+      <a href="https://view-link.cx/d7sGLORJ0DF" style="color: #00D9FF; text-decoration: none;">View Master Requirements</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/" style="color: #555555; text-decoration: none;">Reject &amp; Return</a><br /><br />
+      © 2026 The Ultimate Journey. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>

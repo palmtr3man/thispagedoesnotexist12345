@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+  Template: internalsignupnotification_v1
+  SendGrid ID: d-073dc68a683348f18133d78c9879ced8
+  Purpose: Internal alert on new passenger signup
+  Last updated: 2026-04-02
+
+  Fix log (aligned to Spark/newsletter canon — Fix Ticket Mar 29, 2026):
+  Fix 1: Label/value collision resolved — each field uses two-column row layout
+          with label and value on separate lines (no more "NameJo" collisions)
+  Fix 2: Header block corrected — split to two lines:
+          Line 1: "The Ultimate Journey · Forward Airways"
+          Line 2: "Powered by The Ultimate Journey · Internal Alert"
+  Fix 3: Footer corrected — "The Ultimate Journey · Forward Airways · Internal"
+          with proper line break before footer divider
+  Fix 4: {{first_name}} — code-side fix already applied in seat-request.js (Bug-003):
+          internalDynamicTemplateData.first_name uses nameTrimmed (full name "Jo Ann")
+          not just the first token. No template change needed for this fix.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Passenger Boarded — Internal Alert</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Arial', Helvetica, sans-serif;">
+
+  <!-- WRAPPER -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #0a0a0a;">
+    <tr>
+      <td align="center" style="padding: 20px 0;">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%;">
+
+          <!-- ====== HEADER (Fix 2: split to two lines) ====== -->
+          <tr>
+            <td style="background-color: #1a1a2e; padding: 28px 40px 24px 40px; border-top: 4px solid #A8C400; text-align: center;">
+              <p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #A8C400; letter-spacing: 1px;">
+                The Ultimate Journey &middot; Forward Airways
+              </p>
+              <p style="margin: 0; font-size: 11px; color: #888888; letter-spacing: 1px;">
+                Powered by The Ultimate Journey &middot; Internal Alert
+              </p>
+            </td>
+          </tr>
+
+          <!-- ====== ALERT TITLE ====== -->
+          <tr>
+            <td style="background-color: #16213e; padding: 28px 40px 20px 40px; border-left: 4px solid #A8C400;">
+              <p style="margin: 0 0 4px 0; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #A8C400;">
+                🛬 Internal Alert
+              </p>
+              <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #ffffff;">
+                New Passenger Boarded
+              </h1>
+              <p style="margin: 0; font-size: 13px; color: #aaaaaa;">
+                {{tier}} Tier
+              </p>
+            </td>
+          </tr>
+
+          <!-- ====== PASSENGER DETAILS (Fix 1: two-column label/value layout) ====== -->
+          <tr>
+            <td style="background-color: #0f1a2e; padding: 24px 40px;">
+              <p style="margin: 0 0 16px 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #A8C400;">
+                Passenger Details
+              </p>
+
+              <!-- Name row -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 10px;">
+                <tr>
+                  <td width="120" style="font-size: 13px; color: #888888; vertical-align: top; padding-right: 12px;">Name:</td>
+                  <td style="font-size: 13px; color: #ffffff; vertical-align: top;">{{first_name}}</td>
+                </tr>
+              </table>
+
+              <!-- Email row -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 10px;">
+                <tr>
+                  <td width="120" style="font-size: 13px; color: #888888; vertical-align: top; padding-right: 12px;">Email:</td>
+                  <td style="font-size: 13px; color: #ffffff; vertical-align: top;">{{email}}</td>
+                </tr>
+              </table>
+
+              <!-- Cabin Tier row -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 10px;">
+                <tr>
+                  <td width="120" style="font-size: 13px; color: #888888; vertical-align: top; padding-right: 12px;">Cabin Tier:</td>
+                  <td style="font-size: 13px; color: #ffffff; vertical-align: top;">{{cabin_tier}}</td>
+                </tr>
+              </table>
+
+              <!-- Signup Date row -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 10px;">
+                <tr>
+                  <td width="120" style="font-size: 13px; color: #888888; vertical-align: top; padding-right: 12px;">Signup Date:</td>
+                  <td style="font-size: 13px; color: #ffffff; vertical-align: top;">{{signup_date}}</td>
+                </tr>
+              </table>
+
+              <!-- Amount Paid row -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
+                <tr>
+                  <td width="120" style="font-size: 13px; color: #888888; vertical-align: top; padding-right: 12px;">Amount Paid:</td>
+                  <td style="font-size: 13px; color: #ffffff; vertical-align: top;">{{amount_paid}}</td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- ====== CTA BUTTONS ====== -->
+          <tr>
+            <td style="background-color: #0f1a2e; padding: 0 40px 28px 40px; text-align: center;">
+              <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                <tr>
+                  <td style="padding: 0 8px;">
+                    <a href="{{passport_url}}" style="display: inline-block; background-color: #A8C400; color: #0a0a0a; font-size: 13px; font-weight: bold; padding: 12px 24px; border-radius: 4px; text-decoration: none;">
+                      View in Dashboard
+                    </a>
+                  </td>
+                  <td style="padding: 0 8px;">
+                    <a href="mailto:{{email}}" style="display: inline-block; background-color: #1a1a2e; color: #A8C400; font-size: 13px; font-weight: bold; padding: 12px 24px; border-radius: 4px; text-decoration: none; border: 1px solid #A8C400;">
+                      Email Passenger
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ====== DIVIDER ====== -->
+          <tr>
+            <td style="background-color: #A8C400; height: 1px; font-size: 0; line-height: 0;">&nbsp;</td>
+          </tr>
+
+          <!-- ====== FOOTER (Fix 3: correct branding + line break before divider) ====== -->
+          <tr>
+            <td style="background-color: #0a0a0a; padding: 20px 40px; text-align: center;">
+              <p style="margin: 0 0 6px 0; font-size: 12px; color: #ffffff; font-weight: bold;">
+                The Ultimate Journey &middot; Forward Airways &middot; Internal
+              </p>
+              <p style="margin: 0 0 12px 0; font-size: 11px; color: #555555;">
+                Internal notification &mdash; do not forward.
+              </p>
+              <p style="margin: 0; font-size: 11px;">
+                <a href="https://www.thispagedoesnotexist12345.com/" style="color: #A8C400; text-decoration: none;">Main Site</a>
+                &nbsp;&middot;&nbsp;
+                <a href="https://www.thispagedoesnotexist12345.com/#support" style="color: #A8C400; text-decoration: none;">Support</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

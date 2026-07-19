@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<!--
+  Template: preboard_nurture_v1
+  SendGrid ID: (set after upload — update SENDGRID_TEMPLATE_PREBOARD_NURTURE in Netlify)
+  Purpose: Pre-boarding nurture track for Passive Browsers
+           Fires from seat-request.js when career_stage = 'Passive Browser'.
+           Acknowledges the seat request, sets low-pressure expectations, and
+           keeps the passenger warm with Signal newsletter + platform preview.
+  Segment: Pre-Boarding (Career Stage = Passive Browser) → pre-tech tag
+  Created: 2026-05-06 (BEEHIIV-SEG)
+
+  Dynamic variables:
+    {{first_name}}      — Passenger first name
+    {{full_name}}       — Passenger full name
+    {{seat_id}}         — Seat label (e.g. TUJ-XXXXXX)
+    {{tuj_code}}        — TUJ access code (same value as seat_id)
+    {{platform_url}}    — Base platform URL
+    {{signal_url}}      — Signal newsletter URL
+    {{career_stage}}    — "Passive Browser" (passed for personalisation if needed)
+    {{unsubscribe_url}} — SendGrid unsubscribe token
+
+  Test data:
+    {
+      "first_name": "Morgan",
+      "full_name": "Morgan Lee",
+      "seat_id": "TUJ-B9X2MR",
+      "tuj_code": "TUJ-B9X2MR",
+      "platform_url": "https://www.thispagedoesnotexist12345.com",
+      "signal_url": "https://newsletter.thispagedoesnotexist12345.us",
+      "career_stage": "Passive Browser"
+    }
+
+  Notes:
+    - career_stage = 'Passive Browser' routes here via seat-request.js BEEHIIV-SEG block
+    - 'pre-tech' Beehiiv tag applied in the same request before this email fires
+    - Tone: warm, low-pressure — passenger is not actively searching; nurture, don't rush
+    - BCC to support@thispagedoesnotexist12345.com per universal BCC rule
+    - ASM group: Transactional (SENDGRID_UNSUBSCRIBE_GROUP_TRANSACTIONAL)
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Seat is Held — The Ultimate Journey</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background-color: #0A0A0A; font-family: 'Inter', Arial, sans-serif; color: #E0E0E0; padding: 40px 20px; }
+    .wrapper { max-width: 600px; margin: 0 auto; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 32px; }
+    .header .eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 4px; }
+    .header .logo { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; font-weight: 700; margin-bottom: 4px; }
+    .header .sub { font-size: 10px; letter-spacing: 1px; color: #555; margin-bottom: 16px; }
+    .header h1 { font-size: 26px; font-weight: 700; color: #FFFFFF; line-height: 1.25; }
+    .header .subtitle { font-size: 13px; color: #888; margin-top: 8px; }
+
+    /* Seat hold card */
+    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,217,255,0.06); overflow: hidden; margin-bottom: 24px; }
+    .card-top-bar { height: 3px; background: linear-gradient(90deg, rgba(0,217,255,0.4) 0%, rgba(0,217,255,0.15) 100%); }
+
+    /* Card header */
+    .card-header { background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.07); padding: 20px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-header .airline { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #00D9FF; margin-bottom: 2px; }
+    .card-header .sub { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #444; margin-bottom: 6px; }
+    .card-header .flight { font-size: 20px; font-weight: 700; color: #FFFFFF; }
+    .hold-badge { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 6px 16px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #AAAAAA; font-weight: 600; white-space: nowrap; }
+
+    /* Card body */
+    .card-body { padding: 28px; }
+    .field-row { display: flex; gap: 24px; margin-bottom: 24px; }
+    .field { flex: 1; }
+    .field label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; display: block; margin-bottom: 4px; }
+    .field .value { font-size: 16px; font-weight: 600; color: #FFFFFF; }
+    .divider { border: none; border-top: 1px dashed rgba(255,255,255,0.08); margin: 20px 0; }
+
+    /* Seat ID block — subtle, not the hero */
+    .seat-block { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px 20px; margin-bottom: 16px; }
+    .seat-block .seat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+    .seat-block .seat-code { font-size: 20px; font-weight: 700; color: #CCCCCC; letter-spacing: 3px; }
+    .seat-block .seat-note { font-size: 11px; color: #555; margin-top: 4px; line-height: 1.5; }
+
+    /* Nurture message block */
+    .message-block { background: rgba(0,217,255,0.04); border-left: 3px solid rgba(0,217,255,0.4); border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 20px; }
+    .message-block p { font-size: 14px; color: #CCCCCC; line-height: 1.7; margin: 0; }
+    .message-block p + p { margin-top: 10px; }
+
+    /* What's ahead list */
+    .ahead-section h3 { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+    .ahead-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+    .ahead-item .num { width: 24px; height: 24px; background: rgba(0,217,255,0.1); border: 1px solid rgba(0,217,255,0.25); border-radius: 50%; text-align: center; line-height: 22px; font-size: 11px; font-weight: 700; color: #00D9FF; flex-shrink: 0; }
+    .ahead-item .text { font-size: 13px; color: #CCCCCC; line-height: 1.5; padding-top: 2px; }
+    .ahead-item .text strong { color: #FFFFFF; }
+
+    /* Barcode strip */
+    .barcode-strip { background: rgba(0,0,0,0.3); border-top: 1px dashed rgba(255,255,255,0.07); padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .barcode-strip .gate-info { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #444; }
+    .barcode-strip .seat-display { font-size: 12px; font-weight: 700; color: #888; letter-spacing: 2px; }
+
+    /* CTA */
+    .cta-block { text-align: center; margin: 28px 0 16px; }
+    .cta-btn-primary { display: inline-block; background: #00D9FF; color: #0A0A0A; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-decoration: none; padding: 14px 36px; border-radius: 8px; text-transform: uppercase; }
+    .cta-btn-secondary { display: inline-block; background: transparent; color: #888; font-weight: 500; font-size: 13px; letter-spacing: 0.5px; text-decoration: none; padding: 10px 24px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-top: 12px; }
+
+    /* Signal callout */
+    .signal-callout { background: rgba(0,217,255,0.05); border: 1px solid rgba(0,217,255,0.15); border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; text-align: center; }
+    .signal-callout .signal-eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #00D9FF; margin-bottom: 6px; }
+    .signal-callout .signal-title { font-size: 16px; font-weight: 700; color: #FFFFFF; margin-bottom: 6px; }
+    .signal-callout .signal-desc { font-size: 13px; color: #888; line-height: 1.6; margin-bottom: 14px; }
+    .signal-btn { display: inline-block; background: transparent; color: #00D9FF; font-weight: 600; font-size: 13px; letter-spacing: 1px; text-decoration: none; padding: 9px 24px; border-radius: 8px; border: 1px solid rgba(0,217,255,0.4); text-transform: uppercase; }
+
+    /* Footer */
+    .footer { text-align: center; font-size: 11px; color: #333; margin-top: 32px; line-height: 1.8; }
+    .footer a { color: #00D9FF; text-decoration: none; }
+    .footer .tuj-footer { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+
+    @media (max-width: 480px) {
+      .field-row { flex-direction: column; gap: 16px; }
+      .card-header { flex-direction: column; gap: 12px; }
+      body { padding: 20px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="eyebrow">The Ultimate Journey</div>
+      <div class="logo">PageForward Airways</div>
+      <div class="sub">Pre-Boarding Track · No Rush</div>
+      <h1>🛫 Your Seat is Held, {{first_name}}</h1>
+      <div class="subtitle">You're on the manifest. We'll be here when you're ready to move.</div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="card">
+      <div class="card-top-bar"></div>
+
+      <div class="card-header">
+        <div>
+          <div class="airline">PageForward Airways</div>
+          <div class="sub">Powered by The Ultimate Journey</div>
+          <div class="flight">Pre-Boarding</div>
+        </div>
+        <div class="hold-badge">Seat Held</div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Passenger fields -->
+        <div class="field-row">
+          <div class="field">
+            <label>Passenger</label>
+            <div class="value">{{first_name}}</div>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <div class="value" style="color:#AAAAAA;">Passive Browser</div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Nurture message -->
+        <div class="message-block">
+          <p>
+            You're not actively searching right now — and that's completely fine.
+            We built TUJ for exactly this moment: when you're watching the market,
+            keeping your options open, and want to be ready when the right opportunity appears.
+          </p>
+          <p>
+            Your seat is held. There's no deadline, no pressure, and no homework.
+            When you're ready to go active, everything will be waiting for you.
+          </p>
+        </div>
+
+        <!-- Seat ID — present but understated -->
+        <div class="seat-block">
+          <div class="seat-label">Your Seat Reference</div>
+          <div class="seat-code">{{seat_id}}</div>
+          <div class="seat-note">Keep this — it's your access code when you're ready to board.</div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- What's ahead -->
+        <div class="ahead-section">
+          <h3>What Happens Next</h3>
+          <div class="ahead-item">
+            <div class="num">1</div>
+            <div class="text"><strong>Stay on Signal.</strong> Our newsletter tracks the market so you don't have to. One send per week — no noise, just signal.</div>
+          </div>
+          <div class="ahead-item">
+            <div class="num">2</div>
+            <div class="text"><strong>Watch for your boarding window.</strong> When you're ready to go active, your seat code unlocks the full platform instantly.</div>
+          </div>
+          <div class="ahead-item">
+            <div class="num">3</div>
+            <div class="text"><strong>No action required today.</strong> We'll keep your seat warm. You'll hear from us when something worth your attention comes through.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Barcode strip -->
+      <div class="barcode-strip">
+        <span class="gate-info">Status: Pre-Boarding &nbsp;|&nbsp; The Ultimate Journey</span>
+        <span class="seat-display">{{seat_id}}</span>
+      </div>
+    </div>
+
+    <!-- SIGNAL CALLOUT -->
+    <div class="signal-callout">
+      <div class="signal-eyebrow">📡 Signal Newsletter</div>
+      <div class="signal-title">Stay on the Manifest</div>
+      <div class="signal-desc">
+        Weekly market intelligence for career professionals — job market trends,
+        resume strategy, and platform updates. No spam. Unsubscribe any time.
+      </div>
+      <a href="{{signal_url}}" class="signal-btn">Join Signal</a>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <div>
+        <a href="{{platform_url}}" class="cta-btn-primary">↗ Preview the Platform</a>
+      </div>
+      <div>
+        <a href="{{signal_url}}" class="cta-btn-secondary">📡 Signal Newsletter</a>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="tuj-footer">The Ultimate Journey · PageForward Airways · Pre-Boarding</div>
+      You're receiving this because you requested a seat at The Ultimate Journey.<br />
+      <a href="{{platform_url}}">Platform</a>
+      &nbsp;·&nbsp;
+      <a href="{{signal_url}}" style="color:#00D9FF;">Signal Newsletter</a>
+      &nbsp;·&nbsp;
+      <a href="{{unsubscribe_url}}" style="color:#555;">Unsubscribe</a><br /><br />
+      © 2026 The Ultimate Journey. All rights reserved.
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TUJ Mission Control Gateway</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem; --space-20: 5rem;
+      --radius-sm: 0.375rem; --radius-md: 0.75rem; --radius-lg: 1rem; --radius-xl: 1.5rem; --radius-full: 9999px;
+      --color-bg: #f3f1eb; --color-surface: #f8f6f2; --color-surface-2: #ffffff; --color-surface-offset: #e8e3da; --color-border: rgba(37,33,28,0.12);
+      --color-text: #25211c; --color-text-muted: #6f6a62; --color-text-faint: #9d978f; --color-text-inverse: #f8f7f3;
+      --color-primary: #0b8ea0; --color-primary-hover: #096d7b; --color-primary-soft: rgba(11,142,160,0.08); --color-gold: #c89b3c; --color-shadow: 0 20px 60px rgba(30,25,20,0.08);
+      --font-display: 'Instrument Serif', Georgia, serif; --font-body: 'Inter', Arial, sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg: #0a0d10; --color-surface: #12171c; --color-surface-2: #182028; --color-surface-offset: #202a33; --color-border: rgba(214,225,235,0.12);
+      --color-text: #edf3f7; --color-text-muted: #a5b4c0; --color-text-faint: #738291; --color-text-inverse: #0c1014;
+      --color-primary: #58c7d7; --color-primary-hover: #86ddea; --color-primary-soft: rgba(88,199,215,0.12); --color-gold: #d9b36a; --color-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh; font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6;
+      color: var(--color-text); background:
+      radial-gradient(circle at 15% 10%, rgba(88,199,215,0.10), transparent 28%),
+      radial-gradient(circle at 80% 0%, rgba(217,179,106,0.09), transparent 20%),
+      linear-gradient(180deg, rgba(255,255,255,0.02), transparent 30%),
+      var(--color-bg);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; border: 0; background: none; color: inherit; cursor: pointer; }
+    .shell { max-width: 1360px; margin: 0 auto; padding: var(--space-6); }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-8);
+      padding: var(--space-4) var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(18px);
+      position: sticky; top: 16px; z-index: 20;
+    }
+    .brand { display: flex; align-items: center; gap: var(--space-3); }
+    .logo { width: 40px; height: 40px; padding: 8px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); }
+    .brand-title { font-size: var(--text-sm); letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-text-muted); }
+    .brand-name { font-size: var(--text-base); font-weight: 600; }
+    .top-actions { display: flex; align-items: center; gap: var(--space-3); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-full);
+      border: 1px solid var(--color-border); background: rgba(255,255,255,0.03); color: var(--color-text-muted); font-size: var(--text-sm);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-primary); box-shadow: 0 0 0 6px rgba(88,199,215,0.08); }
+    .theme-toggle { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--color-border); background: rgba(255,255,255,0.03); }
+    .hero {
+      display: grid; grid-template-columns: 1.2fr 0.8fr; gap: var(--space-6); align-items: stretch; margin-bottom: var(--space-6);
+    }
+    .panel {
+      position: relative; overflow: hidden; border-radius: calc(var(--radius-xl) + 6px); border: 1px solid var(--color-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); box-shadow: var(--color-shadow);
+    }
+    .hero-copy { padding: clamp(1.75rem, 3vw, 3.5rem); min-height: 540px; display: flex; flex-direction: column; justify-content: space-between; }
+    .eyebrow { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.2em; color: var(--color-gold); margin-bottom: var(--space-4); }
+    h1 { font-family: var(--font-display); font-size: clamp(3rem, 6vw, 6.5rem); line-height: 0.95; letter-spacing: -0.04em; max-width: 11ch; }
+    .lede { margin-top: var(--space-5); max-width: 58ch; color: var(--color-text-muted); }
+    .cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+    .btn {
+      min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 18px; border-radius: var(--radius-full);
+      border: 1px solid transparent; font-size: var(--text-sm); font-weight: 600;
+    }
+    .btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
+    .btn-secondary { border-color: var(--color-border); background: rgba(255,255,255,0.04); }
+    .status-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-3); margin-top: var(--space-8); }
+    .status-card {
+      padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05);
+    }
+    .status-label { font-size: var(--text-xs); letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-text-faint); margin-bottom: 8px; }
+    .status-value { font-size: var(--text-lg); font-weight: 600; }
+    .window-panel { min-height: 540px; display: flex; flex-direction: column; }
+    .window-head { display: flex; justify-content: space-between; align-items: center; padding: var(--space-5); border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); }
+    .window-view {
+      flex: 1; position: relative; overflow: hidden; background:
+      linear-gradient(180deg, rgba(103,153,188,0.16) 0%, rgba(74,103,126,0.08) 22%, rgba(24,32,40,0.0) 45%),
+      linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    }
+    .runway { position: absolute; inset: auto 0 0 0; height: 34%; background: linear-gradient(180deg, rgba(28,34,40,0.1), rgba(7,10,14,0.72)); border-top: 1px solid rgba(255,255,255,0.08); }
+    .taxi-line { position: absolute; left: 8%; right: 8%; bottom: 22%; height: 2px; background: repeating-linear-gradient(90deg, rgba(217,179,106,0.7) 0 42px, transparent 42px 76px); }
+    .plane, .operator, .tower-signal { position: absolute; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px); }
+    .plane { width: 110px; height: 36px; right: 18%; bottom: 26%; border-radius: 999px; background: rgba(255,255,255,0.06); }
+    .plane::before { content: ''; position: absolute; width: 34px; height: 6px; left: 38px; top: -8px; border-radius: 999px; background: rgba(255,255,255,0.22); }
+    .operator { width: 148px; height: 92px; bottom: 18%; background: rgba(18,28,36,0.58); border-radius: 18px; padding: 14px; }
+    .operator.one { left: 10%; } .operator.two { left: 39%; } .operator.three { right: 11%; }
+    .operator small { display:block; color: var(--color-text-faint); text-transform: uppercase; letter-spacing: .14em; font-size: 11px; }
+    .operator strong { display:block; margin-top: 6px; font-size: 15px; }
+    .tower-signal { width: 12px; height: 12px; right: 12%; top: 18%; border-radius: 50%; background: var(--color-primary); box-shadow: 0 0 0 14px rgba(88,199,215,0.08), 0 0 60px rgba(88,199,215,0.3); }
+    .glass-reflection { position: absolute; inset: 0; background: linear-gradient(112deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.04) 18%, transparent 34%, transparent 66%, rgba(255,255,255,0.06) 82%, transparent 100%); pointer-events: none; }
+
+    .launchpad { position: absolute; left: 20%; bottom: 24%; width: 82px; height: 26px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+    .rocket-loop { position: absolute; left: 23%; bottom: 22%; width: 26px; height: 72px; animation: launchLoop 10s linear infinite; transform-origin: center bottom; }
+    .rocket-body { position: absolute; left: 7px; bottom: 12px; width: 12px; height: 34px; border-radius: 999px 999px 5px 5px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(152,212,224,0.72)); box-shadow: 0 0 18px rgba(88,199,215,0.18); }
+    .rocket-body::before { content: ''; position: absolute; inset: -8px 1px auto 1px; height: 12px; border-radius: 50% 50% 0 0; background: rgba(255,255,255,0.95); }
+    .rocket-fin-left, .rocket-fin-right { position: absolute; bottom: 13px; width: 8px; height: 16px; background: rgba(217,179,106,0.85); }
+    .rocket-fin-left { left: 2px; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
+    .rocket-fin-right { right: 2px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+    .rocket-window { position: absolute; top: 11px; left: 9px; width: 8px; height: 8px; border-radius: 50%; background: rgba(11, 25, 34, 0.7); border: 1px solid rgba(255,255,255,0.42); }
+    .rocket-flame { position: absolute; left: 9px; bottom: 0; width: 8px; height: 18px; background: linear-gradient(180deg, rgba(255,214,153,0.95), rgba(255,121,66,0.0)); filter: blur(0.6px); animation: flamePulse 0.35s ease-in-out infinite alternate; }
+    .rocket-trail { position: absolute; left: 12px; bottom: -112px; width: 2px; height: 120px; background: linear-gradient(180deg, rgba(255,255,255,0.0), rgba(174,231,241,0.78), rgba(255,255,255,0.0)); opacity: 0; animation: trailLoop 10s linear infinite; }
+    .smoke { position: absolute; left: 20.5%; bottom: 18.5%; width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.08); filter: blur(1px); animation: smokePulse 10s linear infinite; }
+    .smoke::before, .smoke::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.06); }
+    .smoke::before { width: 18px; height: 18px; left: -10px; bottom: 2px; }
+    .smoke::after { width: 16px; height: 16px; left: 10px; bottom: 0; }
+    @keyframes launchLoop {
+      0%, 62% { transform: translate3d(0, 0, 0) scale(0.95); opacity: 0; }
+      66% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+      76% { transform: translate3d(12px, -88px, 0) rotate(-8deg); opacity: 1; }
+      88% { transform: translate3d(58px, -215px, 0) rotate(-12deg) scale(0.98); opacity: 1; }
+      100% { transform: translate3d(120px, -360px, 0) rotate(-16deg) scale(0.92); opacity: 0; }
+    }
+    @keyframes trailLoop {
+      0%, 64% { opacity: 0; transform: translateY(0); }
+      70% { opacity: 0.82; }
+      90% { opacity: 0.42; transform: translateY(-70px); }
+      100% { opacity: 0; transform: translateY(-120px); }
+    }
+    @keyframes flamePulse { from { transform: scaleY(0.8); opacity: 0.72; } to { transform: scaleY(1.18); opacity: 1; } }
+    @keyframes smokePulse {
+      0%, 62% { opacity: 0; transform: scale(0.5); }
+      68% { opacity: 0.8; transform: scale(1); }
+      78% { opacity: 0.28; transform: translateY(-12px) scale(1.5); }
+      100% { opacity: 0; transform: translateY(-22px) scale(1.8); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rocket-loop, .rocket-trail, .smoke, .rocket-flame { animation: none !important; opacity: 1; transform: none; }
+      .rocket-loop { left: 26%; bottom: 30%; }
+      .rocket-trail { display: none; }
+    }
+    .frame-lines { position: absolute; inset: 0; pointer-events: none; }
+    .frame-lines::before, .frame-lines::after { content: ''; position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.08); }
+    .frame-lines::before { left: 33.333%; } .frame-lines::after { left: 66.666%; }
+    .bands { display: grid; gap: var(--space-6); }
+    .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); }
+    .section-card { padding: var(--space-6); }
+    h2 { font-family: var(--font-display); font-size: clamp(2rem, 3vw, 3rem); letter-spacing: -0.03em; margin-bottom: var(--space-3); }
+    .subcopy { color: var(--color-text-muted); max-width: 62ch; }
+    .operator-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-4); margin-top: var(--space-5); }
+    .operator-pane {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5); min-height: 220px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .operator-kicker { color: var(--color-text-faint); text-transform: uppercase; letter-spacing: 0.14em; font-size: var(--text-xs); }
+    .operator-pane h3 { font-size: var(--text-lg); margin: var(--space-2) 0 var(--space-3); }
+    .operator-pane p { color: var(--color-text-muted); }
+    .micro-list { display: grid; gap: 10px; margin-top: var(--space-4); }
+    .micro-item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted); }
+    .micro-item strong { color: var(--color-text); font-weight: 600; }
+    .signal { display: inline-flex; align-items: center; gap: 8px; color: var(--color-text); }
+    .signal::before { content:''; width: 7px; height: 7px; border-radius:50%; background: var(--color-primary); box-shadow: 0 0 0 5px rgba(88,199,215,0.09); }
+    .lane-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: var(--space-6); }
+    .timeline { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+    .timeline-item { display: grid; grid-template-columns: auto 1fr; gap: var(--space-4); align-items: start; }
+    .timeline-mark { width: 12px; height: 12px; margin-top: 8px; border-radius: 50%; background: var(--color-gold); box-shadow: 0 0 0 7px rgba(217,179,106,0.08); }
+    .timeline-copy h4 { font-size: var(--text-base); margin-bottom: 6px; }
+    .timeline-copy p { color: var(--color-text-muted); }
+    .control-stack { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+    .control-row {
+      display: grid; grid-template-columns: 1.1fr auto auto; gap: var(--space-3); align-items: center;
+      padding: var(--space-4); border-radius: var(--radius-lg); background: rgba(255,255,255,0.03); border: 1px solid var(--color-border);
+    }
+    .tag { padding: 7px 11px; border-radius: 999px; font-size: var(--text-xs); letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--color-border); color: var(--color-text-muted); }
+    .footer-note { color: var(--color-text-faint); font-size: var(--text-sm); margin-top: var(--space-5); }
+    @media (max-width: 1080px) {
+      .hero, .section-grid, .lane-grid, .operator-grid { grid-template-columns: 1fr; }
+      .window-panel, .hero-copy { min-height: auto; }
+    }
+    @media (max-width: 720px) {
+      .shell { padding: var(--space-4); }
+      .topbar { border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); align-items: flex-start; flex-direction: column; }
+      .top-actions { width: 100%; justify-content: space-between; }
+      .status-strip { grid-template-columns: 1fr; }
+      .control-row { grid-template-columns: 1fr; }
+      h1 { max-width: 9ch; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" style="position:absolute;left:-9999px;">Skip to content</a>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-label="TUJ logo">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M6 22c4-8 10-12 20-12" />
+            <path d="M6 26h20" opacity="0.5" />
+            <path d="M16 8l4 4-4 4" />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">The Ultimate Journey</div>
+          <div class="brand-name">Mission Control Gateway</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="pill"><span class="dot"></span> Gate open · overlooked operators visible</div>
+        <button class="theme-toggle" data-theme-toggle aria-label="Switch theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main" class="bands">
+      <section class="hero">
+        <article class="panel hero-copy">
+          <div>
+            <div class="eyebrow">Observation lounge / One-page Studio gateway</div>
+            <h1>Look out over the operators moving your journey.</h1>
+            <p class="lede">This is not a dashboard first. It is a glass-front vantage point into the hidden machinery behind your seat: recruiters, referrals, ATS filters, handoffs, follow-ups, and signals that usually stay out of sight.</p>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="#operators">Enter Mission Control</a>
+              <a class="btn btn-secondary" href="#control-band">See control surfaces</a>
+            </div>
+          </div>
+          <div class="status-strip" aria-label="Mission control summary">
+            <div class="status-card">
+              <div class="status-label">Current lane</div>
+              <div class="status-value">Executive Preboard</div>
+            </div>
+            <div class="status-card">
+              <div class="status-label">Visible operators</div>
+              <div class="status-value">5 active across ramp</div>
+            </div>
+            <div class="status-card">
+              <div class="status-label">Clearest next move</div>
+              <div class="status-value">Secure seat and review signal path</div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="panel window-panel" aria-label="Airport window inspired system view">
+          <div class="window-head">
+            <span>Apron view · Hidden activity now visible</span>
+            <span>Mission Control / Studio shell</span>
+          </div>
+          <div class="window-view">
+            <div class="tower-signal"></div>
+            <div class="operator one"><small>Recruiter desk</small><strong>Gate 03 · reviewing profile</strong></div>
+            <div class="operator two"><small>ATS filter</small><strong>Ramp check · parsing resume</strong></div>
+            <div class="operator three"><small>Referral line</small><strong>Pushback queued · waiting handoff</strong></div>
+            <div class="plane" aria-hidden="true"></div>
+
+            <div class="launchpad" aria-hidden="true"></div>
+            <div class="smoke" aria-hidden="true"></div>
+            <div class="rocket-loop" aria-hidden="true">
+              <div class="rocket-body"><div class="rocket-window"></div></div>
+              <div class="rocket-fin-left"></div>
+              <div class="rocket-fin-right"></div>
+              <div class="rocket-flame"></div>
+              <div class="rocket-trail"></div>
+            </div>
+            <div class="taxi-line"></div>
+            <div class="runway"></div>
+            <div class="frame-lines"></div>
+            <div class="glass-reflection"></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel section-card" id="operators">
+        <h2>The overlooked operators</h2>
+        <p class="subcopy">Each pane behaves like a window, not a widget. You are not scanning a generic control panel; you are seeing the crews, checkpoints, and signals that actually shape movement through the system.</p>
+        <div class="operator-grid">
+          <article class="operator-pane">
+            <div>
+              <div class="operator-kicker">Window 01</div>
+              <h3>Recruiter gates</h3>
+              <p>Where human attention opens, stalls, or advances the journey. You should feel gate logic, not CRM clutter.</p>
+            </div>
+            <div class="micro-list">
+              <div class="micro-item"><span>Oldest open review</span><strong>2 days</strong></div>
+              <div class="micro-item"><span>Fastest-moving gate</span><strong class="signal">Fintech hiring</strong></div>
+            </div>
+          </article>
+          <article class="operator-pane">
+            <div>
+              <div class="operator-kicker">Window 02</div>
+              <h3>ATS ramp crew</h3>
+              <p>The mechanical layer that inspects documents before anyone else does. This pane should make machine filters legible and less mysterious.</p>
+            </div>
+            <div class="micro-list">
+              <div class="micro-item"><span>Latest scan</span><strong>Passed core terms</strong></div>
+              <div class="micro-item"><span>Risk pattern</span><strong>Experience phrasing weak</strong></div>
+            </div>
+          </article>
+          <article class="operator-pane">
+            <div>
+              <div class="operator-kicker">Window 03</div>
+              <h3>Referral dispatch</h3>
+              <p>Warm introductions, side doors, and overlooked network operators. This pane should feel like ramp coordination, not inbox triage.</p>
+            </div>
+            <div class="micro-list">
+              <div class="micro-item"><span>Warm path</span><strong>2 ready to activate</strong></div>
+              <div class="micro-item"><span>Delay reason</span><strong>Awaiting follow-up</strong></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="lane-grid">
+        <article class="panel section-card">
+          <h2>Arrival to departure</h2>
+          <p class="subcopy">The one-page Studio should tell a story of movement. The user enters through the lounge, sees the hidden field of action, then steps into a clear path forward.</p>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-mark"></div>
+              <div class="timeline-copy"><h4>Arrival</h4><p>Orient the passenger with one line of truth, one status, one invitation to look outward.</p></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-mark"></div>
+              <div class="timeline-copy"><h4>Visibility</h4><p>Reveal the overlooked operators as active forces beyond the glass, with signals that read like real movement.</p></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-mark"></div>
+              <div class="timeline-copy"><h4>Control</h4><p>Only after that reveal the practical tools, prompts, and next actions that let the user steer.</p></div>
+            </div>
+          </div>
+        </article>
+        <article class="panel section-card" id="control-band">
+          <h2>Control surfaces</h2>
+          <p class="subcopy">These are the practical modules that sit behind the observation metaphor. They should feel like polished counters in the lounge, not stacked admin cards.</p>
+          <div class="control-stack">
+            <div class="control-row">
+              <div>
+                <strong>Boarding signal review</strong>
+                <div class="footer-note">See seat state, route contract, and message history in one place.</div>
+              </div>
+              <span class="tag">Primary</span>
+              <a class="btn btn-secondary" href="#" data-cta="boarding-signal">Open</a>
+            </div>
+            <div class="control-row">
+              <div>
+                <strong>Operator trace</strong>
+                <div class="footer-note">Follow recruiter, ATS, referral, and follow-up handoffs across the journey.</div>
+              </div>
+              <span class="tag">Visibility</span>
+              <a class="btn btn-secondary" href="#" data-cta="operator-trace">Inspect</a>
+            </div>
+            <div class="control-row">
+              <div>
+                <strong>One-page Studio entry</strong>
+                <div class="footer-note">When the user is ready, the lounge gives way to the tool without breaking the story.</div>
+              </div>
+              <span class="tag">Gateway</span>
+              <a class="btn btn-primary" href="#" data-cta="studio-entry">Continue</a>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const btn = document.querySelector('[data-theme-toggle]');
+      let current = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.setAttribute('data-theme', current);
+      const renderIcon = () => {
+        btn.innerHTML = current === 'dark'
+          ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      };
+      renderIcon();
+      btn.addEventListener('click', () => {
+        current = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', current);
+        renderIcon();
+      });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const seatId  = params.get('seat_id')  || '';
+      const tujCode = params.get('tuj_code') || '';
+
+      // Boarding signal review — internal ops / admin boarding signal page
+      const boardingEl = document.querySelector('[data-cta="boarding-signal"]');
+      if (boardingEl) {
+        boardingEl.href = seatId
+          ? 'https://www.thispagedoesnotexist12345.com/?seat_id=' + seatId + '&tuj_code=' + tujCode + '&view=boarding-signal'
+          : 'https://www.thispagedoesnotexist12345.com/';
+      }
+
+      // Operator trace — /mission-control with seat_id + tuj_code
+      const traceEl = document.querySelector('[data-cta="operator-trace"]');
+      if (traceEl) {
+        traceEl.href = seatId
+          ? 'https://www.thispagedoesnotexist12345.com/mission-control?tuj_code=' + tujCode + '&seat_id=' + seatId + '&origin=gateway'
+          : 'https://www.thispagedoesnotexist12345.com/mission-control';
+      }
+
+      // One-page Studio entry — /Studio with seat_id + tuj_code
+      const studioEl = document.querySelector('[data-cta="studio-entry"]');
+      if (studioEl) {
+        studioEl.href = seatId
+          ? 'https://www.thispagedoesnotexist12345.com/Studio?seat_id=' + seatId + '&tuj_code=' + tujCode
+          : 'https://www.thispagedoesnotexist12345.com/Studio';
+      }
+    })();
+  </script>
+</body>
+</html>

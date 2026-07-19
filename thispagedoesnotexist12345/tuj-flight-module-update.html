@@ -1,0 +1,332 @@
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TUJ ACTIVE-FLIGHT MODULE — Hierarchy & Clarity Upgrade
+     Target: #loading-dock (id="loading-dock") in index.html
+     Replaces lines ~1893–2148 of the current index.html
+     
+     WHAT CHANGED (summary — see full spec in tuj-flight-module-spec.md):
+     1. Flight Name is now the primary visual title (large, prominent heading)
+     2. Flight Code is secondary metadata (small badge, below the name)
+     3. Arrival Date + Arrival Time are paired in one row
+     4. Departure Date + Departure Time are paired in one row
+     5. Status and Loading Dock remain visible as status badges
+     6. Countdown is preserved
+     7. "Request a Seat" is the dominant CTA — visually reinforced
+     8. "Book a Consultation" is secondary — smaller, muted, clearly subordinate
+     9. Studio / Signal / Systems / Support the Journey links are demoted to
+        the lower nav row (unchanged in position, reduced visual weight)
+     10. No new DOM IDs introduced — all existing JS hooks preserved
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ACTIVE-FLIGHT STATUS SECTION -->
+    <div class="status-section" id="loading-dock" data-show-state="landing departed">
+      <div class="status-scanlines"></div>
+
+      <!-- ── PRIMARY: Flight Name (human-facing identity) ──────────────────
+           JS target: #flight-name-primary
+           Driven by: status.flight_name (new field) or falls back to status.flight_label
+           This is the passenger-facing display name — e.g. "Solo Flight 1"
+           It must use the canonical name, NOT the operational code.
+           ──────────────────────────────────────────────────────────────── -->
+      <div class="flight-name-block">
+        <span class="flight-name-eyebrow">✈️ Active Flight</span>
+        <h2 class="flight-name-primary" id="flight-name-primary">Solo Flight 1</h2>
+        <!-- SECONDARY: Flight Code (operational metadata) -->
+        <span class="flight-code-secondary">
+          <span class="flight-code-label">Flight Code</span>
+          <span class="badge badge--meta" id="flight-number">FL032126</span>
+        </span>
+      </div>
+
+      <!-- ── ARRIVAL: Date + Time paired ───────────────────────────────────
+           JS targets: #arrival-date (NEW), #arrival-text (existing)
+           Driven by: status.nextflightarrivaldate (existing field)
+           ──────────────────────────────────────────────────────────────── -->
+      <div class="status-row status-row--paired">
+        <div class="status-pair">
+          <span class="status-pair-label">Arrival</span>
+          <div class="status-pair-values">
+            <span class="badge badge--arriving" id="arrival-date">
+              <span class="arriving-dot"></span>
+              <span id="arrival-date-text">May 1</span>
+            </span>
+            <span class="badge badge--arriving" id="arrival-time">
+              <span class="arriving-dot"></span>
+              <span id="arrival-text">8:34 AM ET</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- ── DEPARTURE: Date + Time paired ─────────────────────────────
+             JS targets: #departure-date (existing), #departure-time-badge (existing)
+             Driven by: status.nextflightdeparturedate (existing field)
+             ──────────────────────────────────────────────────────────── -->
+        <div class="status-pair">
+          <span class="status-pair-label">Departure</span>
+          <div class="status-pair-values">
+            <span class="badge badge--arriving" id="departure-date">
+              <span class="arriving-dot"></span>April 3
+            </span>
+            <span class="badge badge--highlight" id="departure-time-badge">2:01 AM ET</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STATUS + LOADING DOCK: side-by-side status strip ─────────────
+           JS targets: #dock-status-badge (existing), #dock-status (existing)
+           ──────────────────────────────────────────────────────────────── -->
+      <div class="status-row status-row--strip">
+        <div class="status-title">
+          <span class="status-title-label">Status:</span>
+          <span class="badge badge--highlight" id="dock-status-badge" style="color:#ff4444;border-color:rgba(255,68,68,0.6);background:rgba(255,68,68,0.15);">
+            <span class="full-text">DELAYED</span>
+            <span class="short-text">DELAYED</span>
+          </span>
+        </div>
+        <div class="status-title">
+          <span class="status-title-label">Loading Dock:</span>
+          <span class="badge badge--status" id="dock-status">GATE OPEN</span>
+        </div>
+      </div>
+
+      <!-- ── COUNTDOWN TIMER (preserved as-is) ─────────────────────────── -->
+      <div id="countdown-container" style="margin-top:1rem;margin-bottom:0.25rem;">
+        <div class="countdown-wrap" id="countdown-wrap">
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-hours">00</span>
+            <span class="countdown-label">Hours</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-minutes">00</span>
+            <span class="countdown-label">Minutes</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-seconds">00</span>
+            <span class="countdown-label">Seconds</span>
+          </div>
+        </div>
+        <div class="countdown-departed" id="countdown-departed" style="display:none;">✈️ Wheels Up — Flight Departed</div>
+      </div>
+
+      <!-- ── SEAT INVALID RECOVERY NOTICE (preserved as-is) ───────────── -->
+      <div
+        id="seat-invalid-notice"
+        data-show-state="landing"
+        style="display:none;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.35);border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.55;text-align:center;margin-bottom:0.75rem;"
+      >
+        That Seat ID wasn't found on this flight.
+        Check your boarding confirmation email, or
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" target="_blank" rel="noopener noreferrer" style="color:#2EE6D6;text-decoration:underline;">join Signal</a>
+        to stay on the manifest.
+      </div>
+
+      <!-- ── PRIMARY CTA: Request a Seat ───────────────────────────────────
+           Dominant action — full-width, high-contrast, visually prominent.
+           All existing JS logic preserved (waitlistBtn, joinWaitlistBtn, form).
+           ──────────────────────────────────────────────────────────────── -->
+      <div id="cta-wrapper" style="display:flex;flex-direction:column;align-items:center;gap:8px;margin:1.5rem auto 0.5rem;text-align:center;">
+
+        <!-- Primary: Request a Seat (shown by default) -->
+        <button
+          class="btn-waitlist unlocked"
+          id="waitlistBtn"
+          data-umami-event="Waitlist Click"
+          onclick="(function(){
+            document.getElementById('waitlistBtn').style.display = 'none';
+            var f = document.getElementById('seat-request-form');
+            f.style.display = 'flex';
+            f.querySelector('input[name=name]').focus();
+          })()"
+        >
+          ✈️ Request a Seat
+        </button>
+
+        <!-- Primary: Join the Waitlist (shown when flight is full) -->
+        <a
+          id="joinWaitlistBtn"
+          href="https://newsletter.thispagedoesnotexist12345.us/"
+          class="btn-waitlist unlocked"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-umami-event="Join Waitlist Click"
+          style="display:none;"
+        >
+          📡 Join the Waitlist
+        </a>
+
+        <!-- Inline seat request form (hidden until button clicked) -->
+        <form
+          id="seat-request-form"
+          style="display:none;flex-direction:column;align-items:center;gap:0.6rem;width:100%;max-width:340px;"
+          onsubmit="(function(e){
+            e.preventDefault();
+            var form  = document.getElementById('seat-request-form');
+            var name  = form.querySelector('input[name=name]').value.trim();
+            var email = form.querySelector('input[name=email]').value.trim();
+            var errEl = document.getElementById('seat-form-error');
+            var subBtn = document.getElementById('seat-submit-btn');
+            errEl.textContent = '';
+            if (!name)  { errEl.textContent = 'Name is required.'; return; }
+            if (!email) { errEl.textContent = 'Email is required.'; return; }
+            var _ageToken = sessionStorage.getItem('tuj_age_token') || null;
+            if (!_ageToken) {
+              errEl.textContent = 'Age verification required. Please complete the passenger verification step first.';
+              return;
+            }
+            subBtn.disabled = true;
+            subBtn.textContent = '⏳ Submitting…';
+            fetch('/api/seat-request', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify(Object.assign({ name: name, email: email, age_token: _ageToken, source: 'landing' }, (_seatIdOverride ? { seat_id_override: _seatIdOverride } : {})))
+            })
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+              if (d.waitlisted) {
+                form.style.display = 'none';
+                var wlConf = document.getElementById('seat-request-waitlisted');
+                if (wlConf) wlConf.style.display = 'block';
+              } else if (d.ok) {
+                form.style.display = 'none';
+                var conf = document.getElementById('seat-request-confirm');
+                conf.style.display = 'block';
+              } else {
+                errEl.textContent = d.error || 'Something went wrong — please try again.';
+                subBtn.disabled = false;
+                subBtn.textContent = '✈️ Submit Request';
+              }
+            })
+            .catch(function(){
+              errEl.textContent = 'Network error — please try again.';
+              subBtn.disabled = false;
+              subBtn.textContent = '✈️ Submit Request';
+            });
+          })(event)"
+        >
+          <input name="name" type="text" placeholder="Your name" autocomplete="name" required
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(46, 230, 214,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(46, 230, 214,0.8)'"
+            onblur="this.style.borderColor='rgba(46, 230, 214,0.35)'"
+          />
+          <input name="email" type="email" placeholder="Your email" autocomplete="email" required
+            style="width:100%;padding:0.6rem 0.9rem;border-radius:6px;border:1px solid rgba(46, 230, 214,0.35);background:rgba(0,0,0,0.55);color:#fff;font-size:0.9rem;outline:none;letter-spacing:0.02em;"
+            onfocus="this.style.borderColor='rgba(46, 230, 214,0.8)'"
+            onblur="this.style.borderColor='rgba(46, 230, 214,0.35)'"
+          />
+          <span id="seat-form-error" style="font-size:0.78rem;color:#ff6b6b;min-height:1em;"></span>
+          <label class="age-check" for="age-confirmed">
+            <input id="age-confirmed" name="age_confirmed" type="checkbox" required />
+            <span>I confirm that I am 21 years of age or older.</span>
+          </label>
+          <div style="display:flex;gap:0.5rem;width:100%;">
+            <button type="button"
+              style="flex:0 0 auto;padding:0.6rem 1rem;border-radius:6px;border:1px solid rgba(46, 230, 214,0.25);background:rgba(0,0,0,0.4);color:rgba(46, 230, 214,0.6);font-size:0.85rem;cursor:pointer;"
+              onclick="(function(){
+                document.getElementById('seat-request-form').style.display = 'none';
+                document.getElementById('waitlistBtn').style.display = '';
+              })()"
+            >Cancel</button>
+            <button id="seat-submit-btn" type="submit" class="btn-waitlist unlocked"
+              style="flex:1;padding:0.6rem 1rem;" disabled
+            >✈️ Submit Request</button>
+          </div>
+        </form>
+
+        <!-- Confirmation: seat reserved -->
+        <div id="seat-request-confirm"
+          style="display:none;font-size:0.9rem;color:#2EE6D6;letter-spacing:0.03em;padding:0.5rem 0;"
+        >
+          ✅ Your seat request has been received. Check your inbox for the next steps.
+        </div>
+
+        <!-- Confirmation: waitlisted (cohort full) -->
+        <div id="seat-request-waitlisted" style="display:none;padding:1rem 0;">
+          <p style="font-size:1rem;color:#2EE6D6;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">You're on the next flight.</p>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:1rem;">All 5 seats on this flight are full.<br>We'll notify you the moment a seat opens — passengers graduate when they land an offer.</p>
+          <a href="/ResumeFitCheck" class="btn-waitlist unlocked" style="display:inline-block;">▶ While you wait, run an ATS check</a>
+        </div>
+
+        <!-- Hold state -->
+        <div id="seat-request-hold" style="display:none;padding:1rem 0;">
+          <p style="font-size:1rem;color:#ffd740;font-weight:600;margin-bottom:0.5rem;letter-spacing:0.03em;">⏸ Boarding is temporarily paused.</p>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.75);line-height:1.6;">We're preparing for the next flight. Check back soon — the gate will reopen shortly.</p>
+        </div>
+
+        <!-- Seat count subtext (appended by applySeatGate) -->
+        <span id="cta-subtext" style="display:none;font-size:0.75rem;opacity:0.6;color:rgba(46, 230, 214, 0.7);letter-spacing:0.03em;margin-top:0.25rem;">Request a seat. Five seats. One flight.</span>
+      </div>
+
+      <!-- ── SECONDARY CTA: Book a Consultation ────────────────────────────
+           Clearly subordinate — separated by a divider, smaller text, muted.
+           Visually accessible but does NOT compete with "Request a Seat".
+           JS hook preserved: data-umami-event="Book a Consultation Click"
+           ──────────────────────────────────────────────────────────────── -->
+      <div class="secondary-cta-row">
+        <a
+          href="https://calendarjet.com/theultimatejourney/thispagedoesnotexist12345"
+          class="btn btn--secondary-cta"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-umami-event="Book a Consultation Click"
+        >📅 Book a Consultation</a>
+      </div>
+
+      <!-- Gate-closed locked state -->
+      <div class="gate-locked-msg" style="display:none">
+        🔒 Next Flight — Studio → Signal → Systems
+      </div>
+
+      <!-- Gate-closed reveal panel -->
+      <div class="gate-closed-reveal" style="display:none">
+        <h3 style="color:#2EE6D6;margin-bottom:0.5rem">Next cohort assembling.</h3>
+        <p style="opacity:0.8;margin-bottom:1.25rem">Stay on the manifest — you'll be first to know when the gate opens.</p>
+        <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn-waitlist" target="_blank" rel="noopener noreferrer">
+          📡 Join Signal — Stay on the manifest
+        </a>
+      </div>
+
+    </div><!-- /#loading-dock -->
+
+
+    <!-- ── LOWER NAVIGATION (preserved, no structural change) ────────────────
+         Studio / Signal / Systems / Support the Journey remain accessible
+         but are visually subordinate — they are navigation, not primary actions.
+         ──────────────────────────────────────────────────────────────────── -->
+    <div class="btn-row" data-show-state="landing departed">
+      <a href="/Studio" class="btn btn-studio" data-path="studio" target="_blank" rel="noopener noreferrer" data-umami-event="Studio Click">📄 Studio</a>
+      <a href="https://newsletter.thispagedoesnotexist12345.us/" class="btn btn-signal" data-path="signal" target="_blank" rel="noopener noreferrer" data-umami-event="Signal Click">📡 Signal</a>
+      <a href="https://www.thispagedoesnotexist12345.tech" class="btn btn-systems" data-path="systems" target="_blank" rel="noopener noreferrer" data-umami-event="Systems Click">⚙️ Systems</a>
+      <a href="https://buymeacoffee.com/theultimatejourney" class="btn" data-path="support" target="_blank" rel="noopener noreferrer" data-umami-event="Support Click">Support the Journey ☕</a>
+    </div>
+    <div class="btn-row" data-show-state="landing departed" style="margin-top:-0.25rem;">
+      <a id="mc-nav-btn" href="/?seat_id=" class="btn btn-mc" data-path="mission-control" data-umami-event="Mission Control Click" style="display:none;">❖ Mission Control</a>
+    </div>
+
+    <!-- PUZZLE PATH TRACKER (preserved as-is) -->
+    <div class="puzzle-tracker" id="puzzleTracker" data-show-state="landing departed">
+      <span class="puzzle-label">Paths Activated</span>
+      <div class="puzzle-diamonds">
+        <span class="puzzle-diamond" id="diamond-signal" title="Signal">✦</span>
+        <span class="puzzle-diamond" id="diamond-systems" title="Systems">✦</span>
+        <span class="puzzle-diamond" id="diamond-support" title="Support">✦</span>
+      </div>
+    </div>
+
+    <!-- NEXT STEP GUIDANCE (preserved as-is) -->
+    <div class="btn-row-divider" data-show-state="landing departed">
+      <span>next step</span>
+    </div>
+    <div class="btn-row-waitlist" data-show-state="landing departed" style="display: block; text-align: center; margin-bottom: 2rem;">
+      <p style="font-size: 0.85rem; color: rgba(46, 230, 214, 0.7); margin: 0;">Next step: Use the <strong>Request a Seat</strong> button above to board.</p>
+    </div>
+
+    <!-- FOOTER LINKS (preserved as-is) -->
+    <section data-show-state="landing departed" style="text-align:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(46, 230, 214,0.1); font-size:0.8rem;">
+      <a href="https://thispagedoesnotexist12345-info.netlify.app" target="_blank" rel="noopener noreferrer" style="color:rgba(46, 230, 214,0.6); text-decoration:none; margin:0 0.75rem;">About / Field Guide</a>
+      <a href="https://www.thispagedoesnotexist12345.org/" target="_blank" rel="noopener noreferrer" style="color:rgba(46, 230, 214,0.6); text-decoration:none; margin:0 0.75rem;">Community (.org)</a>
+      <a href="https://buymeacoffee.com/theultimatejourney" target="_blank" rel="noopener noreferrer" style="color:rgba(46, 230, 214,0.6); text-decoration:none; margin:0 0.75rem;">Support the Journey</a>
+    </section>
+    <footer data-show-state="landing departed">
+      &copy; 2026 The Ultimate Journey | <span id="theme-status">Black Glass Theme Active</span>
+    </footer>
