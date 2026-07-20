@@ -57,44 +57,44 @@
   <div class="wrapper">
 
     <div class="header">
-      <div class="tuj">The Ultimate Journey</div>
-      <div class="logo">PageForward Airways</div>
-      <div class="powered">Powered by The Ultimate Journey</div>
+      <div class="tuj">THE ULTIMATE JOURNEY</div>
+      <div class="logo">PAGEFORWARD AIRWAYS</div>
+      <div class="powered">POWERED BY THE ULTIMATE JOURNEY</div>
       <h1>✈️ Your Boarding Pass is Ready</h1>
     </div>
 
     <div class="boarding-pass">
       <div class="pass-header">
         <div class="airline-block">
-          <div class="airline">PageForward Airways</div>
-          <div class="sub">Powered by The Ultimate Journey</div>
-          <div class="flight">PF-001</div>
+          <div class="airline">PAGEFORWARD AIRWAYS</div>
+          <div class="sub">POWERED BY THE ULTIMATE JOURNEY</div>
+          <div class="flight">{{flight_code}}</div>
         </div>
-        <div class="class-badge">Economy</div>
+        <div class="class-badge">ECONOMY</div>
       </div>
 
       <div class="pass-body">
         <div class="pass-row">
           <div class="pass-field">
-            <label>Passenger</label>
+            <label>PASSENGER</label>
             <div class="value">{{first_name}}</div>
           </div>
           <div class="pass-field">
-            <label>Destination</label>
+            <label>DESTINATION</label>
             <div class="value">Your Next Role</div>
           </div>
         </div>
         <div class="pass-row">
           <div class="pass-field">
-            <label>Boarded</label>
+            <label>BOARDING DATE</label>
             <div class="value">{{signup_date}}</div>
           </div>
           <div class="pass-field">
-            <label>Cabin Class</label>
+            <label>CABIN CLASS</label>
             <div class="value">Free</div>
           </div>
           <div class="pass-field">
-            <label>Boarding</label>
+            <label>BOARDING</label>
             <div class="value">Now Open</div>
           </div>
         </div>
@@ -102,7 +102,7 @@
         <hr class="divider" />
 
         <div class="perks">
-          <h3>What's Included</h3>
+          <h3>WHAT'S INCLUDED</h3>
           <div class="perk-item"><span class="dot"></span> ATS Resume Scanner (PageRouter)</div>
           <div class="perk-item"><span class="dot"></span> JD Library &amp; Job Pipeline Tracker</div>
           <div class="perk-item"><span class="dot"></span> Application Hub &amp; Status Tracking</div>
@@ -112,23 +112,23 @@
       </div>
 
       <div class="barcode-strip">
-        <span class="gate-info">Gate: Dashboard &nbsp;|&nbsp; Boards: Now &nbsp;|&nbsp; The Ultimate Journey</span>
+        <span class="gate-info">GATE: DASHBOARD &nbsp;|&nbsp; BOARDS: NOW &nbsp;|&nbsp; THE ULTIMATE JOURNEY</span>
         <span class="seat">{{seat_id}}</span>
       </div>
     </div>
 
     <div class="cta-block">
       <!-- SEC-11: wheels_up_url is generated from flight_id without hardcoding a flight-specific Beehiiv slug. -->
-      <a href="{{passport_url}}" class="cta-btn">❖ Mission Control</a>
+      <a href="{{passport_url}}?seat_id={{seat_id}}" class="cta-btn">❖ Mission Control</a>
       <div style="margin-top: 14px;">
-        <a href="{{wheels_up_url}}" style="color: #00D9FF; font-size: 13px; text-decoration: none;">Read your Alpha Arrival briefing →</a>
+        <a href="{{wheels_up_url}}?seat_id={{seat_id}}" style="color: #00D9FF; font-size: 13px; text-decoration: none;">Read your Alpha Arrival briefing →</a>
       </div>
     </div>
 
     <div class="footer">
-      <div class="tuj-footer">The Ultimate Journey · PageForward Airways</div>
+      <div class="tuj-footer">THE ULTIMATE JOURNEY · PAGEFORWARD AIRWAYS</div>
       You're receiving this because you signed up at PageForward.<br />
-      <a href="https://www.thispagedoesnotexist12345.com/request-seat" style="color: #00D9FF; text-decoration: none;">Request a Seat</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/request-seat" style="color: #00D9FF; text-decoration: none;">Request a Seat</a> &nbsp;·&nbsp;
       <a href="https://www.thispagedoesnotexist12345.tech/mission-control/requirements" style="color: #00D9FF; text-decoration: none;">View Master Requirements</a> &nbsp;·&nbsp;
       <a href="https://www.thispagedoesnotexist12345.tech/reject-return" style="color: #555555; text-decoration: none;">Reject &amp; Return</a><br />
       <a href="{{unsubscribe_url}}" style="color: #555555; text-decoration: none;">Unsubscribe</a><br /><br />
