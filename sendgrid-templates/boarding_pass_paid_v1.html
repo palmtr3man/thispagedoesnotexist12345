@@ -3,14 +3,14 @@
   Template: boarding_pass_paid_v1
   SendGrid ID: d-9290e951724f4b028d94945d4f06b69f
   Version: v1-dark-neon (ACTIVE)
-  Last updated: Apr 14, 2026
+  Last updated: Jul 20, 2026
 
   Dynamic variables:
     {{first_name}}      — Passenger first name
     {{last_name}}       — Passenger last name
-    {{seat_id}}         — Seat label (e.g. TUJ-KC2222)
-    {{tuj_code}}        — Internal tracking code for TUJ seat / flight context (e.g. TUJ-KC2222)
-    {{passport_url}}    — server-side: https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-XXXXXX
+    {{seat_id}}         — Seat label (e.g. TUJ-KC1111)
+    {{tuj_code}}        — Internal tracking code for TUJ seat / flight context (e.g. TUJ-KC1111)
+    {{passport_url}}    — server-side: https://www.thispagedoesnotexist12345.tech/?seat_id=TUJ-XXXXXX
     {{signup_date}}     — Optional boarding date string (e.g. "Apr 7, 2026"); falls back to "Confirmed"
     {{unsubscribe_url}} — SendGrid unsubscribe token
     {{wheels_up_url}} — Canonical Beehiiv wheels-up post URL derived from flight_id
@@ -19,11 +19,11 @@
     {
       "first_name": "Kevin",
       "last_name": "Clark",
-      "seat_id": "TUJ-KC2222",
-      "tuj_code": "TUJ-KC2222",
-      "passport_url": "https://www.thispagedoesnotexist12345.com/?seat_id=TUJ-KC2222",
-      "signup_date": "Apr 7, 2026",
-      "wheels_up_url": "https://newsletter.thispagedoesnotexist12345.us/p/flight-id-fl-051126-is-wheels-up-youre-on-board"
+      "seat_id": "TUJ-KC1111",
+      "tuj_code": "TUJ-KC1111",
+      "passport_url": "https://www.thispagedoesnotexist12345.tech/?seat_id=TUJ-KC1111",
+      "signup_date": "Jul 20, 2026",
+      "wheels_up_url": "https://newsletter.thispagedoesnotexist12345.us/p/flight-id-pf-070426-is-wheels-up-youre-on-board"
     }
 
   PATCHES:
@@ -35,6 +35,7 @@
     6. Apr 14, 2026 — Alpha test banner block removed (internal-only label, not for production sends)
     7. Apr 19, 2026 — P2 fix: applied patch 5 to live HTML (was still missing &tuj_code= in href)
     8. May 11, 2026 — SEC-11: secondary CTA href now uses {{wheels_up_url}}
+    9. Jul 20, 2026 — Uppercase labels, consolidated to .tech, removed test banner, and bound to TUJ-KC1111.
 -->
 <html lang="en">
 <head>
@@ -102,20 +103,15 @@
 <body>
 
   <!-- Preview text (hidden) -->
-  <span style="display:none;max-height:0;overflow:hidden;">Your First Class seat on Alpha Flight 1 is confirmed. Your Seat ID is inside.</span>
-
-  <!-- Alpha test banner — REMOVE BEFORE PRODUCTION SEND -->
-  <div style="background-color:#1a0a00;padding:8px 16px;text-align:center;margin-bottom:0;">
-    <p style="margin:0;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#FF8C00;letter-spacing:1px;text-transform:uppercase;">⚠️ Corporate Games Test — FL-CG-000 &nbsp;|&nbsp; Internal Only — Do Not Forward</p>
-  </div>
+  <span style="display:none;max-height:0;overflow:hidden;">Your First Class seat on {{flight_code}} is confirmed. Your Seat ID is inside.</span>
 
   <div class="wrapper">
 
     <div class="header">
-      <div class="tuj">The Ultimate Journey</div>
-      <div class="logo">PageForward Airways</div>
-      <div class="powered">Powered by The Ultimate Journey</div>
-      <h1>✈️ First Class Boarding Pass</h1>
+      <div class="tuj">THE ULTIMATE JOURNEY</div>
+      <div class="logo">PAGEFORWARD AIRWAYS</div>
+      <div class="powered">POWERED BY THE ULTIMATE JOURNEY</div>
+      <h1>✈️ FIRST CLASS BOARDING PASS</h1>
       <div class="subtitle">Welcome aboard, {{first_name}}. Your seat is confirmed.</div>
     </div>
 
@@ -123,37 +119,37 @@
       <div class="premium-bar"></div>
       <div class="pass-header">
         <div class="airline-block">
-          <div class="airline">PageForward Airways</div>
-          <div class="sub">Powered by The Ultimate Journey</div>
+          <div class="airline">PAGEFORWARD AIRWAYS</div>
+          <div class="sub">POWERED BY THE ULTIMATE JOURNEY</div>
           <div class="flight">{{flight_code}}</div>
         </div>
-        <div class="class-badge">First Class</div>
+        <div class="class-badge">FIRST CLASS</div>
       </div>
 
       <div class="pass-body">
         <div class="pass-row">
           <div class="pass-field">
-            <label>Passenger</label>
+            <label>PASSENGER</label>
             <div class="value">{{first_name}} {{last_name}}</div>
           </div>
           <div class="pass-field">
-            <label>Destination</label>
+            <label>DESTINATION</label>
             <div class="value">Your Next Role</div>
           </div>
         </div>
 
         <div class="pass-row">
           <div class="pass-field">
-            <label>Boarding Date</label>
+            <label>BOARDING DATE</label>
             <!-- signup_date fallback: if missing renders "Confirmed" -->
             <div class="value">{{signup_date}}</div>
           </div>
           <div class="pass-field">
-            <label>Cabin Class</label>
+            <label>CABIN CLASS</label>
             <div class="value">First Class</div>
           </div>
           <div class="pass-field">
-            <label>Boarding</label>
+            <label>BOARDING</label>
             <div class="value">Now Open</div>
           </div>
         </div>
@@ -161,13 +157,13 @@
         <hr class="divider" />
 
         <div class="seat-id-block">
-          <div class="label">Your Seat ID</div>
+          <div class="label">YOUR SEAT ID</div>
           <div class="code">{{seat_id}}</div>
           <div class="note">Keep this handy — you will need it at every checkpoint.</div>
         </div>
 
         <div class="perks">
-          <h3>First Class Includes</h3>
+          <h3>FIRST CLASS INCLUDES</h3>
           <div class="perk-item premium"><span class="dot"></span> Everything in Free Tier</div>
           <div class="perk-item"><span class="dot"></span> Unlimited Cover Letters</div>
           <div class="perk-item"><span class="dot"></span> TailorForJob — Full Resume Tailoring</div>
@@ -178,27 +174,27 @@
       </div>
 
       <div class="barcode-strip">
-        <span class="gate-info">Gate: Mission Control &nbsp;|&nbsp; Boards: Now &nbsp;|&nbsp; The Ultimate Journey</span>
+        <span class="gate-info">GATE: MISSION CONTROL &nbsp;|&nbsp; BOARDS: NOW &nbsp;|&nbsp; THE ULTIMATE JOURNEY</span>
         <span class="seat">{{seat_id}}</span>
       </div>
     </div>
 
     <!-- PRIMARY CTA: Mission Control via passport_url -->
     <div class="cta-block">
-      <a href="{{passport_url}}" class="cta-btn-primary">❖ Mission Control — First Class</a>
+      <a href="{{passport_url}}?seat_id={{seat_id}}" class="cta-btn-primary">❖ Mission Control — First Class</a>
       <br />
       <!-- SECONDARY CTA: SEC-11 canonical Beehiiv wheels-up briefing -->
-      <a href="{{wheels_up_url}}" class="cta-btn-secondary">Read Your Alpha Arrival Briefing →</a>
+      <a href="{{wheels_up_url}}?seat_id={{seat_id}}" class="cta-btn-secondary">Read Your Alpha Arrival Briefing →</a>
     </div>
 
     <div class="footer">
-      <div class="tuj-footer">The Ultimate Journey · PageForward Airways</div>
+      <div class="tuj-footer">THE ULTIMATE JOURNEY · PAGEFORWARD AIRWAYS</div>
       You're receiving this because you've been invited to {{flight_code}} — First Class.<br />
-      <a href="https://www.thispagedoesnotexist12345.com/">Request a Seat</a> &nbsp;·&nbsp;
-      <a href="https://view-link.cx/d7sGLORJ0DF">View Master Requirements</a> &nbsp;·&nbsp;
-      <a href="https://www.thispagedoesnotexist12345.tech/" style="color:#555555;">Reject &amp; Return</a><br />
+      <a href="https://www.thispagedoesnotexist12345.tech/request-seat">Request a Seat</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/mission-control/requirements">View Master Requirements</a> &nbsp;·&nbsp;
+      <a href="https://www.thispagedoesnotexist12345.tech/reject-return" style="color:#555555;">Reject &amp; Return</a><br />
       <a href="{{unsubscribe_url}}" style="color:#555555;">Unsubscribe</a><br /><br />
-      © 2026 The Ultimate Journey. All rights reserved.
+      © 2026 THE ULTIMATE JOURNEY. All rights reserved.
     </div>
 
   </div>
