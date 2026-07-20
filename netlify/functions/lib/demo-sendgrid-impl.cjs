@@ -4,7 +4,7 @@
  * /api/demo-sendgrid — secured demo-account SendGrid fan-out
  *
  * Sends the configured demo account a controlled set of TUJ templates using
- * Seat ID TUJ-KC2222 by default. This endpoint is intentionally admin-gated and
+ * Seat ID TUJ-KC1111 by default. This endpoint is intentionally admin-gated and
  * never exposes the SendGrid API key or target email in responses.
  *
  * Required env vars:
@@ -14,10 +14,10 @@
  *   DEMO_SEND_SECRET or SEC06_INTERNAL_TOKEN
  *
  * Optional env vars:
- *   DEMO_SEAT_ID          default: TUJ-KC2222
+ *   DEMO_SEAT_ID          default: TUJ-KC1111
  *   DEMO_FIRST_NAME       default: Kevin
  *   DEMO_LAST_NAME        default: Clark
- *   DEMO_FLIGHT_CODE      default: ACTIVE_FLIGHT_CODE || FL-CG-000
+ *   DEMO_FLIGHT_CODE      default: ACTIVE_FLIGHT_CODE || FL-CG-001
  *   SENDGRID_DEMO_DAILY_LIMIT default: 100
  */
 
@@ -239,7 +239,7 @@ exports.handler = async (event) => {
     if (!toEmail) return json(500, { ok: false, error: 'DEMO_ACCOUNT_EMAIL is not configured' });
   }
 
-  const seatId = String(body.seat_id || process.env.DEMO_SEAT_ID || 'TUJ-KC2222').trim().toUpperCase();
+  const seatId = String(body.seat_id || process.env.DEMO_SEAT_ID || 'TUJ-KC1111').trim().toUpperCase();
   if (!SEAT_ID_REGEX.test(seatId)) return json(400, { ok: false, error: 'Invalid demo seat_id format' });
 
   const requestedTemplates = sanitizeTemplateKeys(body.templates);
@@ -250,8 +250,8 @@ exports.handler = async (event) => {
 
   const firstName = String(body.first_name || process.env.DEMO_FIRST_NAME || 'Kevin').trim() || 'Kevin';
   const lastName = String(body.last_name || process.env.DEMO_LAST_NAME || 'Clark').trim() || 'Clark';
-  const flightCode = String(body.flight_code || process.env.DEMO_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-000').trim();
-  const siteUrl = String(process.env.SITE_URL || 'https://www.thispagedoesnotexist12345.com').replace(/\/$/, '');
+  const flightCode = String(body.flight_code || process.env.DEMO_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_CODE || 'FL-CG-001').trim();
+  const siteUrl = String(process.env.SITE_URL || 'https://www.thispagedoesnotexist12345.tech').replace(/\/$/, '');
 
   const { overrides, errors: overrideErrors } = sanitizeUrlOverrides(body.url_overrides || body);
   if (overrideErrors.length) {
