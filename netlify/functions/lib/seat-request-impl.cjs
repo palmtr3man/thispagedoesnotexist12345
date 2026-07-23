@@ -101,9 +101,22 @@ function getBase44SeatRequestUrl() {
   return canonicalUrl || legacyUrl;
 }
 
+function resolveBase44ApiKey() {
+  const direct = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (direct) return direct;
+  const raw = process.env.BASE44_AUTH_JSON;
+  if (!raw) return '';
+  try {
+    const parsed = JSON.parse(raw);
+    return String(parsed?.apiKey || parsed?.api_key || '').trim();
+  } catch {
+    return '';
+  }
+}
+
 function base44Headers() {
   const headers = { 'Content-Type': 'application/json' };
-  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  const apiKey = resolveBase44ApiKey();
   const internalToken = process.env.SEC06_INTERNAL_TOKEN || '';
   if (apiKey) headers.api_key = apiKey;
   if (internalToken) headers['x-internal-token'] = internalToken;

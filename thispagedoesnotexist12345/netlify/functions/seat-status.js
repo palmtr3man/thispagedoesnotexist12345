@@ -44,7 +44,7 @@
 
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
 const LOOKUP_TIMEOUT_MS = 4000;
-const BASE44_APP_ID = '67912f60b0c40c4f1a48d1c7';
+const BASE44_APP_ID = process.env.BASE44_APP_ID;
 
 /**
  * Fetch a single Base44 entity record by ID with a hard timeout.

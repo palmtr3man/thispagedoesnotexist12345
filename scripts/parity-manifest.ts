@@ -14,6 +14,7 @@ export const P0_KEYS = [
 /** P1 — parity / namespace keys; hard fail on main/develop/PR. */
 export const P1_KEYS = [
   'BASE44_AUTH_JSON',
+  'BASE44_APP_ID',
   'BEEHIIV_API_KEY',
   'NOTION_API_KEY',
   'NOTION_SECRET',

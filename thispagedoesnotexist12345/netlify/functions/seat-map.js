@@ -42,7 +42,7 @@ function pickArray(data) {
 function normalizeBase44SeatListUrl(raw) {
   if (!raw) return '';
   if (raw.includes('theultimatejourney.base44.app')) {
-    return 'https://app.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
+    return ((process.env.BASE44_APP_ID) ? ('https://app.base44.com/api/apps/' + process.env.BASE44_APP_ID + '/entities/Seat') : '');
   }
   return raw.replace(/\/$/, '');
 }

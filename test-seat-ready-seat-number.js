@@ -1,7 +1,7 @@
 const assert = require('assert');
 const { handler } = require('./netlify/functions/lib/seat-ready-impl.cjs');
 
-process.env.BASE44_SEAT_URL = 'https://app.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
+process.env.BASE44_SEAT_URL = 'https://app.base44.com/api/apps/test/entities/Seat';
 process.env.ACTIVE_FLIGHT_ID = 'FL_051126';
 process.env.READY_CLICK_SEND_ENABLED = 'false';
 process.env.SEC06_INTERNAL_TOKEN = 'test-seat-secret';

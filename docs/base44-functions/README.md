@@ -10,7 +10,7 @@ the static site side.
 |------|-------|
 | Git remote | `https://github.com/palmtr3man/career-navigator.git` |
 | Deploy tree | `base44/functions/<FunctionName>/entry.ts` |
-| App ID | `67912f60b0c40c4f1a48d1c7` |
+| App ID | Set via `BASE44_APP_ID` (never hard-code in source) |
 | Admin UI | `src/components/tower/NextFlightConfigPanel.jsx` (AutoPilot toggle) |
 | Sync manifest | `scripts/base44-git-sync-manifest.ts` |
 

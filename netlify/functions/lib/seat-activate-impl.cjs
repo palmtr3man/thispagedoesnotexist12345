@@ -62,10 +62,26 @@ const HEADERS = {
 };
 
 /**
+ * Resolve Base44 API key from direct env vars or BASE44_AUTH_JSON.
+ */
+function resolveBase44ApiKey() {
+  const direct = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (direct) return direct;
+  const raw = process.env.BASE44_AUTH_JSON;
+  if (!raw) return '';
+  try {
+    const parsed = JSON.parse(raw);
+    return String(parsed?.apiKey || parsed?.api_key || '').trim();
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Fetch the current Seat record from Base44 by tuj_code.
  */
 async function fetchSeat(base44SeatUrl, seatId) {
-  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  const apiKey = resolveBase44ApiKey();
   // Query by tuj_code field
   const url = `${base44SeatUrl}?tuj_code=${encodeURIComponent(seatId)}`;
   const res = await fetch(url, {
@@ -93,7 +109,7 @@ async function fetchSeat(base44SeatUrl, seatId) {
  * Uses the internal _id from the fetched seat record.
  */
 async function patchSeat(base44SeatUrl, seat, fields) {
-  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  const apiKey = resolveBase44ApiKey();
   const internalId = seat.id || seat._id;
   const res = await fetch(`${base44SeatUrl}/${internalId}`, {
     method:  'PUT',
@@ -207,7 +223,8 @@ exports.handler = async (event) => {
 
   // Correct legacy SPA URL to the Base44 REST API URL
   if (base44SeatUrl.includes('theultimatejourney.base44.app')) {
-    base44SeatUrl = 'https://app.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
+    const appId = process.env.BASE44_APP_ID || '';
+    base44SeatUrl = appId ? `https://app.base44.com/api/apps/${appId}/entities/Seat` : '';
   }
 
   // ── Fetch current seat record ──────────────────────────────────────────────

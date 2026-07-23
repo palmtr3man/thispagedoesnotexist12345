@@ -118,9 +118,22 @@ function normalizeFlightId(value) {
   return String(value || '').trim().replace(/\s+/g, '_');
 }
 
+function resolveBase44ApiKey() {
+  const direct = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (direct) return direct;
+  const raw = process.env.BASE44_AUTH_JSON;
+  if (!raw) return '';
+  try {
+    const parsed = JSON.parse(raw);
+    return String(parsed?.apiKey || parsed?.api_key || '').trim();
+  } catch {
+    return '';
+  }
+}
+
 function base44Headers() {
   const headers = { 'Content-Type': 'application/json' };
-  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  const apiKey = resolveBase44ApiKey();
   if (apiKey) headers.api_key = apiKey;
   return headers;
 }
@@ -128,7 +141,8 @@ function base44Headers() {
 function normalizeBase44SeatUrl(raw) {
   if (!raw) return '';
   if (raw.includes('theultimatejourney.base44.app')) {
-    return 'https://app.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
+    const appId = process.env.BASE44_APP_ID || '';
+    return appId ? `https://app.base44.com/api/apps/${appId}/entities/Seat` : '';
   }
   return raw.replace(/\/$/, '');
 }

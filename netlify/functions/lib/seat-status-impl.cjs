@@ -26,15 +26,28 @@
 // REGEX-MIGRATE-01: Support dual-prefix seat IDs (Legacy TUJ- and Flight-bound FL-)
 const SEAT_ID_REGEX = /^(TUJ-[A-Z2-9]{6}|FL-[A-Z0-9-]{3,10})$/;
 const LOOKUP_TIMEOUT_MS = 4000;
-const BASE44_APP_ID = '697140e628131a06045ebd18';
+const BASE44_APP_ID = process.env.BASE44_APP_ID;
 
 /**
  * Fetch a single Base44 entity record by ID with a hard timeout.
  * Returns parsed JSON on success, null on any error (timeout, 4xx, 5xx, network).
  */
+function resolveBase44ApiKey() {
+  const direct = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  if (direct) return direct;
+  const raw = process.env.BASE44_AUTH_JSON;
+  if (!raw) return '';
+  try {
+    const parsed = JSON.parse(raw);
+    return String(parsed?.apiKey || parsed?.api_key || '').trim();
+  } catch {
+    return '';
+  }
+}
+
 function base44Headers() {
   const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
-  const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
+  const apiKey = resolveBase44ApiKey();
   if (apiKey) headers.api_key = apiKey;
   return headers;
 }

@@ -1024,7 +1024,11 @@ function hideStatus() {
 // ============================================================
 // CAREER NAVIGATOR INTEGRATION
 // ============================================================
-const BASE44_API = 'https://api.base44.com/api/apps/697140e628131a06045ebd18/entities/Resume';
+// BASE44_APP_ID must be injected at deploy time — never hard-code production app IDs.
+const BASE44_APP_ID = (typeof window !== 'undefined' && window.__BASE44_APP_ID__) || '';
+const BASE44_API = BASE44_APP_ID
+  ? `https://api.base44.com/api/apps/${BASE44_APP_ID}/entities/Resume`
+  : '';
 
 function isJwtFresh(token) {
   try {
@@ -1645,7 +1649,10 @@ function initGatewayCtas() {
   // (departure_window_start, departure_window_end, scheduled_departure_date, user_email)
   // that /api/seat does not return. This is data hydration, not seat validation.
   // Do not replace with /api/seat/:id without extending that endpoint's response schema.
-  var BASE44_SEAT_API = 'https://api.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
+  // BASE44_APP_ID must be injected at deploy time — never hard-code production app IDs.
+  var BASE44_SEAT_API = BASE44_APP_ID
+    ? ('https://api.base44.com/api/apps/' + BASE44_APP_ID + '/entities/Seat')
+    : '';
 
   function buildHeaders() {
     var headers = { 'Content-Type': 'application/json' };

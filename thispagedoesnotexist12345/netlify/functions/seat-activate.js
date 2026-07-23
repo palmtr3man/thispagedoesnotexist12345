@@ -207,7 +207,7 @@ exports.handler = async (event) => {
 
   // Correct legacy SPA URL to the Base44 REST API URL
   if (base44SeatUrl.includes('theultimatejourney.base44.app')) {
-    base44SeatUrl = 'https://app.base44.com/api/apps/697140e628131a06045ebd18/entities/Seat';
+    base44SeatUrl = ((process.env.BASE44_APP_ID) ? ('https://app.base44.com/api/apps/' + process.env.BASE44_APP_ID + '/entities/Seat') : '');
   }
 
   // ── Fetch current seat record ──────────────────────────────────────────────
