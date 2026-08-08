@@ -47,6 +47,69 @@ const LOOKUP_TIMEOUT_MS = 4000;
 const BASE44_APP_ID = process.env.BASE44_APP_ID;
 
 /**
+ * Supabase REST API helpers.
+ * The codebase uses direct REST calls rather than the @supabase/supabase-js client.
+ */
+function createSupabaseClient() {
+  const url = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+  if (!url || !key) return null;
+  return {
+    url,
+    key,
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      'Content-Type': 'application/json',
+    },
+  };
+}
+
+/**
+ * getActiveFlightRegistry(supabase)
+ *
+ * Fetches the active flight registry from Supabase. Returns the first active
+ * cohort/flight record, or null if unavailable. Fails gracefully to avoid
+ * blocking the primary seat-status response.
+ *
+ * @param {object} supabase — Supabase client object from createSupabaseClient()
+ * @returns {Promise<object|null>} Active flight registry record or null
+ */
+async function getActiveFlightRegistry(supabase) {
+  if (!supabase || !supabase.url || !supabase.key) {
+    console.warn('[seat-status] getActiveFlightRegistry: Supabase not configured');
+    return null;
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS);
+  try {
+    const activeFlightCode = process.env.ACTIVE_FLIGHT_CODE || process.env.ACTIVE_FLIGHT_ID || '';
+    let url = `${supabase.url}/rest/v1/cohorts?select=id,flight_id,flight_code,name,status,seats_available,seats_total,gate_status&limit=1`;
+    if (activeFlightCode) {
+      url += `&flight_id=eq.${encodeURIComponent(activeFlightCode)}`;
+    } else {
+      url += `&status=eq.active&order=created_at.desc`;
+    }
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: supabase.headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok) {
+      console.warn(`[seat-status] getActiveFlightRegistry: Supabase query failed ${res.status}`);
+      return null;
+    }
+    const rows = await res.json();
+    return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+  } catch (err) {
+    clearTimeout(timer);
+    console.warn('[seat-status] getActiveFlightRegistry: fetch error', err.message);
+    return null;
+  }
+}
+
+/**
  * Fetch a single Base44 entity record by ID with a hard timeout.
  * Returns parsed JSON on success, null on any error (timeout, 4xx, 5xx, network).
  */
@@ -169,17 +232,42 @@ exports.handler = async function handler(event) {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, api_key',
       },
       body: '',
     };
   }
 
   try {
+    // ── 0. Initialize Supabase client ──────────────────────────────────────
+    const supabase = createSupabaseClient();
+
+    // ── 0b. Fetch active flight registry from Supabase (fail-open) ─────────
+    const flightRegistry = await getActiveFlightRegistry(supabase);
+
     // ── 1. Proxy getCohortStatus ───────────────────────────────────────────
-    const res = await fetch(process.env.BASE44_COHORT_STATUS_URL);
+    const res = await fetch(process.env.BASE44_COHORT_STATUS_URL, {
+      method: 'GET',
+      headers: base44Headers(),
+    });
     if (!res.ok) throw new Error(`Upstream error: ${res.status}`);
     const data = await res.json();
+
+    // ── 1b. Merge Supabase flight registry data if available ───────────────
+    if (flightRegistry) {
+      if (flightRegistry.seats_available !== undefined && data.seats_available === undefined) {
+        data.seats_available = flightRegistry.seats_available;
+      }
+      if (flightRegistry.seats_total !== undefined && data.seats_total === undefined) {
+        data.seats_total = flightRegistry.seats_total;
+      }
+      if (flightRegistry.gate_status && !data.gate_status) {
+        data.gate_status = flightRegistry.gate_status;
+      }
+      if (flightRegistry.flight_code && !data.flight_code) {
+        data.flight_code = flightRegistry.flight_code;
+      }
+    }
 
     // ── 2. ALPHA_MODE override ─────────────────────────────────────────────
     const alphaModeEnv = String(process.env.ALPHA_MODE || '').toLowerCase();
