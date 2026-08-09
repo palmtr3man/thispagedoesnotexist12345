@@ -85,10 +85,18 @@ const NOTION_SEAT_REQUEST_DATABASE_ID = process.env.NOTION_SEAT_REQUEST_DATABASE
 const ACTIVE_FLIGHT_CODE_DEFAULT = 'FL_051126'; // canonical fallback aligned with FL_051126
 const SUBJECT_TEMPLATE = (flightCode) => `Your seat request is in — ${flightCode} ✈️`;
 
+/**
+ * Base44 authorization helper.
+ * Returns headers with API key authentication for Base44 REST API calls.
+ * Supports multiple env var naming conventions for flexibility.
+ */
 function base44Headers() {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
   const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
-  if (apiKey) headers.api_key = apiKey;
+  if (apiKey) {
+    headers.api_key = apiKey;
+    headers.Authorization = `Bearer ${apiKey}`;
+  }
   return headers;
 }
 
