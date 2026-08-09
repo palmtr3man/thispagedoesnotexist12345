@@ -1,0 +1,58 @@
+name: SEC-05 Infisical Vault Sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/sync-infisical-vault.ts'
+      - '.github/workflows/sec05-vault-sync.yml'
+  repository_dispatch:
+    types: [trigger-sync]
+
+jobs:
+  sync-vault:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      INFISICAL_DOMAIN: https://us.infisical.com
+      INFISICAL_PROJECT_ID: 6c7646e9-04dd-484a-a5d1-612b9582da15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Infisical CLI
+        run: |
+          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
+      - name: Authenticate with Infisical (OIDC)
+        uses: Infisical/auth-action@v1.0.0
+        with:
+          method: oidc
+          identity-id: ${{ secrets.INFISICAL_MACHINE_IDENTITY_ID }}
+          domain: https://us.infisical.com
+          oidc-audience: https://us.infisical.com
+          output-env-credential: true
+      - name: Verify TUJ Infisical key alignment
+        run: npx tsx scripts/tuj_infisical_sync_check.ts
+      - name: Sync staging secrets
+        env:
+          SUPABASE_PROJECT_ID: snsxtpdwiclwnfcdpgqv
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_STAGING }}
+        run: infisical run --domain="$INFISICAL_DOMAIN" --projectId="$INFISICAL_PROJECT_ID" --env staging -- npx tsx scripts/sync-infisical-vault.ts
+      - name: Sync production secrets
+        env:
+          SUPABASE_PROJECT_ID: dykyabqoilzvuncikzkd
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_PRODUCTION }}
+        run: infisical run --domain="$INFISICAL_DOMAIN" --projectId="$INFISICAL_PROJECT_ID" --env prod -- npx tsx scripts/sync-infisical-vault.ts
