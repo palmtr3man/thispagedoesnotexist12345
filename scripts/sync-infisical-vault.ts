@@ -54,12 +54,18 @@ function getSecrets(): Record<string, string> {
 
 function getConfig() {
   const projectId = process.env.SUPABASE_PROJECT_ID;
-  const serviceRoleKey = process.env.SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const url = process.env.SUPABASE_URL || (projectId ? `https://${projectId}.supabase.co` : undefined);
+  // Read ONLY from the explicitly-named GitHub Actions secret env var.
+  // Do NOT fall back to SERVICE_ROLE_KEY or SUPABASE_URL — Infisical injects all
+  // vault secrets into the environment before this script runs, so any vault secret
+  // named SERVICE_ROLE_KEY or SUPABASE_URL would silently override the GitHub secret
+  // and send the wrong key to the wrong endpoint.
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Derive the URL exclusively from SUPABASE_PROJECT_ID (set by the workflow, not Infisical).
+  const url = projectId ? `https://${projectId}.supabase.co` : undefined;
 
   if (!projectId) throw new Error("SUPABASE_PROJECT_ID is required");
-  if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY or SERVICE_ROLE_KEY is required");
-  if (!url) throw new Error("SUPABASE_URL could not be determined");
+  if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is required (set the GitHub Actions secret, never use the anon key)");
+  if (!url) throw new Error("SUPABASE_URL could not be determined from SUPABASE_PROJECT_ID");
 
   return { projectId, serviceRoleKey, url: url.replace(/\/$/, "") };
 }
