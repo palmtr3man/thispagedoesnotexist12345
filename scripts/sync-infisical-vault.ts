@@ -22,12 +22,49 @@ function getSecrets(): Record<string, string> {
   return result;
 }
 
+/**
+ * Refuse anon/publishable keys before any Vault write.
+ * Supabase API keys are JWTs; inspect role claim only — never log the key.
+ */
+export function assertServiceRoleKey(key: string): void {
+  const parts = key.split(".");
+  if (parts.length !== 3) {
+    throw new Error(
+      "Refusing Vault sync: SUPABASE_SERVICE_ROLE_KEY is not a JWT. Use the project service-role/secret key (never the anon key)."
+    );
+  }
+  let role: unknown;
+  try {
+    const json = Buffer.from(parts[1], "base64url").toString("utf8");
+    role = (JSON.parse(json) as { role?: unknown }).role;
+  } catch {
+    throw new Error(
+      "Refusing Vault sync: could not decode SUPABASE_SERVICE_ROLE_KEY JWT payload. Use the service-role/secret key (never the anon key)."
+    );
+  }
+  if (role === "anon") {
+    throw new Error(
+      "Refusing Vault sync: anon key cannot authorize privileged Vault writes. Populate the real service-role/secret key in the matching GitHub Actions secret — never use anon as a placeholder."
+    );
+  }
+  if (role !== "service_role") {
+    throw new Error(
+      `Refusing Vault sync: key role must be service_role (got ${String(role ?? "missing")}). Do not reuse staging credentials for production.`
+    );
+  }
+}
+
 function getConfig() {
   const projectId = process.env.SUPABASE_PROJECT_ID;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY;
   const url = process.env.SUPABASE_URL || (projectId ? `https://${projectId}.supabase.co` : undefined);
   if (!projectId) throw new Error("SUPABASE_PROJECT_ID is required");
-  if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY or SERVICE_ROLE_KEY is required");
+  if (!serviceRoleKey) {
+    throw new Error(
+      "SUPABASE_SERVICE_ROLE_KEY or SERVICE_ROLE_KEY is required (nonempty). Leave the env unset to skip at the workflow guard — do not substitute the anon key."
+    );
+  }
+  assertServiceRoleKey(serviceRoleKey);
   if (!url) throw new Error("SUPABASE_URL could not be determined");
   const parameter = process.env.VAULT_SECRET_PARAMETER ||
     (projectId === STAGING_PROJECT_ID ? "p_value" : projectId === PRODUCTION_PROJECT_ID ? "p_secret" : "p_secret");
