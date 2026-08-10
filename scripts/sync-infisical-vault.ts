@@ -86,35 +86,58 @@ export async function runSync(): Promise<string> {
     throw new Error("No allowlisted secrets found; refusing silent no-op");
   }
 
-  let count = 0;
-  for (const [key, value] of entries) {
+  // Staging uses p_value; production uses p_secret (older migration).
+  // Try p_value first; if the function signature rejects it (PGRST202 / 404),
+  // retry with p_secret so both environments are handled without a schema migration.
+  const callVaultWrite = async (key: string, value: string): Promise<void> => {
     const description = `Synced from Infisical project ${INFISICAL_PROJECT_ID} on ${new Date().toISOString()}`;
-    const payload = {
-      p_name: key,
-      p_description: description,
-      p_value: value,
+    const headers = {
+      apikey: config.serviceRoleKey,
+      Authorization: `Bearer ${config.serviceRoleKey}`,
+      "Content-Type": "application/json",
     };
+    const rpcUrl = `${config.url}/rest/v1/rpc/vault_write_secret`;
 
+    // First attempt: p_value (live staging signature)
     let response: Response;
     try {
-      response = await fetch(`${config.url}/rest/v1/rpc/vault_write_secret`, {
+      response = await fetch(rpcUrl, {
         method: "POST",
-        headers: {
-          apikey: config.serviceRoleKey,
-          Authorization: `Bearer ${config.serviceRoleKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        headers,
+        body: JSON.stringify({ p_name: key, p_description: description, p_value: value }),
       });
     } catch (error) {
       throw new Error(`vault_write_secret request failed for ${key}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // If the function doesn't accept p_value (PGRST202 = unknown function signature),
+    // retry with p_secret (live production / repo migration signature).
+    if (response.status === 404) {
+      const body = await response.text().catch(() => "");
+      if (body.includes("PGRST202")) {
+        try {
+          response = await fetch(rpcUrl, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ p_name: key, p_description: description, p_secret: value }),
+          });
+        } catch (error) {
+          throw new Error(`vault_write_secret retry (p_secret) request failed for ${key}: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      } else {
+        throw new Error(`vault_write_secret failed for ${key} in ${environment}: HTTP 404: ${body.slice(0, 500)}`);
+      }
     }
 
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
       throw new Error(`vault_write_secret failed for ${key} in ${environment}: HTTP ${response.status}${detail ? `: ${detail.slice(0, 500)}` : ""}`);
     }
+  };
 
+  let count = 0;
+  for (const [key, value] of entries) {
+    await callVaultWrite(key, value);
     count++;
   }
 
