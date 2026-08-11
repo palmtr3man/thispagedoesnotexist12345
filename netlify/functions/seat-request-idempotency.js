@@ -3,7 +3,7 @@
  * Review only; this does not replace seat-request.js automatically.
  */
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -68,7 +68,7 @@ async function proxyToBase44(payload) {
   return jsonResponse(response.status, { ...data, ok: response.ok });
 }
 
-export const handler = async function handler(event) {
+exports.handler = async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: CORS_HEADERS, body: '' };
   if (event.httpMethod !== 'POST') return jsonResponse(405, { ok: false, error: 'Method not allowed' });
 
