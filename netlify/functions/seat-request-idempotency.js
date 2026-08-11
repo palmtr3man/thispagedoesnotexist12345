@@ -1,14 +1,20 @@
 /**
  * Gate 3/4 staging handler: idempotent Supabase intake with Base44 fallback.
  * Review only; this does not replace seat-request.js automatically.
+ *
+ * Security notes:
+ * - Every request requires the same signed age token used by seat-request.js.
+ * - Duplicate responses are deliberately sanitized and never expose stored metadata.
+ * - Header names are handled case-insensitively and conflicting credentials are rejected.
  */
 
 const { createClient } = require('@supabase/supabase-js');
+const { verifyAgeToken } = require('./verify-age');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-Idempotency-Key, X-Request-Id',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Idempotency-Key, X-Request-Id',
 };
 
 function jsonResponse(statusCode, payload, extraHeaders = {}) {
@@ -24,9 +30,44 @@ function parseJson(value) {
   try { return JSON.parse(value); } catch (_) { throw new Error('Request body is invalid JSON'); }
 }
 
-function header(event, name) {
+function getHeader(event, name) {
   const headers = event.headers || {};
-  return headers[name] || headers[name.toLowerCase()] || headers[name.toUpperCase()] || '';
+  const matchingKey = Object.keys(headers).find((key) => key.toLowerCase() === name.toLowerCase());
+  return matchingKey ? String(headers[matchingKey] || '').trim() : '';
+}
+
+function getAuthenticatedAgeToken(event, payload) {
+  const bodyToken = typeof payload.age_token === 'string' ? payload.age_token.trim() : '';
+  const authorization = getHeader(event, 'Authorization');
+  let bearerToken = '';
+
+  if (authorization) {
+    const match = authorization.match(/^Bearer\s+(.+)$/i);
+    if (!match || !match[1].trim()) throw new Error('Invalid authorization header');
+    bearerToken = match[1].trim();
+  }
+
+  if (bodyToken && bearerToken && bodyToken !== bearerToken) {
+    throw new Error('Conflicting authentication tokens');
+  }
+
+  const token = bodyToken || bearerToken;
+  const secret = process.env.AGE_TOKEN_SECRET;
+  if (!secret || !token) throw new Error('Age verification required');
+
+  const verified = verifyAgeToken(token, secret);
+  if (!verified || !verified.verified) throw new Error('Age verification required');
+  return token;
+}
+
+function getIdempotencyKey(event, payload) {
+  const headerKey = getHeader(event, 'X-Idempotency-Key');
+  const bodyKey = typeof payload.idempotency_key === 'string' ? payload.idempotency_key.trim() : '';
+  if (headerKey && bodyKey && headerKey !== bodyKey) throw new Error('Conflicting idempotency keys');
+  const key = headerKey || bodyKey;
+  if (!key) throw new Error('Idempotency key is required');
+  if (key.length > 255) throw new Error('Idempotency key is too long');
+  return key;
 }
 
 function getSupabase() {
@@ -68,36 +109,40 @@ async function proxyToBase44(payload) {
   return jsonResponse(response.status, { ...data, ok: response.ok });
 }
 
+function duplicateResponse(row, idempotencyKey) {
+  // Never return metadata or the original payload from a duplicate lookup.
+  return jsonResponse(200, {
+    ok: true,
+    duplicate: true,
+    idempotency_key: idempotencyKey,
+    seat_request: {
+      id: row.id,
+      status: row.status,
+    },
+  });
+}
+
 exports.handler = async function handler(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: CORS_HEADERS, body: '' };
   if (event.httpMethod !== 'POST') return jsonResponse(405, { ok: false, error: 'Method not allowed' });
 
+  let payload;
   try {
-    const payload = parseJson(event.body);
-    const idempotencyKey = String(
-      header(event, 'X-Idempotency-Key') || payload.idempotency_key || ''
-    ).trim();
-    if (!idempotencyKey) return jsonResponse(400, { ok: false, error: 'Idempotency key is required' });
-    if (idempotencyKey.length > 255) return jsonResponse(400, { ok: false, error: 'Idempotency key is too long' });
-
-    const requestId = String(header(event, 'X-Request-Id') || '').trim() || null;
+    payload = parseJson(event.body);
+    // Authenticate before any idempotency lookup or other database access.
+    getAuthenticatedAgeToken(event, payload);
+    const idempotencyKey = getIdempotencyKey(event, payload);
+    const requestId = getHeader(event, 'X-Request-Id') || null;
     const db = getSupabase();
 
     const existing = await db
       .from('seat_requests')
-      .select('*')
+      .select('id, status')
       .eq('idempotency_key', idempotencyKey)
       .maybeSingle();
     if (existing.error) throw existing.error;
 
-    if (existing.data) {
-      return jsonResponse(200, {
-        ok: true,
-        duplicate: true,
-        idempotency_key: idempotencyKey,
-        seat_request: existing.data,
-      });
-    }
+    if (existing.data) return duplicateResponse(existing.data, idempotencyKey);
 
     const requestRow = {
       passenger_id: payload.passenger_id ?? null,
@@ -109,15 +154,13 @@ exports.handler = async function handler(event) {
       metadata: { payload, request_id: requestId, intake: 'gate4-staging' },
     };
 
-    const inserted = await db.from('seat_requests').insert(requestRow).select('*').single();
+    const inserted = await db.from('seat_requests').insert(requestRow).select('id, status').single();
     if (inserted.error) {
-      // A concurrent request may have won the unique-key race. Return its row
-      // rather than forwarding a duplicate upstream request.
+      // A concurrent request may have won the unique-key race. Return only a
+      // sanitized result rather than forwarding a duplicate upstream request.
       if (inserted.error.code === '23505') {
-        const raced = await db.from('seat_requests').select('*').eq('idempotency_key', idempotencyKey).maybeSingle();
-        if (!raced.error && raced.data) {
-          return jsonResponse(200, { ok: true, duplicate: true, idempotency_key: idempotencyKey, seat_request: raced.data });
-        }
+        const raced = await db.from('seat_requests').select('id, status').eq('idempotency_key', idempotencyKey).maybeSingle();
+        if (!raced.error && raced.data) return duplicateResponse(raced.data, idempotencyKey);
       }
       throw inserted.error;
     }
@@ -142,11 +185,21 @@ exports.handler = async function handler(event) {
       }),
     };
   } catch (error) {
+    // Authentication failures must never fall through to the upstream proxy.
+    if (error?.message === 'Age verification required' ||
+        error?.message === 'Invalid authorization header' ||
+        error?.message === 'Conflicting authentication tokens') {
+      return jsonResponse(401, { ok: false, error: 'Authentication required' });
+    }
+    if (error?.message === 'Idempotency key is required' ||
+        error?.message === 'Idempotency key is too long' ||
+        error?.message === 'Conflicting idempotency keys') {
+      return jsonResponse(400, { ok: false, error: error.message });
+    }
+
     // Staging fallback preserves the existing proxy behavior if Supabase is
-    // unavailable. The response explicitly indicates that DB intake was not
-    // recorded so callers can investigate rather than assume Gate 4 passed.
+    // unavailable. Authentication has already succeeded before this point.
     try {
-      const payload = parseJson(event.body);
       const fallback = await proxyToBase44(payload);
       return {
         ...fallback,
