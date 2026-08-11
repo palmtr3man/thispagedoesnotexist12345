@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "drift-check": "tsx scripts/drift-check.ts",
     "security:gates": "npx tsx check_signal_gate.ts",
     "security:gates:negative": "npx tsx test-sync-malicious.ts"
   },
@@ -23,12 +24,14 @@
   },
   "devDependencies": {
     "@base44/vite-plugin": "latest",
+    "@infisical/sdk": "^2.1.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.0",
     "typescript": "^5.2.2",
     "vite": "^5.2.2"
   }

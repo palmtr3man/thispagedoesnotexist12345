@@ -1,5 +1,5 @@
 import { InfisicalSDK } from "@infisical/sdk";
-import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
+import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.ts";
 
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
 const INFISICAL_SITE_URL = "https://us.infisical.com";
