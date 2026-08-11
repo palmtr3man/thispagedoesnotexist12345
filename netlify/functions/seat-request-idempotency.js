@@ -70,6 +70,36 @@ function getIdempotencyKey(event, payload) {
   return key;
 }
 
+function validatePayload(payload) {
+  if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+    throw new Error('Invalid request payload');
+  }
+
+  const passengerId = typeof payload.passenger_id === 'string' ? payload.passenger_id.trim() : '';
+  const cohortId = typeof payload.cohort_id === 'string' ? payload.cohort_id.trim() : '';
+  const seatId = typeof payload.seat_id === 'string' ? payload.seat_id.trim() : '';
+  const source = typeof payload.source === 'string' ? payload.source.trim() : 'seat-request-idempotency';
+
+  if (!passengerId || !cohortId || !seatId) {
+    throw new Error('Missing required seat-request parameters');
+  }
+  if (passengerId.length > 255 || cohortId.length > 255 || seatId.length > 255 || source.length > 255) {
+    throw new Error('Parameter exceeds maximum allowed length');
+  }
+  const controlCharPattern = /[\u0000-\u001F\u007F-\u009F]/;
+  if (controlCharPattern.test(passengerId) || controlCharPattern.test(cohortId) ||
+      controlCharPattern.test(seatId) || controlCharPattern.test(source)) {
+    throw new Error('Invalid characters in parameters');
+  }
+
+  return {
+    passenger_id: passengerId,
+    cohort_id: cohortId,
+    seat_id: seatId,
+    source,
+  };
+}
+
 function getSupabase() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -106,7 +136,13 @@ async function proxyToBase44(payload) {
   try { data = await response.json(); } catch (_) {
     return jsonResponse(502, { ok: false, error: 'Seat request service returned invalid JSON' });
   }
-  return jsonResponse(response.status, { ...data, ok: response.ok });
+  if (!response.ok) {
+    const clientMessage = (data && typeof data.error === 'string')
+      ? data.error
+      : 'Seat request service failed';
+    return jsonResponse(response.status, { ok: false, error: clientMessage });
+  }
+  return jsonResponse(response.status, { ...data, ok: true });
 }
 
 function duplicateResponse(row, idempotencyKey) {
@@ -127,11 +163,14 @@ exports.handler = async function handler(event) {
   if (event.httpMethod !== 'POST') return jsonResponse(405, { ok: false, error: 'Method not allowed' });
 
   let payload;
+  let sanitizedPayload;
+  let ageToken = '';
   let idempotencyKey = '';
   try {
     payload = parseJson(event.body);
+    sanitizedPayload = validatePayload(payload);
     // Authenticate before any idempotency lookup or other database access.
-    getAuthenticatedAgeToken(event, payload);
+    ageToken = getAuthenticatedAgeToken(event, payload);
     idempotencyKey = getIdempotencyKey(event, payload);
     const requestId = getHeader(event, 'X-Request-Id') || null;
     const db = getSupabase();
@@ -146,13 +185,10 @@ exports.handler = async function handler(event) {
     if (existing.data) return duplicateResponse(existing.data, idempotencyKey);
 
     const requestRow = {
-      passenger_id: payload.passenger_id ?? null,
-      cohort_id: payload.cohort_id ?? null,
-      seat_id: payload.seat_id ?? null,
+      ...sanitizedPayload,
       idempotency_key: idempotencyKey,
-      source: payload.source || 'seat-request-idempotency',
       status: 'open',
-      metadata: { payload, request_id: requestId, intake: 'gate4-staging' },
+      metadata: { payload: sanitizedPayload, request_id: requestId, intake: 'gate4-staging' },
     };
 
     const inserted = await db.from('seat_requests').insert(requestRow).select('id, status').single();
@@ -170,12 +206,13 @@ exports.handler = async function handler(event) {
       event_id: requestId,
       idempotency_key: idempotencyKey,
       event_type: 'seat_request',
-      payload,
+      payload: sanitizedPayload,
       status: 'received',
     });
     if (eventInsert.error && eventInsert.error.code !== '42P01') throw eventInsert.error;
 
-    const upstream = await proxyToBase44({ ...payload, idempotency_key: idempotencyKey });
+    const upstreamPayload = { ...sanitizedPayload, age_token: ageToken, idempotency_key: idempotencyKey };
+    const upstream = await proxyToBase44(upstreamPayload);
     return {
       ...upstream,
       body: JSON.stringify({
@@ -194,16 +231,24 @@ exports.handler = async function handler(event) {
     }
     if (error?.message === 'Idempotency key is required' ||
         error?.message === 'Idempotency key is too long' ||
-        error?.message === 'Conflicting idempotency keys') {
+        error?.message === 'Conflicting idempotency keys' ||
+        error?.message === 'Invalid request payload' ||
+        error?.message === 'Missing required seat-request parameters' ||
+        error?.message === 'Parameter exceeds maximum allowed length' ||
+        error?.message === 'Invalid characters in parameters' ||
+        error?.message === 'Request body is empty' ||
+        error?.message === 'Request body is invalid JSON') {
       return jsonResponse(400, { ok: false, error: error.message });
     }
 
     // Staging fallback preserves the existing proxy behavior if Supabase is
-    // unavailable. Authentication has already succeeded before this point.
+    // unavailable. Authentication and validation have already succeeded.
     try {
-      const fallbackPayload = idempotencyKey
-        ? { ...payload, idempotency_key: idempotencyKey }
-        : payload;
+      const fallbackPayload = {
+        ...sanitizedPayload,
+        age_token: ageToken,
+        idempotency_key: idempotencyKey,
+      };
       const fallback = await proxyToBase44(fallbackPayload);
       return {
         ...fallback,
