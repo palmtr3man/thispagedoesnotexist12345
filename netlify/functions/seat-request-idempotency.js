@@ -9,7 +9,7 @@
  */
 
 const { createClient } = require('@supabase/supabase-js');
-const { verifyAgeToken } = require('./verify-age');
+const { verifyAgeToken } = require('./lib/verify-age-impl.cjs');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -127,11 +127,12 @@ exports.handler = async function handler(event) {
   if (event.httpMethod !== 'POST') return jsonResponse(405, { ok: false, error: 'Method not allowed' });
 
   let payload;
+  let idempotencyKey = '';
   try {
     payload = parseJson(event.body);
     // Authenticate before any idempotency lookup or other database access.
     getAuthenticatedAgeToken(event, payload);
-    const idempotencyKey = getIdempotencyKey(event, payload);
+    idempotencyKey = getIdempotencyKey(event, payload);
     const requestId = getHeader(event, 'X-Request-Id') || null;
     const db = getSupabase();
 
@@ -200,7 +201,10 @@ exports.handler = async function handler(event) {
     // Staging fallback preserves the existing proxy behavior if Supabase is
     // unavailable. Authentication has already succeeded before this point.
     try {
-      const fallback = await proxyToBase44(payload);
+      const fallbackPayload = idempotencyKey
+        ? { ...payload, idempotency_key: idempotencyKey }
+        : payload;
+      const fallback = await proxyToBase44(fallbackPayload);
       return {
         ...fallback,
         headers: { ...fallback.headers, 'X-Intake-Fallback': 'base44-proxy' },
