@@ -37,7 +37,7 @@ jobs:
           curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
           sudo apt-get update && sudo apt-get install -y infisical
       - name: Authenticate with Infisical (OIDC)
-        uses: Infisical/auth-action@v1.0.0
+        uses: Infisical/auth-action@bfe3dacda023af78349e300914a168e1fb766dbe # v1.0.0
         with:
           method: oidc
           identity-id: ${{ secrets.INFISICAL_MACHINE_IDENTITY_ID }}
