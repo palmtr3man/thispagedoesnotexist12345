@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "security:gates": "npx tsx check_signal_gate.ts",
-    "security:gates:negative": "npx tsx test-sync-malicious.ts"
+    "security:gates:negative": "npx tsx test-sync-malicious.ts",
+    "drift-check": "npx tsx scripts/sync-drift-keys.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@base44/vite-plugin": "latest",
+    "@infisical/sdk": "^5.0.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
