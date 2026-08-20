@@ -1,3 +1,10 @@
+/**
+ * seat-request.js — Netlify Function (Self-Contained)
+ * 
+ * Proxies seat request submissions to the Base44 upstream service.
+ * Fully self-contained with no dynamic imports from ./lib/.
+ */
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -27,7 +34,7 @@ function base44Headers() {
   return headers;
 }
 
-async function handler(event) {
+exports.handler = async function handler(event) {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: CORS_HEADERS, body: '' };
   }
@@ -64,6 +71,4 @@ async function handler(event) {
     console.error('[seat-request] Internal error:', err && err.message ? err.message : 'unknown');
     return jsonResponse(500, { ok: false, error: 'Internal server error' });
   }
-}
-
-module.exports = { handler };
+};

@@ -51,8 +51,17 @@ const BASE44_APP_ID = process.env.BASE44_APP_ID;
  * The codebase uses direct REST calls rather than the @supabase/supabase-js client.
  */
 function createSupabaseClient() {
-  const url = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+  // Dual-read fallbacks for URL and key to support both native Supabase vars and Vite-prefixed alternatives
+  const url = (
+    process.env.SUPABASE_URL ||
+    process.env.VITE_SUPABASE_URL ||
+    ''
+  ).replace(/\/$/, '');
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.APP_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    '';
   if (!url || !key) return null;
   return {
     url,
@@ -116,7 +125,13 @@ async function getActiveFlightRegistry(supabase) {
 function base44Headers() {
   const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
   const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
-  if (apiKey) headers.api_key = apiKey;
+  if (apiKey) {
+    // Try multiple header formats to support different Base44 authentication schemes
+    // Priority: X-API-Key (most common), Authorization (Bearer), api_key (fallback)
+    headers['X-API-Key'] = apiKey;
+    headers['api_key'] = apiKey;
+    headers['Authorization'] = `Bearer ${apiKey}`;
+  }
   return headers;
 }
 
@@ -203,12 +218,14 @@ function resolveFlightCode(data) {
 
 function resolveProgramMode(rawMode) {
   const normalized = String(rawMode || '').trim();
+  // Return normalized mode if present, otherwise null (do not default to degraded AWAITING_CLEARANCE)
   return normalized
     ? normalized.toUpperCase().replace(/[\s-]+/g, '_')
-    : 'AWAITING_CLEARANCE';
+    : null;
 }
 
 function getProgramModeMeta(programMode) {
+  if (!programMode) return { label: null, variant: null };
   return {
     label: programMode.replace(/_/g, ' '),
     variant: programMode === 'AWAITING_CLEARANCE' ? 'neutral' : 'active',
@@ -216,12 +233,19 @@ function getProgramModeMeta(programMode) {
 }
 
 function ensureStableModeFields(data) {
-  const programMode = resolveProgramMode(data.program_mode || data.programMode);
-  const modeMeta = getProgramModeMeta(programMode);
-
-  data.program_mode = data.program_mode || programMode;
-  data.mode = data.mode || modeMeta.label;
-  data.mode_variant = data.mode_variant || modeMeta.variant;
+  // Only stabilize mode fields if the upstream Base44 response doesn't already have a valid program_mode
+  const upstreamMode = data.program_mode || data.programMode;
+  if (upstreamMode) {
+    // Upstream has a mode value; just normalize it
+    const normalized = resolveProgramMode(upstreamMode);
+    if (normalized && !data.program_mode) {
+      data.program_mode = normalized;
+      const modeMeta = getProgramModeMeta(normalized);
+      if (modeMeta.label && !data.mode) data.mode = modeMeta.label;
+      if (modeMeta.variant && !data.mode_variant) data.mode_variant = modeMeta.variant;
+    }
+  }
+  // If no upstream mode, leave fields as-is; do not apply degraded default
 }
 
 exports.handler = async function handler(event) {

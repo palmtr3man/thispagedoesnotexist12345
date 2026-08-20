@@ -8,7 +8,9 @@ const { createClient } = require('@supabase/supabase-js');
 
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' };
 function jsonResponse(statusCode, payload, extraHeaders = {}) { return { statusCode, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json', ...extraHeaders }, body: JSON.stringify(payload) }; }
-function getSupabaseClient() { if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Supabase configuration is missing'); return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY); }
+function getSupabaseUrl() { return process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || ''; }
+function getSupabaseServiceKey() { return process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.APP_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || ''; }
+function getSupabaseClient() { const url = getSupabaseUrl(); const key = getSupabaseServiceKey(); if (!url || !key) throw new Error('Supabase configuration is missing'); return createClient(url, key); }
 
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
 const SEAT_STATUSES = new Set(['pending', 'approved', 'opened', 'denied']);
@@ -48,7 +50,11 @@ async function getActiveFlightRegistry(supabase) {
 function base44Headers() {
   const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
   const apiKey = process.env.BASE44APIKEY || process.env.BASE44_API_KEY || '';
-  if (apiKey) headers.api_key = apiKey;
+  if (apiKey) {
+    headers['X-API-Key'] = apiKey;
+    headers.api_key = apiKey;
+    headers.Authorization = `Bearer ${apiKey}`;
+  }
   return headers;
 }
 
@@ -113,12 +119,12 @@ function resolveFlightCode(data, registryCode) {
 
 function resolveProgramMode(rawMode) {
   const normalized = String(rawMode || '').trim();
-  return normalized
-    ? normalized.toUpperCase().replace(/[\s-]+/g, '_')
-    : 'AWAITING_CLEARANCE';
+  if (!normalized) return null;
+  return normalized.toUpperCase().replace(/[\s-]+/g, '_');
 }
 
 function getProgramModeMeta(programMode) {
+  if (!programMode) return { label: '', variant: 'active' };
   return {
     label: programMode.replace(/_/g, ' '),
     variant: programMode === 'AWAITING_CLEARANCE' ? 'neutral' : 'active',
@@ -126,12 +132,15 @@ function getProgramModeMeta(programMode) {
 }
 
 function ensureStableModeFields(data) {
-  const programMode = resolveProgramMode(data.program_mode || data.programMode);
+  const upstreamMode = data.program_mode || data.programMode || null;
+  const programMode = resolveProgramMode(upstreamMode);
   const modeMeta = getProgramModeMeta(programMode);
 
-  data.program_mode = data.program_mode || programMode;
-  data.mode = data.mode || modeMeta.label;
-  data.mode_variant = data.mode_variant || modeMeta.variant;
+  if (programMode) {
+    data.program_mode = data.program_mode || programMode;
+    data.mode = data.mode || modeMeta.label;
+    data.mode_variant = data.mode_variant || modeMeta.variant;
+  }
 }
 
 exports.handler = async function handler(event) {
