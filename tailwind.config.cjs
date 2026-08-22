@@ -1,8 +1,5 @@
 /**
- * Tailwind design tokens for the TUJ black-glass / neon aesthetic.
- *
- * The current production shell is plain HTML/CSS, but this config keeps the
- * palette and shadows aligned if a Tailwind build is introduced or resumed.
+ * Tailwind design tokens for the TUJ crimson / electric-red black-glass aesthetic.
  */
 
 module.exports = {
@@ -11,25 +8,26 @@ module.exports = {
     extend: {
       colors: {
         glass: {
-          950: '#04070b',
-          900: '#071017',
-          850: '#0c1620',
-          800: '#101c2b',
+          950: '#000000',
+          900: '#000000',
+          850: '#000000',
+          800: '#000000',
         },
-        neon: {
-          cyan: '#00d9ff',
-          blue: '#7c9fff',
-          lime: '#b6ff3b',
-          pink: '#ff5fd7',
+        onyx: '#000000',
+        crimson: {
+          deep: '#8B0000',
+          mid: '#990000',
+          electric: '#FF0000',
         },
       },
       boxShadow: {
-        'glass-soft': '0 24px 70px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255,255,255,0.04) inset',
-        'glass-neon': '0 0 0 1px rgba(0,217,255,0.22), 0 0 24px rgba(0,217,255,0.14)',
+        'glass-soft': '0 24px 70px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(255,255,255,0.04) inset',
+        'glass-crimson': '0 0 0 1px rgba(255,0,0,0.24), 0 0 24px rgba(255,0,0,0.18), 0 10px 34px rgba(139,0,0,0.28)',
       },
       backgroundImage: {
-        'glass-panel': 'linear-gradient(180deg, rgba(12,20,34,0.96), rgba(7,12,20,0.98))',
-        'glass-radial': 'radial-gradient(circle at top, rgba(0,217,255,0.16), transparent 60%)',
+        'crimson-fade': 'linear-gradient(135deg, #8B0000 0%, #990000 48%, #FF0000 100%)',
+        'glass-panel': 'linear-gradient(180deg, rgba(0,0,0,0.96), rgba(0,0,0,0.99))',
+        'glass-radial': 'radial-gradient(circle at top, rgba(139,0,0,0.26), rgba(255,0,0,0.08) 42%, transparent 68%)',
       },
     },
   },
