@@ -118,25 +118,24 @@ async function upsertNetlifySecret(
 ): Promise<void> {
   const scopes = existing?.scopes ?? ["builds", "functions", "runtime"];
   const context = existing?.values?.[0]?.context ?? "all";
-  const envVar = {
-    key,
-    scopes,
-    values: [{ context, value }],
+  const siteScopedEnvUrl =
+    `https://api.netlify.com/api/v1/accounts/${accountId}/env/${encodeURIComponent(key)}?site_id=${siteId}`;
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+    Accept: "application/json",
+    "Content-Type": "application/json",
   };
+  const valuePayload = { values: [{ context, value }] };
 
-  if (existing?.id) {
-    const res = await fetch(
-      `https://api.netlify.com/api/v1/accounts/${accountId}/env/${encodeURIComponent(key)}?site_id=${siteId}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify([envVar]),
-      }
-    );
+  const patchExisting = async (): Promise<Response> =>
+    fetch(siteScopedEnvUrl, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(valuePayload),
+    });
+
+  if (existing) {
+    const res = await patchExisting();
     if (!res.ok) {
       throw new Error(`Netlify update ${key} failed: ${res.status} ${await res.text()}`);
     }
@@ -144,22 +143,32 @@ async function upsertNetlifySecret(
     return;
   }
 
-  const res = await fetch(
+  const envVar = { key, scopes, values: [{ context, value }] };
+  const createRes = await fetch(
     `https://api.netlify.com/api/v1/accounts/${accountId}/env?site_id=${siteId}`,
     {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify([envVar]),
     }
   );
-  if (!res.ok) {
-    throw new Error(`Netlify create ${key} failed: ${res.status} ${await res.text()}`);
+  if (createRes.ok) {
+    console.log(`  + Netlify created ${key}`);
+    return;
   }
-  console.log(`  + Netlify created ${key}`);
+
+  // A concurrent or stale list result can make a new-key POST collide with an
+  // existing key. Retain the site-scoped route and update only its contextual value.
+  if (createRes.status === 409 || createRes.status === 422) {
+    const updateRes = await patchExisting();
+    if (updateRes.ok) {
+      console.log(`  ↻ Netlify updated ${key} after create conflict`);
+      return;
+    }
+    throw new Error(`Netlify fallback update ${key} failed: ${updateRes.status} ${await updateRes.text()}`);
+  }
+
+  throw new Error(`Netlify create ${key} failed: ${createRes.status} ${await createRes.text()}`);
 }
 
 async function main(): Promise<void> {
