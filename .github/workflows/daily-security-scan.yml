@@ -4,7 +4,7 @@ name: Daily Security Scan
 on:
   schedule:
     - cron: "0 14 * * *"   # ~10:00 AM Eastern
-  workflow_dispatch: {}  # allow manual runs too
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -45,18 +45,48 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           exit $status
 
-      - name: Dependency audit (high+)
+      - name: Dependency audit (production, high+)
         id: audit
         continue-on-error: true
         run: |
-          npm audit --audit-level=high > /tmp/audit.out 2>&1
+          set +e
+          npm audit --omit=dev --audit-level=high --json > audit.json 2>&1
           status=$?
+          cp audit.json /tmp/audit.out
+          echo "Production dependency audit exit status: $status"
+          if command -v jq >/dev/null 2>&1; then
+            jq -r 'if .metadata then "Production audit summary: vulnerabilities=" + ((.metadata.vulnerabilities // {}) | to_entries | map(.key + "=" + (.value|tostring)) | join(", ")) else "Production audit returned nonstandard output; see audit.json" end' audit.json || true
+          fi
           {
             echo "audit_out<<EOF"
             cat /tmp/audit.out
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
           exit $status
+
+      - name: Upload audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-reports-${{ github.run_id }}
+          path: |
+            audit.json
+            /tmp/audit.out
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Write security summary
+        if: always()
+        run: |
+          {
+            echo "## Daily Security Scan"
+            echo ""
+            echo "- SEC-08 gates: **${{ steps.sec08.outcome }}**"
+            echo "- Production dependency audit (npm audit --omit=dev --audit-level=high): **${{ steps.audit.outcome }}**"
+            echo "- Audit reports: uploaded as the security-audit-reports-${{ github.run_id }} artifact"
+            echo ""
+            echo "The production audit excludes development dependencies; the full audit output is preserved in audit.json and /tmp/audit.out."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Did anything surface?
         id: findings
@@ -67,7 +97,7 @@ jobs:
           [ "${{ steps.audit.outcome }}" = "failure" ] && found=true
           echo "found=$found" >> "$GITHUB_OUTPUT"
           if [ "$found" = "false" ]; then
-            echo "No issues found"
+            echo "No production or SEC-08 issues found"
           fi
 
       - name: Ping email alert (advisory, no containment)
@@ -81,13 +111,7 @@ jobs:
           curl -sS -X POST "$BREACH_HANDLER_URL" \
             -H "Authorization: Bearer $INTERNAL_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{
-              \"scan\": \"Daily Security Scan (GitHub Actions)\",
-              \"severity\": \"advisory\",
-              \"contain\": false,
-              \"findings\": \"SEC-08 gates: ${{ steps.sec08.outcome }}. npm audit (high+): ${{ steps.audit.outcome }}.\",
-              \"run_url\": \"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"
-            }"
+            -d "{\"scan\":\"Daily Security Scan (GitHub Actions)\",\"severity\":\"advisory\",\"contain\":false,\"findings\":\"SEC-08 gates: ${{ steps.sec08.outcome }}. Production npm audit (--omit=dev, high+): ${{ steps.audit.outcome }}.\",\"run_url\":\"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}"
 
       - name: Open or update tracking issue
         if: always() && steps.findings.outputs.found == 'true'
@@ -95,56 +119,29 @@ jobs:
         with:
           script: |
             const label = 'security-scan-finding';
-            const date = new Date().toISOString().slice(0,10);
+            const date = new Date().toISOString().slice(0, 10);
             const sec08 = '${{ steps.sec08.outcome }}';
             const audit = '${{ steps.audit.outcome }}';
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const body = [
-              `**Daily security scan — ${date}**`,
-              '',
+              `**Daily security scan — ${date}**`, '',
               `SEC-08 gates: \`${sec08}\``,
-              `npm audit (high+): \`${audit}\``,
-              '',
+              `Production npm audit (--omit=dev, high+): \`${audit}\``, '',
               `Run: ${runUrl}`,
+              `Reports: security-audit-reports-${context.runId}`,
               '',
               '> This workflow is currently **non-blocking** — findings are tracked here only, build stays green.',
             ].join('\n');
-
             try {
-              await github.rest.issues.getLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: label,
-              });
+              await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label });
             } catch (err) {
               if (err.status === 404) {
-                await github.rest.issues.createLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: label,
-                  color: 'B60205',
-                  description: 'Rolling findings from Daily Security Scan (advisory)',
-                });
-              } else {
-                throw err;
-              }
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label, color: 'B60205', description: 'Rolling findings from Daily Security Scan (advisory)' });
+              } else throw err;
             }
-
-            const existing = await github.rest.issues.listForRepo({
-              owner: context.repo.owner, repo: context.repo.repo,
-              state: 'open', labels: label, per_page: 1,
-            });
+            const existing = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 1 });
             if (existing.data.length) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner, repo: context.repo.repo,
-                issue_number: existing.data[0].number, body,
-              });
-              core.info(`Commented on issue #${existing.data[0].number}`);
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.data[0].number, body });
             } else {
-              const created = await github.rest.issues.create({
-                owner: context.repo.owner, repo: context.repo.repo,
-                title: `[Security Scan] Open findings as of ${date}`,
-                labels: [label], body,
-              });
-              core.info(`Created issue #${created.data.number}`);
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title: `[Security Scan] Open findings as of ${date}`, labels: [label], body });
             }
