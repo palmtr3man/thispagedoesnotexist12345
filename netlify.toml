@@ -43,6 +43,121 @@
   status = 301
   force = true
 
+# Vector 2 Phase 1 entrypoint isolation: .com serves the Public/Marketing
+# (Studio) shell and .tech serves the App/Ops (CommandCenter) shell, so each
+# domain loads its own SPA bundle instead of sharing index.html. Non-forced
+# rules (other than the .tech apex) allow real files/assets to win.
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.com/"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.com/Studio"
+  to = "/Studio/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.com/Studio/*"
+  to = "/Studio/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/CommandCenter"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/CommandCenter/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Dashboard"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Dashboard/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Ops"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Ops/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/JDLibrary"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/JDLibrary/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/MissionControl"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/MissionControl/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Passengers"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Passengers/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/FlightLog"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/FlightLog/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Applications"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Applications/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/InterviewsAndFollowUps"
+  to = "/CommandCenter/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/InterviewsAndFollowUps/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+
 # Maintenance mode = false: keep the 503 redirect disabled and use normal routing.
 # [[redirects]]
 #   from = "/*"
