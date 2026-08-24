@@ -35,10 +35,10 @@
   status = 301
   force = true
 
-# Redirect www sub-domain for the .com site to the apex domain (consistent with .tech)
+# Redirect www sub-domain for the .com site to the apex domain
 [[redirects]]
   from = "https://www.thispagedoesnotexist12345.com/*"
-  to = "https://www.thispagedoesnotexist12345.com/:splat"
+  to = "https://thispagedoesnotexist12345.com/:splat"
   status = 301
   force = true
 
