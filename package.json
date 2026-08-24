@@ -27,7 +27,7 @@
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
-    "@base44/vite-plugin": "latest",
+    "@base44/vite-plugin": "1.0.30",
     "@infisical/sdk": "^5.0.2",
     "@types/node": "^20.19.43",
     "@types/react": "^18.2.66",
