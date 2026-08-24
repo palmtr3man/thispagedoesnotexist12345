@@ -21,29 +21,96 @@
   [headers.values]
     Content-Type = "application/javascript; charset=UTF-8"
 
-# Fixed redirect – www → apex (desired behavior)
+# Canonical www redirects
 [[redirects]]
   from = "https://www.thispagedoesnotexist12345.tech/*"
   to = "https://thispagedoesnotexist12345.tech/:splat"
   status = 301
   force = true
 
-# Redirect www sub-domain for the .com site to the apex domain
 [[redirects]]
   from = "https://www.thispagedoesnotexist12345.com/*"
   to = "https://thispagedoesnotexist12345.com/:splat"
   status = 301
   force = true
 
-# Maintenance mode: serve a static 503 page for every public route.
-# To disable, remove/comment this block and re-enable the SPA catch-all below.
+# Vector 2 Phase 1: .com is the Public/Marketing vector.
+# Apex resolves to the public root shell; Studio remains an explicit subpath.
 [[redirects]]
-  from = "/*"
-  to = "/maintenance.html"
-  status = 503
+  from = "https://thispagedoesnotexist12345.com/"
+  to = "/index.html"
+  status = 200
   force = true
 
-# Existing function redirects (inactive while maintenance mode is enabled)
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.com/Studio"
+  to = "/Studio/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.com/Studio/*"
+  to = "/Studio/:splat"
+  status = 200
+  force = true
+
+# Vector 2 Phase 1: .tech is the App/Ops/Dashboard vector.
+# The current verified operational shell is CommandCenter/index.html.
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Dashboard"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Dashboard/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Ops"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Ops/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/JDLibrary"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/JDLibrary/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/MissionControl"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/MissionControl/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+  force = true
+
+# API/function endpoints are preserved and intentionally precede the fallback.
 [[redirects]]
   from = "/api/health"
   to = "/.netlify/functions/health"
@@ -94,9 +161,9 @@
   to = "/.netlify/functions/trpc/:splat"
   status = 200
 
-# SPA catch-all to restore after maintenance mode is disabled
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
-#   force = true
+# Local/unknown-host fallback retains the existing public shell.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
