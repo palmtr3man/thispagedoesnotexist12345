@@ -10,6 +10,8 @@ on:
 jobs:
   drift-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -23,10 +25,31 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Install Infisical CLI
+        run: |
+          curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | sudo -E bash
+          sudo apt-get update && sudo apt-get install -y infisical
+
+      - name: Authenticate with Infisical (Universal Auth)
+        env:
+          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "$INFISICAL_CLIENT_ID" ] || [ -z "$INFISICAL_CLIENT_SECRET" ]; then
+            echo "::error::INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET GitHub Actions secrets are required."
+            exit 1
+          fi
+          INFISICAL_TOKEN="$(infisical login --method=universal-auth --client-id="$INFISICAL_CLIENT_ID" --client-secret="$INFISICAL_CLIENT_SECRET" --plain --silent)"
+          if [ -z "$INFISICAL_TOKEN" ]; then
+            echo "::error::Infisical Universal Auth returned an empty token."
+            exit 1
+          fi
+          echo "INFISICAL_TOKEN=$INFISICAL_TOKEN" >> "$GITHUB_ENV"
+
       - name: Run Drift Check
         env:
           STRICTNESS: ${{ github.ref == 'refs/heads/main' && 'fail' || (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 'warn' }}
-          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
         run: npm run drift-check

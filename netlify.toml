@@ -1,102 +1,161 @@
 [build]
   publish = "dist"
   functions = "netlify/functions"
-
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "NOTION_SEAT_DB_ID,NOTION_DRIFT_REPORT_DB_ID,NOTION_JD_PIPELINE_DB_ID,BEEHIIV_PUB_ID,DEMO_FIRST_NAME,DEMO_LAST_NAME,DEMO_ACCOUNT_EMAIL"
   SECRETS_SCAN_OMIT_PATHS = "supabase/migrations"
-
 [functions]
   directory = "netlify/functions"
   included_files = ["netlify/functions/lib/**"]
   node_bundler = "esbuild"
-
 [[headers]]
   for = "/*.html"
   [headers.values]
     Content-Type = "text/html; charset=UTF-8"
-
 [[headers]]
   for = "/*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=UTF-8"
-
-# Fixed redirect – www → apex (desired behavior)
 [[redirects]]
   from = "https://www.thispagedoesnotexist12345.tech/*"
   to = "https://thispagedoesnotexist12345.tech/:splat"
   status = 301
   force = true
-
-# Redirect www sub-domain for the .com site to the apex domain
 [[redirects]]
   from = "https://www.thispagedoesnotexist12345.com/*"
   to = "https://thispagedoesnotexist12345.com/:splat"
   status = 301
   force = true
-
-# Maintenance mode: serve a static 503 page for every public route.
-# To disable, remove/comment this block and re-enable the SPA catch-all below.
 [[redirects]]
-  from = "/*"
-  to = "/maintenance.html"
-  status = 503
+  from = "https://thispagedoesnotexist12345.com/"
+  to = "/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.com/Studio"
+  to = "/Studio/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.com/Studio/*"
+  to = "/Studio/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/"
+  to = "/CommandCenter/index.html"
+  status = 200
   force = true
-
-# Existing function redirects (inactive while maintenance mode is enabled)
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/CommandCenter"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/CommandCenter/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Dashboard"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Dashboard/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Ops"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Ops/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/JDLibrary"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/JDLibrary/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/MissionControl"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/MissionControl/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Passengers"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Passengers/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/FlightLog"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/FlightLog/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Applications"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/Applications/*"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/InterviewsAndFollowUps"
+  to = "/CommandCenter/index.html"
+  status = 200
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.tech/InterviewsAndFollowUps/*"
+  to = "/CommandCenter/index.html"
+  status = 200
 [[redirects]]
   from = "/api/health"
   to = "/.netlify/functions/health"
   status = 200
-
 [[redirects]]
   from = "/api/seat-status"
   to = "/.netlify/functions/seat-status"
   status = 200
-
 [[redirects]]
   from = "/api/seat-request"
   to = "/.netlify/functions/seat-request"
   status = 200
-
 [[redirects]]
   from = "/api/verify-age"
   to = "/.netlify/functions/verify-age"
   status = 200
-
 [[redirects]]
   from = "/api/seat-ready"
   to = "/.netlify/functions/seat-ready"
   status = 200
-
 [[redirects]]
   from = "/api/seat-map"
   to = "/.netlify/functions/seat-map"
   status = 200
-
 [[redirects]]
   from = "/api/seat-claim"
   to = "/.netlify/functions/seat-claim"
   status = 200
-
 [[redirects]]
   from = "/api/mission-control-bind"
   to = "/.netlify/functions/mission-control-bind"
   status = 200
-
 [[redirects]]
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
   status = 200
-
 [[redirects]]
   from = "/api/trpc/*"
   to = "/.netlify/functions/trpc/:splat"
   status = 200
-
-# SPA catch-all to restore after maintenance mode is disabled
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
-#   force = true
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
