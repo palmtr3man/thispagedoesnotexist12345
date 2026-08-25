@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "repository": "palmtr3man/thispagedoesnotexist12345",
+  "defaultBranch": "main",
+  "staleAfterDays": 30,
+  "criticalAfterDays": 90,
+  "systems": ["github", "notion", "supabase", "netlify", "infisical"],
+  "allowlists": { "branches": [], "secrets": [], "statuses": ["draft", "backlog", "discovery", "archived", "rejected"] },
+  "outputs": { "directory": "reports/orphan-reconciliation", "notion": false, "slack": false }
+}
