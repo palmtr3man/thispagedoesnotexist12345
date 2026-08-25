@@ -28,6 +28,13 @@
   status = 301
   force = true
 
+# Scoped .us host redirect to the canonical .com host
+[[redirects]]
+  from = "https://thispagedoesnotexist12345.us/*"
+  to = "https://www.thispagedoesnotexist12345.com/:splat"
+  status = 301
+  force = true
+
 # Redirect www sub-domain for the .com site to the apex domain
 [[redirects]]
   from = "https://www.thispagedoesnotexist12345.com/*"
