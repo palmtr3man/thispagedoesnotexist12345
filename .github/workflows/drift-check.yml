@@ -28,9 +28,18 @@ jobs:
       - name: Install Infisical CLI
         run: |
           set -euo pipefail
-          npm install --global --ignore-scripts @infisical/cli@0.43.125
-          command -v infisical
-          test "$(infisical --version | head -n 1)" = "0.43.125"
+          version="0.43.125"
+          archive="cli_${version}_linux_amd64.tar.gz"
+          base_url="https://github.com/Infisical/cli/releases/download/v${version}"
+          tmp_dir="$(mktemp -d)"
+          trap 'rm -rf "$tmp_dir"' EXIT
+          curl --fail --location --silent --show-error "$base_url/$archive" --output "$tmp_dir/$archive"
+          curl --fail --location --silent --show-error "$base_url/checksums.txt" --output "$tmp_dir/checksums.txt"
+          grep "  $archive$" "$tmp_dir/checksums.txt" > "$tmp_dir/checksum"
+          sha256sum --check "$tmp_dir/checksum"
+          tar -xzf "$tmp_dir/$archive" -C "$tmp_dir"
+          install -m 0755 "$tmp_dir/infisical" /usr/local/bin/infisical
+          test "$(infisical --version | head -n 1)" = "$version"
 
       - name: Authenticate with Infisical (Universal Auth)
         env:
