@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "security:gates": "npx tsx check_signal_gate.ts",
     "security:gates:negative": "npx tsx test-sync-malicious.ts",
-    "drift-check": "npx tsx scripts/sync-drift-keys.ts"
+    "drift-check": "npx tsx scripts/sync-drift-keys.ts",
+    "reconcile:orphans": "npx tsx scripts/orphan-reconciler.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",
