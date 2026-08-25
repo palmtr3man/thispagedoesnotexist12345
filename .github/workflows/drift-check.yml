@@ -11,6 +11,7 @@ jobs:
   drift-check:
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: read
     steps:
       - name: Checkout Repository
@@ -32,22 +33,27 @@ jobs:
           command -v infisical
           infisical --version
 
-      - name: Authenticate with Infisical (Universal Auth)
+      - name: Authenticate with Infisical (GitHub OIDC)
         env:
-          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
-          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          INFISICAL_IDENTITY_ID: d7c719c4-943f-4204-acb2-d04994ae1516
+          INFISICAL_PROJECT_ID: 6c7646e9-04dd-484a-a5d1-612b9582da15
         run: |
           set -euo pipefail
-          if [ -z "$INFISICAL_CLIENT_ID" ] || [ -z "$INFISICAL_CLIENT_SECRET" ]; then
-            echo "::error::INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET GitHub Actions secrets are required."
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then
+            echo "::error::GitHub OIDC token endpoint is unavailable. Ensure id-token: write is granted."
             exit 1
           fi
-          INFISICAL_TOKEN="$(infisical login --method=universal-auth --client-id="$INFISICAL_CLIENT_ID" --client-secret="$INFISICAL_CLIENT_SECRET" --plain --silent)"
+          oidc_token="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://github.com")"
+          jwt="$(printf '%s' "$oidc_token" | jq -er '.value')"
+          INFISICAL_TOKEN="$(infisical login --method=oidc --identity-id="$INFISICAL_IDENTITY_ID" --jwt="$jwt" --plain --silent)"
           if [ -z "$INFISICAL_TOKEN" ]; then
-            echo "::error::Infisical Universal Auth returned an empty token."
+            echo "::error::Infisical OIDC authentication returned an empty token."
             exit 1
           fi
           echo "INFISICAL_TOKEN=$INFISICAL_TOKEN" >> "$GITHUB_ENV"
+          echo "INFISICAL_PROJECT_ID=$INFISICAL_PROJECT_ID" >> "$GITHUB_ENV"
 
       - name: Run Drift Check
         env:
