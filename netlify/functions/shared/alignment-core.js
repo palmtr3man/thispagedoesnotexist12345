@@ -7,6 +7,15 @@
 
 const FETCH_TIMEOUT_MS = 8000;
 
+// Canonical Notion configuration names are listed first. Later entries keep
+// existing deployments working while secrets are migrated between vaults.
+const NOTION_TOKEN_ENV_KEYS = ['NOTION_API_KEY', 'NOTION_SECRET'];
+const PASSENGER_PIPELINE_DB_ENV_KEYS = [
+  'NOTION_SEAT_DB_ID',
+  'NOTION_PASSENGER_PIPELINE_DB_ID',
+  'NOTION_PIPELINE_DATABASE_ID',
+];
+
 // ── Field-level repair policy ─────────────────────────────────────────────────
 const FIELD_POLICY = {
   boarding_emails_sent:    'auto',
@@ -24,9 +33,25 @@ function timedFetch(url, opts = {}) {
     .finally(() => clearTimeout(timer));
 }
 
+function firstConfiguredEnv(...keys) {
+  for (const key of keys) {
+    const value = process.env[key];
+    if (value && value.trim()) return value;
+  }
+  return '';
+}
+
+function notionToken() {
+  return firstConfiguredEnv(...NOTION_TOKEN_ENV_KEYS);
+}
+
+function passengerPipelineDbId() {
+  return firstConfiguredEnv(...PASSENGER_PIPELINE_DB_ENV_KEYS);
+}
+
 function notionHeaders() {
   return {
-    'Authorization': `Bearer ${process.env.NOTION_SECRET}`,
+    'Authorization': `Bearer ${notionToken()}`,
     'Notion-Version': '2022-06-28',
     'Content-Type': 'application/json',
   };
@@ -41,7 +66,11 @@ function supabaseHeaders() {
 }
 
 async function fetchNotionPassengers() {
-  const url = `https://api.notion.com/v1/databases/${process.env.NOTION_SEAT_DB_ID}/query`;
+  const dbId = passengerPipelineDbId();
+  if (!dbId) {
+    throw new Error(`Notion passenger database is not configured (tried ${PASSENGER_PIPELINE_DB_ENV_KEYS.join(', ')})`);
+  }
+  const url = `https://api.notion.com/v1/databases/${dbId}/query`;
   const res = await timedFetch(url, {
     method: 'POST',
     headers: notionHeaders(),
@@ -171,20 +200,22 @@ async function autoRepairBase44Seat(seatId, field, notionValue) {
   } catch (_) { return false; }
 }
 
-const REQUIRED_ENV_VARS = [
-  'NOTION_SECRET', 'NOTION_SEAT_DB_ID', 'NOTION_DRIFT_REPORT_DB_ID',
-  'SEC06_INTERNAL_TOKEN', 'SEC06_SCHEDULER_SECRET',
-  'BASE44_SEAT_URL', 'BASE44_USER_URL',
-  'BASE44_APPLICATION_URL', 'NOTION_JD_PIPELINE_DB_ID',
-  'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY',
-  'NETLIFY_API_KEY', 'NETLIFY_SITE_ID',
+const REQUIRED_ENV_GROUPS = [
+  NOTION_TOKEN_ENV_KEYS,
+  PASSENGER_PIPELINE_DB_ENV_KEYS,
+  ['NOTION_DRIFT_REPORT_DB_ID'],
+  ['SEC06_INTERNAL_TOKEN'], ['SEC06_SCHEDULER_SECRET'],
+  ['BASE44_SEAT_URL'], ['BASE44_USER_URL'],
+  ['BASE44_APPLICATION_URL'], ['NOTION_JD_PIPELINE_DB_ID'],
+  ['SUPABASE_URL'], ['SUPABASE_SERVICE_ROLE_KEY'],
+  ['NETLIFY_API_KEY'], ['NETLIFY_SITE_ID'],
 ];
 
 function checkNetlifyEnvDrift() {
-  const missing = REQUIRED_ENV_VARS.filter(k => !process.env[k]);
-  return missing.map(k => ({
+  const missing = REQUIRED_ENV_GROUPS.filter(keys => !firstConfiguredEnv(...keys));
+  return missing.map(keys => ({
     source: 'netlify_env',
-    field_name: k,
+    field_name: keys[0],
     notion_value: 'required',
     saas_value: 'missing',
     repair_action: 'auto',
