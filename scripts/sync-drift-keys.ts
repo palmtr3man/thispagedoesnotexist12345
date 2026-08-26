@@ -2,7 +2,7 @@ import { InfisicalSDK } from "@infisical/sdk";
 import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
 
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
-const INFISICAL_SITE_URL = "https://us.infisical.com";
+const INFISICAL_SITE_URL = "https://app.infisical.com";
 const INFISICAL_ENV = "staging";
 const INFISICAL_PATH = "/";
 
@@ -172,17 +172,22 @@ async function upsertNetlifySecret(
 }
 
 async function main(): Promise<void> {
-  const infisicalToken = process.env.INFISICAL_TOKEN;
+  const clientId = process.env.INFISICAL_CLIENT_ID ?? process.env.INFISICAL_UNIVERSAL_AUTH_CLIENT_ID;
+  const clientSecret = process.env.INFISICAL_CLIENT_SECRET ?? process.env.INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET;
   const netlifyAuthToken =
     process.env.NETLIFY_AUTH_TOKEN ?? process.env.NETLIFY_API_TOKEN;
   const netlifySiteId = process.env.NETLIFY_SITE_ID;
 
-  if (!infisicalToken) throw new Error("INFISICAL_TOKEN is not set");
+  if (!clientId) throw new Error("INFISICAL_CLIENT_ID or INFISICAL_UNIVERSAL_AUTH_CLIENT_ID is not set");
+  if (!clientSecret) throw new Error("INFISICAL_CLIENT_SECRET or INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET is not set");
   if (!netlifyAuthToken) throw new Error("NETLIFY_AUTH_TOKEN is not set");
   if (!netlifySiteId) throw new Error("NETLIFY_SITE_ID is not set");
 
   const client = new InfisicalSDK({ siteUrl: INFISICAL_SITE_URL });
-  await client.auth().accessToken(infisicalToken);
+  await client.auth().universalAuth.login({
+    clientId: clientId,
+    clientSecret: clientSecret,
+  });
 
   const infisicalMap = await fetchInfisicalMap(client);
   const infisicalKeys = new Set(infisicalMap.keys());
