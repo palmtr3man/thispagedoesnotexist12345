@@ -1,7 +1,4 @@
-import { withLambda } from '@netlify/aws-lambda-compat';
-import { createRequire } from 'node:module';
+import { handler } from './lib/brevo-integration-impl.cjs';
 
-const require = createRequire(import.meta.url);
-const { handler } = require('./lib/sendgrid-integration-impl.cjs');
-
-export default withLambda(handler);
+// Netlify Functions v2 entrypoint. The historical filename is retained for URL compatibility.
+export default async (request, context) => handler(request, context);
