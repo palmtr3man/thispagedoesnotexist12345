@@ -13,13 +13,16 @@
     ACTIVE_FLIGHT_CODE: 'FL051126',
     LEGACY_FLIGHT_CODES: [],
     PALETTE: {
-      background: '#0A0A0A',
-      surface: '#0f1117',
-      accent: '#00D9FF',
-      accentSoft: 'rgba(0, 217, 255, 0.16)',
-      border: 'rgba(0, 217, 255, 0.18)',
-      text: '#effffb',
-      muted: 'rgba(239, 255, 251, 0.72)'
+      background: '#000000',
+      surface: '#000000',
+      accent: '#FF0000',
+      accentDeep: '#8B0000',
+      accentMid: '#990000',
+      accentGradient: 'linear-gradient(135deg, #8B0000 0%, #990000 48%, #FF0000 100%)',
+      accentSoft: 'rgba(255, 0, 0, 0.16)',
+      border: 'rgba(255, 0, 0, 0.24)',
+      text: '#FFFFFF',
+      muted: 'rgba(255, 255, 255, 0.72)'
     }
   };
 }));
