@@ -1,6 +1,8 @@
 /**
  * Canonical parity manifest for Infisical ↔ Netlify drift checks.
- * Keep aligned with career-navigator/scripts/sync-infisical-vault.ts PARITY_KEYS.
+ * Keep aligned with this repo's scripts/sync-infisical-vault.ts ALLOWLIST
+ * (there is no `career-navigator` copy of this list, and it never exported
+ * a `PARITY_KEYS` constant).
  */
 
 /** P0 — hard fail when missing on Netlify (staging/prod). */
