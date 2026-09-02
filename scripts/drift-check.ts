@@ -1,4 +1,5 @@
 import { InfisicalSDK } from "@infisical/sdk";
+import { pathToFileURL } from "node:url";
 import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
 
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
@@ -88,23 +89,26 @@ function reportDrift(
   console.warn(`⚠️ WARNING: ${message}`);
 }
 
+/**
+ * Reads a required environment variable and rejects values that are missing,
+ * empty, or whitespace-only, so a misconfigured (but present) secret can't
+ * silently sail through as a valid credential.
+ */
+export function requireEnv(name: string): string {
+  const raw = process.env[name];
+  if (raw === undefined || raw.trim().length === 0) {
+    throw new Error(`${name} is not set (or is empty/whitespace-only)`);
+  }
+  return raw.trim();
+}
+
 async function runDriftCheck(): Promise<void> {
   const strictness = process.env.STRICTNESS || "warn";
-  const infisicalToken = process.env.INFISICAL_TOKEN;
-  const netlifyAuthToken = process.env.NETLIFY_AUTH_TOKEN;
-  const netlifySiteId = process.env.NETLIFY_SITE_ID;
+  const infisicalToken = requireEnv("INFISICAL_TOKEN");
+  const netlifyAuthToken = requireEnv("NETLIFY_AUTH_TOKEN");
+  const netlifySiteId = requireEnv("NETLIFY_SITE_ID");
 
   console.log(`[Guardrails] Starting drift check with strictness: ${strictness}`);
-
-  if (!infisicalToken) {
-    throw new Error("INFISICAL_TOKEN is not set");
-  }
-  if (!netlifyAuthToken) {
-    throw new Error("NETLIFY_AUTH_TOKEN is not set");
-  }
-  if (!netlifySiteId) {
-    throw new Error("NETLIFY_SITE_ID is not set");
-  }
 
   const [infisicalKeys, netlifyKeys] = await Promise.all([
     fetchInfisicalKeys(infisicalToken),
@@ -124,7 +128,13 @@ async function runDriftCheck(): Promise<void> {
   reportDrift(strictness, missingOnNetlify, missingInInfisical);
 }
 
-runDriftCheck().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectExecution =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(process.argv[1]!).href;
+
+if (isDirectExecution) {
+  runDriftCheck().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

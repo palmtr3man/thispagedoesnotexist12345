@@ -1,4 +1,5 @@
 import { InfisicalSDK } from "@infisical/sdk";
+import { pathToFileURL } from "node:url";
 import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
 
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
@@ -15,11 +16,18 @@ const CANONICAL_VALUES: Record<string, string> = {
   NOTION_DRIFT_REPORT_DB_ID: "398bc9d7494c819494cfdb5b41de8f6d",
 };
 
+interface NetlifyEnvVarValue {
+  context?: string;
+  /** Branch name when `context` is "branch"/"branch-deploy" overrides for a specific branch. */
+  context_parameter?: string;
+  value?: string;
+}
+
 interface NetlifyEnvVar {
   id?: string;
   key?: string;
   scopes?: string[];
-  values?: { context?: string; value?: string }[];
+  values?: NetlifyEnvVarValue[];
 }
 
 function resolveAlias(key: string, keys: Set<string>): string | null {
@@ -108,7 +116,34 @@ async function upsertInfisicalSecret(
   console.log(`  + Infisical created ${key}`);
 }
 
-async function upsertNetlifySecret(
+/**
+ * Builds the full `values` array to send to Netlify for a secret update.
+ *
+ * Netlify's env-var PATCH/POST bodies replace the entire `values` array, so
+ * naively sending a single `{ context, value }` pair — as this used to do by
+ * reading only `existing.values[0]` — silently deletes any other deployment
+ * context overrides (Preview, Branch deploys) the variable already had.
+ * Instead, preserve every existing context (and its `context_parameter`,
+ * used for a specific branch override) and apply the new value to each one.
+ */
+export function buildNetlifyValuesPayload(
+  value: string,
+  existingValues: NetlifyEnvVarValue[] | undefined
+): NetlifyEnvVarValue[] {
+  if (!existingValues || existingValues.length === 0) {
+    return [{ context: "all", value }];
+  }
+
+  return existingValues.map((entry) => ({
+    context: entry.context ?? "all",
+    ...(entry.context_parameter !== undefined
+      ? { context_parameter: entry.context_parameter }
+      : {}),
+    value,
+  }));
+}
+
+export async function upsertNetlifySecret(
   authToken: string,
   accountId: string,
   siteId: string,
@@ -117,7 +152,7 @@ async function upsertNetlifySecret(
   existing: NetlifyEnvVar | undefined
 ): Promise<void> {
   const scopes = existing?.scopes ?? ["builds", "functions", "runtime"];
-  const context = existing?.values?.[0]?.context ?? "all";
+  const values = buildNetlifyValuesPayload(value, existing?.values);
   const siteScopedEnvUrl =
     `https://api.netlify.com/api/v1/accounts/${accountId}/env/${encodeURIComponent(key)}?site_id=${siteId}`;
   const headers = {
@@ -125,7 +160,7 @@ async function upsertNetlifySecret(
     Accept: "application/json",
     "Content-Type": "application/json",
   };
-  const valuePayload = { values: [{ context, value }] };
+  const valuePayload = { values };
 
   const patchExisting = async (): Promise<Response> =>
     fetch(siteScopedEnvUrl, {
@@ -139,11 +174,12 @@ async function upsertNetlifySecret(
     if (!res.ok) {
       throw new Error(`Netlify update ${key} failed: ${res.status} ${await res.text()}`);
     }
-    console.log(`  ↻ Netlify updated ${key}`);
+    const contexts = values.map((entry) => entry.context ?? "all").join(", ");
+    console.log(`  ↻ Netlify updated ${key} (preserved contexts: ${contexts})`);
     return;
   }
 
-  const envVar = { key, scopes, values: [{ context, value }] };
+  const envVar = { key, scopes, values };
   const createRes = await fetch(
     `https://api.netlify.com/api/v1/accounts/${accountId}/env?site_id=${siteId}`,
     {
@@ -253,7 +289,13 @@ async function main(): Promise<void> {
   console.log("[sync] Done. Re-run npm run drift-check to verify.");
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectExecution =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(process.argv[1]!).href;
+
+if (isDirectExecution) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}
