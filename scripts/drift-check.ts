@@ -44,7 +44,7 @@ async function fetchNetlifyKeys(
 
   const response = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${authToken}`,
+      Authorization: ["Bearer", authToken].join(" "),
       Accept: "application/json",
     },
   });
