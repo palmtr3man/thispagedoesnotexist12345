@@ -44,14 +44,14 @@
   force = true
 
 # Maintenance mode: serve a static 503 page for every public route.
-# To disable, remove/comment this block and re-enable the SPA catch-all below.
-[[redirects]]
-  from = "/*"
-  to = "/maintenance.html"
-  status = 503
-  force = true
+# Disabled — SPA catch-all below is active instead.
+# [[redirects]]
+#   from = "/*"
+#   to = "/maintenance.html"
+#   status = 503
+#   force = true
 
-# Existing function redirects (inactive while maintenance mode is enabled)
+# Existing function redirects
 [[redirects]]
   from = "/api/health"
   to = "/.netlify/functions/health"
@@ -102,9 +102,9 @@
   to = "/.netlify/functions/trpc/:splat"
   status = 200
 
-# SPA catch-all to restore after maintenance mode is disabled
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
-#   force = true
+# SPA catch-all — must stay last, after API redirects
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
