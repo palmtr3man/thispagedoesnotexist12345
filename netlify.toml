@@ -43,15 +43,14 @@
   status = 301
   force = true
 
-# Maintenance mode: serve a static 503 page for every public route.
-# Disabled — SPA catch-all below is active instead.
+# Maintenance mode = false: keep the 503 redirect disabled and use normal routing.
 # [[redirects]]
 #   from = "/*"
 #   to = "/maintenance.html"
 #   status = 503
 #   force = true
 
-# Existing function redirects
+# API function redirects must precede the SPA fallback.
 [[redirects]]
   from = "/api/health"
   to = "/.netlify/functions/health"
@@ -112,7 +111,7 @@
   status = 200
   force = true
 
-# SPA catch-all — must stay last, after API redirects
+# Maintenance mode = false: SPA fallback is the final redirect rule.
 [[redirects]]
   from = "/*"
   to = "/index.html"
