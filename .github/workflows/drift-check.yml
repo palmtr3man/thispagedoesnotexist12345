@@ -7,6 +7,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   drift-check:
     runs-on: ubuntu-latest
@@ -29,18 +32,25 @@ jobs:
           INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+          IS_FORK_PR: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork }}
         run: |
+          # Trim before testing: requireEnv() in the scripts rejects whitespace-only
+          # values, so a blank-but-not-empty secret must not pass this gate.
+          trim() { printf '%s' "$1" | tr -d '[:space:]'; }
           missing=()
-          [ -n "${INFISICAL_TOKEN}" ] || missing+=("INFISICAL_TOKEN")
-          [ -n "${NETLIFY_AUTH_TOKEN}" ] || missing+=("NETLIFY_AUTH_TOKEN")
-          [ -n "${NETLIFY_SITE_ID}" ] || missing+=("NETLIFY_SITE_ID")
+          [ -n "$(trim "${INFISICAL_TOKEN}")" ] || missing+=("INFISICAL_TOKEN")
+          [ -n "$(trim "${NETLIFY_AUTH_TOKEN}")" ] || missing+=("NETLIFY_AUTH_TOKEN")
+          [ -n "$(trim "${NETLIFY_SITE_ID}")" ] || missing+=("NETLIFY_SITE_ID")
           if [ "${#missing[@]}" -eq 0 ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "available=false" >> "$GITHUB_OUTPUT"
           msg="Drift check credentials unavailable: ${missing[*]}"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          # Only fork pull requests are excused: GitHub withholds secrets from them.
+          # Same-repo pull requests do get secrets, so a missing value there is a
+          # real misconfiguration and must fail rather than silently skip.
+          if [ "${IS_FORK_PR}" = "true" ]; then
             echo "::notice::${msg} — skipping drift check (secrets are not exposed to pull_request runs from forks)."
             echo "### Drift check skipped" >> "$GITHUB_STEP_SUMMARY"
             echo "${msg}. Secrets are not exposed to pull_request runs from forks; the check runs on push to main/develop." >> "$GITHUB_STEP_SUMMARY"
