@@ -11,7 +11,7 @@ interface NetlifyEnvVar {
   key?: string;
 }
 
-function isKeyPresent(key: string, present: Set<string>): boolean {
+export function isKeyPresent(key: string, present: Set<string>): boolean {
   if (present.has(key)) return true;
   const group = ALIAS_GROUPS.find((aliases) => aliases.includes(key));
   return group ? group.some((alias) => present.has(alias)) : false;

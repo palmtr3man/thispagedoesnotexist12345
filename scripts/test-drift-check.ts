@@ -1,6 +1,6 @@
 /** Unit tests for drift-check helpers (no live Netlify/Infisical calls). */
 import assert from "node:assert/strict";
-import { requireEnv } from "./drift-check.js";
+import { isKeyPresent, requireEnv } from "./drift-check.js";
 
 function test(name: string, fn: () => void): void {
   try {
@@ -55,6 +55,18 @@ test("requireEnv rejects a whitespace-only string", () => {
       /TEST_DRIFT_CHECK_WHITESPACE is not set/
     );
   });
+});
+
+test("isKeyPresent treats BASE44_AUTH_JSON and BASE44_API_KEY as an alias group", () => {
+  assert.equal(isKeyPresent("BASE44_AUTH_JSON", new Set(["BASE44_API_KEY"])), true);
+  assert.equal(isKeyPresent("BASE44_AUTH_JSON", new Set(["BASE44APIKEY"])), true);
+  assert.equal(isKeyPresent("BASE44_API_KEY", new Set(["BASE44_AUTH_JSON"])), true);
+  assert.equal(isKeyPresent("BASE44_AUTH_JSON", new Set(["BASE44_AUTH_JSON"])), true);
+});
+
+test("isKeyPresent still reports drift when every Base44 alias is missing", () => {
+  assert.equal(isKeyPresent("BASE44_AUTH_JSON", new Set(["BASE44_APP_ID"])), false);
+  assert.equal(isKeyPresent("BASE44_AUTH_JSON", new Set()), false);
 });
 
 console.log("All drift-check helper tests passed.");
