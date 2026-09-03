@@ -26,16 +26,12 @@ jobs:
       - name: Check Credential Availability
         id: creds
         env:
-          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
-          INFISICAL_UNIVERSAL_AUTH_CLIENT_ID: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_ID }}
-          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET }}
+          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
         run: |
           missing=()
-          [ -n "${INFISICAL_CLIENT_ID}${INFISICAL_UNIVERSAL_AUTH_CLIENT_ID}" ] || missing+=("INFISICAL_CLIENT_ID|INFISICAL_UNIVERSAL_AUTH_CLIENT_ID")
-          [ -n "${INFISICAL_CLIENT_SECRET}${INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET}" ] || missing+=("INFISICAL_CLIENT_SECRET|INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET")
+          [ -n "${INFISICAL_TOKEN}" ] || missing+=("INFISICAL_TOKEN")
           [ -n "${NETLIFY_AUTH_TOKEN}" ] || missing+=("NETLIFY_AUTH_TOKEN")
           [ -n "${NETLIFY_SITE_ID}" ] || missing+=("NETLIFY_SITE_ID")
           if [ "${#missing[@]}" -eq 0 ]; then
@@ -58,10 +54,6 @@ jobs:
         env:
           STRICTNESS: ${{ github.ref == 'refs/heads/main' && 'fail' || (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 'warn' }}
           INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
-          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
-          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
-          INFISICAL_UNIVERSAL_AUTH_CLIENT_ID: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_ID }}
-          INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
         run: npm run drift-check
