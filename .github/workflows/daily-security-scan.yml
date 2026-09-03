@@ -1,10 +1,9 @@
-# .github/workflows/daily-security-scan.yml
 name: Daily Security Scan
 
 on:
   schedule:
-    - cron: "0 14 * * *"   # ~10:00 AM Eastern
-  workflow_dispatch: {}  # allow manual runs too
+    - cron: "0 14 * * *"
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -32,62 +31,69 @@ jobs:
         id: sec08
         continue-on-error: true
         run: |
-          if [ ! -f scripts/sec08-security-gates.mjs ]; then
-            echo "scripts/sec08-security-gates.mjs not present — skipping SEC-08 gates."
-            exit 0
-          fi
+          if [ ! -f scripts/sec08-security-gates.mjs ]; then echo "SEC-08 gates not present — skipping."; exit 0; fi
           node scripts/sec08-security-gates.mjs > /tmp/sec08.out 2>&1
-          status=$?
-          {
-            echo "sec08_out<<EOF"
-            cat /tmp/sec08.out
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-          exit $status
 
-      - name: Dependency audit (high+)
-        id: audit
+      - name: Dependency audit (production, high+)
+        id: audit-production
         continue-on-error: true
         run: |
-          npm audit --audit-level=high > /tmp/audit.out 2>&1
+          set +e
+          npm audit --omit=dev --audit-level=high --json > audit-production.json 2>&1
           status=$?
-          {
-            echo "audit_out<<EOF"
-            cat /tmp/audit.out
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          echo "Production dependency audit exit status: $status"
           exit $status
+
+      - name: Dependency audit (development and build, high+)
+        id: audit-development
+        continue-on-error: true
+        run: |
+          set +e
+          npm audit --include=dev --audit-level=high --json > audit-development.json 2>&1
+          status=$?
+          echo "Development/build dependency audit exit status: $status"
+          exit $status
+
+      - name: Upload audit reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: security-audit-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            audit-production.json
+            audit-development.json
+            /tmp/sec08.out
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Write security summary
+        if: always()
+        run: |
+          {
+            echo "## Daily Security Scan"
+            echo "- SEC-08 gates: **${{ steps.sec08.outcome }}**"
+            echo "- Production dependency audit: **${{ steps.audit-production.outcome }}**"
+            echo "- Development/build dependency audit: **${{ steps.audit-development.outcome }}**"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Did anything surface?
         id: findings
         if: always()
         run: |
           found=false
-          [ "${{ steps.sec08.outcome }}" = "failure" ] && found=true
-          [ "${{ steps.audit.outcome }}" = "failure" ] && found=true
+          [ "${{ steps.sec08.outcome }}" = failure ] && found=true
+          [ "${{ steps.audit-production.outcome }}" = failure ] && found=true
+          [ "${{ steps.audit-development.outcome }}" = failure ] && found=true
           echo "found=$found" >> "$GITHUB_OUTPUT"
-          if [ "$found" = "false" ]; then
-            echo "No issues found"
-          fi
 
       - name: Ping email alert (advisory, no containment)
         if: always() && steps.findings.outputs.found == 'true'
         continue-on-error: true
         run: |
-          if [ -z "${BREACH_HANDLER_URL}" ] || [ -z "${INTERNAL_TOKEN}" ]; then
-            echo "Missing repo secret BREACH_HANDLER_URL or SEC06_INTERNAL_TOKEN — skipping ping." >&2
-            exit 0
+          if [ -n "$BREACH_HANDLER_URL" ] && [ -n "$INTERNAL_TOKEN" ]; then
+            curl -sS -X POST "$BREACH_HANDLER_URL" -H "Authorization: Bearer $INTERNAL_TOKEN" -H "Content-Type: application/json" \
+              -d "{\"scan\":\"Daily Security Scan (GitHub Actions)\",\"severity\":\"advisory\",\"contain\":false,\"findings\":\"SEC-08: ${{ steps.sec08.outcome }}; production audit: ${{ steps.audit-production.outcome }}; development/build audit: ${{ steps.audit-development.outcome }}\",\"run_url\":\"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}"
           fi
-          curl -sS -X POST "$BREACH_HANDLER_URL" \
-            -H "Authorization: Bearer $INTERNAL_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"scan\": \"Daily Security Scan (GitHub Actions)\",
-              \"severity\": \"advisory\",
-              \"contain\": false,
-              \"findings\": \"SEC-08 gates: ${{ steps.sec08.outcome }}. npm audit (high+): ${{ steps.audit.outcome }}.\",
-              \"run_url\": \"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"
-            }"
 
       - name: Open or update tracking issue
         if: always() && steps.findings.outputs.found == 'true'
@@ -95,56 +101,7 @@ jobs:
         with:
           script: |
             const label = 'security-scan-finding';
-            const date = new Date().toISOString().slice(0,10);
-            const sec08 = '${{ steps.sec08.outcome }}';
-            const audit = '${{ steps.audit.outcome }}';
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const body = [
-              `**Daily security scan — ${date}**`,
-              '',
-              `SEC-08 gates: \`${sec08}\``,
-              `npm audit (high+): \`${audit}\``,
-              '',
-              `Run: ${runUrl}`,
-              '',
-              '> This workflow is currently **non-blocking** — findings are tracked here only, build stays green.',
-            ].join('\n');
-
-            try {
-              await github.rest.issues.getLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: label,
-              });
-            } catch (err) {
-              if (err.status === 404) {
-                await github.rest.issues.createLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: label,
-                  color: 'B60205',
-                  description: 'Rolling findings from Daily Security Scan (advisory)',
-                });
-              } else {
-                throw err;
-              }
-            }
-
-            const existing = await github.rest.issues.listForRepo({
-              owner: context.repo.owner, repo: context.repo.repo,
-              state: 'open', labels: label, per_page: 1,
-            });
-            if (existing.data.length) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner, repo: context.repo.repo,
-                issue_number: existing.data[0].number, body,
-              });
-              core.info(`Commented on issue #${existing.data[0].number}`);
-            } else {
-              const created = await github.rest.issues.create({
-                owner: context.repo.owner, repo: context.repo.repo,
-                title: `[Security Scan] Open findings as of ${date}`,
-                labels: [label], body,
-              });
-              core.info(`Created issue #${created.data.number}`);
-            }
+            const body = `Daily security scan: SEC-08 ${{ steps.sec08.outcome }}, production audit ${{ steps.audit-production.outcome }}, development/build audit ${{ steps.audit-development.outcome }}. Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const existing = await github.rest.issues.listForRepo({owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 1});
+            if (existing.data.length) await github.rest.issues.createComment({owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.data[0].number, body});
+            else await github.rest.issues.create({owner: context.repo.owner, repo: context.repo.repo, title: '[Security Scan] Open findings', labels: [label], body});

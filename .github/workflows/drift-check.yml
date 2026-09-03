@@ -10,23 +10,52 @@ on:
 jobs:
   drift-check:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
       - name: Install Dependencies
         run: npm ci
-
+      - name: Install Infisical CLI
+        run: |
+          set -euo pipefail
+          npm install --global @infisical/cli@0.43.125
+          command -v infisical
+          version_output="$(infisical --version)"
+          infisical_version="$(printf '%s\n' "$version_output" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)"
+          if [ "$infisical_version" != "0.43.125" ]; then
+            echo "::error::Unexpected Infisical CLI version: $version_output"
+            exit 1
+          fi
+      - name: Authenticate with Infisical (GitHub OIDC)
+        env:
+          INFISICAL_IDENTITY_ID: ${{ secrets.INFISICAL_MACHINE_IDENTITY_ID }}
+          INFISICAL_DOMAIN: https://us.infisical.com
+        run: |
+          set -euo pipefail
+          test -n "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" && test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}"
+          encoded_audience="$(printf '%s' "$INFISICAL_DOMAIN" | jq -sRr @uri)"
+          oidc_request_url="$ACTIONS_ID_TOKEN_REQUEST_URL"
+          case "$oidc_request_url" in
+            *\?*) oidc_request_url="${oidc_request_url}&audience=$encoded_audience" ;;
+            *) oidc_request_url="${oidc_request_url}?audience=$encoded_audience" ;;
+          esac
+          oidc_token="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$oidc_request_url")"
+          jwt="$(printf '%s' "$oidc_token" | jq -er '.value')"
+          token="$(infisical login --method=oidc-auth --machine-identity-id="$INFISICAL_IDENTITY_ID" --jwt="$jwt" --domain="$INFISICAL_DOMAIN" --plain --silent)"
+          test -n "$token"
+          echo "INFISICAL_TOKEN=$token" >> "$GITHUB_ENV"
       - name: Run Drift Check
+        working-directory: ${{ github.workspace }}
         env:
           STRICTNESS: ${{ github.ref == 'refs/heads/main' && 'fail' || (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 'warn' }}
-          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
         run: npm run drift-check
