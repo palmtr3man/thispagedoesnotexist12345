@@ -56,51 +56,61 @@
   from = "/api/health"
   to = "/.netlify/functions/health"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-status"
   to = "/.netlify/functions/seat-status"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-request"
   to = "/.netlify/functions/seat-request"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/verify-age"
   to = "/.netlify/functions/verify-age"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-ready"
   to = "/.netlify/functions/seat-ready"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-map"
   to = "/.netlify/functions/seat-map"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-claim"
   to = "/.netlify/functions/seat-claim"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/mission-control-bind"
   to = "/.netlify/functions/mission-control-bind"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/trpc/*"
   to = "/.netlify/functions/trpc/:splat"
   status = 200
+  force = true
 
 # SPA catch-all — must stay last, after API redirects
 [[redirects]]
