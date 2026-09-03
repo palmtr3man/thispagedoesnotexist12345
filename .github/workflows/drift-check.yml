@@ -23,7 +23,38 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Check Credential Availability
+        id: creds
+        env:
+          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_UNIVERSAL_AUTH_CLIENT_ID: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET: ${{ secrets.INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+        run: |
+          missing=()
+          [ -n "${INFISICAL_CLIENT_ID}${INFISICAL_UNIVERSAL_AUTH_CLIENT_ID}" ] || missing+=("INFISICAL_CLIENT_ID|INFISICAL_UNIVERSAL_AUTH_CLIENT_ID")
+          [ -n "${INFISICAL_CLIENT_SECRET}${INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET}" ] || missing+=("INFISICAL_CLIENT_SECRET|INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET")
+          [ -n "${NETLIFY_AUTH_TOKEN}" ] || missing+=("NETLIFY_AUTH_TOKEN")
+          [ -n "${NETLIFY_SITE_ID}" ] || missing+=("NETLIFY_SITE_ID")
+          if [ "${#missing[@]}" -eq 0 ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "available=false" >> "$GITHUB_OUTPUT"
+          msg="Drift check credentials unavailable: ${missing[*]}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "::notice::${msg} — skipping drift check (secrets are not exposed to pull_request runs from forks)."
+            echo "### Drift check skipped" >> "$GITHUB_STEP_SUMMARY"
+            echo "${msg}. Secrets are not exposed to pull_request runs from forks; the check runs on push to main/develop." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::${msg}"
+            exit 1
+          fi
+
       - name: Run Drift Check
+        if: steps.creds.outputs.available == 'true'
         env:
           STRICTNESS: ${{ github.ref == 'refs/heads/main' && 'fail' || (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 'warn' }}
           INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
