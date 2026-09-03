@@ -31,7 +31,13 @@ jobs:
           set -euo pipefail
           npm install --global @infisical/cli@0.43.125
           command -v infisical
-          infisical --version
+          version_output="$(infisical --version)"
+          infisical_version="$(printf '%s\n' "$version_output" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)"
+          if [ "$infisical_version" != "0.43.125" ]; then
+            echo "::error::Unexpected Infisical CLI version: $version_output"
+            exit 1
+          fi
+          echo "Infisical CLI $infisical_version"
 
       - name: Authenticate with Infisical (GitHub OIDC)
         env:
@@ -49,20 +55,19 @@ jobs:
             *\?*) oidc_request_url="${oidc_request_url}&audience=$encoded_audience" ;;
             *) oidc_request_url="${oidc_request_url}?audience=$encoded_audience" ;;
           esac
-          oidc_token="$(curl --fail --silent --show-error \
-            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$oidc_request_url")"
+          oidc_token="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$oidc_request_url")"
           jwt="$(printf '%s' "$oidc_token" | jq -er '.value')"
           INFISICAL_TOKEN="$(infisical login --method=oidc-auth --machine-identity-id="$INFISICAL_IDENTITY_ID" --jwt="$jwt" --domain="$INFISICAL_DOMAIN" --plain --silent)"
-          if [ -z "$INFISICAL_TOKEN" ]; then
-            echo "::error::Infisical OIDC authentication returned an empty token."
-            exit 1
-          fi
+          if [ -z "$INFISICAL_TOKEN" ]; then echo "::error::Infisical OIDC authentication returned an empty token."; exit 1; fi
           echo "INFISICAL_TOKEN=$INFISICAL_TOKEN" >> "$GITHUB_ENV"
 
       - name: Run Drift Check
+        working-directory: ${{ github.workspace }}
         env:
           STRICTNESS: ${{ github.ref == 'refs/heads/main' && 'fail' || (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 'warn' }}
+          INFISICAL_TOKEN: ${{ env.INFISICAL_TOKEN }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
-        run: npm run drift-check
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          npm run drift-check
