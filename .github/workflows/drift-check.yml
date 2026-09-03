@@ -1,32 +1,18 @@
-name: "Netlify Guardrails: Drift Check"
-
+name: 'Netlify Guardrails: Drift Check'
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
-
+permissions:
+  contents: read
 jobs:
   drift-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Drift Check
-        env:
-          STRICTNESS: ${{ github.ref == 'refs/heads/main' && 'fail' || (github.ref == 'refs/heads/develop' || github.event_name == 'pull_request') && 'fail' || 'warn' }}
-          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
-        run: npm run drift-check
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: {node-version: '20', cache: npm}
+      - run: npm ci
+      - run: npm run drift-check
