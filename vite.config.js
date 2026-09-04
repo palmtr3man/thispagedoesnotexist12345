@@ -22,6 +22,12 @@ const pages = {
 // therefore would not otherwise be emitted.
 const staticFiles = ['robots.txt', 'sitemap.xml', 'og-image.png', 'favicon.ico'];
 
+/**
+ * Vite plugin that copies root-level static files to the dist directory.
+ * Runs during the closeBundle hook to ensure files like robots.txt and sitemap.xml
+ * are included in the build output even though they're not referenced from HTML.
+ * @returns Vite plugin object with closeBundle hook
+ */
 function copyRootStatic() {
   return {
     name: 'copy-root-static',

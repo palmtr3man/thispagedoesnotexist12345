@@ -2,6 +2,11 @@
 import assert from "node:assert/strict";
 import { isKeyPresent, requireEnv } from "./drift-check.js";
 
+/**
+ * Runs a test function and logs the result with a checkmark or error indicator.
+ * @param name - The descriptive name of the test
+ * @param fn - The test function to execute
+ */
 function test(name: string, fn: () => void): void {
   try {
     fn();
@@ -12,6 +17,13 @@ function test(name: string, fn: () => void): void {
   }
 }
 
+/**
+ * Temporarily sets an environment variable for the duration of a test function,
+ * then restores the original value.
+ * @param name - The environment variable name
+ * @param value - The value to set (undefined to delete the variable)
+ * @param fn - The test function to execute with the modified environment
+ */
 function withEnv(name: string, value: string | undefined, fn: () => void): void {
   const previous = process.env[name];
   if (value === undefined) delete process.env[name];
