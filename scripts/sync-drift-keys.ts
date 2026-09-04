@@ -3,7 +3,7 @@ import { pathToFileURL } from "node:url";
 import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
 
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
-const INFISICAL_SITE_URL = "https://app.infisical.com";
+const INFISICAL_SITE_URL = process.env.INFISICAL_DOMAIN?.trim() || "https://us.infisical.com";
 const INFISICAL_ENV = "staging";
 const INFISICAL_PATH = "/";
 
@@ -207,12 +207,26 @@ export async function upsertNetlifySecret(
   throw new Error(`Netlify create ${key} failed: ${createRes.status} ${await createRes.text()}`);
 }
 
+/**
+ * Returns the first non-empty value among the given env var names.
+ * CI passes unset secrets as empty strings, so `??` alone never falls through.
+ */
+export function firstEnv(
+  env: NodeJS.ProcessEnv,
+  ...names: string[]
+): string | undefined {
+  for (const name of names) {
+    const value = env[name]?.trim();
+    if (value) return value;
+  }
+  return undefined;
+}
+
 async function main(): Promise<void> {
-  const clientId = process.env.INFISICAL_CLIENT_ID ?? process.env.INFISICAL_UNIVERSAL_AUTH_CLIENT_ID;
-  const clientSecret = process.env.INFISICAL_CLIENT_SECRET ?? process.env.INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET;
-  const netlifyAuthToken =
-    process.env.NETLIFY_AUTH_TOKEN ?? process.env.NETLIFY_API_TOKEN;
-  const netlifySiteId = process.env.NETLIFY_SITE_ID;
+  const clientId = firstEnv(process.env, "INFISICAL_CLIENT_ID", "INFISICAL_UNIVERSAL_AUTH_CLIENT_ID");
+  const clientSecret = firstEnv(process.env, "INFISICAL_CLIENT_SECRET", "INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET");
+  const netlifyAuthToken = firstEnv(process.env, "NETLIFY_AUTH_TOKEN", "NETLIFY_API_TOKEN");
+  const netlifySiteId = firstEnv(process.env, "NETLIFY_SITE_ID");
 
   if (!clientId) throw new Error("INFISICAL_CLIENT_ID or INFISICAL_UNIVERSAL_AUTH_CLIENT_ID is not set");
   if (!clientSecret) throw new Error("INFISICAL_CLIENT_SECRET or INFISICAL_UNIVERSAL_AUTH_CLIENT_SECRET is not set");

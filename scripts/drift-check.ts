@@ -11,7 +11,14 @@ interface NetlifyEnvVar {
   key?: string;
 }
 
-function isKeyPresent(key: string, present: Set<string>): boolean {
+/**
+ * Checks if a key is present in a set, treating alias groups as equivalent.
+ * If the key is part of an alias group, returns true if any alias in the group is present.
+ * @param key - The environment variable key to check
+ * @param present - Set of keys that are currently present
+ * @returns true if the key or any of its aliases is present, false otherwise
+ */
+export function isKeyPresent(key: string, present: Set<string>): boolean {
   if (present.has(key)) return true;
   const group = ALIAS_GROUPS.find((aliases) => aliases.includes(key));
   return group ? group.some((alias) => present.has(alias)) : false;

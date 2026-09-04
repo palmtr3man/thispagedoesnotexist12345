@@ -43,68 +43,89 @@
   status = 301
   force = true
 
-# Maintenance mode: serve a static 503 page for every public route.
-# To disable, remove/comment this block and re-enable the SPA catch-all below.
-[[redirects]]
-  from = "/*"
-  to = "/maintenance.html"
-  status = 503
-  force = true
+# Maintenance mode = false: keep the 503 redirect disabled and use normal routing.
+# [[redirects]]
+#   from = "/*"
+#   to = "/maintenance.html"
+#   status = 503
+#   force = true
 
-# Existing function redirects (inactive while maintenance mode is enabled)
+# API function redirects must precede the SPA fallback.
 [[redirects]]
   from = "/api/health"
   to = "/.netlify/functions/health"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-status"
   to = "/.netlify/functions/seat-status"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-request"
   to = "/.netlify/functions/seat-request"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/verify-age"
   to = "/.netlify/functions/verify-age"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-ready"
   to = "/.netlify/functions/seat-ready"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-map"
   to = "/.netlify/functions/seat-map"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/seat-claim"
   to = "/.netlify/functions/seat-claim"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/mission-control-bind"
   to = "/.netlify/functions/mission-control-bind"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/set-departure"
   to = "/.netlify/functions/set-departure"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/trpc/*"
   to = "/.netlify/functions/trpc/:splat"
   status = 200
+  force = true
 
-# SPA catch-all to restore after maintenance mode is disabled
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
-#   force = true
+# Catch-all for any API path not enumerated above: route to the matching
+# function so unlisted endpoints 404 from the function layer instead of
+# silently falling through to the SPA shell with a 200. This file is the
+# single source of redirect rules; do not add a public/_redirects file, as
+# Netlify evaluates it before these rules and it would shadow the host 301s.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# Maintenance mode = false: SPA fallback is the final redirect rule.
+# No force: static assets and standalone pages (door.html, request-seat.html,
+# seat-selection.html, robots.txt, sitemap.xml) must win over the SPA shell.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

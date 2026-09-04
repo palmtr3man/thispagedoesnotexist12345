@@ -1,6 +1,6 @@
 /** Unit tests for sync-drift-keys helpers (no live Netlify/Infisical calls). */
 import assert from "node:assert/strict";
-import { buildNetlifyValuesPayload, upsertNetlifySecret } from "./sync-drift-keys.js";
+import { buildNetlifyValuesPayload, firstEnv, upsertNetlifySecret } from "./sync-drift-keys.js";
 
 async function test(name: string, fn: () => Promise<void> | void): Promise<void> {
   try {
@@ -33,6 +33,16 @@ async function withMockFetch<T>(
 }
 
 async function main(): Promise<void> {
+  await test("firstEnv falls through empty strings (CI passes unset secrets as '')", () => {
+    assert.equal(
+      firstEnv({ INFISICAL_CLIENT_ID: "", INFISICAL_UNIVERSAL_AUTH_CLIENT_ID: "ua-id" }, "INFISICAL_CLIENT_ID", "INFISICAL_UNIVERSAL_AUTH_CLIENT_ID"),
+      "ua-id"
+    );
+    assert.equal(firstEnv({ A: "primary", B: "fallback" }, "A", "B"), "primary");
+    assert.equal(firstEnv({ A: "   " }, "A", "B"), undefined);
+    assert.equal(firstEnv({}, "A"), undefined);
+  });
+
   await test("buildNetlifyValuesPayload defaults to a single 'all' context when none exists", () => {
     assert.deepEqual(buildNetlifyValuesPayload("v1", undefined), [
       { context: "all", value: "v1" },

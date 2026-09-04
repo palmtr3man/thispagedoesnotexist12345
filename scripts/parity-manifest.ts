@@ -33,7 +33,7 @@ export const P1_KEYS = [
 
 /** At least one key in each group must be present on Netlify. */
 export const ALIAS_GROUPS: readonly (readonly string[])[] = [
-  ['BASE44_API_KEY', 'BASE44APIKEY'],
+  ['BASE44_AUTH_JSON', 'BASE44_API_KEY', 'BASE44APIKEY'],
   ['ACTIVE_FLIGHT_ID', 'ACTIVE_FLIGHT_CODE'],
   ['NOTION_API_KEY', 'NOTION_SECRET'],
   ['NOTION_SEAT_DB_ID', 'NOTION_CANON_PROFILE_DB_ID'],
