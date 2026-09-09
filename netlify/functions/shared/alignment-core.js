@@ -11,10 +11,13 @@ const FETCH_TIMEOUT_MS = 8000;
 // existing deployments working while secrets are migrated between vaults.
 const NOTION_TOKEN_ENV_KEYS = ['NOTION_API_KEY', 'NOTION_SECRET'];
 const PASSENGER_PIPELINE_DB_ENV_KEYS = [
-  'NOTION_SEAT_DB_ID',
-  'NOTION_PASSENGER_PIPELINE_DB_ID',
   'NOTION_PIPELINE_DATABASE_ID',
+  'NOTION_PASSENGER_PIPELINE_DB_ID',
 ];
+// Canonical Profile DB is a distinct Notion database from the Passenger
+// Pipeline DB above. NOTION_SEAT_DB_ID is a legacy alias retained here only —
+// it must never be used to resolve the Passenger Pipeline DB.
+const CANONICAL_PROFILE_DB_ENV_KEYS = ['NOTION_CANON_PROFILE_DB_ID', 'NOTION_SEAT_DB_ID'];
 
 // ── Field-level repair policy ─────────────────────────────────────────────────
 const FIELD_POLICY = {
@@ -47,6 +50,10 @@ function notionToken() {
 
 function passengerPipelineDbId() {
   return firstConfiguredEnv(...PASSENGER_PIPELINE_DB_ENV_KEYS);
+}
+
+function canonicalProfileDbId() {
+  return firstConfiguredEnv(...CANONICAL_PROFILE_DB_ENV_KEYS);
 }
 
 function notionHeaders() {
@@ -203,6 +210,7 @@ async function autoRepairBase44Seat(seatId, field, notionValue) {
 const REQUIRED_ENV_GROUPS = [
   NOTION_TOKEN_ENV_KEYS,
   PASSENGER_PIPELINE_DB_ENV_KEYS,
+  CANONICAL_PROFILE_DB_ENV_KEYS,
   ['NOTION_DRIFT_REPORT_DB_ID'],
   ['SEC06_INTERNAL_TOKEN'], ['SEC06_SCHEDULER_SECRET'],
   ['BASE44_SEAT_URL'], ['BASE44_USER_URL'],
@@ -437,4 +445,10 @@ async function runAlignmentLoop() {
   return results;
 }
 
-module.exports = { runAlignmentLoop };
+module.exports = {
+  runAlignmentLoop,
+  passengerPipelineDbId,
+  canonicalProfileDbId,
+  PASSENGER_PIPELINE_DB_ENV_KEYS,
+  CANONICAL_PROFILE_DB_ENV_KEYS,
+};
