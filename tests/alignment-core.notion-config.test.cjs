@@ -12,7 +12,13 @@ const calls = [];
 const env = {
   NOTION_API_KEY: 'canonical-notion-token',
   NOTION_SECRET: 'legacy-notion-token',
-  NOTION_SEAT_DB_ID: 'canonical-passenger-db',
+  // NOTION_SEAT_DB_ID intentionally holds an UNRELATED database id here (it
+  // maps to the Canon Profiles DB in real deployments, not the Passenger
+  // Pipeline). It must never be selected for Passenger Pipeline operations,
+  // even when it is present alongside — or in place of — the real pipeline
+  // aliases.
+  NOTION_SEAT_DB_ID: 'canon-profiles-db-unrelated',
+  NOTION_PIPELINE_DATABASE_ID: 'fresh-pipeline-db',
   NOTION_PASSENGER_PIPELINE_DB_ID: 'legacy-passenger-db',
   NOTION_DRIFT_REPORT_DB_ID: 'drift-report-db',
   SEC06_INTERNAL_TOKEN: 'internal-token',
@@ -58,11 +64,13 @@ async function runAndGetPassengerRequest() {
 }
 
 (async () => {
+  // 1. Fresh NOTION_PIPELINE_DATABASE_ID must win over every other alias,
+  //    including NOTION_SEAT_DB_ID, when all are present.
   let request = await runAndGetPassengerRequest();
   assert.equal(
     request.url,
-    'https://api.notion.com/v1/databases/canonical-passenger-db/query',
-    'the canonical Passenger Pipeline variable must take precedence'
+    'https://api.notion.com/v1/databases/fresh-pipeline-db/query',
+    'NOTION_PIPELINE_DATABASE_ID must take precedence over every other Passenger Pipeline alias'
   );
   assert.equal(
     request.options.headers.Authorization,
@@ -70,13 +78,15 @@ async function runAndGetPassengerRequest() {
     'NOTION_API_KEY must take precedence when both token variables are present'
   );
 
+  // 2. With the fresh pipeline id absent, the documented legacy alias must
+  //    still be used — and NOTION_SEAT_DB_ID (still present) must be skipped.
   delete env.NOTION_API_KEY;
-  delete env.NOTION_SEAT_DB_ID;
+  delete env.NOTION_PIPELINE_DATABASE_ID;
   request = await runAndGetPassengerRequest();
   assert.equal(
     request.url,
     'https://api.notion.com/v1/databases/legacy-passenger-db/query',
-    'the documented Passenger Pipeline alias must remain supported'
+    'NOTION_PASSENGER_PIPELINE_DB_ID must be used when the fresh pipeline id is absent, without falling back to NOTION_SEAT_DB_ID'
   );
   assert.equal(
     request.options.headers.Authorization,
@@ -84,13 +94,20 @@ async function runAndGetPassengerRequest() {
     'NOTION_SECRET must remain a token fallback for existing deployments'
   );
 
+  // 3. NOTION_SEAT_DB_ID must NEVER be used for Passenger Pipeline
+  //    operations, even as a last resort when it is the only Notion
+  //    database id configured. The loop must fail closed with a config
+  //    error rather than silently querying the Canon Profiles database.
   delete env.NOTION_PASSENGER_PIPELINE_DB_ID;
-  env.NOTION_PIPELINE_DATABASE_ID = 'older-pipeline-db';
-  request = await runAndGetPassengerRequest();
-  assert.equal(
-    request.url,
-    'https://api.notion.com/v1/databases/older-pipeline-db/query',
-    'the older Pipeline Database alias must remain supported'
+  calls.length = 0;
+  const result = await loadedModule.exports.runAlignmentLoop();
+  assert.ok(
+    result.errors.some(e => e.includes('Notion passenger fetch failed')),
+    'expected a Notion passenger fetch failure when only NOTION_SEAT_DB_ID is configured'
+  );
+  assert.ok(
+    !calls.some(call => call.url.includes('canon-profiles-db-unrelated')),
+    'NOTION_SEAT_DB_ID must never be queried for Passenger Pipeline operations, even as a last-resort fallback'
   );
 
   console.log('alignment-core Notion configuration tests passed');
