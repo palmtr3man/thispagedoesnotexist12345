@@ -170,7 +170,7 @@ platform-managed secrets whitelist. Remediation has two parts:
 | `createAdminPassenger` | invite template ID | `SENDGRID_TEMPLATE_INTAKE` | `INVITE_TEMPLATE_ID` |
 | `migrateSeatIds` | seat IDs map | `MIGRATION_SEAT_IDS_MAP` | `MIGRATION_SEAT_IDS`, `MIGRATE_SEAT_IDS_MAP` |
 | `notifyTaskFailure` | alert recipient | `TASK_FAILURE_ALERT_EMAIL` | `TASK_FAILURE_EMAIL` |
-| `syncPassengerPipeline` | Notion pipeline DB | `NOTION_SEAT_DB_ID` | `NOTION_PASSENGER_PIPELINE_DB_ID`, `NOTION_PIPELINE_DATABASE_ID` |
+| `syncPassengerPipeline` | Notion pipeline DB | `NOTION_PIPELINE_DATABASE_ID` | `NOTION_PASSENGER_PIPELINE_DB_ID` (never `NOTION_SEAT_DB_ID` — reserved for the Canonical Profile DB) |
 | `syncBmacMembers` | Alpha / Beta product IDs | `BMAC_ALPHA_PRODUCT_ID`, `BMAC_BETA_PRODUCT_ID` | — |
 | `syncPassportSeatId` | pilot TUJ code | `DEMO_SEAT_ID` | `PILOT_USER_TUJ_CODE`, `PILOT_SEAT_ID` |
 | `patchUserSeatId` | pilot TUJ code (admin self-test) | `DEMO_SEAT_ID` | `PILOT_USER_TUJ_CODE`, `PILOT_SEAT_ID` |
@@ -207,7 +207,7 @@ base44 secrets set \
   SENDGRID_TEMPLATE_INTAKE=d-... \
   MIGRATION_SEAT_IDS_MAP='{"old":"new"}' \
   TASK_FAILURE_ALERT_EMAIL=ops@example.com \
-  NOTION_SEAT_DB_ID=... \
+  NOTION_PIPELINE_DATABASE_ID=... \
   BMAC_ALPHA_PRODUCT_ID=... \
   BMAC_BETA_PRODUCT_ID=... \
   DEMO_SEAT_ID=TUJ-KC1111 \
