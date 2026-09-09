@@ -50,9 +50,8 @@ export const ENV_ALIASES = {
   migrationSeatIdsMap: ['MIGRATION_SEAT_IDS_MAP', 'MIGRATION_SEAT_IDS', 'MIGRATE_SEAT_IDS_MAP'],
   taskFailureAlertEmail: ['TASK_FAILURE_ALERT_EMAIL', 'TASK_FAILURE_EMAIL'],
   notionPassengerPipelineDbId: [
-    'NOTION_SEAT_DB_ID',
-    'NOTION_PASSENGER_PIPELINE_DB_ID',
     'NOTION_PIPELINE_DATABASE_ID',
+    'NOTION_PASSENGER_PIPELINE_DB_ID',
   ],
   pilotSeatId: ['DEMO_SEAT_ID', 'PILOT_USER_TUJ_CODE', 'PILOT_SEAT_ID'],
 } as const;
