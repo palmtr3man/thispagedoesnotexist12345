@@ -9,11 +9,15 @@ const FETCH_TIMEOUT_MS = 8000;
 
 // Canonical Notion configuration names are listed first. Later entries keep
 // existing deployments working while secrets are migrated between vaults.
+//
+// NOTION_SEAT_DB_ID is deliberately excluded here: Infisical currently loads
+// the Canon Profiles DB ID into that variable (not the Passenger Pipeline),
+// so treating it as a pipeline alias would silently query the wrong Notion
+// database and bypass any future pipeline ID rotation.
 const NOTION_TOKEN_ENV_KEYS = ['NOTION_API_KEY', 'NOTION_SECRET'];
 const PASSENGER_PIPELINE_DB_ENV_KEYS = [
-  'NOTION_SEAT_DB_ID',
-  'NOTION_PASSENGER_PIPELINE_DB_ID',
   'NOTION_PIPELINE_DATABASE_ID',
+  'NOTION_PASSENGER_PIPELINE_DB_ID',
 ];
 
 // ── Field-level repair policy ─────────────────────────────────────────────────
