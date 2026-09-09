@@ -18,7 +18,8 @@
  *
  * Required env vars:
  *   NOTION_SECRET                — TUJ Alignment Bot integration token
- *   NOTION_SEAT_DB_ID            — Passenger Pipeline DB (86452d89-...)
+ *   NOTION_PIPELINE_DATABASE_ID  — Passenger Pipeline DB (86452d89-...)
+ *   NOTION_PASSENGER_PIPELINE_DB_ID — Passenger Pipeline DB alias
  *   NOTION_DRIFT_REPORT_DB_ID    — TUJ Drift Reports DB (ce04014f-...)
  *   SEC06_INTERNAL_TOKEN         — Internal token for webhook trigger (x-internal-token or Authorization Bearer)
  *   SEC06_SCHEDULER_SECRET       — Scheduler token (Authorization: Bearer or x-scheduler-secret)
@@ -37,6 +38,22 @@
 const { validateAlignmentLoopTrigger } = require('./shared/sec06-auth.js');
 
 const FETCH_TIMEOUT_MS = 8000;
+
+// Passenger Pipeline DB resolution — NOTION_SEAT_DB_ID must never be used
+// here; it is reserved for the (distinct) Canonical Profile DB.
+const PASSENGER_PIPELINE_DB_ENV_KEYS = ['NOTION_PIPELINE_DATABASE_ID', 'NOTION_PASSENGER_PIPELINE_DB_ID'];
+
+function firstConfiguredEnv(...keys) {
+  for (const key of keys) {
+    const value = process.env[key];
+    if (value && value.trim()) return value;
+  }
+  return '';
+}
+
+function passengerPipelineDbId() {
+  return firstConfiguredEnv(...PASSENGER_PIPELINE_DB_ENV_KEYS);
+}
 
 // ── Field-level repair policy ─────────────────────────────────────────────────
 // 'auto'   → Notion is source of truth; write Notion value to SaaS when stale.
@@ -82,7 +99,11 @@ function validateTrigger(event) {
 
 /** Fetch all pages from the Passenger Pipeline DB. */
 async function fetchNotionPassengers() {
-  const url = `https://api.notion.com/v1/databases/${process.env.NOTION_SEAT_DB_ID}/query`;
+  const dbId = passengerPipelineDbId();
+  if (!dbId) {
+    throw new Error(`Notion passenger database is not configured (tried ${PASSENGER_PIPELINE_DB_ENV_KEYS.join(', ')})`);
+  }
+  const url = `https://api.notion.com/v1/databases/${dbId}/query`;
   const res = await timedFetch(url, {
     method: 'POST',
     headers: notionHeaders(),
@@ -368,7 +389,7 @@ async function fetchSupabaseSeatRequest(seatId) {
 // ── Netlify env var check ─────────────────────────────────────────────────────
 
 const REQUIRED_ENV_VARS = [
-  'NOTION_SECRET', 'NOTION_SEAT_DB_ID', 'NOTION_DRIFT_REPORT_DB_ID',
+  'NOTION_SECRET', 'NOTION_PIPELINE_DATABASE_ID', 'NOTION_DRIFT_REPORT_DB_ID',
   'SEC06_INTERNAL_TOKEN', 'SEC06_SCHEDULER_SECRET',
   'BASE44_SEAT_URL', 'BASE44_USER_URL',
   'BASE44_APPLICATION_URL', 'NOTION_JD_PIPELINE_DB_ID',
