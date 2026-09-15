@@ -107,7 +107,7 @@ jobs:
               `Run: ${runUrl}`,
               '',
               '> This workflow is currently **non-blocking** — findings are tracked here only, build stays green.',
-            ].join('\\n');
+            ].join('\n');
 
             try {
               await github.rest.issues.getLabel({
