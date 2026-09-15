@@ -6,11 +6,60 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
-const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' };
+const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };
 function jsonResponse(statusCode, payload, extraHeaders = {}) { return { statusCode, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json', ...extraHeaders }, body: JSON.stringify(payload) }; }
 function getSupabaseUrl() { return process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || ''; }
 function getSupabaseServiceKey() { return process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.APP_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || ''; }
 function getSupabaseClient() { const url = getSupabaseUrl(); const key = getSupabaseServiceKey(); if (!url || !key) throw new Error('Supabase configuration is missing'); return createClient(url, key); }
+function isMaintenanceMode() { return String(process.env.MAINTENANCE_MODE || '').trim().toLowerCase() === 'true'; }
+function getProfileTable() { return process.env.PROFILE_TABLE || 'profiles'; }
+
+function headerValue(headers, name) {
+  if (!headers) return '';
+  return headers[name] || headers[name.toLowerCase()] || headers[name.toUpperCase()] || '';
+}
+
+function extractBearerToken(headers) {
+  const auth = headerValue(headers, 'authorization');
+  const match = String(auth || '').match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : '';
+}
+
+/** Validates a Supabase access token against the Auth server; returns the auth user or null. */
+async function fetchAuthUser(token) {
+  const baseUrl = getSupabaseUrl();
+  const apiKey = getSupabaseServiceKey();
+  if (!baseUrl || !apiKey) throw new Error('Supabase auth is not configured');
+  const res = await fetch(`${baseUrl.replace(/\/$/, '')}/auth/v1/user`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}`, apikey: apiKey },
+  });
+  if (!res.ok) return null;
+  const data = await res.json().catch(() => null);
+  if (!data || !data.id) return null;
+  return data;
+}
+
+/** Fetches the caller's profile row from Supabase, keyed by the authenticated user id. */
+async function fetchProfile(userId) {
+  const baseUrl = getSupabaseUrl();
+  const apiKey = getSupabaseServiceKey();
+  if (!baseUrl || !apiKey) throw new Error('Supabase configuration is missing');
+  const table = getProfileTable();
+  const url = `${baseUrl.replace(/\/$/, '')}/rest/v1/${encodeURIComponent(table)}?id=eq.${encodeURIComponent(userId)}&select=*`;
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { apikey: apiKey, Authorization: `Bearer ${apiKey}` },
+  });
+  if (!res.ok) throw new Error(`Profile lookup failed: ${res.status}`);
+  const data = await res.json().catch(() => null);
+  return pickEntityRecord(data);
+}
+
+function isProfileVerified(profile) {
+  if (!profile) return false;
+  return profile.me_profile_status === 'verified' || Boolean(profile.passport_completed_at);
+}
 
 const SEAT_ID_REGEX = /^TUJ-[A-Z2-9]{6}$/;
 const SEAT_STATUSES = new Set(['pending', 'approved', 'opened', 'denied']);
@@ -152,7 +201,28 @@ exports.handler = async function handler(event) {
     };
   }
 
+  if (isMaintenanceMode()) {
+    return jsonResponse(503, { gate_status: 'closed', seat_status: 'unknown', seat_status_meta: seatStatusMetadata('unknown'), error: 'Service is in maintenance mode' });
+  }
+
   if ((event.httpMethod || '').toUpperCase() !== 'GET') return jsonResponse(405, { gate_status: 'closed', seat_status: 'unknown', seat_status_meta: seatStatusMetadata('unknown'), error: 'Method not allowed' });
+
+  // ── Server-side gate enforcement: Bearer auth is optional for public
+  // status, but when present it must be valid. Anonymous callers keep the
+  // exact public payload shape below (no profile_gate_status field).
+  const bearerToken = extractBearerToken(event.headers);
+  let authUser = null;
+  if (bearerToken) {
+    try {
+      authUser = await fetchAuthUser(bearerToken);
+    } catch (err) {
+      console.error('[seat-status] Auth lookup error:', err && err.message ? err.message : 'unknown');
+      authUser = null;
+    }
+    if (!authUser || !authUser.id) {
+      return jsonResponse(401, { ok: false, error: 'Invalid or expired token', code: 'INVALID_TOKEN' });
+    }
+  }
 
   try {
     const supabase = getSupabaseClient();
@@ -230,6 +300,20 @@ exports.handler = async function handler(event) {
     data.seat_status = seat_status;
     data.seat_status_meta = seatStatusMetadata(seat_status);
     data.registry_synced = !!registry;
+
+    // ── 6. Server-side gate enforcement: profile_gate_status ───────────────
+    // Only added when a valid Bearer token was supplied; anonymous callers
+    // get the exact public payload shape above, unchanged.
+    if (authUser) {
+      let profile = null;
+      try {
+        profile = await fetchProfile(authUser.id);
+      } catch (err) {
+        console.error('[seat-status] Profile lookup error:', err && err.message ? err.message : 'unknown');
+        profile = null;
+      }
+      data.profile_gate_status = isProfileVerified(profile) ? 'verified' : 'unverified';
+    }
 
     return {
       ...jsonResponse(200, data, { 'Cache-Control': 'no-cache' }),
