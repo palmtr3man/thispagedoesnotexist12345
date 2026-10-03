@@ -1,17 +1,1 @@
-:root {
-  /* Wreath Signal: light neutral canvas, charcoal text, evergreen primary
-     accent/CTA color, restrained gold reserved for small highlight details. */
-  --wreath-bg: #F7F5F0;
-  --wreath-text: #262B27;
-  --wreath-accent: #1E5631;
-  --wreath-accent-deep: #16432A;
-  --wreath-gold: #7A5E18;
-}
-body {
-  background-color: var(--wreath-bg);
-  color: var(--wreath-text);
-}
-.wreath-button {
-  border: 2px solid var(--wreath-accent);
-  box-shadow: 0 0 10px rgba(30, 86, 49, 0.25);
-}
+@import url('./theme/wreath-signal-tokens.css');
