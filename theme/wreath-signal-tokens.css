@@ -1,0 +1,11 @@
+:root {
+  --wreath-canvas: #F7F5F0;
+  --wreath-panel: #FFFFFF;
+  --wreath-text: #262B27;
+  --wreath-muted: #55594F;
+  --wreath-evergreen: #1E5631;
+  --wreath-evergreen-deep: #16432A;
+  --wreath-gold: #7A5E18;
+}
+
+/* Gold is decorative only; never use it for text, controls, or status meaning. */

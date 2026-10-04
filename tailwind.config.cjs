@@ -1,5 +1,8 @@
 /**
- * Tailwind design tokens for the TUJ black-glass / neon aesthetic.
+ * Tailwind design tokens for the TUJ "Wreath Signal" aesthetic:
+ * evergreen accent on a light neutral canvas, charcoal text, restrained
+ * gold reserved for small highlight details only (not a full-bleed
+ * gradient).
  *
  * The current production shell is plain HTML/CSS, but this config keeps the
  * palette and shadows aligned if a Tailwind build is introduced or resumed.
@@ -10,26 +13,29 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        glass: {
-          950: '#04070b',
-          900: '#071017',
-          850: '#0c1620',
-          800: '#101c2b',
+        canvas: {
+          950: '#262B27',
+          900: '#4B504A',
+          100: '#FBF9F4',
+          50: '#F7F5F0',
         },
-        neon: {
-          cyan: '#00d9ff',
-          blue: '#7c9fff',
-          lime: '#b6ff3b',
-          pink: '#ff5fd7',
+        evergreen: {
+          deep: '#16432A',
+          DEFAULT: '#1E5631',
+          soft: '#2F6B45',
+        },
+        gold: {
+          DEFAULT: '#7A5E18',
+          soft: '#9C7A1E',
         },
       },
       boxShadow: {
-        'glass-soft': '0 24px 70px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255,255,255,0.04) inset',
-        'glass-neon': '0 0 0 1px rgba(0,217,255,0.22), 0 0 24px rgba(0,217,255,0.14)',
+        'glass-soft': '0 24px 70px rgba(38, 43, 39, 0.12), 0 0 0 1px rgba(255,255,255,0.5) inset',
+        'glass-evergreen': '0 0 0 1px rgba(30,86,49,0.22), 0 0 24px rgba(30,86,49,0.14)',
       },
       backgroundImage: {
-        'glass-panel': 'linear-gradient(180deg, rgba(12,20,34,0.96), rgba(7,12,20,0.98))',
-        'glass-radial': 'radial-gradient(circle at top, rgba(0,217,255,0.16), transparent 60%)',
+        'glass-panel': 'linear-gradient(180deg, rgba(255,255,255,0.92), rgba(250,248,243,0.96))',
+        'glass-radial': 'radial-gradient(circle at top, rgba(30,86,49,0.1), transparent 60%)',
       },
     },
   },

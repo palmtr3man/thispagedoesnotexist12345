@@ -13,13 +13,18 @@
     ACTIVE_FLIGHT_CODE: 'FL051126',
     LEGACY_FLIGHT_CODES: [],
     PALETTE: {
-      background: '#0A0A0A',
-      surface: '#0f1117',
-      accent: '#00D9FF',
-      accentSoft: 'rgba(0, 217, 255, 0.16)',
-      border: 'rgba(0, 217, 255, 0.18)',
-      text: '#effffb',
-      muted: 'rgba(239, 255, 251, 0.72)'
+      // Wreath Signal: evergreen accent on a light neutral canvas, charcoal
+      // text, restrained gold reserved for small highlight details only.
+      background: '#F7F5F0',
+      surface: '#FFFFFF',
+      accent: '#1E5631',
+      accentDeep: '#16432A',
+      accentSoft: 'rgba(30, 86, 49, 0.12)',
+      gold: '#7A5E18',
+      goldSoft: 'rgba(122, 94, 24, 0.14)',
+      border: 'rgba(30, 86, 49, 0.28)',
+      text: '#262B27',
+      muted: '#55594F'
     }
   };
 }));
