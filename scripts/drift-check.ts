@@ -1,5 +1,5 @@
-import { InfisicalSDK } from "@infisical/sdk";
 import { pathToFileURL } from "node:url";
+import { InfisicalRestClient } from "./infisical-rest.js";
 import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
 
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
@@ -25,10 +25,10 @@ export function isKeyPresent(key: string, present: Set<string>): boolean {
 }
 
 async function fetchInfisicalKeys(token: string): Promise<Set<string>> {
-  const client = new InfisicalSDK({ siteUrl: INFISICAL_SITE_URL });
-  await client.auth().accessToken(token);
+  const client = new InfisicalRestClient(INFISICAL_SITE_URL);
+  client.useAccessToken(token);
 
-  const response = await client.secrets().listSecrets({
+  const response = await client.listSecrets({
     projectId: INFISICAL_PROJECT_ID,
     environment: INFISICAL_ENV,
     secretPath: INFISICAL_PATH,

@@ -1,5 +1,5 @@
-import { InfisicalSDK } from "@infisical/sdk";
 import { pathToFileURL } from "node:url";
+import { InfisicalRestClient } from "./infisical-rest.js";
 import { ALIAS_GROUPS, P0_KEYS, P1_KEYS } from "./parity-manifest.js";
 
 const INFISICAL_PROJECT_ID = "6c7646e9-04dd-484a-a5d1-612b9582da15";
@@ -38,9 +38,9 @@ function resolveAlias(key: string, keys: Set<string>): string | null {
 }
 
 async function fetchInfisicalMap(
-  client: InfisicalSDK
+  client: InfisicalRestClient
 ): Promise<Map<string, string>> {
-  const response = await client.secrets().listSecrets({
+  const response = await client.listSecrets({
     projectId: INFISICAL_PROJECT_ID,
     environment: INFISICAL_ENV,
     secretPath: INFISICAL_PATH,
@@ -91,13 +91,13 @@ function netlifyValue(entry: NetlifyEnvVar | undefined): string | undefined {
 }
 
 async function upsertInfisicalSecret(
-  client: InfisicalSDK,
+  client: InfisicalRestClient,
   key: string,
   value: string,
   existing: Set<string>
 ): Promise<void> {
   if (existing.has(key)) {
-    await client.secrets().updateSecret(key, {
+    await client.updateSecret(key, {
       projectId: INFISICAL_PROJECT_ID,
       environment: INFISICAL_ENV,
       secretPath: INFISICAL_PATH,
@@ -107,7 +107,7 @@ async function upsertInfisicalSecret(
     return;
   }
 
-  await client.secrets().createSecret(key, {
+  await client.createSecret(key, {
     projectId: INFISICAL_PROJECT_ID,
     environment: INFISICAL_ENV,
     secretPath: INFISICAL_PATH,
@@ -233,11 +233,8 @@ async function main(): Promise<void> {
   if (!netlifyAuthToken) throw new Error("NETLIFY_AUTH_TOKEN is not set");
   if (!netlifySiteId) throw new Error("NETLIFY_SITE_ID is not set");
 
-  const client = new InfisicalSDK({ siteUrl: INFISICAL_SITE_URL });
-  await client.auth().universalAuth.login({
-    clientId: clientId,
-    clientSecret: clientSecret,
-  });
+  const client = new InfisicalRestClient(INFISICAL_SITE_URL);
+  await client.loginUniversalAuth(clientId, clientSecret);
 
   const infisicalMap = await fetchInfisicalMap(client);
   const infisicalKeys = new Set(infisicalMap.keys());
